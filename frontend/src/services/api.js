@@ -47,6 +47,11 @@ class ApiService {
     return this.request('/stats');
   }
 
+  // Get mitzvah of the day
+  async getMitzvahOfTheDay() {
+    return this.request('/mitzvah-of-the-day');
+  }
+
   // Initialize database (development/admin use)
   async initializeData() {
     return this.request('/initialize', { method: 'POST' });
