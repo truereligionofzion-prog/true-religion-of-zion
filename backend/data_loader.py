@@ -232,13 +232,7 @@ MITZVOT_DATA = [
         "sourceVerse": "Leviticus 19:32 — \"Thou shalt rise up before the hoary head, and honour the face of the old man…\"",
         "scholarlyNote": "Rabbinic interpretation links \"elders\" to Torah teachers."
     },
-    {
-        "number": 11,
-        "title": "To cling to those who know Him",
-        "traditionalWording": "Cleave to scholars and the righteous.",
-        "sourceVerse": "Deuteronomy 10:20 — \"…and to him shalt thou cleave.\"",
-        "scholarlyNote": "Original text refers to cleaving to God, tradition applies to righteous people."
-    },
+
     {
         "number": 12,
         "title": "To recite the Shema twice daily",
