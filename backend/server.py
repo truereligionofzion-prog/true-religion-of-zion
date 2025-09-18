@@ -381,18 +381,28 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
                 category_doc = await categories_collection.find_one({"slug": mitzvah["category"]})
                 correct_category = category_doc["name"] if category_doc else mitzvah["category"]
                 
-                # Get wrong categories
+                # Get unique wrong categories
                 wrong_categories = []
                 for wrong_mitzvah in wrong_answers:
                     wrong_cat_doc = await categories_collection.find_one({"slug": wrong_mitzvah["category"]})
-                    wrong_categories.append(wrong_cat_doc["name"] if wrong_cat_doc else wrong_mitzvah["category"])
+                    wrong_cat_name = wrong_cat_doc["name"] if wrong_cat_doc else wrong_mitzvah["category"]
+                    if wrong_cat_name != correct_category and wrong_cat_name not in wrong_categories:
+                        wrong_categories.append(wrong_cat_name)
+                
+                # Fill with more categories if needed
+                all_categories = await categories_collection.find({}).to_list(length=None)
+                while len(wrong_categories) < 3:
+                    random_cat = random.choice(all_categories)
+                    cat_name = random_cat["name"]
+                    if cat_name != correct_category and cat_name not in wrong_categories:
+                        wrong_categories.append(cat_name)
                 
                 question = {
                     "id": len(quiz_questions) + 1,
                     "type": "multiple_choice", 
                     "question": f"Which category does this mitzvah belong to: \"{mitzvah['title']}\"?",
                     "correct_answer": correct_category,
-                    "options": [correct_category] + wrong_categories,
+                    "options": [correct_category] + wrong_categories[:3],
                     "explanation": f"This mitzvah belongs to {correct_category} because: {mitzvah['scholarlyNote'][:100]}..."
                 }
             
@@ -405,14 +415,27 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
                 }
                 
                 correct_status = status_labels.get(mitzvah["status"], mitzvah["status"])
-                wrong_statuses = [status_labels.get(m["status"], m["status"]) for m in wrong_answers]
+                
+                # Get unique wrong statuses
+                wrong_statuses = []
+                for m in wrong_answers:
+                    wrong_status = status_labels.get(m["status"], m["status"])
+                    if wrong_status != correct_status and wrong_status not in wrong_statuses:
+                        wrong_statuses.append(wrong_status)
+                
+                # Fill with remaining status types if needed
+                all_status_labels = list(status_labels.values())
+                while len(wrong_statuses) < 3:
+                    random_status = random.choice(all_status_labels)
+                    if random_status != correct_status and random_status not in wrong_statuses:
+                        wrong_statuses.append(random_status)
                 
                 question = {
                     "id": len(quiz_questions) + 1,
                     "type": "multiple_choice",
                     "question": f"What is the origin status of: \"{mitzvah['title']}\"?",
                     "correct_answer": correct_status,
-                    "options": [correct_status] + wrong_statuses,
+                    "options": [correct_status] + wrong_statuses[:3],
                     "explanation": f"This mitzvah is {correct_status}. {mitzvah['scholarlyNote'][:100]}..."
                 }
             
