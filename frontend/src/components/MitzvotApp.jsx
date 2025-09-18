@@ -15,6 +15,7 @@ const MitzvotApp = () => {
   const [mitzvot, setMitzvot] = useState([]);
   const [categories, setCategories] = useState([]);
   const [stats, setStats] = useState({});
+  const [mitzvahOfTheDay, setMitzvahOfTheDay] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
