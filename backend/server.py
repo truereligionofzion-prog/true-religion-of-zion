@@ -183,7 +183,13 @@ async def get_mitzvot(
         cursor = mitzvot_collection.find(query).sort("number", 1).skip(skip).limit(limit)
         mitzvot_data = await cursor.to_list(length=limit)
         
-        mitzvot = [Mitzvah(**m) for m in mitzvot_data]
+        # Convert MongoDB documents to Pydantic models
+        mitzvot = []
+        for m in mitzvot_data:
+            # Remove MongoDB _id field
+            if '_id' in m:
+                del m['_id']
+            mitzvot.append(Mitzvah(**m))
         
         # Get filter options
         categories = await categories_collection.find().sort("order", 1).to_list(length=None)
