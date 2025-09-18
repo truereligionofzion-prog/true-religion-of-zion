@@ -606,7 +606,7 @@ const MitzvotApp = () => {
             </Tabs>
 
             {/* Pagination */}
-            {renderPagination()}
+            <Pagination />
           </TabsContent>
 
           {/* Quiz Tab Content */}
