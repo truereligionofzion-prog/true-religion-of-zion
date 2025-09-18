@@ -226,7 +226,7 @@ MITZVOT_DATA = [
         "scholarlyNote": "This fundamental obligation encompasses both personal study and transmission of Torah knowledge to future generations."
     },
     {
-        "number": 10,
+        "number": 11,
         "title": "To honor those who teach Torah",
         "traditionalWording": "Honor your teachers and elders in Torah.",
         "sourceVerse": "Leviticus 19:32 — \"Thou shalt rise up before the hoary head, and honour the face of the old man…\"",
