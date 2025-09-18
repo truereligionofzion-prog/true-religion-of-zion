@@ -289,6 +289,71 @@ const MitzvotApp = () => {
     );
   };
 
+  // Quiz Functions
+  const startQuiz = async (category = 'all') => {
+    try {
+      setLoading(true);
+      const quizResponse = await apiService.getQuizQuestions(category, 5);
+      setQuizData(quizResponse);
+      setCurrentQuestionIndex(0);
+      setSelectedAnswer('');
+      setShowResult(false);
+      setScore(0);
+      setActiveTab('quiz');
+      
+      toast({
+        title: "Quiz Started!",
+        description: `Starting quiz with ${quizResponse.questions.length} questions.`,
+      });
+    } catch (error) {
+      console.error('Error starting quiz:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start quiz. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitAnswer = () => {
+    if (!selectedAnswer || !quizData) return;
+    
+    const currentQuestion = quizData.questions[currentQuestionIndex];
+    const isCorrect = selectedAnswer === currentQuestion.correct_answer;
+    
+    if (isCorrect) {
+      setScore(score + 1);
+    }
+    
+    setShowResult(true);
+    
+    setTimeout(() => {
+      if (currentQuestionIndex < quizData.questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setSelectedAnswer('');
+        setShowResult(false);
+      } else {
+        // Quiz completed
+        const finalScore = isCorrect ? score + 1 : score;
+        toast({
+          title: "Quiz Completed!",
+          description: `Your score: ${finalScore}/${quizData.questions.length}`,
+        });
+      }
+    }, 2000);
+  };
+
+  const resetQuiz = () => {
+    setQuizData(null);
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer('');
+    setShowResult(false);
+    setScore(0);
+    setActiveTab('explore');
+  };
+
   if (loading && mitzvot.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
