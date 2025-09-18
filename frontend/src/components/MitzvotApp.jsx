@@ -1,42 +1,119 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Filter, BookOpen, Tag, Info } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Search, Filter, BookOpen, Tag, Info, Loader } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { allMitzvot, categories, statusTypes } from '../data/mockMitzvot';
+import { useToast } from '../hooks/use-toast';
+import { Toaster } from './ui/toaster';
+import apiService from '../services/api';
 
 const MitzvotApp = () => {
+  // State management
+  const [mitzvot, setMitzvot] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [stats, setStats] = useState({});
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedBook, setSelectedBook] = useState('all');
   const [viewMode, setViewMode] = useState('cards');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filters, setFilters] = useState({});
 
-  // Get unique books for filter
-  const books = useMemo(() => {
-    const uniqueBooks = [...new Set(allMitzvot.map(m => m.book))].sort();
-    return uniqueBooks;
+  const { toast } = useToast();
+
+  // Status types for display
+  const statusTypes = [
+    { value: 'direct', label: 'Direct in Bible', color: 'bg-green-100 text-green-800' },
+    { value: 'indirect', label: 'Indirect in Bible', color: 'bg-blue-100 text-blue-800' },
+    { value: 'rabbinic', label: 'Rabbinic Origin', color: 'bg-purple-100 text-purple-800' },
+    { value: 'traditional', label: 'Traditional', color: 'bg-orange-100 text-orange-800' }
+  ];
+
+  // Load initial data
+  useEffect(() => {
+    loadInitialData();
   }, []);
 
-  // Filter mitzvot based on search and filters
-  const filteredMitzvot = useMemo(() => {
-    return allMitzvot.filter(mitzvah => {
-      const matchesSearch = searchTerm === '' || 
-        mitzvah.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        mitzvah.traditionalWording.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        mitzvah.sourceVerse.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        mitzvah.keywords.some(keyword => keyword.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Load mitzvot when filters change
+  useEffect(() => {
+    if (categories.length > 0) {
+      loadMitzvot();
+    }
+  }, [searchTerm, selectedCategory, selectedStatus, selectedBook, currentPage]);
 
-      const matchesCategory = selectedCategory === 'all' || mitzvah.category === selectedCategory;
-      const matchesStatus = selectedStatus === 'all' || mitzvah.status === selectedStatus;
-      const matchesBook = selectedBook === 'all' || mitzvah.book === selectedBook;
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      
+      // Load stats and categories in parallel
+      const [statsResponse, categoriesResponse] = await Promise.all([
+        apiService.getStats(),
+        apiService.getCategories()
+      ]);
 
-      return matchesSearch && matchesCategory && matchesStatus && matchesBook;
-    });
-  }, [searchTerm, selectedCategory, selectedStatus, selectedBook]);
+      setStats(statsResponse);
+      setCategories(categoriesResponse);
+      
+    } catch (error) {
+      console.error('Error loading initial data:', error);
+      toast({
+        title: "Error Loading Data",
+        description: "Failed to load initial data. Please refresh the page.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const loadMitzvot = async () => {
+    try {
+      setLoading(true);
+
+      const params = {
+        search: searchTerm,
+        category: selectedCategory,
+        status: selectedStatus,
+        book: selectedBook,
+        page: currentPage,
+        limit: 20
+      };
+
+      const response = await apiService.getMitzvot(params);
+      
+      setMitzvot(response.mitzvot);
+      setTotalPages(response.totalPages);
+      setFilters(response.filters);
+      
+    } catch (error) {
+      console.error('Error loading mitzvot:', error);
+      toast({
+        title: "Error Loading Mitzvot",
+        description: "Failed to load mitzvot data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle search with debouncing
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setCurrentPage(1); // Reset to first page on new search
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedStatus, selectedBook]);
 
   const getStatusColor = (status) => {
     const statusType = statusTypes.find(s => s.value === status);
@@ -48,9 +125,14 @@ const MitzvotApp = () => {
     return statusType ? statusType.label : status;
   };
 
-  const getCategoryName = (categoryId) => {
-    const category = categories.find(c => c.id === categoryId);
-    return category ? category.name : categoryId;
+  const getCategoryName = (categorySlug) => {
+    const category = categories.find(c => c.slug === categorySlug);
+    return category ? category.name : categorySlug;
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const MitzvahCard = ({ mitzvah }) => (
@@ -129,6 +211,83 @@ const MitzvotApp = () => {
     </tr>
   );
 
+  const Pagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="flex justify-center items-center space-x-2 mt-8">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </Button>
+        
+        {startPage > 1 && (
+          <>
+            <Button variant="outline" size="sm" onClick={() => handlePageChange(1)}>1</Button>
+            {startPage > 2 && <span className="px-2">...</span>}
+          </>
+        )}
+        
+        {pages.map(page => (
+          <Button
+            key={page}
+            variant={currentPage === page ? "default" : "outline"}
+            size="sm"
+            onClick={() => handlePageChange(page)}
+          >
+            {page}
+          </Button>
+        ))}
+        
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span className="px-2">...</span>}
+            <Button variant="outline" size="sm" onClick={() => handlePageChange(totalPages)}>
+              {totalPages}
+            </Button>
+          </>
+        )}
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </Button>
+      </div>
+    );
+  };
+
+  if (loading && mitzvot.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Loading the 613 Laws of the Bible...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8">
@@ -148,28 +307,26 @@ const MitzvotApp = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <Card className="text-center">
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-blue-600">{allMitzvot.length}</div>
+              <div className="text-2xl font-bold text-blue-600">{stats.totalMitzvot || 0}</div>
               <div className="text-sm text-gray-600">Total Mitzvot</div>
             </CardContent>
           </Card>
           <Card className="text-center">
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-green-600">
-                {allMitzvot.filter(m => m.status === 'direct').length}
-              </div>
+              <div className="text-2xl font-bold text-green-600">{stats.directBiblical || 0}</div>
               <div className="text-sm text-gray-600">Direct Biblical</div>
             </CardContent>
           </Card>
           <Card className="text-center">
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-purple-600">{categories.length}</div>
+              <div className="text-2xl font-bold text-purple-600">{stats.categoriesCount || 0}</div>
               <div className="text-sm text-gray-600">Categories</div>
             </CardContent>
           </Card>
           <Card className="text-center">
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-orange-600">{filteredMitzvot.length}</div>
-              <div className="text-sm text-gray-600">Filtered Results</div>
+              <div className="text-2xl font-bold text-orange-600">{mitzvot.length}</div>
+              <div className="text-sm text-gray-600">Current Results</div>
             </CardContent>
           </Card>
         </div>
@@ -197,8 +354,8 @@ const MitzvotApp = () => {
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
                   {categories.map(category => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name} ({category.count})
+                    <SelectItem key={category.slug} value={category.slug}>
+                      {category.name} ({category.count || 0})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -224,7 +381,7 @@ const MitzvotApp = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Books</SelectItem>
-                  {books.map(book => (
+                  {(filters.books || []).map(book => (
                     <SelectItem key={book} value={book}>{book}</SelectItem>
                   ))}
                 </SelectContent>
@@ -236,7 +393,14 @@ const MitzvotApp = () => {
         {/* View Mode Toggle */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-gray-900">
-            {filteredMitzvot.length} Mitzvot Found
+            {loading ? (
+              <span className="flex items-center">
+                <Loader className="w-5 h-5 animate-spin mr-2" />
+                Loading...
+              </span>
+            ) : (
+              `${mitzvot.length} of ${stats.totalMitzvot || 613} Mitzvot`
+            )}
           </h2>
           <Tabs value={viewMode} onValueChange={setViewMode}>
             <TabsList>
@@ -250,7 +414,7 @@ const MitzvotApp = () => {
         <Tabs value={viewMode}>
           <TabsContent value="cards">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMitzvot.map(mitzvah => (
+              {mitzvot.map(mitzvah => (
                 <MitzvahCard key={mitzvah.id} mitzvah={mitzvah} />
               ))}
             </div>
@@ -271,7 +435,7 @@ const MitzvotApp = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredMitzvot.map(mitzvah => (
+                      {mitzvot.map(mitzvah => (
                         <MitzvahTableRow key={mitzvah.id} mitzvah={mitzvah} />
                       ))}
                     </tbody>
@@ -282,7 +446,8 @@ const MitzvotApp = () => {
           </TabsContent>
         </Tabs>
 
-        {filteredMitzvot.length === 0 && (
+        {/* No Results */}
+        {!loading && mitzvot.length === 0 && (
           <Card className="text-center py-12">
             <CardContent>
               <div className="text-gray-500">
@@ -293,7 +458,12 @@ const MitzvotApp = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Pagination */}
+        <Pagination />
       </div>
+      
+      <Toaster />
     </div>
   );
 };
