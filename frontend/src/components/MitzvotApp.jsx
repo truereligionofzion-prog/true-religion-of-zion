@@ -414,6 +414,349 @@ const MitzvotApp = () => {
           </div>
         )}
 
+        {/* Main Navigation Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="explore">Explore Mitzvot</TabsTrigger>
+            <TabsTrigger value="quiz">Take Quiz</TabsTrigger>
+          </TabsList>
+
+          {/* Explore Tab Content */}
+          <TabsContent value="explore">
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <Card className="text-center">
+                <CardContent className="pt-4">
+                  <div className="text-2xl font-bold text-blue-600">{stats.totalMitzvot || 0}</div>
+                  <div className="text-sm text-gray-600">Total Mitzvot</div>
+                </CardContent>
+              </Card>
+              <Card className="text-center">
+                <CardContent className="pt-4">
+                  <div className="text-2xl font-bold text-green-600">{stats.directBiblical || 0}</div>
+                  <div className="text-sm text-gray-600">Direct Biblical</div>
+                </CardContent>
+              </Card>
+              <Card className="text-center">
+                <CardContent className="pt-4">
+                  <div className="text-2xl font-bold text-purple-600">{stats.categoriesCount || 0}</div>
+                  <div className="text-sm text-gray-600">Categories</div>
+                </CardContent>
+              </Card>
+              <Card className="text-center">
+                <CardContent className="pt-4">
+                  <div className="text-2xl font-bold text-orange-600">{mitzvot.length}</div>
+                  <div className="text-sm text-gray-600">Current Results</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Search and Filters */}
+            <Card className="mb-8">
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <div className="lg:col-span-2">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        placeholder="Search mitzvot, keywords, or verses..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.slug}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Origins" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Origins</SelectItem>
+                      {statusTypes.map((status) => (
+                        <SelectItem key={status.value} value={status.value}>
+                          {status.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={selectedBook} onValueChange={setSelectedBook}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Books" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Books</SelectItem>
+                      {filters.books && filters.books.map((book) => (
+                        <SelectItem key={book} value={book}>
+                          {book}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* View Mode Tabs */}
+            <Tabs value={viewMode} onValueChange={setViewMode} className="w-full">
+              <TabsList>
+                <TabsTrigger value="cards">Card View</TabsTrigger>
+                <TabsTrigger value="table">Table View</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="cards" className="mt-6">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {mitzvot.map((mitzvah) => (
+                    <Card key={mitzvah.id} className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <CardTitle className="text-lg leading-tight">
+                            <span className="text-blue-600 font-bold">#{mitzvah.number}</span> {mitzvah.title}
+                          </CardTitle>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-700 mb-1">Traditional Wording:</p>
+                            <p className="text-sm text-gray-600 italic">"{mitzvah.traditionalWording}"</p>
+                          </div>
+                          
+                          <div>
+                            <p className="text-sm font-medium text-gray-700 mb-1">Source:</p>
+                            <p className="text-sm text-gray-600">{mitzvah.sourceVerse}</p>
+                          </div>
+                          
+                          <div>
+                            <p className="text-sm font-medium text-gray-700 mb-1">Scholarly Note:</p>
+                            <p className="text-sm text-gray-600">{mitzvah.scholarlyNote}</p>
+                          </div>
+                          
+                          <div className="flex flex-wrap gap-2 pt-2">
+                            <Badge className={getStatusColor(mitzvah.status)}>
+                              {getStatusLabel(mitzvah.status)}
+                            </Badge>
+                            <Badge variant="outline">
+                              {getCategoryName(mitzvah.category)}
+                            </Badge>
+                            <Badge variant="secondary">
+                              {mitzvah.book}
+                            </Badge>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="table" className="mt-6">
+                <Card>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="border-b bg-gray-50">
+                          <tr>
+                            <th className="text-left p-4 font-medium">#</th>
+                            <th className="text-left p-4 font-medium">Title</th>
+                            <th className="text-left p-4 font-medium">Traditional Wording</th>
+                            <th className="text-left p-4 font-medium">Source</th>
+                            <th className="text-left p-4 font-medium">Status</th>
+                            <th className="text-left p-4 font-medium">Category</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {mitzvot.map((mitzvah) => (
+                            <tr key={mitzvah.id} className="border-b hover:bg-gray-50">
+                              <td className="p-4 text-blue-600 font-bold">#{mitzvah.number}</td>
+                              <td className="p-4 font-medium">{mitzvah.title}</td>
+                              <td className="p-4 text-gray-600 italic">"{mitzvah.traditionalWording}"</td>
+                              <td className="p-4 text-sm text-gray-600">{mitzvah.sourceVerse}</td>
+                              <td className="p-4">
+                                <Badge className={getStatusColor(mitzvah.status)}>
+                                  {getStatusLabel(mitzvah.status)}
+                                </Badge>
+                              </td>
+                              <td className="p-4">
+                                <Badge variant="outline">{getCategoryName(mitzvah.category)}</Badge>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+
+            {/* Pagination */}
+            {renderPagination()}
+          </TabsContent>
+
+          {/* Quiz Tab Content */}
+          <TabsContent value="quiz">
+            {!quizData ? (
+              <div className="text-center py-12">
+                <Card className="max-w-2xl mx-auto">
+                  <CardHeader>
+                    <CardTitle className="text-2xl">🧠 Test Your Knowledge</CardTitle>
+                    <p className="text-gray-600">
+                      Challenge yourself with questions about the 613 mitzvot. Choose a category or test your overall knowledge!
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Button onClick={() => startQuiz('all')} className="h-16">
+                        <div className="text-center">
+                          <div className="font-semibold">All Categories</div>
+                          <div className="text-sm opacity-75">Mixed questions from all 613 mitzvot</div>
+                        </div>
+                      </Button>
+                      {categories.slice(0, 6).map((category) => (
+                        <Button
+                          key={category.id}
+                          variant="outline"
+                          onClick={() => startQuiz(category.slug)}
+                          className="h-16"
+                        >
+                          <div className="text-center">
+                            <div className="font-semibold">{category.name}</div>
+                            <div className="text-sm opacity-75">Focus on this category</div>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="max-w-4xl mx-auto">
+                {currentQuestionIndex < quizData.questions.length ? (
+                  <Card>
+                    <CardHeader>
+                      <div className="flex justify-between items-center">
+                        <CardTitle>
+                          Question {currentQuestionIndex + 1} of {quizData.questions.length}
+                        </CardTitle>
+                        <Badge variant="outline">
+                          Score: {score}/{currentQuestionIndex}
+                        </Badge>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${((currentQuestionIndex + 1) / quizData.questions.length) * 100}%` }}
+                        />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        <h3 className="text-xl font-semibold">
+                          {quizData.questions[currentQuestionIndex].question}
+                        </h3>
+                        
+                        <div className="grid gap-3">
+                          {quizData.questions[currentQuestionIndex].options.map((option, index) => (
+                            <Button
+                              key={index}
+                              variant={selectedAnswer === option ? "default" : "outline"}
+                              className="text-left h-auto p-4 justify-start"
+                              onClick={() => setSelectedAnswer(option)}
+                              disabled={showResult}
+                            >
+                              <div className="w-6 h-6 rounded-full border-2 border-current mr-3 flex items-center justify-center">
+                                {String.fromCharCode(65 + index)}
+                              </div>
+                              {option}
+                            </Button>
+                          ))}
+                        </div>
+
+                        {showResult && (
+                          <div className={`p-4 rounded-lg ${
+                            selectedAnswer === quizData.questions[currentQuestionIndex].correct_answer
+                              ? 'bg-green-100 border border-green-300'
+                              : 'bg-red-100 border border-red-300'
+                          }`}>
+                            <p className={`font-semibold ${
+                              selectedAnswer === quizData.questions[currentQuestionIndex].correct_answer
+                                ? 'text-green-800'
+                                : 'text-red-800'
+                            }`}>
+                              {selectedAnswer === quizData.questions[currentQuestionIndex].correct_answer
+                                ? '✅ Correct!'
+                                : '❌ Incorrect'
+                              }
+                            </p>
+                            <p className="text-sm mt-2 text-gray-700">
+                              {quizData.questions[currentQuestionIndex].explanation}
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="flex justify-between">
+                          <Button variant="outline" onClick={resetQuiz}>
+                            Exit Quiz
+                          </Button>
+                          <Button 
+                            onClick={submitAnswer} 
+                            disabled={!selectedAnswer || showResult}
+                          >
+                            {currentQuestionIndex === quizData.questions.length - 1 ? 'Finish Quiz' : 'Next Question'}
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card className="text-center">
+                    <CardHeader>
+                      <CardTitle className="text-2xl">🎉 Quiz Complete!</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="text-4xl font-bold text-blue-600">
+                          {score}/{quizData.questions.length}
+                        </div>
+                        <p className="text-lg">
+                          {score === quizData.questions.length ? 'Perfect Score! 🏆' :
+                           score >= quizData.questions.length * 0.8 ? 'Excellent Work! 👏' :
+                           score >= quizData.questions.length * 0.6 ? 'Good Job! 👍' :
+                           'Keep Studying! 📚'}
+                        </p>
+                        <div className="flex gap-4 justify-center">
+                          <Button onClick={() => startQuiz(quizData.category)}>
+                            Try Again
+                          </Button>
+                          <Button variant="outline" onClick={resetQuiz}>
+                            Back to Explore
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <Card className="text-center">
