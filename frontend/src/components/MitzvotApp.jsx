@@ -502,9 +502,11 @@ const MitzvotApp = () => {
 
         {/* Main Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="explore">Explore Mitzvot</TabsTrigger>
-            <TabsTrigger value="quiz">Take Quiz</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 mb-8">
+            <TabsTrigger value="explore">Explore</TabsTrigger>
+            <TabsTrigger value="quiz">Quiz</TabsTrigger>
+            <TabsTrigger value="flashcards">Flashcards</TabsTrigger>
+            <TabsTrigger value="progress">Progress</TabsTrigger>
           </TabsList>
 
           {/* Explore Tab Content */}
