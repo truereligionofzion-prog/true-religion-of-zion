@@ -25,6 +25,12 @@ const MitzvotApp = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({});
+  const [activeTab, setActiveTab] = useState('explore');
+  const [quizData, setQuizData] = useState(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState('');
+  const [showResult, setShowResult] = useState(false);
+  const [score, setScore] = useState(0);
 
   const { toast } = useToast();
 
