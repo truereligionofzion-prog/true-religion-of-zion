@@ -248,12 +248,16 @@ async def get_mitzvah(mitzvah_id: str):
 async def get_categories_endpoint():
     """Get all categories"""
     try:
-        categories = await categories_collection.find().sort("order", 1).to_list(length=None)
+        categories_data = await categories_collection.find().sort("order", 1).to_list(length=None)
         
-        # Add counts
-        for category in categories:
+        # Add counts and clean MongoDB fields
+        categories = []
+        for category in categories_data:
+            if '_id' in category:
+                del category['_id']
             count = await mitzvot_collection.count_documents({"category": category["slug"]})
             category["count"] = count
+            categories.append(category)
         
         return categories
         
