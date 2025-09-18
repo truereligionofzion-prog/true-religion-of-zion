@@ -192,7 +192,12 @@ async def get_mitzvot(
             mitzvot.append(Mitzvah(**m))
         
         # Get filter options
-        categories = await categories_collection.find().sort("order", 1).to_list(length=None)
+        categories_data = await categories_collection.find().sort("order", 1).to_list(length=None)
+        categories = []
+        for cat in categories_data:
+            if '_id' in cat:
+                del cat['_id']
+            categories.append(cat)
         books = await mitzvot_collection.distinct("book")
         books.sort()
         
