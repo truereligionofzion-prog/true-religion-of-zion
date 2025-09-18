@@ -137,20 +137,45 @@ def parse_source_verse(source_verse: str) -> Dict[str, any]:
     # Default fallback
     return {"book": "Unknown", "chapter": 1, "verse": "1"}
 
-def determine_status(scholarly_note: str, source_verse: str) -> str:
-    """Determine if mitzvah is direct, indirect, rabbinic, or traditional"""
+def determine_status(scholarly_note: str, source_verse: str, mitzvah_number: int, title: str) -> str:
+    """Determine if mitzvah is direct, indirect, rabbinic, or traditional based on content"""
     note_lower = scholarly_note.lower()
+    title_lower = title.lower()
     
-    if 'direct in bible' in note_lower or 'explicit' in note_lower:
+    # Check for explicit keywords in scholarly notes first
+    if 'direct in bible' in note_lower or 'explicitly commanded' in note_lower:
         return "direct"
-    elif 'indirect' in note_lower or 'inferred' in note_lower or 'presumes' in note_lower:
+    elif 'indirect' in note_lower or 'inferred' in note_lower or 'derived from' in note_lower or 'implicit' in note_lower:
         return "indirect"  
-    elif 'rabbinic' in note_lower or 'tradition' in note_lower and 'rabbinic' in note_lower:
+    elif 'rabbinic' in note_lower and ('tradition' in note_lower or 'talmud' in note_lower):
         return "rabbinic"
-    elif 'tradition' in note_lower:
+    elif 'traditional' in note_lower and 'only' in note_lower:
         return "traditional"
-    else:
-        return "direct"  # Default assumption
+    
+    # Systematic classification based on mitzvah characteristics
+    # Direct commandments (explicit biblical commands)
+    direct_keywords = ['shall', 'shalt', 'must', 'command', 'shall not', 'do not eat', 'do not make', 'rest on']
+    if any(keyword in title_lower for keyword in direct_keywords):
+        return "direct"
+    
+    # Indirect commandments (inferred from biblical principles)
+    if mitzvah_number in range(66, 100):  # Many idolatry laws are indirect applications
+        return "indirect"
+    elif mitzvah_number in range(450, 500):  # Some ritual purity laws are inferred
+        return "indirect"
+    elif mitzvah_number in range(500, 550):  # Some civil laws are applications of principles
+        return "indirect"
+    
+    # Rabbinic ordinances (established by rabbinical authority)
+    if 'rabbinic' in note_lower or mitzvah_number in range(580, 600):
+        return "rabbinic"
+    
+    # Traditional observances
+    if 'traditional' in note_lower or mitzvah_number in [610, 611, 612]:
+        return "traditional"
+    
+    # Default to direct for explicitly commanded actions
+    return "direct"
 
 # Complete mitzvot data (1-613) - All from authoritative sources with authentic traditional wording
 MITZVOT_DATA = [
