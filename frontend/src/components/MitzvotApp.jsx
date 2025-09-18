@@ -360,6 +360,86 @@ const MitzvotApp = () => {
     setActiveTab('explore');
   };
 
+  // Flashcard Functions
+  const startFlashcards = async () => {
+    try {
+      setLoading(true);
+      const flashcardResponse = await apiService.getFlashcards('user_001', 10);
+      setFlashcards(flashcardResponse.flashcards);
+      setCurrentFlashcardIndex(0);
+      setShowFlashcardAnswer(false);
+      setActiveTab('flashcards');
+      
+      toast({
+        title: "Flashcards Ready!",
+        description: `Starting flashcard review with ${flashcardResponse.flashcards.length} cards.`,
+      });
+    } catch (error) {
+      console.error('Error starting flashcards:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load flashcards. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const reviewFlashcard = async (correct) => {
+    if (!flashcards[currentFlashcardIndex]) return;
+    
+    const flashcard = flashcards[currentFlashcardIndex].flashcard;
+    const difficulty = correct ? Math.min(5, flashcard.difficulty + 1) : Math.max(1, flashcard.difficulty - 1);
+    
+    try {
+      await apiService.reviewFlashcard(flashcard.id, difficulty, correct);
+      
+      // Update progress for the mitzvah
+      const mitzvah = flashcards[currentFlashcardIndex].mitzvah;
+      await apiService.updateMitzvahProgress(mitzvah.id, correct);
+      
+      toast({
+        title: correct ? "Correct! ✅" : "Keep practicing! 📚",
+        description: correct ? "Great job! Moving to next card." : "Don't worry, you'll get it next time!",
+      });
+      
+      // Move to next flashcard
+      setTimeout(() => {
+        if (currentFlashcardIndex < flashcards.length - 1) {
+          setCurrentFlashcardIndex(currentFlashcardIndex + 1);
+          setShowFlashcardAnswer(false);
+        } else {
+          // Finished all flashcards
+          toast({
+            title: "Session Complete! 🎉",
+            description: "Great work! Come back tomorrow for more review.",
+          });
+          setActiveTab('progress');
+          // Reload progress data
+          loadUserProgress();
+        }
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error reviewing flashcard:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save review. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const loadUserProgress = async () => {
+    try {
+      const progressResponse = await apiService.getUserProgress();
+      setUserProgress(progressResponse);
+    } catch (error) {
+      console.error('Error loading progress:', error);
+    }
+  };
+
   if (loading && mitzvot.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
