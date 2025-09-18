@@ -635,7 +635,7 @@ def get_remaining_mitzvot():
             "number": 60,
             "title": "To bring additional offerings on festivals",
             "traditionalWording": "Offer special sacrifices on appointed festivals.",
-            "sourceVerse": "Numbers 28–29 — Detailed festival offerings.",
+            "sourceVerse": "Numbers 28:1 — \"And the LORD spake unto Moses, saying, Command the children of Israel, and say unto them, My offering, and my bread for my sacrifices made by fire, for a sweet savour unto me, shall ye observe to offer unto me in their due season.\"",
             "scholarlyNote": "Additional sacrifices (musaf) beyond daily offerings for festive occasions, expressing heightened joy and devotion during sacred seasons."
         },
         {
