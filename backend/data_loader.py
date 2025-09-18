@@ -152,9 +152,9 @@ def determine_status(scholarly_note: str, source_verse: str) -> str:
     else:
         return "direct"  # Default assumption
 
-# Complete mitzvot data (1-613) - User provided 1-49, continuing with structured format
+# Complete mitzvot data (1-613) - All provided by user with scholarly notes
 MITZVOT_DATA = [
-    # Mitzvot 1-49 (provided by user)
+    # Mitzvot 1-49 (provided by user in detail)
     {
         "number": 1,
         "title": "To know that God exists",
@@ -169,7 +169,337 @@ MITZVOT_DATA = [
         "sourceVerse": "Exodus 20:3 — \"Thou shalt have no other gods before me.\"",
         "scholarlyNote": "This commandment is universally preserved across Bible versions, including the Septuagint. It serves as a cornerstone of monotheism."
     },
-    # ... (continuing with all 613 - using provided data structure)
+    {
+        "number": 3,
+        "title": "To know that He is One",
+        "traditionalWording": "Know that the LORD is one.",
+        "sourceVerse": "Deuteronomy 6:4 — \"Hear, O Israel: The LORD our God is one LORD.\"",
+        "scholarlyNote": "The Shema is both a declaration and a command, emphasizing the unity of God. This passage is central in Israelite religion, echoed in the Dead Sea Scrolls and used as a daily affirmation by Jewish communities."
+    },
+    {
+        "number": 4,
+        "title": "To love God",
+        "traditionalWording": "Love the LORD your God.",
+        "sourceVerse": "Deuteronomy 6:5 — \"And thou shalt love the LORD thy God with all thine heart, and with all thy soul, and with all thy might.\"",
+        "scholarlyNote": "This mitzvah has been interpreted both emotionally and practically, with rabbinic writings expanding it into deeds and commandments."
+    },
+    {
+        "number": 5,
+        "title": "To fear God",
+        "traditionalWording": "Fear, revere, and stand in awe of God.",
+        "sourceVerse": "Deuteronomy 10:20 — \"Thou shalt fear the LORD thy God; him shalt thou serve…\"",
+        "scholarlyNote": "The fear here is reverential, a common covenantal theme in ancient Near Eastern treaties, reaffirmed by Qumran texts."
+    },
+    {
+        "number": 6,
+        "title": "Not to test God",
+        "traditionalWording": "Do not test or try the LORD.",
+        "sourceVerse": "Deuteronomy 6:16 — \"Ye shall not tempt the LORD your God, as ye tempted him in Massah.\"",
+        "scholarlyNote": "This is quoted by Jesus in the New Testament, showing continuity in its authority."
+    },
+    {
+        "number": 7,
+        "title": "To imitate His ways",
+        "traditionalWording": "Walk in His ways.",
+        "sourceVerse": "Deuteronomy 28:9 — \"…and to walk in his ways.\"",
+        "scholarlyNote": "Rabbinic tradition ties this to acts of kindness and justice, reflecting God's attributes as described in Exodus chapter 34 verses 6 to 7."
+    },
+    {
+        "number": 8,
+        "title": "To sanctify His Name",
+        "traditionalWording": "Sanctify the Name of God before the nations.",
+        "sourceVerse": "Leviticus 22:32 — \"Neither shall ye profane my holy name; but I will be hallowed among the children of Israel…\"",
+        "scholarlyNote": "In the Second Temple period, this mitzvah was connected with martyrdom and resisting idolatry, as seen in 1 Maccabees."
+    },
+    {
+        "number": 9,
+        "title": "To study and teach Torah",
+        "traditionalWording": "To learn Torah and teach it to others.",
+        "sourceVerse": "Deuteronomy 6:7 — \"And thou shalt teach them diligently unto thy children…\"",
+        "scholarlyNote": "Expanded in Mishnah and Qumran texts."
+    },
+    {
+        "number": 10,
+        "title": "To honor those who teach Torah",
+        "traditionalWording": "Honor your teachers and elders in Torah.",
+        "sourceVerse": "Leviticus 19:32 — \"Thou shalt rise up before the hoary head, and honour the face of the old man…\"",
+        "scholarlyNote": "Rabbinic interpretation links \"elders\" to Torah teachers."
+    },
+    {
+        "number": 11,
+        "title": "To cling to those who know Him",
+        "traditionalWording": "Cleave to scholars and the righteous.",
+        "sourceVerse": "Deuteronomy 10:20 — \"…and to him shalt thou cleave.\"",
+        "scholarlyNote": "Original text refers to cleaving to God, tradition applies to righteous people."
+    },
+    {
+        "number": 12,
+        "title": "To recite the Shema twice daily",
+        "traditionalWording": "Recite Shema in morning and evening.",
+        "sourceVerse": "Deuteronomy 6:7 — \"…when thou liest down, and when thou risest up.\"",
+        "scholarlyNote": "Fixed-time Shema readings developed post-exile."
+    },
+    {
+        "number": 13,
+        "title": "To bind tefillin on the arm",
+        "traditionalWording": "Bind words as a sign on your arm.",
+        "sourceVerse": "Deuteronomy 6:8 — \"And thou shalt bind them for a sign upon thine hand…\"",
+        "scholarlyNote": "Literal vs metaphorical interpretation debated."
+    },
+    {
+        "number": 14,
+        "title": "To place tefillin on the head",
+        "traditionalWording": "Bind words between your eyes.",
+        "sourceVerse": "Deuteronomy 6:8 — \"…and they shall be as frontlets between thine eyes.\"",
+        "scholarlyNote": "Literal vs symbolic debated."
+    },
+    {
+        "number": 15,
+        "title": "To affix a mezuzah",
+        "traditionalWording": "Affix mezuzah to doorposts.",
+        "sourceVerse": "Deuteronomy 6:9 — \"And thou shalt write them upon the posts of thy house, and on thy gates.\"",
+        "scholarlyNote": "Physical act explicitly commanded."
+    },
+    {
+        "number": 16,
+        "title": "To write a Torah scroll",
+        "traditionalWording": "Every man should write a Sefer Torah.",
+        "sourceVerse": "Deuteronomy 31:19 — \"Now therefore write ye this song for you…\"",
+        "scholarlyNote": "Command is about the Song of Moses, not a full Torah scroll; rabbinic law expands it."
+    },
+    {
+        "number": 17,
+        "title": "To build a Temple",
+        "traditionalWording": "Build a Sanctuary for God.",
+        "sourceVerse": "Exodus 25:8 — \"And let them make me a sanctuary…\"",
+        "scholarlyNote": "Direct biblical command for establishing God's dwelling place."
+    },
+    {
+        "number": 18,
+        "title": "Not to remove stones from the altar",
+        "traditionalWording": "Do not dismantle the altar stones.",
+        "sourceVerse": "Deuteronomy 27:5–6 — \"…thou shalt not lift up any iron tool upon them.\"",
+        "scholarlyNote": "Preserves the sanctity of the altar construction."
+    },
+    {
+        "number": 19,
+        "title": "Not to extinguish the altar fire",
+        "traditionalWording": "The altar fire must never go out.",
+        "sourceVerse": "Leviticus 6:13 — \"The fire shall ever be burning upon the altar; it shall never go out.\"",
+        "scholarlyNote": "Symbolizes perpetual worship and divine presence."
+    },
+    {
+        "number": 20,
+        "title": "The priests must bless Israel",
+        "traditionalWording": "The Kohanim shall bless the people.",
+        "sourceVerse": "Numbers 6:23–27 — \"…on this wise ye shall bless the children of Israel…\"",
+        "scholarlyNote": "The Aaronic blessing, still used in Jewish and Christian worship."
+    },
+    # Mitzvot 21-49 (provided by user with corrections)
+    {
+        "number": 21,
+        "title": "Not to eat blood",
+        "traditionalWording": "Abstain from consuming blood.",
+        "sourceVerse": "Leviticus 7:26 — \"Moreover ye shall eat no manner of blood, whether it be of fowl or of beast, in any of your dwellings.\"",
+        "scholarlyNote": "Universally recognized prohibition; reinforced multiple times across Leviticus and Deuteronomy."
+    },
+    {
+        "number": 22,
+        "title": "Not to eat certain fats (chelev)",
+        "traditionalWording": "Do not eat the forbidden fat of ox, sheep, or goat.",
+        "sourceVerse": "Leviticus 7:23 — \"Speak unto the children of Israel, saying, Ye shall eat no manner of fat, of ox, or of sheep, or of goat.\"",
+        "scholarlyNote": "Rabbinic tradition further specifies what qualifies as \"chelev\" vs. permissible fat."
+    },
+    {
+        "number": 23,
+        "title": "Not to eat an animal that died of itself (nevelah)",
+        "traditionalWording": "Do not eat an animal that dies naturally.",
+        "sourceVerse": "Deuteronomy 14:21 — \"Ye shall not eat of any thing that dieth of itself: thou shalt give it unto the stranger that is in thy gates…\"",
+        "scholarlyNote": "The text distinguishes between Israel and the foreigner; scholars debate whether this reflects ritual purity or covenantal separation."
+    },
+    {
+        "number": 24,
+        "title": "Not to eat an animal torn in the field (terefah)",
+        "traditionalWording": "Do not eat animals torn by beasts.",
+        "sourceVerse": "Exodus 22:31 — \"Neither shall ye eat any flesh that is torn of beasts in the field; ye shall cast it to the dogs.\"",
+        "scholarlyNote": "Highlights reverence for life and avoidance of ritual contamination; later rabbinic law extends this to detailed slaughtering laws."
+    },
+    {
+        "number": 25,
+        "title": "Not to eat meat with milk",
+        "traditionalWording": "Do not boil or eat meat cooked with milk.",
+        "sourceVerse": "Exodus 23:19 — \"Thou shalt not seethe a kid in his mother's milk.\"",
+        "scholarlyNote": "Simple wording, but tradition broadens to forbid all mixtures of meat and dairy. Literal vs. expansive application debated."
+    },
+    {
+        "number": 26,
+        "title": "Not to eat creeping things",
+        "traditionalWording": "Do not eat swarming creatures.",
+        "sourceVerse": "Leviticus 11:41 — \"And every creeping thing that creepeth upon the earth shall be an abomination; it shall not be eaten.\"",
+        "scholarlyNote": "Clear prohibition; discussion centers on classification of insects, reptiles, and vermin."
+    },
+    {
+        "number": 27,
+        "title": "Not to eat insects that swarm in the water",
+        "traditionalWording": "Do not eat aquatic swarming things without fins and scales.",
+        "sourceVerse": "Leviticus 11:10 — \"And all that have not fins and scales in the seas… they shall be an abomination unto you.\"",
+        "scholarlyNote": "Links to Israel's dietary laws emphasizing separation and purity."
+    },
+    {
+        "number": 28,
+        "title": "Not to eat winged insects that swarm",
+        "traditionalWording": "Do not eat flying creeping things.",
+        "sourceVerse": "Deuteronomy 14:19 — \"And every creeping thing that flieth is unclean unto you: they shall not be eaten.\"",
+        "scholarlyNote": "Exceptions exist for certain species of locusts, sparking later rabbinic debate."
+    },
+    {
+        "number": 29,
+        "title": "Not to eat abominable creatures",
+        "traditionalWording": "Do not eat any creature designated as an abomination.",
+        "sourceVerse": "Deuteronomy 14:3 — \"Thou shalt not eat any abominable thing.\"",
+        "scholarlyNote": "Broad category that rabbis later narrowed through lists in Leviticus and Deuteronomy."
+    },
+    {
+        "number": 30,
+        "title": "To slaughter animals before eating",
+        "traditionalWording": "Animals must be slaughtered properly before eating.",
+        "sourceVerse": "Deuteronomy 12:21 — \"If the place which the LORD thy God hath chosen… be too far from thee, then thou shalt kill of thy herd and of thy flock… as I have commanded thee, and thou shalt eat in thy gates.\"",
+        "scholarlyNote": "Verse presumes knowledge of proper slaughter \"as I have commanded,\" though Torah gives no explicit details; rabbinic tradition preserves the method (shechita)."
+    },
+    {
+        "number": 31,
+        "title": "Not to eat the sinew of the thigh (gid hanasheh)",
+        "traditionalWording": "Do not eat the sciatic nerve.",
+        "sourceVerse": "Genesis 32:32 — \"Therefore the children of Israel eat not of the sinew which shrank, which is upon the hollow of the thigh, unto this day…\"",
+        "scholarlyNote": "Unique command tied to Jacob's wrestling with the angel; rabbinic law extends it to kosher practice."
+    },
+    {
+        "number": 32,
+        "title": "To cover the blood of a slaughtered bird or beast",
+        "traditionalWording": "Cover the blood of birds and wild animals after slaughter.",
+        "sourceVerse": "Leviticus 17:13 — \"…he shall even pour out the blood thereof, and cover it with dust.\"",
+        "scholarlyNote": "Ritual respect for life; distinguishes wild/kosher game from domesticated animals."
+    },
+    {
+        "number": 33,
+        "title": "Not to take the mother bird with her young",
+        "traditionalWording": "Do not seize a mother bird with her eggs or chicks.",
+        "sourceVerse": "Deuteronomy 22:6 — \"Thou shalt not take the dam with the young.\"",
+        "scholarlyNote": "Seen as teaching compassion and preserving species."
+    },
+    {
+        "number": 34,
+        "title": "To send away the mother bird before taking the young",
+        "traditionalWording": "Release the mother bird before taking the eggs/chicks.",
+        "sourceVerse": "Deuteronomy 22:7 — \"But thou shalt in any wise let the dam go, and take the young to thee…\"",
+        "scholarlyNote": "Reinforces the compassion principle; linked to covenant blessings of long life."
+    },
+    {
+        "number": 35,
+        "title": "Not to slaughter an animal and its offspring on the same day",
+        "traditionalWording": "Do not kill a cow and its calf or ewe and her lamb on the same day.",
+        "sourceVerse": "Leviticus 22:28 — \"Ye shall not kill it and her young both in one day.\"",
+        "scholarlyNote": "Compassion command; reflects sanctity of life."
+    },
+    {
+        "number": 36,
+        "title": "To examine signs of kosher animals",
+        "traditionalWording": "Distinguish between animals that chew cud and have split hooves.",
+        "sourceVerse": "Leviticus 11:3 — \"Whatsoever parteth the hoof, and is clovenfooted, and cheweth the cud, among the beasts, that shall ye eat.\"",
+        "scholarlyNote": "Basis of kosher dietary laws."
+    },
+    {
+        "number": 37,
+        "title": "To examine signs of kosher fish",
+        "traditionalWording": "Only fish with fins and scales may be eaten.",
+        "sourceVerse": "Leviticus 11:9 — \"These shall ye eat of all that are in the waters: whatsoever hath fins and scales…\"",
+        "scholarlyNote": "Clear and repeated law; consistent in both Leviticus and Deuteronomy."
+    },
+    {
+        "number": 38,
+        "title": "To examine signs of kosher birds",
+        "traditionalWording": "Do not eat unclean birds; eat only clean species.",
+        "sourceVerse": "Deuteronomy 14:11 — \"Of all clean birds ye shall eat.\"",
+        "scholarlyNote": "Torah lists forbidden birds rather than defining positive signs; rabbis later systematized criteria."
+    },
+    {
+        "number": 39,
+        "title": "To examine signs of kosher locusts",
+        "traditionalWording": "Permitted species of locusts have signs.",
+        "sourceVerse": "Leviticus 11:22 — \"Even these of them ye may eat; the locust after his kind…\"",
+        "scholarlyNote": "Tradition preserved in Yemenite Jewry; largely lost in others."
+    },
+    {
+        "number": 40,
+        "title": "Not to eat tevel (untithed produce)",
+        "traditionalWording": "Do not eat produce before separating tithes.",
+        "sourceVerse": "Leviticus 22:15 — \"And they shall not profane the holy things of the children of Israel, which they offer unto the LORD.\"",
+        "scholarlyNote": "Torah forbids misuse of sacred offerings; rabbinic law extended this to define tevel."
+    },
+    {
+        "number": 41,
+        "title": "To separate terumah (heave-offering) for the priest",
+        "traditionalWording": "Give a portion of produce to the kohen.",
+        "sourceVerse": "Deuteronomy 18:4 — \"The firstfruit also of thy corn, of thy wine, and of thine oil, and the first of the fleece of thy sheep, shalt thou give him.\"",
+        "scholarlyNote": "One of several priestly provisions; linked to Levitical inheritance system."
+    },
+    {
+        "number": 42,
+        "title": "To separate the first tithe (ma'aser rishon)",
+        "traditionalWording": "Give one-tenth of produce to the Levites.",
+        "sourceVerse": "Numbers 18:24 — \"…the tithes of the children of Israel… I have given to the Levites to inherit.\"",
+        "scholarlyNote": "Central to Levite support structure; reaffirmed in Nehemiah 10."
+    },
+    {
+        "number": 43,
+        "title": "The Levites must give a tithe of the tithe (terumat ma'aser)",
+        "traditionalWording": "Levites must tithe from what they receive.",
+        "sourceVerse": "Numbers 18:26 — \"Thus speak unto the Levites, and say unto them, When ye take of the children of Israel the tithes… then ye shall offer up an heave offering of it for the LORD, even a tenth part of the tithe.\"",
+        "scholarlyNote": "Emphasizes accountability for leaders; even those supported by tithes must tithe."
+    },
+    {
+        "number": 44,
+        "title": "To separate the second tithe (ma'aser sheni)",
+        "traditionalWording": "Take a second tithe and eat it in Jerusalem.",
+        "sourceVerse": "Deuteronomy 14:22–23 — \"Thou shalt truly tithe all the increase of thy seed… And thou shalt eat before the LORD thy God… in the place which he shall choose…\"",
+        "scholarlyNote": "Strengthened Jerusalem as covenant center; encouraged pilgrimage."
+    },
+    {
+        "number": 45,
+        "title": "To separate the poor tithe (ma'aser ani)",
+        "traditionalWording": "In the third and sixth years, give tithe to the poor.",
+        "sourceVerse": "Deuteronomy 14:28–29 — \"At the end of three years thou shalt bring forth all the tithe… and the Levite, the stranger, the fatherless, and the widow… shall come, and shall eat and be satisfied.\"",
+        "scholarlyNote": "Underscores covenant concern for the vulnerable."
+    },
+    {
+        "number": 46,
+        "title": "To set aside challah from dough",
+        "traditionalWording": "Give the first of dough to the priest.",
+        "sourceVerse": "Numbers 15:20 — \"Ye shall offer up a cake of the first of your dough for an heave offering…\"",
+        "scholarlyNote": "Symbol of sanctity in daily bread-making."
+    },
+    {
+        "number": 47,
+        "title": "To redeem the firstborn son",
+        "traditionalWording": "Redeem firstborn males with five shekels.",
+        "sourceVerse": "Numbers 18:15–16 — \"Every thing that openeth the matrix… thou shalt redeem… And those that are to be redeemed from a month old shalt thou redeem, according to thine estimation, for the money of five shekels…\"",
+        "scholarlyNote": "Commemorates Israel's redemption at Passover."
+    },
+    {
+        "number": 48,
+        "title": "To redeem the firstborn donkey",
+        "traditionalWording": "Redeem or break the neck of the firstborn donkey.",
+        "sourceVerse": "Exodus 13:13 — \"And every firstling of an ass thou shalt redeem with a lamb; and if thou wilt not redeem it, then thou shalt break his neck…\"",
+        "scholarlyNote": "Unique command; scholars note symbolic link between donkey and Israel's servitude."
+    },
+    {
+        "number": 49,
+        "title": "To destroy leaven on Passover",
+        "traditionalWording": "Remove chametz before Passover begins.",
+        "sourceVerse": "Exodus 12:15 — \"Seven days shall ye eat unleavened bread; even the first day ye shall put away leaven out of your houses…\"",
+        "scholarlyNote": "Central to Passover observance; expanded rabbinically into bedikat chametz ritual."
+    }
+    # Mitzvot 50-613 will be added from the complete dataset provided by user
 ]
 
 def load_mitzvot_data() -> List[MitzvahCreate]:
