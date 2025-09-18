@@ -16,8 +16,8 @@ class Mitzvah(BaseModel):
     category: str  # category ID
     scholarlyNote: str
     keywords: List[str]
-    createdAt: datetime = Field(default_factory=datetime.utcnow)
-    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+    createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class MitzvahCreate(BaseModel):
     number: int
