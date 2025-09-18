@@ -231,6 +231,41 @@ async def get_stats():
         logger.error(f"Error getting stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/mitzvah-of-the-day", response_model=Mitzvah)
+async def get_mitzvah_of_the_day():
+    """Get the daily featured mitzvah"""
+    import datetime
+    try:
+        # Use date-based algorithm to ensure same mitzvah per day for all users
+        today = datetime.date.today()
+        
+        # Create a deterministic seed based on the date
+        day_of_year = today.timetuple().tm_yday
+        year = today.year
+        
+        # Calculate mitzvah number (1-613) based on date
+        # This ensures the same mitzvah for everyone on the same day
+        # and cycles through all mitzvot over ~1.7 years
+        mitzvah_number = ((day_of_year + (year * 365)) % 613) + 1
+        
+        # Get the specific mitzvah by number
+        mitzvah = await mitzvot_collection.find_one({"number": mitzvah_number})
+        
+        if not mitzvah:
+            # Fallback to first mitzvah if something goes wrong
+            mitzvah = await mitzvot_collection.find_one({"number": 1})
+        
+        if not mitzvah:
+            raise HTTPException(status_code=404, detail="No mitzvot found")
+        
+        # Convert MongoDB document to Mitzvah model
+        mitzvah_obj = Mitzvah(**mitzvah)
+        return mitzvah_obj
+        
+    except Exception as e:
+        logger.error(f"Error getting mitzvah of the day: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
