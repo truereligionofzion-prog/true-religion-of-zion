@@ -60,6 +60,9 @@ const MitzvotApp = () => {
       setStats(statsResponse);
       setCategories(categoriesResponse);
       
+      // Load initial mitzvot data
+      await loadMitzvot();
+      
     } catch (error) {
       console.error('Error loading initial data:', error);
       toast({
