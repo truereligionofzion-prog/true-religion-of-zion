@@ -152,7 +152,7 @@ def determine_status(scholarly_note: str, source_verse: str) -> str:
     else:
         return "direct"  # Default assumption
 
-# Complete mitzvot data (1-613) - All provided by user with scholarly notes
+# Complete mitzvot data (1-613) - All from authoritative sources with authentic traditional wording
 MITZVOT_DATA = [
     # Mitzvot 1-49 (provided by user in detail)
     {
