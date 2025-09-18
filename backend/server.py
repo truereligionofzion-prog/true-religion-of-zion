@@ -266,6 +266,126 @@ async def get_mitzvah_of_the_day():
         logger.error(f"Error getting mitzvah of the day: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/quiz/{category}")
+async def get_quiz_questions(category: str = "all", limit: int = 5):
+    """Generate quiz questions for a specific category"""
+    import random
+    try:
+        # Build query based on category
+        query = {}
+        if category != "all":
+            query["category"] = category
+        
+        # Get all mitzvot for the category
+        all_mitzvot = await mitzvot_collection.find(query).to_list(length=None)
+        
+        if len(all_mitzvot) < 4:  # Need at least 4 for multiple choice
+            raise HTTPException(status_code=400, detail="Not enough mitzvot in category for quiz")
+        
+        # Randomly select mitzvot for questions
+        selected_mitzvot = random.sample(all_mitzvot, min(limit, len(all_mitzvot)))
+        
+        quiz_questions = []
+        
+        for mitzvah in selected_mitzvot:
+            # Get other mitzvot for wrong answers
+            other_mitzvot = [m for m in all_mitzvot if m["number"] != mitzvah["number"]]
+            wrong_answers = random.sample(other_mitzvot, 3)
+            
+            # Create question types randomly
+            question_types = [
+                "title_from_traditional",
+                "traditional_from_title", 
+                "category_from_title",
+                "status_from_title"
+            ]
+            
+            question_type = random.choice(question_types)
+            
+            if question_type == "title_from_traditional":
+                question = {
+                    "id": len(quiz_questions) + 1,
+                    "type": "multiple_choice",
+                    "question": f"Which mitzvah has this traditional wording: \"{mitzvah['traditionalWording']}\"?",
+                    "correct_answer": mitzvah["title"],
+                    "options": [
+                        mitzvah["title"],
+                        wrong_answers[0]["title"],
+                        wrong_answers[1]["title"], 
+                        wrong_answers[2]["title"]
+                    ],
+                    "explanation": f"This is mitzvah #{mitzvah['number']}: {mitzvah['title']}. Source: {mitzvah['sourceVerse']}"
+                }
+            
+            elif question_type == "traditional_from_title":
+                question = {
+                    "id": len(quiz_questions) + 1,
+                    "type": "multiple_choice",
+                    "question": f"What is the traditional wording for: \"{mitzvah['title']}\"?",
+                    "correct_answer": mitzvah["traditionalWording"],
+                    "options": [
+                        mitzvah["traditionalWording"],
+                        wrong_answers[0]["traditionalWording"],
+                        wrong_answers[1]["traditionalWording"],
+                        wrong_answers[2]["traditionalWording"]
+                    ],
+                    "explanation": f"The traditional wording emphasizes: {mitzvah['scholarlyNote'][:100]}..."
+                }
+            
+            elif question_type == "category_from_title":
+                # Get category name
+                category_doc = await categories_collection.find_one({"slug": mitzvah["category"]})
+                correct_category = category_doc["name"] if category_doc else mitzvah["category"]
+                
+                # Get wrong categories
+                wrong_categories = []
+                for wrong_mitzvah in wrong_answers:
+                    wrong_cat_doc = await categories_collection.find_one({"slug": wrong_mitzvah["category"]})
+                    wrong_categories.append(wrong_cat_doc["name"] if wrong_cat_doc else wrong_mitzvah["category"])
+                
+                question = {
+                    "id": len(quiz_questions) + 1,
+                    "type": "multiple_choice", 
+                    "question": f"Which category does this mitzvah belong to: \"{mitzvah['title']}\"?",
+                    "correct_answer": correct_category,
+                    "options": [correct_category] + wrong_categories,
+                    "explanation": f"This mitzvah belongs to {correct_category} because: {mitzvah['scholarlyNote'][:100]}..."
+                }
+            
+            else:  # status_from_title
+                status_labels = {
+                    "direct": "Direct in Bible",
+                    "indirect": "Indirect in Bible", 
+                    "rabbinic": "Rabbinic Origin",
+                    "traditional": "Traditional"
+                }
+                
+                correct_status = status_labels.get(mitzvah["status"], mitzvah["status"])
+                wrong_statuses = [status_labels.get(m["status"], m["status"]) for m in wrong_answers]
+                
+                question = {
+                    "id": len(quiz_questions) + 1,
+                    "type": "multiple_choice",
+                    "question": f"What is the origin status of: \"{mitzvah['title']}\"?",
+                    "correct_answer": correct_status,
+                    "options": [correct_status] + wrong_statuses,
+                    "explanation": f"This mitzvah is {correct_status}. {mitzvah['scholarlyNote'][:100]}..."
+                }
+            
+            # Shuffle options
+            random.shuffle(question["options"])
+            quiz_questions.append(question)
+        
+        return {
+            "category": category,
+            "questions": quiz_questions,
+            "total_questions": len(quiz_questions)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error generating quiz: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
