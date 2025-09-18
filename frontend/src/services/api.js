@@ -57,6 +57,32 @@ class ApiService {
     return this.request(`/quiz/${category}?limit=${limit}`);
   }
 
+  // Progress Tracking
+  async getUserProgress(userId = 'user_001') {
+    return this.request(`/progress?user_id=${userId}`);
+  }
+
+  async updateMitzvahProgress(mitzvahId, correct, userId = 'user_001') {
+    return this.request(`/progress/${mitzvahId}?user_id=${userId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ correct })
+    });
+  }
+
+  // Flashcards
+  async getFlashcards(userId = 'user_001', limit = 10) {
+    return this.request(`/flashcards?user_id=${userId}&limit=${limit}`);
+  }
+
+  async reviewFlashcard(flashcardId, difficulty, correct) {
+    return this.request(`/flashcards/${flashcardId}/review`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ difficulty, correct })
+    });
+  }
+
   // Initialize database (development/admin use)
   async initializeData() {
     return this.request('/initialize', { method: 'POST' });
