@@ -455,6 +455,222 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
         logger.error(f"Error generating quiz: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# New collections for progress tracking
+progress_collection = db["user_progress"]
+sessions_collection = db["study_sessions"] 
+flashcards_collection = db["flashcards"]
+achievements_collection = db["achievements"]
+
+# Simple user ID for now (in production, would use authentication)
+DEFAULT_USER_ID = "user_001"
+
+@api_router.get("/progress")
+async def get_user_progress(user_id: str = DEFAULT_USER_ID):
+    """Get user's learning progress"""
+    try:
+        # Get overall progress stats
+        total_mitzvot = await mitzvot_collection.count_documents({})
+        
+        progress_records = await progress_collection.find({"userId": user_id}).to_list(length=None)
+        
+        learning_count = len([p for p in progress_records if p["status"] == "learning"])
+        reviewing_count = len([p for p in progress_records if p["status"] == "reviewing"])  
+        mastered_count = len([p for p in progress_records if p["status"] == "mastered"])
+        
+        # Calculate category progress
+        category_progress = {}
+        categories = await categories_collection.find({}).to_list(length=None)
+        
+        for category in categories:
+            category_mitzvot = await mitzvot_collection.count_documents({"category": category["slug"]})
+            category_mastered = await progress_collection.count_documents({
+                "userId": user_id,
+                "status": "mastered",
+                "mitzvahId": {"$in": [str(m["_id"]) for m in await mitzvot_collection.find({"category": category["slug"]}).to_list(length=None)]}
+            })
+            
+            category_progress[category["name"]] = {
+                "total": category_mitzvot,
+                "mastered": category_mastered,
+                "percentage": round((category_mastered / category_mitzvot) * 100, 1) if category_mitzvot > 0 else 0
+            }
+        
+        return {
+            "userId": user_id,
+            "totalMitzvot": total_mitzvot,
+            "learning": learning_count,
+            "reviewing": reviewing_count,
+            "mastered": mastered_count,
+            "overallProgress": round((mastered_count / total_mitzvot) * 100, 1) if total_mitzvot > 0 else 0,
+            "categoryProgress": category_progress,
+            "currentStreak": 0,  # TODO: Calculate streak
+            "totalStudyTime": 0  # TODO: Calculate from sessions
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting progress: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/progress/{mitzvah_id}")
+async def update_mitzvah_progress(mitzvah_id: str, correct: bool, user_id: str = DEFAULT_USER_ID):
+    """Update progress for a specific mitzvah"""
+    try:
+        # Get the mitzvah
+        mitzvah = await mitzvot_collection.find_one({"id": mitzvah_id})
+        if not mitzvah:
+            raise HTTPException(status_code=404, detail="Mitzvah not found")
+        
+        # Find or create progress record
+        progress = await progress_collection.find_one({"userId": user_id, "mitzvahId": mitzvah_id})
+        
+        if not progress:
+            progress = {
+                "id": str(uuid.uuid4()),
+                "userId": user_id,
+                "mitzvahId": mitzvah_id,
+                "mitzvahNumber": mitzvah["number"],
+                "status": "learning",
+                "correctAnswers": 0,
+                "totalAttempts": 0,
+                "lastStudied": datetime.now(timezone.utc),
+                "masteredAt": None,
+                "createdAt": datetime.now(timezone.utc)
+            }
+            
+        # Update progress
+        progress["totalAttempts"] += 1
+        if correct:
+            progress["correctAnswers"] += 1
+            
+        progress["lastStudied"] = datetime.now(timezone.utc)
+        
+        # Update status based on performance
+        accuracy = progress["correctAnswers"] / progress["totalAttempts"]
+        if progress["totalAttempts"] >= 3:
+            if accuracy >= 0.8 and progress["correctAnswers"] >= 3:
+                progress["status"] = "mastered"
+                if not progress.get("masteredAt"):
+                    progress["masteredAt"] = datetime.now(timezone.utc)
+            elif accuracy >= 0.6:
+                progress["status"] = "reviewing"
+            else:
+                progress["status"] = "learning"
+        
+        # Upsert progress record
+        await progress_collection.replace_one(
+            {"userId": user_id, "mitzvahId": mitzvah_id},
+            progress,
+            upsert=True
+        )
+        
+        return {"status": "success", "progress": progress}
+        
+    except Exception as e:
+        logger.error(f"Error updating progress: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/flashcards")
+async def get_flashcards_for_review(user_id: str = DEFAULT_USER_ID, limit: int = 10):
+    """Get flashcards due for review"""
+    try:
+        # Get flashcards due for review
+        now = datetime.now(timezone.utc)
+        due_flashcards = await flashcards_collection.find({
+            "userId": user_id,
+            "nextReview": {"$lte": now}
+        }).limit(limit).to_list(length=None)
+        
+        # If not enough due cards, add new ones
+        if len(due_flashcards) < limit:
+            # Get mitzvot that don't have flashcards yet
+            existing_mitzvah_ids = [f["mitzvahId"] for f in await flashcards_collection.find({"userId": user_id}).to_list(length=None)]
+            
+            query = {}
+            if existing_mitzvah_ids:
+                query["id"] = {"$nin": existing_mitzvah_ids}
+                
+            new_mitzvot = await mitzvot_collection.find(query).limit(limit - len(due_flashcards)).to_list(length=None)
+            
+            # Create new flashcards
+            for mitzvah in new_mitzvot:
+                flashcard = {
+                    "id": str(uuid.uuid4()),
+                    "userId": user_id,
+                    "mitzvahId": mitzvah["id"],
+                    "mitzvahNumber": mitzvah["number"],
+                    "difficulty": 1,
+                    "nextReview": now,
+                    "reviewCount": 0,
+                    "correctStreak": 0,
+                    "createdAt": now,
+                    "lastReviewed": None
+                }
+                await flashcards_collection.insert_one(flashcard)
+                due_flashcards.append(flashcard)
+        
+        # Get full mitzvah details for each flashcard
+        flashcard_data = []
+        for flashcard in due_flashcards:
+            mitzvah = await mitzvot_collection.find_one({"id": flashcard["mitzvahId"]})
+            if mitzvah:
+                flashcard_data.append({
+                    "flashcard": flashcard,
+                    "mitzvah": mitzvah
+                })
+        
+        return {
+            "flashcards": flashcard_data,
+            "total": len(flashcard_data)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting flashcards: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/flashcards/{flashcard_id}/review")
+async def review_flashcard(flashcard_id: str, difficulty: int, correct: bool):
+    """Update flashcard after review using spaced repetition"""
+    try:
+        flashcard = await flashcards_collection.find_one({"id": flashcard_id})
+        if not flashcard:
+            raise HTTPException(status_code=404, detail="Flashcard not found")
+        
+        now = datetime.now(timezone.utc)
+        flashcard["lastReviewed"] = now
+        flashcard["reviewCount"] += 1
+        
+        if correct:
+            flashcard["correctStreak"] += 1
+            # Increase interval based on difficulty and streak
+            intervals = {
+                1: timedelta(days=1),
+                2: timedelta(days=3),
+                3: timedelta(days=7),
+                4: timedelta(days=14),
+                5: timedelta(days=30)
+            }
+            
+            # Increase difficulty if doing well
+            if flashcard["correctStreak"] >= 2:
+                flashcard["difficulty"] = min(5, flashcard["difficulty"] + 1)
+                
+            interval = intervals.get(flashcard["difficulty"], timedelta(days=1))
+            flashcard["nextReview"] = now + interval
+        else:
+            flashcard["correctStreak"] = 0
+            # Reset to easier difficulty
+            flashcard["difficulty"] = max(1, flashcard["difficulty"] - 1)
+            # Review again soon
+            flashcard["nextReview"] = now + timedelta(hours=1)
+        
+        await flashcards_collection.replace_one({"id": flashcard_id}, flashcard)
+        
+        return {"status": "success", "nextReview": flashcard["nextReview"]}
+        
+    except Exception as e:
+        logger.error(f"Error reviewing flashcard: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
