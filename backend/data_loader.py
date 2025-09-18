@@ -200,7 +200,7 @@ MITZVOT_DATA = [
     {
         "number": 7,
         "title": "To imitate His ways",
-        "traditionalWording": "Walk in His ways.",
+        "traditionalWording": "To imitate His good and upright ways.",
         "sourceVerse": "Deuteronomy 28:9 — \"…and to walk in his ways.\"",
         "scholarlyNote": "Rabbinic tradition ties this to acts of kindness and justice, reflecting God's attributes as described in Exodus chapter 34 verses 6 to 7."
     },
