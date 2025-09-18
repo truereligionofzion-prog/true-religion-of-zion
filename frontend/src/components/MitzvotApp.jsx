@@ -309,6 +309,40 @@ const MitzvotApp = () => {
           </p>
         </div>
 
+        {/* Mitzvah of the Day */}
+        {mitzvahOfTheDay && (
+          <div className="mb-8">
+            <Card className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  Mitzvah of the Day
+                  <Badge variant="secondary" className="bg-white/20 text-white">
+                    #{mitzvahOfTheDay.number}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <h3 className="text-xl font-semibold">{mitzvahOfTheDay.title}</h3>
+                  <p className="text-purple-100 italic">"{mitzvahOfTheDay.traditionalWording}"</p>
+                  <p className="text-sm text-purple-200">
+                    <strong>{mitzvahOfTheDay.sourceVerse}</strong>
+                  </p>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    <Badge variant="secondary" className="bg-white/20 text-white">
+                      {getStatusLabel(mitzvahOfTheDay.status)}
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white/20 text-white">
+                      {getCategoryName(mitzvahOfTheDay.category)}
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <Card className="text-center">
