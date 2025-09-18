@@ -207,7 +207,7 @@ MITZVOT_DATA = [
     {
         "number": 8,
         "title": "To sanctify His Name",
-        "traditionalWording": "Sanctify the Name of God before the nations.",
+        "traditionalWording": "To hallow G-d's name.",
         "sourceVerse": "Leviticus 22:32 — \"Neither shall ye profane my holy name; but I will be hallowed among the children of Israel…\"",
         "scholarlyNote": "In the Second Temple period, this mitzvah was connected with martyrdom and resisting idolatry, as seen in 1 Maccabees."
     },
