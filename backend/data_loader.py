@@ -656,26 +656,26 @@ def get_remaining_mitzvot():
         # Determine which book/category this mitzvah belongs to based on Maimonides' structure
         if i <= 75:  # Completing Book 1: Knowledge - Laws of Idolatry
             specific_laws = [
-                ("Not to turn to idolatry", "Do not turn to idols.", "Leviticus 19:4 — \"Turn ye not unto idols, nor make to yourselves molten gods.\""),
-                ("Not to make a graven image for oneself", "Do not make a graven image.", "Exodus 20:4 — \"Thou shalt not make unto thee any graven image.\""),
-                ("Not to make a graven image even for others", "Do not make idols for others.", "Leviticus 19:4 — \"nor make to yourselves molten gods.\""),
-                ("Not to make figures even for decoration", "Do not make decorative figures.", "Exodus 20:20 — \"Neither shall ye make with me gods of silver.\""),
-                ("Not to prostrate oneself to idolatry", "Do not bow down to idols.", "Exodus 20:5 — \"Thou shalt not bow down thyself to them.\""),
-                ("Not to worship idolatry in its normal way", "Do not serve idols.", "Exodus 20:5 — \"nor serve them.\""),
-                ("Not to proselytize others to idolatry", "Do not lead others to idolatry.", "Deuteronomy 13:11 — \"So that all Israel shall hear, and fear.\""),
-                ("To burn a city proselytized to idolatry", "Destroy cities given to idolatry.", "Deuteronomy 13:16 — \"And thou shalt burn with fire the city.\""),
-                ("Not to rebuild such a city", "Never rebuild the destroyed city.", "Deuteronomy 13:16 — \"it shall not be built again.\""),
-                ("Not to benefit from its property", "Take no spoil from the condemned city.", "Deuteronomy 13:17 — \"And there shall cleave nought of the cursed thing to thine hand.\"")
+                ("Not to turn to idolatry", "Do not turn to idols.", "Leviticus 19:4 — \"Turn ye not unto idols, nor make to yourselves molten gods.\"", "Explicitly commanded prohibition against any form of idolatrous worship, establishing monotheism as the foundation of Israelite faith."),
+                ("Not to make a graven image for oneself", "Do not make a graven image.", "Exodus 20:4 — \"Thou shalt not make unto thee any graven image.\"", "Direct biblical prohibition against creating physical representations of divine beings, preserving the transcendence of God."),
+                ("Not to make a graven image even for others", "Do not make idols for others.", "Leviticus 19:4 — \"nor make to yourselves molten gods.\"", "This prohibition is inferred from the general command, extending to include making idols for other people, preventing participation in idolatrous practices."),
+                ("Not to make figures even for decoration", "Do not make decorative figures.", "Exodus 20:20 — \"Neither shall ye make with me gods of silver.\"", "Indirect application of the idolatry prohibition against decorative figures that might lead to idolatrous worship or confusion about God's nature."),
+                ("Not to prostrate oneself to idolatry", "Do not bow down to idols.", "Exodus 20:5 — \"Thou shalt not bow down thyself to them.\"", "Explicitly commanded prohibition against the physical act of worship toward idols, maintaining exclusive worship of the one true God."),
+                ("Not to worship idolatry in its normal way", "Do not serve idols.", "Exodus 20:5 — \"nor serve them.\"", "Direct biblical command prohibiting service to idols in any customary manner of worship."),
+                ("Not to proselytize others to idolatry", "Do not lead others to idolatry.", "Deuteronomy 13:11 — \"So that all Israel shall hear, and fear.\"", "This is derived from biblical principles about community responsibility and preventing the spread of idolatrous practices."),
+                ("To burn a city proselytized to idolatry", "Destroy cities given to idolatry.", "Deuteronomy 13:16 — \"And thou shalt burn with fire the city.\"", "Explicitly commanded in cases of communal apostasy, demonstrating the severity of idolatrous rebellion against God."),
+                ("Not to rebuild such a city", "Never rebuild the destroyed city.", "Deuteronomy 13:16 — \"it shall not be built again.\"", "Direct biblical prohibition ensuring permanent consequences for communal idolatry."),
+                ("Not to benefit from its property", "Take no spoil from the condemned city.", "Deuteronomy 13:17 — \"And there shall cleave nought of the cursed thing to thine hand.\"", "Explicitly commanded to avoid any material benefit from items devoted to destruction due to idolatry.")
             ]
             idx = i - 66
             if idx < len(specific_laws):
-                title, wording, verse = specific_laws[idx]
+                title, wording, verse, note = specific_laws[idx]
                 mitzvah = {
                     "number": i,
                     "title": title,
                     "traditionalWording": wording,
                     "sourceVerse": verse,
-                    "scholarlyNote": "Part of the comprehensive prohibition against idolatry, establishing monotheistic worship as central to covenant relationship with God."
+                    "scholarlyNote": note
                 }
             else:
                 mitzvah = {
@@ -683,31 +683,31 @@ def get_remaining_mitzvot():
                     "title": f"Additional law against idolatry {idx-9}",
                     "traditionalWording": f"Further prohibition against idolatrous practices.",
                     "sourceVerse": f"Deuteronomy 13:{(idx % 18) + 1} — \"Biblical prohibition against false worship.\"",
-                    "scholarlyNote": "Additional laws completing the comprehensive prohibition against idolatry and false worship."
+                    "scholarlyNote": "Additional laws inferred from biblical principles completing the comprehensive prohibition against idolatry and false worship."
                 }
         elif i <= 86:  # Book 2: Love - 11 commandments
             love_laws = [
-                ("To recite Shema twice daily", "Recite Shema morning and evening.", "Deuteronomy 6:7 — \"And thou shalt speak of them when thou sittest in thine house.\""),
-                ("To serve God in prayer daily", "Pray to God each day.", "Deuteronomy 6:13 — \"And Him shalt thou serve.\""),
-                ("For priests to bless Israel daily", "Priests shall bless the people.", "Numbers 6:23 — \"On this wise ye shall bless the children of Israel.\""),
-                ("To bind tefillin on head", "Place tefillin between the eyes.", "Deuteronomy 6:8 — \"And they shall be as frontlets between thine eyes.\""),
-                ("To bind tefillin on arm", "Bind tefillin on the hand.", "Deuteronomy 6:8 — \"And thou shalt bind them for a sign upon thine hand.\""),
-                ("To affix mezuzah on doorposts", "Write on doorposts of thy house.", "Deuteronomy 6:9 — \"And thou shalt write them upon the posts of thy house.\""),
-                ("To write a Torah scroll", "Every man should write Torah.", "Deuteronomy 31:19 — \"Now therefore write ye this song for you.\""),
-                ("To make tzitzit on garments", "Put fringes on the corners.", "Numbers 15:38 — \"Speak unto the children of Israel, and bid them that they make them fringes.\""),
-                ("To bless God after eating", "Bless the LORD thy God after eating.", "Deuteronomy 8:10 — \"When thou hast eaten and art full, then thou shalt bless the LORD thy God.\""),
-                ("To circumcise males on eighth day", "Circumcise every male child.", "Leviticus 12:3 — \"And in the eighth day the flesh of his foreskin shall be circumcised.\""),
-                ("To honor those who teach Torah", "Honor teachers and scholars.", "Leviticus 19:32 — \"Thou shalt rise up before the hoary head.\"")
+                ("To recite Shema twice daily", "Recite Shema morning and evening.", "Deuteronomy 6:7 — \"And thou shalt speak of them when thou sittest in thine house.\"", "This obligation is derived from the biblical instruction to speak of God's words at specific times, establishing fixed prayer periods."),
+                ("To serve God in prayer daily", "Pray to God each day.", "Deuteronomy 6:13 — \"And Him shalt thou serve.\"", "The specific form of daily prayer is a traditional interpretation of the biblical command to serve God, developed through rabbinic tradition."),
+                ("For priests to bless Israel daily", "Priests shall bless the people.", "Numbers 6:23 — \"On this wise ye shall bless the children of Israel.\"", "Explicitly commanded priestly function with the exact wording provided in the Torah for the Aaronic benediction."),
+                ("To bind tefillin on head", "Place tefillin between the eyes.", "Deuteronomy 6:8 — \"And they shall be as frontlets between thine eyes.\"", "Traditional interpretation of the biblical metaphor, understood literally through ancient Jewish practice preserved in archaeological evidence."),
+                ("To bind tefillin on arm", "Bind tefillin on the hand.", "Deuteronomy 6:8 — \"And thou shalt bind them for a sign upon thine hand.\"", "Traditional observance derived from the biblical instruction, with specific forms established through continuous Jewish practice."),
+                ("To affix mezuzah on doorposts", "Write on doorposts of thy house.", "Deuteronomy 6:9 — \"And thou shalt write them upon the posts of thy house.\"", "Explicitly commanded practice of inscribing Torah passages on doorways, with specific format established through tradition."),
+                ("To write a Torah scroll", "Every man should write Torah.", "Deuteronomy 31:19 — \"Now therefore write ye this song for you.\"", "The application of this biblical command about Moses' song is extended through rabbinic interpretation to include writing complete Torah scrolls."),
+                ("To make tzitzit on garments", "Put fringes on the corners.", "Numbers 15:38 — \"Speak unto the children of Israel, and bid them that they make them fringes.\"", "Explicitly commanded in the Torah with specific instructions for the tassels and their placement on four-cornered garments."),
+                ("To bless God after eating", "Bless the LORD thy God after eating.", "Deuteronomy 8:10 — \"When thou hast eaten and art full, then thou shalt bless the LORD thy God.\"", "Direct biblical commandment establishing the obligation of gratitude after meals, with specific blessing formulas developed through tradition."),
+                ("To circumcise males on eighth day", "Circumcise every male child.", "Leviticus 12:3 — \"And in the eighth day the flesh of his foreskin shall be circumcised.\"", "Explicitly commanded ritual establishing the covenant sign, with precise timing and procedure specified in biblical law."),
+                ("To honor those who teach Torah", "Honor teachers and scholars.", "Leviticus 19:32 — \"Thou shalt rise up before the hoary head.\"", "Application of the biblical principle of honoring elders is extended through rabbinic interpretation to include Torah scholars regardless of age.")
             ]
             idx = i - 76
             if idx < len(love_laws):
-                title, wording, verse = love_laws[idx]
+                title, wording, verse, note = love_laws[idx]
                 mitzvah = {
                     "number": i,
                     "title": title,
                     "traditionalWording": wording,
                     "sourceVerse": verse,
-                    "scholarlyNote": "Part of the Book of Love, establishing daily practices that cultivate love and remembrance of God through ritual observance."
+                    "scholarlyNote": note
                 }
             else:
                 mitzvah = {
@@ -715,15 +715,21 @@ def get_remaining_mitzvot():
                     "title": "Additional law of love",
                     "traditionalWording": "Additional practice connecting to God.",
                     "sourceVerse": "Deuteronomy 6:5 — \"And thou shalt love the LORD thy God.\"",
-                    "scholarlyNote": "Additional commandment in the Book of Love expressing devotion to God."
+                    "scholarlyNote": "Additional commandment derived from biblical principles in the Book of Love expressing devotion to God."
                 }
         elif i <= 121:  # Book 3: Times - 35 commandments
+            if i <= 100:
+                note = "These Sabbath and festival laws are explicitly commanded in the Torah, establishing sacred time through direct biblical instruction."
+            elif i <= 110:
+                note = "Festival observances are explicitly commanded with specific dates and procedures detailed in Leviticus 23 and related passages."
+            else:
+                note = "These time-related observances represent applications of biblical principles about sanctifying appointed seasons and sacred calendar cycles."
             mitzvah = {
                 "number": i,
                 "title": f"Law of Sabbath and festivals {i-86}",
                 "traditionalWording": "Observance of sacred time as appointed by God.",
                 "sourceVerse": f"Leviticus 23:{(i-86) % 44 + 1} — \"These are the feasts of the LORD, holy convocations.\"",
-                "scholarlyNote": "Sacred time observances sanctifying specific days and seasons according to divine appointment in the covenant calendar."
+                "scholarlyNote": note
             }
         elif i <= 138:  # Book 4: Women - 17 commandments  
             mitzvah = {
@@ -731,15 +737,21 @@ def get_remaining_mitzvot():
                 "title": f"Law of marriage and family {i-121}",
                 "traditionalWording": "Regulation of marriage and family relationships according to Torah law.",
                 "sourceVerse": f"Deuteronomy 24:{(i-121) % 4 + 1} — \"When a man hath taken a wife.\"",
-                "scholarlyNote": "Family and marriage laws designed to preserve social stability and covenant continuity across generations."
+                "scholarlyNote": "Family and marriage laws explicitly detailed in biblical legislation, designed to preserve social stability and covenant continuity across generations."
             }
         elif i <= 208:  # Book 5: Holiness - 70 commandments
+            if i <= 150:
+                note = "Dietary laws explicitly commanded in Leviticus 11 and Deuteronomy 14, distinguishing Israel as a holy nation through specific food restrictions."
+            elif i <= 180:
+                note = "Sexual morality laws are direct biblical commandments found in Leviticus 18 and 20, establishing boundaries for holy living."
+            else:
+                note = "Additional holiness regulations derived from biblical principles about maintaining ritual purity and moral separation from pagan practices."
             mitzvah = {
                 "number": i,
                 "title": f"Law of holiness and dietary restrictions {i-138}",
                 "traditionalWording": "Maintaining ritual purity and dietary holiness as commanded.",
                 "sourceVerse": f"Leviticus 11:{(i-138) % 47 + 1} — \"These are the beasts which ye shall eat among all the beasts.\"",
-                "scholarlyNote": "Holiness laws distinguishing Israel as a consecrated nation through dietary restrictions and moral purity."
+                "scholarlyNote": note
             }
         elif i <= 233:  # Book 6: Promises - 25 commandments
             mitzvah = {
@@ -747,23 +759,31 @@ def get_remaining_mitzvot():
                 "title": f"Law of vows and oaths {i-208}",
                 "traditionalWording": "Proper observance of vows and oath-taking.",
                 "sourceVerse": f"Numbers 30:{(i-208) % 17 + 1} — \"If a man vow a vow unto the LORD.\"",
-                "scholarlyNote": "Laws governing voluntary commitments to God, ensuring integrity in religious vows and sacred promises."
+                "scholarlyNote": "Laws governing voluntary commitments to God are explicitly detailed in Numbers 30, ensuring integrity in religious vows and sacred promises."
             }
         elif i <= 300:  # Book 7: Seeds - 67 commandments
+            if i <= 270:
+                note = "Agricultural and tithing laws are explicitly commanded in biblical legislation, connecting the people to the land through sabbatical cycles and proper support of priests and Levites."
+            else:
+                note = "These agricultural regulations represent applications of biblical principles about stewardship of the land and support for religious leadership."
             mitzvah = {
                 "number": i,
                 "title": f"Law of agriculture and tithes {i-233}",
                 "traditionalWording": "Agricultural observance and proper tithing as commanded.",
                 "sourceVerse": f"Deuteronomy 14:{(i-233) % 29 + 1} — \"Thou shalt truly tithe all the increase of thy seed.\"",
-                "scholarlyNote": "Agricultural laws connecting the people to the land through sabbatical cycles and proper support of priests and Levites."
+                "scholarlyNote": note
             }
         elif i <= 403:  # Book 8: Service - 103 commandments
+            if i <= 350:
+                note = "Temple service regulations are explicitly detailed in Leviticus and Numbers, establishing proper worship through priestly mediation and sacrificial offerings."
+            else:
+                note = "Additional Temple procedures represent traditional interpretations and applications of biblical principles about sacred worship and priestly duties."
             mitzvah = {
                 "number": i,
                 "title": f"Law of Temple service {i-300}",
                 "traditionalWording": "Proper conduct of Temple worship and sacrificial service.",
                 "sourceVerse": f"Leviticus 1:{(i-300) % 17 + 1} — \"And the LORD called unto Moses, and spake unto him.\"",
-                "scholarlyNote": "Temple service regulations establishing proper worship through priestly mediation and sacrificial offerings."
+                "scholarlyNote": note
             }
         elif i <= 442:  # Book 9: Sacrifices - 39 commandments
             mitzvah = {
@@ -771,23 +791,31 @@ def get_remaining_mitzvot():
                 "title": f"Law of individual sacrifices {i-403}",
                 "traditionalWording": "Proper offering of individual sacrifices as prescribed.",
                 "sourceVerse": f"Leviticus 4:{(i-403) % 35 + 1} — \"And the LORD spake unto Moses, saying.\"",
-                "scholarlyNote": "Individual sacrifice regulations providing means for personal atonement and devotion to God."
+                "scholarlyNote": "Individual sacrifice regulations are explicitly commanded in Leviticus, providing means for personal atonement and devotion to God through prescribed ritual offerings."
             }
         elif i <= 462:  # Book 10: Ritual Purity - 20 commandments
+            if i <= 455:
+                note = "Ritual purity laws are explicitly detailed in Leviticus 11-15, maintaining the sanctity necessary for approaching God and participating in worship."
+            else:
+                note = "Additional purity regulations represent applications of biblical principles about cleanness and preparation for sacred encounters."
             mitzvah = {
                 "number": i,
                 "title": f"Law of ritual purity {i-442}",
                 "traditionalWording": "Maintaining ritual cleanliness as required for approaching God.",
                 "sourceVerse": f"Leviticus 15:{(i-442) % 33 + 1} — \"Speak unto the children of Israel, and say unto them.\"",
-                "scholarlyNote": "Ritual purity laws maintaining the sanctity necessary for approaching God and participating in worship."
+                "scholarlyNote": note
             }
         elif i <= 498:  # Book 11: Injuries - 36 commandments
+            if i <= 480:
+                note = "Civil law establishing justice and proper compensation for injuries is explicitly commanded in Exodus 21-22, reflecting God's concern for social order and fairness."
+            else:
+                note = "Additional civil procedures represent applications of biblical justice principles, ensuring comprehensive protection of individual rights and social harmony."
             mitzvah = {
                 "number": i,
                 "title": f"Law of damages and injuries {i-462}",
                 "traditionalWording": "Justice in cases of personal injury and property damage.",
                 "sourceVerse": f"Exodus 21:{(i-462) % 37 + 1} — \"Now these are the judgments which thou shalt set.\"",
-                "scholarlyNote": "Civil law establishing justice and proper compensation for injuries, reflecting God's concern for social order."
+                "scholarlyNote": note
             }
         elif i <= 516:  # Book 12: Acquisition - 18 commandments
             mitzvah = {
@@ -795,23 +823,33 @@ def get_remaining_mitzvot():
                 "title": f"Law of acquisition and commerce {i-498}",
                 "traditionalWording": "Honest dealing in business and commercial transactions.",
                 "sourceVerse": f"Leviticus 25:{(i-498) % 55 + 1} — \"And ye shall not therefore oppress one another.\"",
-                "scholarlyNote": "Commercial law ensuring honest business practices and fair treatment in economic relationships."
+                "scholarlyNote": "Commercial law is explicitly commanded in biblical legislation, ensuring honest business practices and fair treatment in economic relationships."
             }
         elif i <= 539:  # Book 13: Judgments - 23 commandments
+            if i <= 530:
+                note = "Civil procedure law is explicitly established in Deuteronomy 15-25, providing proper methods for resolving disputes and ensuring justice in society."
+            else:
+                note = "Additional civil procedures represent applications of biblical justice principles for comprehensive legal coverage in community disputes."
             mitzvah = {
                 "number": i,
                 "title": f"Law of civil judgments {i-516}",
                 "traditionalWording": "Proper procedures in civil law and financial disputes.",
                 "sourceVerse": f"Deuteronomy 15:{(i-516) % 23 + 1} — \"At the end of every seven years thou shalt make a release.\"",
-                "scholarlyNote": "Civil procedure law establishing proper methods for resolving disputes and ensuring justice in society."
+                "scholarlyNote": note
             }
         else:  # Book 14: Judges - 74 commandments (540-613)
+            if i <= 580:
+                note = "Judicial and governmental law is explicitly commanded in Deuteronomy 16-19, establishing proper administration of justice and legitimate authority in Israel."
+            elif i <= 600:
+                note = "Additional judicial procedures represent rabbinic applications and interpretations of biblical justice principles for comprehensive legal administration."
+            else:
+                note = "Final governmental regulations represent traditional applications of biblical principles about leadership, warfare, and community governance."
             mitzvah = {
                 "number": i,
                 "title": f"Law of courts and government {i-539}",
                 "traditionalWording": "Proper administration of justice and governmental authority.",
                 "sourceVerse": f"Deuteronomy 16:{(i-539) % 22 + 1} — \"Judges and officers shalt thou make thee.\"",
-                "scholarlyNote": "Judicial and governmental law establishing proper administration of justice and legitimate authority in Israel."
+                "scholarlyNote": note
             }
         
         remaining.append(mitzvah)
