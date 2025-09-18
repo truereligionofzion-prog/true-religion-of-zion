@@ -185,8 +185,8 @@ MITZVOT_DATA = [
     },
     {
         "number": 5,
-        "title": "To fear God",
-        "traditionalWording": "Fear, revere, and stand in awe of God.",
+        "title": "To fear God reverently",
+        "traditionalWording": "To fear Him reverently and stand in awe.",
         "sourceVerse": "Deuteronomy 10:20 — \"Thou shalt fear the LORD thy God; him shalt thou serve…\"",
         "scholarlyNote": "The fear here is reverential, a common covenantal theme in ancient Near Eastern treaties, reaffirmed by Qumran texts."
     },
