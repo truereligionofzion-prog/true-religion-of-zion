@@ -38,7 +38,7 @@ class Category(BaseModel):
     name: str
     description: Optional[str] = ""
     order: int = 0
-    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class CategoryCreate(BaseModel):
     slug: str
