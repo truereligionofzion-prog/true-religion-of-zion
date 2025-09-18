@@ -843,6 +843,234 @@ const MitzvotApp = () => {
               </div>
             )}
           </TabsContent>
+
+          {/* Flashcards Tab Content */}
+          <TabsContent value="flashcards">
+            {flashcards.length === 0 ? (
+              <div className="text-center py-12">
+                <Card className="max-w-2xl mx-auto">
+                  <CardHeader>
+                    <CardTitle className="text-2xl">📚 Flashcard Review</CardTitle>
+                    <p className="text-gray-600">
+                      Use spaced repetition to master the mitzvot! The algorithm will show you cards when you need to review them.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <Button onClick={startFlashcards} className="h-16 w-full">
+                      <div className="text-center">
+                        <div className="font-semibold">Start Flashcard Review</div>
+                        <div className="text-sm opacity-75">Review cards due today</div>
+                      </div>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="max-w-2xl mx-auto">
+                {currentFlashcardIndex < flashcards.length ? (
+                  <Card>
+                    <CardHeader>
+                      <div className="flex justify-between items-center">
+                        <CardTitle>
+                          Card {currentFlashcardIndex + 1} of {flashcards.length}
+                        </CardTitle>
+                        <Badge variant="outline">
+                          #{flashcards[currentFlashcardIndex].mitzvah.number}
+                        </Badge>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${((currentFlashcardIndex + 1) / flashcards.length) * 100}%` }}
+                        />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        <div className="text-center">
+                          <h3 className="text-xl font-semibold mb-4">
+                            {flashcards[currentFlashcardIndex].mitzvah.title}
+                          </h3>
+                          
+                          {!showFlashcardAnswer ? (
+                            <div className="space-y-4">
+                              <p className="text-gray-600">
+                                What is the traditional wording for this mitzvah?
+                              </p>
+                              <Button 
+                                onClick={() => setShowFlashcardAnswer(true)}
+                                variant="outline"
+                                className="w-full h-12"
+                              >
+                                Show Answer
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="space-y-4">
+                              <div className="bg-blue-50 p-4 rounded-lg">
+                                <p className="font-medium text-blue-900 italic">
+                                  "{flashcards[currentFlashcardIndex].mitzvah.traditionalWording}"
+                                </p>
+                              </div>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="text-sm text-gray-700">
+                                  <strong>Source:</strong> {flashcards[currentFlashcardIndex].mitzvah.sourceVerse}
+                                </p>
+                              </div>
+                              
+                              <div className="flex gap-4 justify-center pt-4">
+                                <Button 
+                                  onClick={() => reviewFlashcard(false)}
+                                  variant="outline"
+                                  className="flex items-center gap-2 h-12 px-6"
+                                >
+                                  <span className="text-red-500">❌</span>
+                                  Incorrect
+                                </Button>
+                                <Button 
+                                  onClick={() => reviewFlashcard(true)}
+                                  className="flex items-center gap-2 h-12 px-6"
+                                >
+                                  <span className="text-green-500">✅</span>
+                                  Correct
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card className="text-center">
+                    <CardHeader>
+                      <CardTitle className="text-2xl">🎉 Review Complete!</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <p className="text-lg">Great work! You've reviewed all your flashcards for today.</p>
+                        <div className="flex gap-4 justify-center">
+                          <Button onClick={startFlashcards}>
+                            Review More Cards
+                          </Button>
+                          <Button variant="outline" onClick={() => setActiveTab('progress')}>
+                            View Progress
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Progress Tab Content */}
+          <TabsContent value="progress">
+            <div className="space-y-8">
+              {userProgress && (
+                <>
+                  {/* Overall Progress */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <span className="text-2xl">📊</span>
+                        Your Learning Progress
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div className="text-center p-4 bg-blue-50 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-600">{userProgress.learning}</div>
+                          <div className="text-sm text-gray-600">Learning</div>
+                        </div>
+                        <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                          <div className="text-2xl font-bold text-yellow-600">{userProgress.reviewing}</div>
+                          <div className="text-sm text-gray-600">Reviewing</div>
+                        </div>
+                        <div className="text-center p-4 bg-green-50 rounded-lg">
+                          <div className="text-2xl font-bold text-green-600">{userProgress.mastered}</div>
+                          <div className="text-sm text-gray-600">Mastered</div>
+                        </div>
+                        <div className="text-center p-4 bg-purple-50 rounded-lg">
+                          <div className="text-2xl font-bold text-purple-600">{userProgress.overallProgress}%</div>
+                          <div className="text-sm text-gray-600">Overall</div>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <div className="flex justify-between text-sm text-gray-600 mb-2">
+                          <span>Progress</span>
+                          <span>{userProgress.mastered} / {userProgress.totalMitzvot}</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div 
+                            className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+                            style={{ width: `${userProgress.overallProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Category Progress */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Progress by Category</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-4">
+                        {Object.entries(userProgress.categoryProgress).map(([categoryName, progress]) => (
+                          <div key={categoryName} className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="font-medium">{categoryName}</span>
+                              <span className="text-gray-600">{progress.mastered} / {progress.total} ({progress.percentage}%)</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${progress.percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Quick Actions */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Quick Actions</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <Button onClick={startFlashcards} variant="outline" className="h-16">
+                          <div className="text-center">
+                            <div className="font-semibold">📚 Study Flashcards</div>
+                            <div className="text-sm opacity-75">Review due cards</div>
+                          </div>
+                        </Button>
+                        <Button onClick={() => startQuiz('all')} variant="outline" className="h-16">
+                          <div className="text-center">
+                            <div className="font-semibold">🧠 Take Quiz</div>
+                            <div className="text-sm opacity-75">Test your knowledge</div>
+                          </div>
+                        </Button>
+                        <Button onClick={() => setActiveTab('explore')} variant="outline" className="h-16">
+                          <div className="text-center">
+                            <div className="font-semibold">🔍 Explore</div>
+                            <div className="text-sm opacity-75">Browse mitzvot</div>
+                          </div>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+            </div>
+          </TabsContent>
+
         </Tabs>
       </div>
       
