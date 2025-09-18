@@ -52,14 +52,16 @@ const MitzvotApp = () => {
     try {
       setLoading(true);
       
-      // Load stats and categories in parallel
-      const [statsResponse, categoriesResponse] = await Promise.all([
+      // Load stats, categories, and mitzvah of the day in parallel
+      const [statsResponse, categoriesResponse, mitzvahOfTheDayResponse] = await Promise.all([
         apiService.getStats(),
-        apiService.getCategories()
+        apiService.getCategories(),
+        apiService.getMitzvahOfTheDay()
       ]);
 
       setStats(statsResponse);
       setCategories(categoriesResponse);
+      setMitzvahOfTheDay(mitzvahOfTheDayResponse);
       
       // Load initial mitzvot data
       await loadMitzvot();
