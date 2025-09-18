@@ -335,32 +335,44 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
             question_type = random.choice(question_types)
             
             if question_type == "title_from_traditional":
+                # Ensure unique wrong answer titles
+                wrong_titles = []
+                for wrong_answer in wrong_answers:
+                    if wrong_answer["title"] != mitzvah["title"] and wrong_answer["title"] not in wrong_titles:
+                        wrong_titles.append(wrong_answer["title"])
+                
+                # Fill with more options if needed
+                while len(wrong_titles) < 3:
+                    additional_wrong = random.choice([m for m in other_mitzvot if m["title"] != mitzvah["title"] and m["title"] not in wrong_titles])
+                    wrong_titles.append(additional_wrong["title"])
+                
                 question = {
                     "id": len(quiz_questions) + 1,
                     "type": "multiple_choice",
                     "question": f"Which mitzvah has this traditional wording: \"{mitzvah['traditionalWording']}\"?",
                     "correct_answer": mitzvah["title"],
-                    "options": [
-                        mitzvah["title"],
-                        wrong_answers[0]["title"],
-                        wrong_answers[1]["title"], 
-                        wrong_answers[2]["title"]
-                    ],
+                    "options": [mitzvah["title"]] + wrong_titles[:3],
                     "explanation": f"This is mitzvah #{mitzvah['number']}: {mitzvah['title']}. Source: {mitzvah['sourceVerse']}"
                 }
             
             elif question_type == "traditional_from_title":
+                # Ensure unique wrong answer traditional wordings
+                wrong_traditional = []
+                for wrong_answer in wrong_answers:
+                    if wrong_answer["traditionalWording"] != mitzvah["traditionalWording"] and wrong_answer["traditionalWording"] not in wrong_traditional:
+                        wrong_traditional.append(wrong_answer["traditionalWording"])
+                
+                # Fill with more options if needed
+                while len(wrong_traditional) < 3:
+                    additional_wrong = random.choice([m for m in other_mitzvot if m["traditionalWording"] != mitzvah["traditionalWording"] and m["traditionalWording"] not in wrong_traditional])
+                    wrong_traditional.append(additional_wrong["traditionalWording"])
+                
                 question = {
                     "id": len(quiz_questions) + 1,
                     "type": "multiple_choice",
                     "question": f"What is the traditional wording for: \"{mitzvah['title']}\"?",
                     "correct_answer": mitzvah["traditionalWording"],
-                    "options": [
-                        mitzvah["traditionalWording"],
-                        wrong_answers[0]["traditionalWording"],
-                        wrong_answers[1]["traditionalWording"],
-                        wrong_answers[2]["traditionalWording"]
-                    ],
+                    "options": [mitzvah["traditionalWording"]] + wrong_traditional[:3],
                     "explanation": f"The traditional wording emphasizes: {mitzvah['scholarlyNote'][:100]}..."
                 }
             
