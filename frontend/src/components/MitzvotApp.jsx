@@ -31,6 +31,10 @@ const MitzvotApp = () => {
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
+  const [userProgress, setUserProgress] = useState(null);
+  const [flashcards, setFlashcards] = useState([]);
+  const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
+  const [showFlashcardAnswer, setShowFlashcardAnswer] = useState(false);
 
   const { toast } = useToast();
 
