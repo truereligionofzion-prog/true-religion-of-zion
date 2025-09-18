@@ -55,75 +55,14 @@ async def initialize_data():
             category = Category(**cat_data.dict())
             await categories_collection.insert_one(category.dict())
         
-        # Load mitzvot (using sample data structure - will be expanded with full 613)
-        sample_mitzvot = [
-            {
-                "number": 1,
-                "title": "To know that God exists",
-                "traditionalWording": "To believe in the existence of God.",
-                "sourceVerse": "Exodus 20:2 — \"I am the LORD thy God, which have brought thee out of the land of Egypt, out of the house of bondage.\"",
-                "book": "Exodus",
-                "chapter": 20,
-                "verse": "2",
-                "status": "direct",
-                "category": "faith-god",
-                "scholarlyNote": "Maimonides places this as the first mitzvah. While some scholars view it as more of a declaration than a command, Dead Sea Scrolls fragments confirm its foundational role in Israelite faith.",
-                "keywords": ["God", "existence", "belief", "faith", "foundation", "monotheism"]
-            },
-            {
-                "number": 2,
-                "title": "Not to entertain thoughts of other gods",
-                "traditionalWording": "Do not even think there are other gods before Me.",
-                "sourceVerse": "Exodus 20:3 — \"Thou shalt have no other gods before me.\"",
-                "book": "Exodus",
-                "chapter": 20,
-                "verse": "3",
-                "status": "direct",
-                "category": "faith-god",
-                "scholarlyNote": "This commandment is universally preserved across Bible versions, including the Septuagint. It serves as a cornerstone of monotheism.",
-                "keywords": ["idolatry", "monotheism", "thoughts", "gods", "commandment"]
-            },
-            {
-                "number": 21,
-                "title": "Not to eat blood",
-                "traditionalWording": "Abstain from consuming blood.",
-                "sourceVerse": "Leviticus 7:26 — \"Moreover ye shall eat no manner of blood, whether it be of fowl or of beast, in any of your dwellings.\"",
-                "book": "Leviticus",
-                "chapter": 7,
-                "verse": "26",
-                "status": "direct",
-                "category": "dietary-laws",
-                "scholarlyNote": "Universally recognized prohibition; reinforced multiple times across Leviticus and Deuteronomy.",
-                "keywords": ["blood", "dietary", "kosher", "prohibition", "consumption"]
-            }
-        ]
+        # Load mitzvot from data_loader
+        from data_loader import load_mitzvot_data
+        mitzvot_data = load_mitzvot_data()
         
-        # Generate sample data for remaining mitzvot (will replace with actual user data)
+        # Convert to Mitzvah objects and insert
         all_mitzvot = []
-        for i in range(1, 614):
-            if i <= len(sample_mitzvot):
-                mitzvah_data = sample_mitzvot[i-1]
-            else:
-                # Generate placeholder data structure
-                categories = ["faith-god", "torah-study", "temple-worship", "dietary-laws", "festivals", "ethics-morality"]
-                books = ["Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy"]
-                statuses = ["direct", "indirect", "rabbinic", "traditional"]
-                
-                mitzvah_data = {
-                    "number": i,
-                    "title": f"Mitzvah {i} - Sample Law",
-                    "traditionalWording": f"Traditional wording for mitzvah {i}.",
-                    "sourceVerse": f"{books[i % len(books)]} {(i % 50) + 1}:{(i % 30) + 1} — \"Sample verse text for mitzvah {i}.\"",
-                    "book": books[i % len(books)],
-                    "chapter": (i % 50) + 1,
-                    "verse": str((i % 30) + 1),
-                    "status": statuses[i % len(statuses)],
-                    "category": categories[i % len(categories)],
-                    "scholarlyNote": f"Scholarly note explaining the context and significance of mitzvah {i}.",
-                    "keywords": ["sample", "law", "commandment", "torah"]
-                }
-            
-            mitzvah = Mitzvah(**mitzvah_data)
+        for mitzvah_create in mitzvot_data:
+            mitzvah = Mitzvah(**mitzvah_create.dict())
             all_mitzvot.append(mitzvah.dict())
         
         # Insert all mitzvot
