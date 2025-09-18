@@ -276,21 +276,53 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
         if category != "all":
             query["category"] = category
         
-        # Get all mitzvot for the category
-        all_mitzvot = await mitzvot_collection.find(query).to_list(length=None)
+        # Get ALL mitzvot for diverse wrong answers (not just from selected category)
+        all_mitzvot_for_questions = await mitzvot_collection.find({}).to_list(length=None)
         
-        if len(all_mitzvot) < 4:  # Need at least 4 for multiple choice
-            raise HTTPException(status_code=400, detail="Not enough mitzvot in category for quiz")
+        if len(all_mitzvot_for_questions) < 4:  # Need at least 4 for multiple choice
+            raise HTTPException(status_code=400, detail="Not enough mitzvot in database for quiz")
         
-        # Randomly select mitzvot for questions
-        selected_mitzvot = random.sample(all_mitzvot, min(limit, len(all_mitzvot)))
+        # Randomly select mitzvot for questions from the specified category
+        if category != "all":
+            category_mitzvot = [m for m in all_mitzvot_for_questions if m["category"] == category]
+            if len(category_mitzvot) < 1:
+                raise HTTPException(status_code=400, detail="No mitzvot found in specified category")
+            selected_mitzvot = random.sample(category_mitzvot, min(limit, len(category_mitzvot)))
+        else:
+            selected_mitzvot = random.sample(all_mitzvot_for_questions, min(limit, len(all_mitzvot_for_questions)))
         
         quiz_questions = []
         
         for mitzvah in selected_mitzvot:
-            # Get other mitzvot for wrong answers
-            other_mitzvot = [m for m in all_mitzvot if m["number"] != mitzvah["number"]]
-            wrong_answers = random.sample(other_mitzvot, 3)
+            # Get diverse wrong answers from ALL mitzvot, ensuring variety
+            other_mitzvot = [m for m in all_mitzvot_for_questions if m["number"] != mitzvah["number"]]
+            
+            # Create diverse wrong answers by mixing different categories, statuses, etc.
+            diverse_wrong_answers = []
+            
+            # Try to get wrong answers from different categories
+            different_categories = [m for m in other_mitzvot if m["category"] != mitzvah["category"]]
+            if len(different_categories) >= 2:
+                diverse_wrong_answers.extend(random.sample(different_categories, 2))
+            
+            # Add one from same category if available (for reasonable difficulty)
+            same_category = [m for m in other_mitzvot if m["category"] == mitzvah["category"]]
+            if len(same_category) >= 1 and len(diverse_wrong_answers) < 3:
+                diverse_wrong_answers.extend(random.sample(same_category, min(1, 3 - len(diverse_wrong_answers))))
+            
+            # Fill remaining slots with any other mitzvot if needed
+            while len(diverse_wrong_answers) < 3 and len(other_mitzvot) >= 3:
+                remaining = [m for m in other_mitzvot if m not in diverse_wrong_answers]
+                if remaining:
+                    diverse_wrong_answers.append(random.choice(remaining))
+                else:
+                    break
+            
+            # Fallback to simple random selection if diversity approach fails
+            if len(diverse_wrong_answers) < 3:
+                diverse_wrong_answers = random.sample(other_mitzvot, 3)
+            
+            wrong_answers = diverse_wrong_answers[:3]  # Ensure exactly 3 wrong answers
             
             # Create question types randomly
             question_types = [
