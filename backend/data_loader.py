@@ -13,14 +13,13 @@ CATEGORIES = [
     {"slug": "dietary-laws", "name": "Dietary Laws", "description": "Laws about kosher food and eating", "order": 4},
     {"slug": "tithes-offerings", "name": "Tithes & Offerings", "description": "Laws about tithes, offerings, and priestly portions", "order": 5},
     {"slug": "festivals", "name": "Festivals & Holy Days", "description": "Laws about Sabbath and Jewish holidays", "order": 6},
-    {"slug": "ethics-morality", "name": "Ethics & Morality", "description": "Laws about interpersonal relationships and moral behavior", "order": 7},
-    {"slug": "family-marriage", "name": "Family & Marriage", "description": "Laws about marriage, divorce, and family relationships", "order": 8},
-    {"slug": "civil-criminal", "name": "Civil & Criminal Law", "description": "Laws about justice, courts, and legal procedures", "order": 9},
-    {"slug": "purity-laws", "name": "Purity Laws", "description": "Laws about ritual purity and cleanliness", "order": 10},
-    {"slug": "business-society", "name": "Business & Society", "description": "Laws about commerce, honesty, and social responsibility", "order": 11},
-    {"slug": "leadership", "name": "Leadership & Government", "description": "Laws about kings, judges, and authority", "order": 12},
-    {"slug": "land-agriculture", "name": "Land & Agriculture", "description": "Laws about the land of Israel and farming", "order": 13},
-    {"slug": "other", "name": "Other Laws", "description": "Additional commandments and regulations", "order": 14}
+    {"slug": "family-marriage", "name": "Family & Marriage", "description": "Laws about marriage, divorce, and family relationships", "order": 7},
+    {"slug": "civil-criminal", "name": "Civil & Criminal Law", "description": "Laws about justice, courts, and legal procedures", "order": 8},
+    {"slug": "purity-laws", "name": "Purity Laws", "description": "Laws about ritual purity and cleanliness", "order": 9},
+    {"slug": "business-society", "name": "Business & Society", "description": "Laws about commerce, honesty, and social responsibility", "order": 10},
+    {"slug": "leadership", "name": "Leadership & Government", "description": "Laws about kings, judges, and authority", "order": 11},
+    {"slug": "land-agriculture", "name": "Land & Agriculture", "description": "Laws about the land of Israel and farming", "order": 12},
+    {"slug": "other", "name": "Other Laws", "description": "Additional commandments and regulations", "order": 13}
 ]
 
 def categorize_mitzvah(number: int, title: str, traditional_wording: str) -> str:
