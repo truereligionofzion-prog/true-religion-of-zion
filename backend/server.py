@@ -232,6 +232,10 @@ async def get_mitzvah(mitzvah_id: str):
         if not mitzvah_data:
             raise HTTPException(status_code=404, detail="Mitzvah not found")
         
+        # Remove MongoDB _id field
+        if '_id' in mitzvah_data:
+            del mitzvah_data['_id']
+        
         return Mitzvah(**mitzvah_data)
         
     except HTTPException:
