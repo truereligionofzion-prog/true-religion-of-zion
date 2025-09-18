@@ -98,13 +98,9 @@ def categorize_mitzvah(number: int, title: str, traditional_wording: str) -> str
     if any(word in title_lower or word in wording_lower for word in ['marry', 'marriage', 'father', 'mother', 'parent', 'honor', 'divorce', 'wife', 'husband', 'family']):
         return "family-marriage"
     
-    # Ethics & Morality
-    if any(word in title_lower or word in wording_lower for word in ['love neighbor', 'judge', 'justice', 'honest', 'steal', 'lie', 'witness', 'grudge', 'revenge', 'ethics', 'morality', 'moral']):
-        return "ethics-morality"
-    
-    # Vows and Oaths - these are often miscategorized
+    # Vows and Oaths - redirect to Civil & Criminal Law
     if 'vows and oaths' in title_lower:
-        return "ethics-morality"
+        return "civil-criminal"
     
     # Default category
     return "other"
