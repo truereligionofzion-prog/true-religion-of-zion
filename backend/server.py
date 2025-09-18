@@ -613,9 +613,19 @@ async def get_flashcards_for_review(user_id: str = DEFAULT_USER_ID, limit: int =
         for flashcard in due_flashcards:
             mitzvah = await mitzvot_collection.find_one({"id": flashcard["mitzvahId"]})
             if mitzvah:
+                # Convert mitzvah to proper format, removing MongoDB ObjectId
+                mitzvah_dict = dict(mitzvah)
+                if "_id" in mitzvah_dict:
+                    del mitzvah_dict["_id"]
+                
+                # Convert flashcard to proper format
+                flashcard_dict = dict(flashcard) 
+                if "_id" in flashcard_dict:
+                    del flashcard_dict["_id"]
+                
                 flashcard_data.append({
-                    "flashcard": flashcard,
-                    "mitzvah": mitzvah
+                    "flashcard": flashcard_dict,
+                    "mitzvah": mitzvah_dict
                 })
         
         return {
