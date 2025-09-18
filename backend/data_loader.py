@@ -172,7 +172,7 @@ MITZVOT_DATA = [
     {
         "number": 3,
         "title": "To know that He is One",
-        "traditionalWording": "Know that the LORD is one.",
+        "traditionalWording": "Know that G-d is One, a complete Unity.",
         "sourceVerse": "Deuteronomy 6:4 — \"Hear, O Israel: The LORD our God is one LORD.\"",
         "scholarlyNote": "The Shema is both a declaration and a command, emphasizing the unity of God. This passage is central in Israelite religion, echoed in the Dead Sea Scrolls and used as a daily affirmation by Jewish communities."
     },
