@@ -213,10 +213,17 @@ MITZVOT_DATA = [
     },
     {
         "number": 9,
-        "title": "To study and teach Torah",
-        "traditionalWording": "To learn Torah and teach it to others.",
-        "sourceVerse": "Deuteronomy 6:7 — \"And thou shalt teach them diligently unto thy children…\"",
-        "scholarlyNote": "Expanded in Mishnah and Qumran texts."
+        "title": "Not to profane His Name",
+        "traditionalWording": "Not to profane G-d's name.",
+        "sourceVerse": "Leviticus 22:32 — \"Neither shall ye profane my holy name...\"",
+        "scholarlyNote": "The prohibition against desecrating God's name includes avoiding actions that bring disrepute to God or Judaism."
+    },
+    {
+        "number": 10,
+        "title": "To learn and teach Torah",
+        "traditionalWording": "To learn Torah and to teach it.",
+        "sourceVerse": "Deuteronomy 6:7 — \"And thou shalt teach them diligently unto thy children...\"",
+        "scholarlyNote": "This fundamental obligation encompasses both personal study and transmission of Torah knowledge to future generations."
     },
     {
         "number": 10,
