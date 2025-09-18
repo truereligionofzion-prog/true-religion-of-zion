@@ -52,6 +52,11 @@ class ApiService {
     return this.request('/mitzvah-of-the-day');
   }
 
+  // Get quiz questions
+  async getQuizQuestions(category = 'all', limit = 5) {
+    return this.request(`/quiz/${category}?limit=${limit}`);
+  }
+
   // Initialize database (development/admin use)
   async initializeData() {
     return this.request('/initialize', { method: 'POST' });
