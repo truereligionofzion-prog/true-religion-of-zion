@@ -179,7 +179,7 @@ MITZVOT_DATA = [
     {
         "number": 4,
         "title": "To love God",
-        "traditionalWording": "Love the LORD your God.",
+        "traditionalWording": "To love G-d with all your heart, soul, and might.",
         "sourceVerse": "Deuteronomy 6:5 — \"And thou shalt love the LORD thy God with all thine heart, and with all thy soul, and with all thy might.\"",
         "scholarlyNote": "This mitzvah has been interpreted both emotionally and practically, with rabbinic writings expanding it into deeds and commandments."
     },
