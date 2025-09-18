@@ -836,7 +836,7 @@ def load_mitzvot_data() -> List[MitzvahCreate]:
         keywords = extract_keywords(data["title"], data["traditionalWording"], data["scholarlyNote"])
         
         # Determine status
-        status = determine_status(data["scholarlyNote"], data["sourceVerse"])
+        status = determine_status(data["scholarlyNote"], data["sourceVerse"], data["number"], data["title"])
         
         mitzvah = MitzvahCreate(
             number=data["number"],
