@@ -193,7 +193,7 @@ MITZVOT_DATA = [
     {
         "number": 6,
         "title": "Not to test God",
-        "traditionalWording": "Do not test or try the LORD.",
+        "traditionalWording": "Not to put the word of G-d to the test.",
         "sourceVerse": "Deuteronomy 6:16 — \"Ye shall not tempt the LORD your God, as ye tempted him in Massah.\"",
         "scholarlyNote": "This is quoted by Jesus in the New Testament, showing continuity in its authority."
     },
