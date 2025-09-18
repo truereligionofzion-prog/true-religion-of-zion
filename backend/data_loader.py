@@ -33,28 +33,69 @@ def categorize_mitzvah(number: int, title: str, traditional_wording: str) -> str
         if number <= 10:
             return "faith-god"
     
+    # Check for idolatry laws - these should go to faith-god
+    if any(word in title_lower or word in wording_lower for word in ['idolatry', 'idol', 'graven', 'image', 'prostrate', 'bow down']):
+        return "faith-god"
+    
     # Torah Study & Religious Practice (9-20 approximately)  
     if any(word in title_lower or word in wording_lower for word in ['torah', 'teach', 'study', 'learn', 'tefillin', 'mezuzah', 'shema', 'prayer', 'tzitzit', 'circumcise', 'scroll', 'bind', 'recite', 'write']):
         if number <= 88:  # Extended range to capture more Torah study mitzvot
             return "torah-study"
     
+    # Business & Society - check first for specific titles
+    if 'acquisition and commerce' in title_lower or 'business' in title_lower:
+        return "business-society"
+    if any(word in title_lower or word in wording_lower for word in ['measure', 'weight', 'honest', 'worker', 'wages', 'poor', 'charity', 'commerce', 'acquisition', 'social', 'society', 'oppress', 'balances']):
+        return "business-society"
+    
+    # Land & Agriculture - check first for specific titles
+    if 'agriculture and tithes' in title_lower:
+        return "land-agriculture"
+    if any(word in title_lower or word in wording_lower for word in ['land', 'field', 'harvest', 'jubilee', 'sabbatical', 'farming', 'sow', 'vineyard']):
+        return "land-agriculture"
+        
+    # Tithes & Offerings - but exclude those that should be agriculture
+    if any(word in title_lower or word in wording_lower for word in ['tithe', 'offering', 'firstborn', 'redeem', 'challah', 'terumah']):
+        if 'agriculture' not in title_lower:  # Don't double-categorize agriculture tithes
+            return "tithes-offerings"
+    
     # Dietary Laws 
     if any(word in title_lower or word in wording_lower for word in ['eat', 'blood', 'fat', 'animal', 'slaughter', 'kosher', 'food', 'meat', 'milk', 'dietary', 'beasts', 'clean birds']):
         return "dietary-laws"
     
-    # Tithes & Offerings 
-    if any(word in title_lower or word in wording_lower for word in ['tithe', 'offering', 'firstborn', 'redeem', 'challah', 'terumah', 'agriculture', 'increase', 'seed']):
-        return "tithes-offerings"
+    # Purity Laws - check for specific titles first
+    if 'ritual purity' in title_lower:
+        return "purity-laws"
+    if any(word in title_lower or word in wording_lower for word in ['pure', 'impure', 'clean', 'unclean', 'wash', 'purify', 'leper', 'purity', 'cleanliness']):
+        return "purity-laws"
     
-    # Temple & Worship (includes sacrificial laws)
-    if any(word in title_lower or word in wording_lower for word in ['temple', 'altar', 'priest', 'sacrifice', 'offering', 'holy', 'sanctuary', 'incense', 'showbread', 'burnt', 'sin offering', 'temple service', 'bullock', 'tabernacle']):
+    # Leadership & Government - check for specific titles first
+    if 'courts and government' in title_lower:
+        return "leadership"
+    if any(word in title_lower or word in wording_lower for word in ['king', 'ruler', 'authority', 'leader', 'government', 'judges', 'officers']):
+        return "leadership"
+    
+    # Civil & Criminal Law - check for specific titles first
+    if 'civil judgments' in title_lower or 'damages and injuries' in title_lower:
+        return "civil-criminal"
+    if any(word in title_lower or word in wording_lower for word in ['court', 'witness', 'testimony', 'damages', 'injuries', 'civil', 'criminal', 'judgments']):
+        return "civil-criminal"
+    
+    # Temple & Worship (includes sacrificial laws) - check for specific titles
+    if 'temple service' in title_lower or 'individual sacrifices' in title_lower:
+        return "temple-worship"
+    if any(word in title_lower or word in wording_lower for word in ['temple', 'altar', 'priest', 'sacrifice', 'offering', 'holy', 'sanctuary', 'incense', 'showbread', 'burnt', 'sin offering', 'bullock', 'tabernacle']):
         return "temple-worship"
     
-    # Festivals & Holy Days
+    # Festivals & Holy Days - check for specific titles
+    if 'sabbath and festivals' in title_lower:
+        return "festivals"
     if any(word in title_lower or word in wording_lower for word in ['sabbath', 'passover', 'sukkot', 'yom kippur', 'shavuot', 'festival', 'rest', 'holiday', 'feast', 'holy day', 'festivals']):
         return "festivals"
     
     # Family & Marriage
+    if 'marriage and family' in title_lower:
+        return "family-marriage"
     if any(word in title_lower or word in wording_lower for word in ['marry', 'marriage', 'father', 'mother', 'parent', 'honor', 'divorce', 'wife', 'husband', 'family']):
         return "family-marriage"
     
@@ -62,29 +103,9 @@ def categorize_mitzvah(number: int, title: str, traditional_wording: str) -> str
     if any(word in title_lower or word in wording_lower for word in ['love neighbor', 'judge', 'justice', 'honest', 'steal', 'lie', 'witness', 'grudge', 'revenge', 'ethics', 'morality', 'moral']):
         return "ethics-morality"
     
-    # Civil & Criminal Law
-    if any(word in title_lower or word in wording_lower for word in ['court', 'witness', 'testimony', 'damages', 'injuries', 'civil', 'criminal', 'judgments']):
-        return "civil-criminal"
-    
-    # Purity Laws
-    if any(word in title_lower or word in wording_lower for word in ['pure', 'impure', 'clean', 'unclean', 'wash', 'purify', 'leper', 'purity', 'ritual purity', 'cleanliness']):
-        return "purity-laws"
-    
-    # Business & Society
-    if any(word in title_lower or word in wording_lower for word in ['business', 'measure', 'weight', 'honest', 'worker', 'wages', 'poor', 'charity', 'commerce', 'acquisition', 'social', 'society']):
-        return "business-society"
-    
-    # Leadership & Government
-    if any(word in title_lower or word in wording_lower for word in ['king', 'ruler', 'authority', 'leader', 'courts', 'government', 'judges', 'officers']):
-        return "leadership"
-    
-    # Land & Agriculture
-    if any(word in title_lower or word in wording_lower for word in ['land', 'field', 'harvest', 'jubilee', 'sabbatical', 'agriculture', 'farming', 'seed', 'tithe']):
-        return "land-agriculture"
-    
-    # Check for idolatry laws - these should go to faith-god
-    if any(word in title_lower or word in wording_lower for word in ['idolatry', 'idol', 'graven', 'image', 'prostrate', 'bow down']):
-        return "faith-god"
+    # Vows and Oaths - these are often miscategorized
+    if 'vows and oaths' in title_lower:
+        return "ethics-morality"
     
     # Default category
     return "other"
