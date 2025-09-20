@@ -715,6 +715,18 @@ class APITester:
         print("\n🎯 Testing Specific Mitzvot Content...")
         self.test_specific_mitzvot_content()
         
+        print("\n🧠 Testing Enhanced Quiz System...")
+        self.test_enhanced_quiz_system()
+        
+        print("\n📊 Testing Progress Tracking System...")
+        self.test_progress_tracking_system()
+        
+        print("\n🃏 Testing Flashcard System...")
+        self.test_flashcard_system()
+        
+        print("\n📅 Testing Mitzvah of the Day...")
+        self.test_mitzvah_of_the_day()
+        
         # Summary
         print("\n" + "=" * 70)
         print("📋 TEST SUMMARY")
