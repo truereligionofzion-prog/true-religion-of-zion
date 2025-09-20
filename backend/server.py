@@ -273,6 +273,12 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
     """Generate quiz questions for a specific category"""
     import random
     try:
+        # Validate category exists (unless "all")
+        if category != "all":
+            valid_categories = [cat["slug"] for cat in await categories_collection.find({}).to_list(length=None)]
+            if category not in valid_categories:
+                raise HTTPException(status_code=400, detail=f"Invalid category: {category}. Valid categories: {valid_categories}")
+        
         # Build query based on category
         query = {}
         if category != "all":
