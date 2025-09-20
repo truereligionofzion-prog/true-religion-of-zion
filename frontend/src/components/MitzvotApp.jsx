@@ -14,6 +14,9 @@ import AuthModal from './AuthModal';
 import UserProfile from './UserProfile';
 
 const MitzvotApp = () => {
+  // Authentication
+  const { user, isAuthenticated } = useAuth();
+  
   // State management
   const [mitzvot, setMitzvot] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -38,6 +41,11 @@ const MitzvotApp = () => {
   const [flashcards, setFlashcards] = useState([]);
   const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
   const [showFlashcardAnswer, setShowFlashcardAnswer] = useState(false);
+  
+  // Authentication UI state
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
 
   const { toast } = useToast();
 
