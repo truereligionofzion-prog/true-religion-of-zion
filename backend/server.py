@@ -571,7 +571,12 @@ async def update_mitzvah_progress(mitzvah_id: str, correct: bool, user_id: str =
             upsert=True
         )
         
-        return {"status": "success", "progress": progress}
+        # Remove ObjectId fields for JSON serialization
+        progress_response = dict(progress)
+        if "_id" in progress_response:
+            del progress_response["_id"]
+        
+        return {"status": "success", "progress": progress_response}
         
     except Exception as e:
         logger.error(f"Error updating progress: {e}")
