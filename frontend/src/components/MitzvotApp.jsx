@@ -1149,6 +1149,18 @@ const MitzvotApp = () => {
         </Tabs>
       </div>
       
+      {/* Authentication Modals */}
+      <AuthModal 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        defaultMode={authMode}
+      />
+      
+      {/* User Profile Modal */}
+      {showProfileModal && (
+        <UserProfile onClose={() => setShowProfileModal(false)} />
+      )}
+      
       <Toaster />
     </div>
   );
