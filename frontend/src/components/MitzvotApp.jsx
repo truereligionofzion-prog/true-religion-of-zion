@@ -466,16 +466,80 @@ const MitzvotApp = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            The 613 Laws of the Bible
-          </h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Explore the complete collection of biblical commandments with their sources, 
-            scholarly notes, and categorization. Search by content, filter by origin, 
-            and discover the rich tradition of biblical law.
-          </p>
+        <div className="flex justify-between items-start mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              The 613 Laws of the Bible
+            </h1>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Explore the complete collection of biblical commandments with their sources, 
+              scholarly notes, and categorization. Search by content, filter by origin, 
+              and discover the rich tradition of biblical law.
+            </p>
+          </div>
+          
+          {/* Authentication Section */}
+          <div className="flex gap-2 ml-4">
+            {isAuthenticated ? (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowProfileModal(true)}
+                  className="flex items-center gap-2"
+                >
+                  <User className="w-4 h-4" />
+                  {user?.name || 'Profile'}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setAuthMode('login');
+                    setShowAuthModal(true);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Sign In
+                </Button>
+                <Button
+                  onClick={() => {
+                    setAuthMode('register');
+                    setShowAuthModal(true);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Sign Up
+                </Button>
+              </>
+            )}
+          </div>
         </div>
+        
+        {/* Guest Mode Notice */}
+        {!isAuthenticated && (
+          <div className="mb-6">
+            <Card className="bg-yellow-50 border-yellow-200">
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-2 text-yellow-800">
+                  <Info className="w-4 h-4" />
+                  <span className="text-sm">
+                    <strong>Guest Mode:</strong> You can explore and use all features, but your progress won't be saved. 
+                    <button 
+                      onClick={() => setShowAuthModal(true)}
+                      className="text-yellow-900 underline hover:text-yellow-700 ml-1"
+                    >
+                      Sign up to save your progress!
+                    </button>
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Mitzvah of the Day */}
         {mitzvahOfTheDay && (
