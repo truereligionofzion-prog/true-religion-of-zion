@@ -497,44 +497,66 @@ const MitzvotApp = () => {
             </p>
           </div>
           
-          {/* Authentication Section */}
-          <div className="flex gap-2 ml-4">
-            {isAuthenticated ? (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowProfileModal(true)}
-                  className="flex items-center gap-2"
+          {/* Authentication Section - Subtle User Menu */}
+          <div className="ml-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 >
                   <User className="w-4 h-4" />
-                  {user?.name || 'Profile'}
+                  {isAuthenticated ? (
+                    <>
+                      <span className="hidden sm:inline">{user?.name || 'Account'}</span>
+                      <ChevronDown className="w-3 h-3" />
+                    </>
+                  ) : (
+                    <>
+                      <span className="hidden sm:inline">Account</span>
+                      <ChevronDown className="w-3 h-3" />
+                    </>
+                  )}
                 </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setAuthMode('login');
-                    setShowAuthModal(true);
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <LogIn className="w-4 h-4" />
-                  Sign In
-                </Button>
-                <Button
-                  onClick={() => {
-                    setAuthMode('register');
-                    setShowAuthModal(true);
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  Sign Up
-                </Button>
-              </>
-            )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {isAuthenticated ? (
+                  <>
+                    <DropdownMenuItem 
+                      onClick={() => setShowProfileModal(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <User className="w-4 h-4" />
+                      Profile
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setAuthMode('login');
+                        setShowAuthModal(true);
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <LogIn className="w-4 h-4" />
+                      Sign In
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setAuthMode('register');
+                        setShowAuthModal(true);
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      Sign Up
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         
