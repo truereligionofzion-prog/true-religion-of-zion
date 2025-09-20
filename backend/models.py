@@ -113,3 +113,68 @@ class Achievement(BaseModel):
     completed: bool = False
     unlockedAt: Optional[datetime] = None
     createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# New Models for User Management and Authentication
+
+class UserCreate(BaseModel):
+    email: str
+    name: str
+    password: str
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class User(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    email: str
+    name: str
+    hashedPassword: str
+    isActive: bool = True
+    preferences: Dict = Field(default_factory=dict)
+    
+    # Learning preferences
+    dailyGoal: int = 5  # mitzvot per day
+    preferredCategories: List[str] = Field(default_factory=list)
+    difficulty: str = "medium"  # easy, medium, hard
+    
+    # Marketing/Analytics data
+    signupSource: Optional[str] = None
+    lastActiveDate: Optional[datetime] = None
+    totalStudyTime: int = 0  # in minutes
+    
+    # Subscription/Premium features (for future)
+    subscriptionType: str = "free"  # free, premium
+    subscriptionExpiry: Optional[datetime] = None
+    
+    createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class UserProfile(BaseModel):
+    id: str
+    email: str
+    name: str
+    preferences: Dict
+    dailyGoal: int
+    preferredCategories: List[str]
+    difficulty: str
+    totalStudyTime: int
+    subscriptionType: str
+    createdAt: datetime
+    
+class UserStats(BaseModel):
+    userId: str
+    totalMitzvot: int
+    learning: int
+    reviewing: int
+    mastered: int
+    overallProgress: float
+    currentStreak: int
+    totalStudyTime: int
+    achievementsUnlocked: int
+    favoriteCategory: Optional[str] = None
+
+class AuthResponse(BaseModel):
+    token: str
+    user: UserProfile
+    expiresIn: int = 86400  # 24 hours
