@@ -74,17 +74,26 @@ const MitzvotApp = () => {
       setLoading(true);
       
       // Load stats, categories, mitzvah of the day, and user progress in parallel
-      const [statsResponse, categoriesResponse, mitzvahOfTheDayResponse, progressResponse] = await Promise.all([
+      const promises = [
         apiService.getStats(),
         apiService.getCategories(),
-        apiService.getMitzvahOfTheDay(),
-        apiService.getUserProgress()
-      ]);
-
-      setStats(statsResponse);
-      setCategories(categoriesResponse);
-      setMitzvahOfTheDay(mitzvahOfTheDayResponse);
-      setUserProgress(progressResponse);
+        apiService.getMitzvahOfTheDay()
+      ];
+      
+      // Only load progress if authenticated
+      if (isAuthenticated) {
+        promises.push(apiService.getUserProgress(user.id));
+      }
+      
+      const responses = await Promise.all(promises);
+      
+      setStats(responses[0]);
+      setCategories(responses[1]);
+      setMitzvahOfTheDay(responses[2]);
+      
+      if (isAuthenticated && responses[3]) {
+        setUserProgress(responses[3]);
+      }
       
       // Load initial mitzvot data
       await loadMitzvot();
