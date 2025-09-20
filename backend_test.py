@@ -421,6 +421,262 @@ class APITester:
                 self.log_test(f"Specific Mitzvah {number}", False, f"Error: {str(e)}")
         
         return tests_passed >= len(specific_tests) * 0.75  # At least 75% should pass
+
+    def test_enhanced_quiz_system(self):
+        """Test the enhanced quiz system with diverse answer choices and question types"""
+        try:
+            # Test quiz generation for different categories
+            categories_to_test = ["all", "faith-god", "torah-study", "invalid-category"]
+            quiz_tests_passed = 0
+            
+            for category in categories_to_test:
+                try:
+                    response = self.session.get(f"{self.base_url}/quiz/{category}?limit=5")
+                    
+                    if category == "invalid-category":
+                        # Should handle invalid category gracefully
+                        if response.status_code in [400, 404]:
+                            self.log_test(f"Quiz - Invalid Category Handling", True, f"Properly handled invalid category")
+                            quiz_tests_passed += 1
+                        else:
+                            self.log_test(f"Quiz - Invalid Category Handling", False, f"Status: {response.status_code}")
+                        continue
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        questions = data.get('questions', [])
+                        
+                        if not questions:
+                            self.log_test(f"Quiz - {category} Generation", False, "No questions generated")
+                            continue
+                        
+                        # Test question structure and diversity
+                        question_types_found = set()
+                        unique_answers_per_question = []
+                        
+                        for question in questions:
+                            # Check required fields
+                            required_fields = ['id', 'type', 'question', 'correct_answer', 'options', 'explanation']
+                            if all(field in question for field in required_fields):
+                                # Check question type diversity
+                                if 'title_from_traditional' in question.get('question', ''):
+                                    question_types_found.add('title_from_traditional')
+                                elif 'traditional wording' in question.get('question', ''):
+                                    question_types_found.add('traditional_from_title')
+                                elif 'category' in question.get('question', ''):
+                                    question_types_found.add('category_from_title')
+                                elif 'origin status' in question.get('question', ''):
+                                    question_types_found.add('status_from_title')
+                                
+                                # Check answer diversity (no duplicates)
+                                options = question.get('options', [])
+                                unique_options = len(set(options))
+                                unique_answers_per_question.append(unique_options == len(options))
+                                
+                                # Verify correct answer is in options
+                                correct_answer = question.get('correct_answer')
+                                if correct_answer not in options:
+                                    self.log_test(f"Quiz - {category} Answer Validity", False, "Correct answer not in options")
+                                    continue
+                        
+                        # Test results
+                        if len(question_types_found) >= 2:
+                            self.log_test(f"Quiz - {category} Question Diversity", True, f"Found {len(question_types_found)} question types")
+                        else:
+                            self.log_test(f"Quiz - {category} Question Diversity", False, f"Only {len(question_types_found)} question types")
+                        
+                        if all(unique_answers_per_question):
+                            self.log_test(f"Quiz - {category} Answer Uniqueness", True, "All questions have unique answer options")
+                            quiz_tests_passed += 1
+                        else:
+                            self.log_test(f"Quiz - {category} Answer Uniqueness", False, "Found duplicate answers in some questions")
+                        
+                        self.log_test(f"Quiz - {category} Generation", True, f"Generated {len(questions)} questions successfully")
+                        quiz_tests_passed += 1
+                    else:
+                        self.log_test(f"Quiz - {category} Generation", False, f"Status: {response.status_code}")
+                        
+                except Exception as e:
+                    self.log_test(f"Quiz - {category}", False, f"Error: {str(e)}")
+            
+            return quiz_tests_passed >= 4  # Should pass most tests
+            
+        except Exception as e:
+            self.log_test("Enhanced Quiz System", False, f"Error: {str(e)}")
+            return False
+
+    def test_progress_tracking_system(self):
+        """Test the progress tracking system"""
+        try:
+            # Test GET /api/progress
+            response = self.session.get(f"{self.base_url}/progress")
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['userId', 'totalMitzvot', 'learning', 'reviewing', 'mastered', 'overallProgress', 'categoryProgress']
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("Progress - GET Endpoint Structure", True, "All required fields present")
+                    
+                    # Test category progress structure
+                    category_progress = data.get('categoryProgress', {})
+                    if category_progress and isinstance(category_progress, dict):
+                        # Check if categories have proper structure
+                        sample_category = next(iter(category_progress.values()), {})
+                        if 'total' in sample_category and 'mastered' in sample_category and 'percentage' in sample_category:
+                            self.log_test("Progress - Category Progress Structure", True, f"Found {len(category_progress)} categories")
+                        else:
+                            self.log_test("Progress - Category Progress Structure", False, "Missing category progress fields")
+                    else:
+                        self.log_test("Progress - Category Progress Structure", False, "No category progress data")
+                else:
+                    self.log_test("Progress - GET Endpoint Structure", False, f"Missing fields: {[f for f in required_fields if f not in data]}")
+            else:
+                self.log_test("Progress - GET Endpoint", False, f"Status: {response.status_code}")
+                return False
+            
+            # Test POST /api/progress/{mitzvah_id} - need to get a valid mitzvah ID first
+            mitzvot_response = self.session.get(f"{self.base_url}/mitzvot?limit=1")
+            if mitzvot_response.status_code == 200:
+                mitzvot_data = mitzvot_response.json()
+                mitzvot = mitzvot_data.get('mitzvot', [])
+                if mitzvot:
+                    test_mitzvah_id = mitzvot[0].get('id')
+                    
+                    # Test updating progress with correct answer
+                    progress_response = self.session.post(f"{self.base_url}/progress/{test_mitzvah_id}?correct=true")
+                    if progress_response.status_code == 200:
+                        progress_data = progress_response.json()
+                        if 'status' in progress_data and 'progress' in progress_data:
+                            self.log_test("Progress - POST Update Correct", True, "Successfully updated progress")
+                        else:
+                            self.log_test("Progress - POST Update Correct", False, "Invalid response structure")
+                    else:
+                        self.log_test("Progress - POST Update Correct", False, f"Status: {progress_response.status_code}")
+                    
+                    # Test updating progress with incorrect answer
+                    progress_response = self.session.post(f"{self.base_url}/progress/{test_mitzvah_id}?correct=false")
+                    if progress_response.status_code == 200:
+                        self.log_test("Progress - POST Update Incorrect", True, "Successfully updated progress")
+                    else:
+                        self.log_test("Progress - POST Update Incorrect", False, f"Status: {progress_response.status_code}")
+                    
+                    # Test invalid mitzvah ID
+                    invalid_response = self.session.post(f"{self.base_url}/progress/invalid-id?correct=true")
+                    if invalid_response.status_code == 404:
+                        self.log_test("Progress - Invalid Mitzvah ID", True, "Properly handled invalid ID")
+                    else:
+                        self.log_test("Progress - Invalid Mitzvah ID", False, f"Status: {invalid_response.status_code}")
+                else:
+                    self.log_test("Progress - POST Tests", False, "No mitzvot available for testing")
+            else:
+                self.log_test("Progress - POST Tests", False, "Could not get mitzvot for testing")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Progress Tracking System", False, f"Error: {str(e)}")
+            return False
+
+    def test_flashcard_system(self):
+        """Test the flashcard system with spaced repetition"""
+        try:
+            # Test GET /api/flashcards
+            response = self.session.get(f"{self.base_url}/flashcards?limit=5")
+            if response.status_code == 200:
+                data = response.json()
+                flashcards = data.get('flashcards', [])
+                
+                if flashcards:
+                    self.log_test("Flashcards - GET Endpoint", True, f"Retrieved {len(flashcards)} flashcards")
+                    
+                    # Test flashcard structure
+                    sample_flashcard = flashcards[0]
+                    if 'flashcard' in sample_flashcard and 'mitzvah' in sample_flashcard:
+                        flashcard_data = sample_flashcard['flashcard']
+                        mitzvah_data = sample_flashcard['mitzvah']
+                        
+                        # Check flashcard fields
+                        required_flashcard_fields = ['id', 'userId', 'mitzvahId', 'difficulty', 'nextReview', 'reviewCount']
+                        if all(field in flashcard_data for field in required_flashcard_fields):
+                            self.log_test("Flashcards - Structure", True, "Proper flashcard structure")
+                        else:
+                            self.log_test("Flashcards - Structure", False, "Missing flashcard fields")
+                        
+                        # Check mitzvah fields
+                        required_mitzvah_fields = ['id', 'title', 'traditionalWording', 'sourceVerse']
+                        if all(field in mitzvah_data for field in required_mitzvah_fields):
+                            self.log_test("Flashcards - Mitzvah Data", True, "Complete mitzvah data included")
+                        else:
+                            self.log_test("Flashcards - Mitzvah Data", False, "Missing mitzvah fields")
+                        
+                        # Test POST /api/flashcards/{id}/review
+                        flashcard_id = flashcard_data.get('id')
+                        if flashcard_id:
+                            # Test correct review
+                            review_response = self.session.post(f"{self.base_url}/flashcards/{flashcard_id}/review?difficulty=3&correct=true")
+                            if review_response.status_code == 200:
+                                review_data = review_response.json()
+                                if 'status' in review_data and 'nextReview' in review_data:
+                                    self.log_test("Flashcards - Review Correct", True, "Successfully processed correct review")
+                                else:
+                                    self.log_test("Flashcards - Review Correct", False, "Invalid review response")
+                            else:
+                                self.log_test("Flashcards - Review Correct", False, f"Status: {review_response.status_code}")
+                            
+                            # Test incorrect review
+                            review_response = self.session.post(f"{self.base_url}/flashcards/{flashcard_id}/review?difficulty=2&correct=false")
+                            if review_response.status_code == 200:
+                                self.log_test("Flashcards - Review Incorrect", True, "Successfully processed incorrect review")
+                            else:
+                                self.log_test("Flashcards - Review Incorrect", False, f"Status: {review_response.status_code}")
+                            
+                            # Test invalid flashcard ID
+                            invalid_review = self.session.post(f"{self.base_url}/flashcards/invalid-id/review?difficulty=3&correct=true")
+                            if invalid_review.status_code == 404:
+                                self.log_test("Flashcards - Invalid ID", True, "Properly handled invalid flashcard ID")
+                            else:
+                                self.log_test("Flashcards - Invalid ID", False, f"Status: {invalid_review.status_code}")
+                        else:
+                            self.log_test("Flashcards - Review Tests", False, "No flashcard ID available")
+                    else:
+                        self.log_test("Flashcards - Structure", False, "Invalid flashcard structure")
+                else:
+                    self.log_test("Flashcards - GET Endpoint", False, "No flashcards returned")
+            else:
+                self.log_test("Flashcards - GET Endpoint", False, f"Status: {response.status_code}")
+                return False
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Flashcard System", False, f"Error: {str(e)}")
+            return False
+
+    def test_mitzvah_of_the_day(self):
+        """Test the mitzvah of the day endpoint"""
+        try:
+            response = self.session.get(f"{self.base_url}/mitzvah-of-the-day")
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['id', 'number', 'title', 'traditionalWording', 'sourceVerse', 'category', 'status']
+                
+                if all(field in data for field in required_fields):
+                    mitzvah_number = data.get('number')
+                    if 1 <= mitzvah_number <= 613:
+                        self.log_test("Mitzvah of the Day", True, f"Valid daily mitzvah #{mitzvah_number}")
+                        return True
+                    else:
+                        self.log_test("Mitzvah of the Day", False, f"Invalid mitzvah number: {mitzvah_number}")
+                else:
+                    self.log_test("Mitzvah of the Day", False, "Missing required fields")
+            else:
+                self.log_test("Mitzvah of the Day", False, f"Status: {response.status_code}")
+            
+            return False
+            
+        except Exception as e:
+            self.log_test("Mitzvah of the Day", False, f"Error: {str(e)}")
+            return False
     
     def run_all_tests(self):
         """Run all tests and return summary"""
