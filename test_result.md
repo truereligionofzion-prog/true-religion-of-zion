@@ -228,6 +228,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ WORKING: Authentication interface is fully functional. Sign In/Sign Up buttons present in header, AuthModal opens correctly with proper form fields (email, password, name, confirmPassword for registration). Modal can be opened and closed properly. Guest mode notice visible with sign up prompt. Authentication state management working through AuthContext. Minor: Some API calls fail due to CORS/network issues but core authentication UI is excellent."
+      - working: true
+        agent: "main"
+        comment: "✅ UI IMPROVEMENT COMPLETE: Replaced prominent Sign In/Sign Up buttons with subtle Account dropdown menu. Uses user icon with dropdown containing authentication options. Much less intrusive while maintaining discoverability. Mobile responsive - works perfectly on both desktop (1920x800) and mobile (390x844) viewports. Dropdown menu opens properly showing Sign In/Sign Up options."
 
   - task: "Enhanced Quiz Interface"
     implemented: true
