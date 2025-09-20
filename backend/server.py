@@ -483,10 +483,12 @@ async def get_user_progress(user_id: str = DEFAULT_USER_ID):
         
         for category in categories:
             category_mitzvot = await mitzvot_collection.count_documents({"category": category["slug"]})
+            # Use the 'id' field instead of MongoDB '_id' field to avoid ObjectId serialization issues
+            category_mitzvot_ids = [str(m["id"]) for m in await mitzvot_collection.find({"category": category["slug"]}).to_list(length=None)]
             category_mastered = await progress_collection.count_documents({
                 "userId": user_id,
                 "status": "mastered",
-                "mitzvahId": {"$in": [str(m["_id"]) for m in await mitzvot_collection.find({"category": category["slug"]}).to_list(length=None)]}
+                "mitzvahId": {"$in": category_mitzvot_ids}
             })
             
             category_progress[category["name"]] = {
