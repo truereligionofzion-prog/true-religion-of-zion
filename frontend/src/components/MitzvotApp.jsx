@@ -1201,6 +1201,18 @@ const MitzvotApp = () => {
                     </CardContent>
                   </Card>
                 </>
+              ) : (
+                // Authenticated but no progress data yet
+                <Card className="text-center py-12">
+                  <CardHeader>
+                    <CardTitle className="text-2xl">📊 Loading Your Progress...</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600">
+                      We're setting up your personalized learning dashboard. Start taking quizzes or reviewing flashcards to see your progress here!
+                    </p>
+                  </CardContent>
+                </Card>
               )}
             </div>
           </TabsContent>
