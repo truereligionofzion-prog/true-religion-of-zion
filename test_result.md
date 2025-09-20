@@ -122,15 +122,18 @@ backend:
 
   - task: "Progress Tracking System"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented user progress endpoints: /api/progress (GET), /api/progress/{mitzvah_id} (POST). Tracks learning/reviewing/mastered status, accuracy, category progress. Needs testing."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE: GET /api/progress works perfectly (tracks 613 mitzvot, 13 categories, learning/reviewing/mastered status). However, POST /api/progress/{mitzvah_id} fails with 500 error due to ObjectId serialization issue in line 489 of server.py. The code tries to use MongoDB ObjectId in category progress calculation which is not JSON serializable."
 
   - task: "Flashcard System with Spaced Repetition"
     implemented: true
