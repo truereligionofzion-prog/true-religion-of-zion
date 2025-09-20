@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, BookOpen, Tag, Info, Loader } from 'lucide-react';
+import { Search, Filter, BookOpen, Tag, Info, Loader, User, UserPlus, LogIn } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
@@ -9,6 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useToast } from '../hooks/use-toast';
 import { Toaster } from './ui/toaster';
 import apiService from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import AuthModal from './AuthModal';
+import UserProfile from './UserProfile';
 
 const MitzvotApp = () => {
   // State management
