@@ -375,7 +375,8 @@ const MitzvotApp = () => {
   const startFlashcards = async () => {
     try {
       setLoading(true);
-      const flashcardResponse = await apiService.getFlashcards('user_001', 10);
+      const userId = isAuthenticated ? user.id : 'guest_user';
+      const flashcardResponse = await apiService.getFlashcards(userId, 10);
       setFlashcards(flashcardResponse.flashcards);
       setCurrentFlashcardIndex(0);
       setShowFlashcardAnswer(false);
@@ -406,9 +407,11 @@ const MitzvotApp = () => {
     try {
       await apiService.reviewFlashcard(flashcard.id, difficulty, correct);
       
-      // Update progress for the mitzvah
-      const mitzvah = flashcards[currentFlashcardIndex].mitzvah;
-      await apiService.updateMitzvahProgress(mitzvah.id, correct);
+      // Update progress for the mitzvah (only if authenticated)
+      if (isAuthenticated) {
+        const mitzvah = flashcards[currentFlashcardIndex].mitzvah;
+        await apiService.updateMitzvahProgress(mitzvah.id, correct, user.id);
+      }
       
       toast({
         title: correct ? "Correct! ✅" : "Keep practicing! 📚",
@@ -424,11 +427,15 @@ const MitzvotApp = () => {
           // Finished all flashcards
           toast({
             title: "Session Complete! 🎉",
-            description: "Great work! Come back tomorrow for more review.",
+            description: isAuthenticated 
+              ? "Great work! Your progress has been saved. Come back tomorrow for more review."
+              : "Great work! Sign up to save your progress and continue tomorrow.",
           });
           setActiveTab('progress');
-          // Reload progress data
-          loadUserProgress();
+          // Reload progress data if authenticated
+          if (isAuthenticated) {
+            loadUserProgress();
+          }
         }
       }, 1500);
       
@@ -443,8 +450,10 @@ const MitzvotApp = () => {
   };
 
   const loadUserProgress = async () => {
+    if (!isAuthenticated) return;
+    
     try {
-      const progressResponse = await apiService.getUserProgress();
+      const progressResponse = await apiService.getUserProgress(user.id);
       setUserProgress(progressResponse);
     } catch (error) {
       console.error('Error loading progress:', error);
