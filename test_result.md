@@ -293,8 +293,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "User Authentication Interface integration"
-    - "Final UI improvements for less intrusive sign in/sign up"
+    - "Network/CORS issues with some API endpoints"
+    - "Complete authentication flow testing with backend integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
