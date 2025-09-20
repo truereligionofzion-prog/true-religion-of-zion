@@ -119,6 +119,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ WORKING: Quiz system generates diverse questions with unique answers. Tested categories 'all', 'faith-god', 'torah-study' - all working. Question types properly randomized. Answer uniqueness verified. Minor: Invalid category returns 500 instead of 400, but core functionality excellent."
+      - working: true
+        agent: "testing"
+        comment: "✅ WORKING: Quiz system fully functional with improved error handling. All categories ('all', 'faith-god', 'torah-study') generate diverse questions with unique answers. Question types properly randomized across title_from_traditional, traditional_from_title, category_from_title, and status_from_title. Answer uniqueness verified. Fixed error handling - invalid categories now properly return 400 status instead of 500. Core functionality excellent."
 
   - task: "User Authentication System"
     implemented: true
