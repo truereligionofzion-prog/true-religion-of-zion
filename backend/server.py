@@ -695,6 +695,230 @@ async def review_flashcard(flashcard_id: str, difficulty: int, correct: bool):
         logger.error(f"Error reviewing flashcard: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# New collections for user management
+users_collection = db["users"]
+
+# Simple JWT token handling (in production, use proper JWT library)
+import secrets
+import hashlib
+from datetime import timedelta
+
+def hash_password(password: str) -> str:
+    """Hash password using SHA-256 (use bcrypt in production)"""
+    return hashlib.sha256((password + "salt_key_2024").encode()).hexdigest()
+
+def verify_password(password: str, hashed_password: str) -> bool:
+    """Verify password against hash"""
+    return hash_password(password) == hashed_password
+
+def create_access_token(user_id: str) -> str:
+    """Create simple access token (use proper JWT in production)"""
+    return hashlib.sha256((user_id + secrets.token_hex(16)).encode()).hexdigest()
+
+@api_router.post("/auth/register", response_model=AuthResponse)
+async def register_user(user_data: UserCreate):
+    """Register a new user"""
+    try:
+        # Check if user already exists
+        existing_user = await users_collection.find_one({"email": user_data.email})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Create new user
+        hashed_password = hash_password(user_data.password)
+        user_id = str(uuid.uuid4())
+        
+        user = {
+            "id": user_id,
+            "email": user_data.email,
+            "name": user_data.name,
+            "hashedPassword": hashed_password,
+            "isActive": True,
+            "preferences": {},
+            "dailyGoal": 5,
+            "preferredCategories": [],
+            "difficulty": "medium",
+            "signupSource": "web",
+            "lastActiveDate": datetime.now(timezone.utc),
+            "totalStudyTime": 0,
+            "subscriptionType": "free",
+            "subscriptionExpiry": None,
+            "createdAt": datetime.now(timezone.utc),
+            "updatedAt": datetime.now(timezone.utc)
+        }
+        
+        await users_collection.insert_one(user)
+        
+        # Create access token
+        token = create_access_token(user_id)
+        
+        # Remove sensitive data for response
+        user_profile = UserProfile(
+            id=user["id"],
+            email=user["email"],
+            name=user["name"],
+            preferences=user["preferences"],
+            dailyGoal=user["dailyGoal"],
+            preferredCategories=user["preferredCategories"],
+            difficulty=user["difficulty"],
+            totalStudyTime=user["totalStudyTime"],
+            subscriptionType=user["subscriptionType"],
+            createdAt=user["createdAt"]
+        )
+        
+        return AuthResponse(
+            token=token,
+            user=user_profile,
+            expiresIn=86400
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error registering user: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/auth/login", response_model=AuthResponse)
+async def login_user(login_data: UserLogin):
+    """Login user and return auth token"""
+    try:
+        # Find user by email
+        user = await users_collection.find_one({"email": login_data.email})
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Verify password
+        if not verify_password(login_data.password, user["hashedPassword"]):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        if not user.get("isActive", True):
+            raise HTTPException(status_code=401, detail="Account is disabled")
+        
+        # Update last active date
+        await users_collection.update_one(
+            {"id": user["id"]},
+            {"$set": {"lastActiveDate": datetime.now(timezone.utc)}}
+        )
+        
+        # Create access token
+        token = create_access_token(user["id"])
+        
+        # Create user profile response
+        user_profile = UserProfile(
+            id=user["id"],
+            email=user["email"],
+            name=user["name"],
+            preferences=user.get("preferences", {}),
+            dailyGoal=user.get("dailyGoal", 5),
+            preferredCategories=user.get("preferredCategories", []),
+            difficulty=user.get("difficulty", "medium"),
+            totalStudyTime=user.get("totalStudyTime", 0),
+            subscriptionType=user.get("subscriptionType", "free"),
+            createdAt=user["createdAt"]
+        )
+        
+        return AuthResponse(
+            token=token,
+            user=user_profile,
+            expiresIn=86400
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error logging in user: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/auth/me", response_model=UserProfile)
+async def get_current_user(authorization: str = Header(None)):
+    """Get current user profile (requires auth token)"""
+    try:
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Authorization token required")
+        
+        # In production, properly decode and validate JWT token
+        # For now, we'll use a simple token lookup (not secure for production)
+        token = authorization.replace("Bearer ", "")
+        
+        # Find user by checking recent activity (simplified auth)
+        # In production, decode JWT and get user_id from token
+        users = await users_collection.find({
+            "lastActiveDate": {"$gte": datetime.now(timezone.utc) - timedelta(days=1)}
+        }).to_list(length=10)
+        
+        if not users:
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
+        
+        # For demo, return the most recently active user
+        user = max(users, key=lambda u: u["lastActiveDate"])
+        
+        user_profile = UserProfile(
+            id=user["id"],
+            email=user["email"],
+            name=user["name"],
+            preferences=user.get("preferences", {}),
+            dailyGoal=user.get("dailyGoal", 5),
+            preferredCategories=user.get("preferredCategories", []),
+            difficulty=user.get("difficulty", "medium"),
+            totalStudyTime=user.get("totalStudyTime", 0),
+            subscriptionType=user.get("subscriptionType", "free"),
+            createdAt=user["createdAt"]
+        )
+        
+        return user_profile
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting current user: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/auth/profile")
+async def update_user_profile(profile_data: dict, authorization: str = Header(None)):
+    """Update user profile and preferences"""
+    try:
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Authorization token required")
+        
+        # Get current user (simplified - in production, decode JWT properly)
+        token = authorization.replace("Bearer ", "")
+        users = await users_collection.find({
+            "lastActiveDate": {"$gte": datetime.now(timezone.utc) - timedelta(days=1)}
+        }).to_list(length=10)
+        
+        if not users:
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
+        
+        user = max(users, key=lambda u: u["lastActiveDate"])
+        
+        # Update allowed fields
+        update_data = {}
+        if "name" in profile_data:
+            update_data["name"] = profile_data["name"]
+        if "dailyGoal" in profile_data:
+            update_data["dailyGoal"] = profile_data["dailyGoal"]
+        if "preferredCategories" in profile_data:
+            update_data["preferredCategories"] = profile_data["preferredCategories"]
+        if "difficulty" in profile_data:
+            update_data["difficulty"] = profile_data["difficulty"]
+        if "preferences" in profile_data:
+            update_data["preferences"] = profile_data["preferences"]
+        
+        update_data["updatedAt"] = datetime.now(timezone.utc)
+        
+        await users_collection.update_one(
+            {"id": user["id"]},
+            {"$set": update_data}
+        )
+        
+        return {"status": "success", "message": "Profile updated successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating profile: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
