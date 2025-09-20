@@ -458,6 +458,8 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
             "total_questions": len(quiz_questions)
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error generating quiz: {e}")
         raise HTTPException(status_code=500, detail=str(e))
