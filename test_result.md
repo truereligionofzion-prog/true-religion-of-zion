@@ -242,11 +242,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Backend API endpoints for learning features"
-    - "Frontend learning interface components"
-    - "Data flow between quiz/flashcard/progress systems"
-  stuck_tasks: []
-  test_all: true
+    - "Fix Progress POST endpoint ObjectId serialization"
+    - "Fix Flashcard generation logic"
+    - "Test spaced repetition algorithm once flashcards work"
+  stuck_tasks:
+    - "Progress Tracking System"
+    - "Flashcard System with Spaced Repetition"
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
