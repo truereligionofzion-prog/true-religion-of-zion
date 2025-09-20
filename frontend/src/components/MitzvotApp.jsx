@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, BookOpen, Tag, Info, Loader, User, UserPlus, LogIn } from 'lucide-react';
+import { Search, Filter, BookOpen, Tag, Info, Loader, User, UserPlus, LogIn, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from './ui/dropdown-menu';
 import { useToast } from '../hooks/use-toast';
 import { Toaster } from './ui/toaster';
 import apiService from '../services/api';
