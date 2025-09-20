@@ -1061,7 +1061,48 @@ const MitzvotApp = () => {
           {/* Progress Tab Content */}
           <TabsContent value="progress">
             <div className="space-y-8">
-              {userProgress && (
+              {!isAuthenticated ? (
+                // Guest User - Show sign up prompt
+                <Card className="text-center py-12">
+                  <CardHeader>
+                    <CardTitle className="text-2xl">📊 Track Your Progress</CardTitle>
+                    <p className="text-gray-600 mt-4">
+                      Sign up to unlock personalized progress tracking, achievement badges, and spaced repetition learning!
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div className="text-center p-4 bg-blue-50 rounded-lg opacity-50">
+                          <div className="text-2xl font-bold text-blue-600">?</div>
+                          <div className="text-sm text-gray-600">Learning</div>
+                        </div>
+                        <div className="text-center p-4 bg-yellow-50 rounded-lg opacity-50">
+                          <div className="text-2xl font-bold text-yellow-600">?</div>
+                          <div className="text-sm text-gray-600">Reviewing</div>
+                        </div>
+                        <div className="text-center p-4 bg-green-50 rounded-lg opacity-50">
+                          <div className="text-2xl font-bold text-green-600">?</div>
+                          <div className="text-sm text-gray-600">Mastered</div>
+                        </div>
+                        <div className="text-center p-4 bg-purple-50 rounded-lg opacity-50">
+                          <div className="text-2xl font-bold text-purple-600">?%</div>
+                          <div className="text-sm text-gray-600">Overall</div>
+                        </div>
+                      </div>
+                      <Button 
+                        onClick={() => setShowAuthModal(true)}
+                        className="h-16 px-8"
+                      >
+                        <div className="text-center">
+                          <div className="font-semibold">Sign Up to Track Progress</div>
+                          <div className="text-sm opacity-75">Unlock personalized learning features</div>
+                        </div>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : userProgress ? (
                 <>
                   {/* Overall Progress */}
                   <Card>
