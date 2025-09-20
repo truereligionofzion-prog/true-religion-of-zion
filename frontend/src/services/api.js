@@ -83,6 +83,40 @@ class ApiService {
     });
   }
 
+  // Authentication
+  async register(email, name, password) {
+    return this.request('/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, name, password })
+    });
+  }
+
+  async login(email, password) {
+    return this.request('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+  }
+
+  async getCurrentUser(token) {
+    return this.request('/auth/me', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+  }
+
+  async updateProfile(profileData, token) {
+    return this.request('/auth/profile', {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(profileData)
+    });
+  }
+
   // Initialize database (development/admin use)
   async initializeData() {
     return this.request('/initialize', { method: 'POST' });
