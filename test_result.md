@@ -243,3 +243,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Implemented comprehensive learning platform with quiz improvements, progress tracking, flashcards with spaced repetition, and progress dashboard. Fixed quiz answer diversity issue. Need thorough testing of all new learning features and user flows."
+  - agent: "testing"
+    message: "Completed comprehensive backend testing of new interactive features. Enhanced Quiz System working well with diverse questions and unique answers. Progress GET endpoint working, but POST has ObjectId serialization issues. Flashcard system structure correct but no cards generated yet. Several critical issues need fixing before frontend integration."
