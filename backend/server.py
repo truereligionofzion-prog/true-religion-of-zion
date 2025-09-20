@@ -13,7 +13,8 @@ from datetime import datetime, timezone, timedelta
 
 from models import (
     Mitzvah, MitzvahCreate, Category, CategoryCreate, 
-    MitzvotResponse, StatsResponse
+    MitzvotResponse, StatsResponse, UserCreate, UserLogin, 
+    UserProfile, AuthResponse
 )
 from data_loader import load_mitzvot_data, get_categories
 
