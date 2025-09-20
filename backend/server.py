@@ -581,6 +581,8 @@ async def update_mitzvah_progress(mitzvah_id: str, correct: bool, user_id: str =
         
         return {"status": "success", "progress": progress_response}
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error updating progress: {e}")
         raise HTTPException(status_code=500, detail=str(e))
