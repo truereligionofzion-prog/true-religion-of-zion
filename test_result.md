@@ -290,12 +290,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Fix Progress POST endpoint ObjectId serialization"
-    - "Fix Flashcard generation logic"
-    - "Test spaced repetition algorithm once flashcards work"
-  stuck_tasks:
-    - "Progress Tracking System"
-    - "Flashcard System with Spaced Repetition"
+    - "User Authentication Interface integration"
+    - "Final UI improvements for less intrusive sign in/sign up"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
