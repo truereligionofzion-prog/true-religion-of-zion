@@ -137,15 +137,18 @@ backend:
 
   - task: "Flashcard System with Spaced Repetition"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented flashcard endpoints: /api/flashcards (GET), /api/flashcards/{id}/review (POST). Uses spaced repetition algorithm with difficulty levels 1-5. Fixed ObjectId serialization issue. Needs testing."
+      - working: false
+        agent: "testing"
+        comment: "❌ PARTIAL ISSUE: GET /api/flashcards endpoint structure is correct and returns proper JSON format, but no flashcards are being generated. The endpoint returns empty array. This prevents testing of the spaced repetition algorithm. The flashcard creation logic in lines 586-609 may not be triggering properly."
 
   - task: "Mitzvah of the Day"
     implemented: true
