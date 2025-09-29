@@ -104,13 +104,15 @@ async def get_mitzvot(
         if book and book != "all":
             query["book"] = book
         
-        # Text search
+        # Enhanced text search across all fields
         if search:
             search_regex = {"$regex": search, "$options": "i"}
             query["$or"] = [
                 {"title": search_regex},
                 {"traditionalWording": search_regex},
                 {"sourceVerse": search_regex},
+                {"scholarlyNote": search_regex},
+                {"book": search_regex},
                 {"keywords": {"$in": [re.compile(search, re.IGNORECASE)]}}
             ]
         
