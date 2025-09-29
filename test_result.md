@@ -109,7 +109,7 @@ backend:
     implemented: true
     working: false
     file: "/app/backend/server.py"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -119,6 +119,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "❌ FINAL TESTING RESULTS: New biblical structure implementation is 79.7% complete (51/64 tests passed). ✅ COMPLETED ITEMS: 1) Updated Stats Endpoint - properly returns only totalMitzvot, categoriesCount, booksCount (old status fields removed), 2) Quiz System - working with new question types (verse_from_title, book_from_title, category_from_title, title_from_verse), 3) Data Completeness - all 613 mitzvot properly categorized across 13 categories, 4) Search Functionality - works across title/sourceVerse/book/keywords fields, 5) Progress/Flashcard systems working. ❌ REMAINING CRITICAL ISSUES: 1) Status-based filtering still accepted (GET /api/mitzvot?status=direct returns 200, should return 400/422), 2) NO YHWH/YHUH replacements found - still uses 'God'/'Lord'/'LORD' terms, 3) Search for 'YHWH' and 'Elohim' returns no results, 4) Some quiz question types inconsistent across categories, 5) Minor issues: flashcard error handling (500 instead of 404), mitzvah-of-the-day missing fields."
+      - working: false
+        agent: "testing"
+        comment: "❌ FINAL COMPREHENSIVE REVIEW REQUEST TESTING: Implementation remains 79.7% complete (51/64 tests passed) and FAILS core review requirements. ❌ CRITICAL BLOCKERS: 1) Status Parameter Removal - FAILED: GET /api/mitzvot?status=direct still returns 200 OK instead of 422 validation error as required, 2) YHWH/YHUH Replacements - FAILED: Zero instances found, search for 'YHWH' returns 0 results (expected 175 instances), all data still uses 'God'/'Lord'/'LORD' terms, 3) Mitzvah of the Day - FAILED: Missing required fields (traditionalWording, scholarlyNote). ✅ WORKING: Stats endpoint simplified structure, quiz system with new question types, all 613 mitzvot present and accessible, 13 categories properly assigned, search functionality across fields, progress tracking system, flashcard system with spaced repetition. The review request specifically requires status parameter rejection and YHWH/YHUH replacements - BOTH ARE NOT IMPLEMENTED. These are core requirements that must be addressed."
 
   - task: "Specific Traditional Wording Implementation - Batch 7"
     implemented: false
