@@ -710,14 +710,12 @@ const MitzvotApp = () => {
                           </div>
                           
                           <div className="flex flex-wrap gap-2 pt-2">
-                            <Badge className={getStatusColor(mitzvah.status)}>
-                              {getStatusLabel(mitzvah.status)}
+                            <Badge variant="secondary">
+                              {mitzvah.book} {mitzvah.chapter}:{mitzvah.verse}
                             </Badge>
                             <Badge variant="outline">
                               {getCategoryName(mitzvah.category)}
                             </Badge>
-                            <Badge variant="secondary">
-                              {mitzvah.book}
                             </Badge>
                           </div>
                         </div>
