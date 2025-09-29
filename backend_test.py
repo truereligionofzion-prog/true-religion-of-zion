@@ -17,7 +17,7 @@ import os
 from typing import Dict, List, Any
 
 # Get backend URL from environment
-BACKEND_URL = "https://torah-data-fix.preview.emergentagent.com/api"
+BACKEND_URL = "https://precept-bible-app.preview.emergentagent.com/api"
 
 class APITester:
     def __init__(self, base_url: str):
