@@ -182,17 +182,12 @@ const MitzvotApp = () => {
       <CardContent>
         <div className="space-y-4">
           <div>
-            <h4 className="font-medium text-gray-700 mb-1">Traditional Wording:</h4>
-            <p className="text-gray-600 italic">{mitzvah.traditionalWording}</p>
-          </div>
-          
-          <div>
             <h4 className="font-medium text-gray-700 mb-1 flex items-center">
               <BookOpen className="w-4 h-4 mr-1" />
-              Source:
+              Biblical Source ({mitzvah.book} {mitzvah.chapter}:{mitzvah.verse}):
             </h4>
-            <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
-              {mitzvah.sourceVerse}
+            <p className="text-gray-600 italic bg-gray-50 p-3 rounded border-l-4 border-blue-200">
+              "{mitzvah.sourceVerse}"
             </p>
           </div>
 
