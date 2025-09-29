@@ -203,20 +203,11 @@ async def get_stats():
     """Get summary statistics"""
     try:
         total_mitzvot = await mitzvot_collection.count_documents({})
-        direct_biblical = await mitzvot_collection.count_documents({"status": "direct"})
-        indirect_biblical = await mitzvot_collection.count_documents({"status": "indirect"})
-        rabbinic = await mitzvot_collection.count_documents({"status": "rabbinic"})
-        traditional = await mitzvot_collection.count_documents({"status": "traditional"})
-        
         categories_count = await categories_collection.count_documents({})
         books_count = len(await mitzvot_collection.distinct("book"))
         
         return StatsResponse(
             totalMitzvot=total_mitzvot,
-            directBiblical=direct_biblical,
-            indirectBiblical=indirect_biblical,
-            rabbinic=rabbinic,
-            traditional=traditional,
             categoriesCount=categories_count,
             booksCount=books_count
         )
