@@ -26,7 +26,6 @@ const MitzvotApp = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedBook, setSelectedBook] = useState('all');
   const [viewMode, setViewMode] = useState('cards');
   const [currentPage, setCurrentPage] = useState(1);
