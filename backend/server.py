@@ -294,7 +294,7 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
             # Get diverse wrong answers from ALL mitzvot, ensuring variety
             other_mitzvot = [m for m in all_mitzvot_for_questions if m["number"] != mitzvah["number"]]
             
-            # Create diverse wrong answers by mixing different categories, statuses, etc.
+            # Create diverse wrong answers by mixing different categories, books, etc.
             diverse_wrong_answers = []
             
             # Try to get wrong answers from different categories
@@ -321,18 +321,45 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
             
             wrong_answers = diverse_wrong_answers[:3]  # Ensure exactly 3 wrong answers
             
-            # Create question types randomly
+            # Create meaningful question types for the new structure
             question_types = [
-                "title_from_traditional",
-                "traditional_from_title", 
+                "verse_from_title",
+                "book_from_title", 
                 "category_from_title",
-                "status_from_title"
+                "title_from_verse"
             ]
             
             question_type = random.choice(question_types)
             
-            if question_type == "title_from_traditional":
-                # Ensure unique wrong answer titles
+            if question_type == "verse_from_title":
+                # Show title, ask for verse
+                wrong_verses = []
+                for wrong_answer in wrong_answers:
+                    if wrong_answer["sourceVerse"] != mitzvah["sourceVerse"] and wrong_answer["sourceVerse"] not in wrong_verses:
+                        # Show first 60 chars of verse for readability
+                        verse_preview = wrong_answer["sourceVerse"][:60] + "..." if len(wrong_answer["sourceVerse"]) > 60 else wrong_answer["sourceVerse"]
+                        wrong_verses.append(verse_preview)
+                
+                # Fill with more options if needed
+                while len(wrong_verses) < 3:
+                    additional_wrong = random.choice([m for m in other_mitzvot if m["sourceVerse"] != mitzvah["sourceVerse"]])
+                    verse_preview = additional_wrong["sourceVerse"][:60] + "..." if len(additional_wrong["sourceVerse"]) > 60 else additional_wrong["sourceVerse"]
+                    if verse_preview not in wrong_verses:
+                        wrong_verses.append(verse_preview)
+                
+                correct_verse = mitzvah["sourceVerse"][:60] + "..." if len(mitzvah["sourceVerse"]) > 60 else mitzvah["sourceVerse"]
+                
+                question = {
+                    "id": len(quiz_questions) + 1,
+                    "type": "multiple_choice",
+                    "question": f"Which biblical verse corresponds to: \"{mitzvah['title']}\"?",
+                    "correct_answer": correct_verse,
+                    "options": [correct_verse] + wrong_verses[:3],
+                    "explanation": f"This is from {mitzvah['book']} {mitzvah['chapter']}:{mitzvah['verse']}. Full verse: {mitzvah['sourceVerse'][:150]}..."
+                }
+            
+            elif question_type == "title_from_verse":
+                # Show verse, ask for title
                 wrong_titles = []
                 for wrong_answer in wrong_answers:
                     if wrong_answer["title"] != mitzvah["title"] and wrong_answer["title"] not in wrong_titles:
@@ -343,37 +370,41 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
                     additional_wrong = random.choice([m for m in other_mitzvot if m["title"] != mitzvah["title"] and m["title"] not in wrong_titles])
                     wrong_titles.append(additional_wrong["title"])
                 
+                verse_preview = mitzvah["sourceVerse"][:100] + "..." if len(mitzvah["sourceVerse"]) > 100 else mitzvah["sourceVerse"]
+                
                 question = {
                     "id": len(quiz_questions) + 1,
                     "type": "multiple_choice",
-                    "question": f"Which mitzvah has this traditional wording: \"{mitzvah['traditionalWording']}\"?",
+                    "question": f"Which mitzvah is derived from this verse: \"{verse_preview}\"?",
                     "correct_answer": mitzvah["title"],
                     "options": [mitzvah["title"]] + wrong_titles[:3],
-                    "explanation": f"This is mitzvah #{mitzvah['number']}: {mitzvah['title']}. Source: {mitzvah['sourceVerse']}"
+                    "explanation": f"This verse from {mitzvah['book']} {mitzvah['chapter']}:{mitzvah['verse']} establishes the commandment: {mitzvah['title']}"
                 }
             
-            elif question_type == "traditional_from_title":
-                # Ensure unique wrong answer traditional wordings
-                wrong_traditional = []
+            elif question_type == "book_from_title":
+                # Show title, ask for book
+                wrong_books = []
                 for wrong_answer in wrong_answers:
-                    if wrong_answer["traditionalWording"] != mitzvah["traditionalWording"] and wrong_answer["traditionalWording"] not in wrong_traditional:
-                        wrong_traditional.append(wrong_answer["traditionalWording"])
+                    if wrong_answer["book"] != mitzvah["book"] and wrong_answer["book"] not in wrong_books:
+                        wrong_books.append(wrong_answer["book"])
                 
-                # Fill with more options if needed
-                while len(wrong_traditional) < 3:
-                    additional_wrong = random.choice([m for m in other_mitzvot if m["traditionalWording"] != mitzvah["traditionalWording"] and m["traditionalWording"] not in wrong_traditional])
-                    wrong_traditional.append(additional_wrong["traditionalWording"])
+                # Fill with more books if needed
+                all_books = await mitzvot_collection.distinct("book")
+                while len(wrong_books) < 3:
+                    random_book = random.choice(all_books)
+                    if random_book != mitzvah["book"] and random_book not in wrong_books:
+                        wrong_books.append(random_book)
                 
                 question = {
                     "id": len(quiz_questions) + 1,
-                    "type": "multiple_choice",
-                    "question": f"What is the traditional wording for: \"{mitzvah['title']}\"?",
-                    "correct_answer": mitzvah["traditionalWording"],
-                    "options": [mitzvah["traditionalWording"]] + wrong_traditional[:3],
-                    "explanation": f"The traditional wording emphasizes: {mitzvah['scholarlyNote'][:100]}..."
+                    "type": "multiple_choice", 
+                    "question": f"In which book of the Bible is this commandment found: \"{mitzvah['title']}\"?",
+                    "correct_answer": mitzvah["book"],
+                    "options": [mitzvah["book"]] + wrong_books[:3],
+                    "explanation": f"This commandment is found in {mitzvah['book']} {mitzvah['chapter']}:{mitzvah['verse']}"
                 }
             
-            elif question_type == "category_from_title":
+            else:  # category_from_title
                 # Get category name
                 category_doc = await categories_collection.find_one({"slug": mitzvah["category"]})
                 correct_category = category_doc["name"] if category_doc else mitzvah["category"]
@@ -397,39 +428,10 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
                 question = {
                     "id": len(quiz_questions) + 1,
                     "type": "multiple_choice", 
-                    "question": f"Which category does this mitzvah belong to: \"{mitzvah['title']}\"?",
+                    "question": f"Which category does this commandment belong to: \"{mitzvah['title']}\"?",
                     "correct_answer": correct_category,
                     "options": [correct_category] + wrong_categories[:3],
-                    "explanation": f"This mitzvah belongs to {correct_category} because: {mitzvah['scholarlyNote'][:100]}..."
-                }
-            
-            else:  # status_from_title
-                # Simplified status labels per user requirement
-                status_labels = {
-                    "direct": "Direct in Bible",
-                    "indirect": "Indirect in Bible"
-                }
-                
-                correct_status = status_labels.get(mitzvah["status"], mitzvah["status"])
-                
-                # For status questions, provide both possible answers
-                all_status_options = ["Direct in Bible", "Indirect in Bible"]
-                wrong_statuses = [status for status in all_status_options if status != correct_status]
-                
-                # Add additional generic options for multiple choice
-                additional_options = ["Implied in Bible", "Traditional Interpretation"]
-                remaining_slots = 3 - len(wrong_statuses)
-                
-                if remaining_slots > 0:
-                    wrong_statuses.extend(additional_options[:remaining_slots])
-                
-                question = {
-                    "id": len(quiz_questions) + 1,
-                    "type": "multiple_choice",
-                    "question": f"What is the biblical status of: \"{mitzvah['title']}\"?",
-                    "correct_answer": correct_status,
-                    "options": [correct_status] + wrong_statuses[:3],
-                    "explanation": f"This mitzvah is {correct_status}. {mitzvah['scholarlyNote'][:100]}..."
+                    "explanation": f"This commandment belongs to {correct_category}. Found in {mitzvah['book']} {mitzvah['chapter']}:{mitzvah['verse']}"
                 }
             
             # Shuffle options
