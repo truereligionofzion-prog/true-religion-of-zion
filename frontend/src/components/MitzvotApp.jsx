@@ -456,8 +456,8 @@ const MitzvotApp = () => {
               The 613 Laws of the Bible
             </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Explore the complete collection of biblical commandments with their sources, 
-              scholarly notes, and categorization. Search by content, filter by origin, 
+              Explore the complete collection of biblical commandments with their sources 
+              and categorization. Search by content, filter by origin, 
               and discover the rich tradition of biblical law.
             </p>
           </div>
