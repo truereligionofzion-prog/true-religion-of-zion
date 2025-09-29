@@ -711,7 +711,6 @@ const MitzvotApp = () => {
                             <Badge variant="outline">
                               {getCategoryName(mitzvah.category)}
                             </Badge>
-                            </Badge>
                           </div>
                         </div>
                       </CardContent>
