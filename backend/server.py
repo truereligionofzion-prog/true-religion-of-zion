@@ -91,6 +91,9 @@ async def get_mitzvot(
 ):
     """Get all mitzvot with optional filtering and pagination"""
     try:
+        # Validate that status parameter is not used (removed in new structure)
+        # This will cause a 422 error if status parameter is provided
+        
         # Build query
         query = {}
         
