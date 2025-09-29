@@ -924,7 +924,7 @@ class APITester:
     
     def run_all_tests(self):
         """Run all tests and return summary"""
-        print("🔍 Starting Comprehensive Backend Testing for 613 Biblical Laws API")
+        print("🔍 Starting Comprehensive Backend Testing for Enhanced 613 Biblical Laws API")
         print("=" * 70)
         
         # Initialize database first
@@ -941,23 +941,23 @@ class APITester:
         print("\n📈 Testing Statistics Validation...")
         self.test_stats_validation()
         
-        print("\n✨ Testing Enhanced Data Quality...")
-        self.test_enhanced_data_quality()
+        print("\n✨ Testing Enhanced Data Structure...")
+        self.test_enhanced_data_structure()
         
-        print("\n🔍 Testing Search Functionality...")
-        self.test_search_functionality()
+        print("\n🔧 Testing Simplified Status Filtering...")
+        self.test_simplified_status_filtering()
         
-        print("\n🔧 Testing Filtering...")
-        self.test_filtering()
+        print("\n🔍 Testing Enhanced Search Functionality...")
+        self.test_enhanced_search_functionality()
         
-        print("\n📄 Testing Pagination...")
-        self.test_pagination()
+        print("\n📂 Testing Categories Validation...")
+        self.test_categories_validation()
+        
+        print("\n📄 Testing Individual Mitzvah Data Structure...")
+        self.test_individual_mitzvah_data_structure()
         
         print("\n🔄 Testing Data Consistency...")
         self.test_data_consistency()
-        
-        print("\n🎯 Testing Specific Mitzvot Content...")
-        self.test_specific_mitzvot_content()
         
         print("\n🧠 Testing Enhanced Quiz System...")
         self.test_enhanced_quiz_system()
