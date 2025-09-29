@@ -216,14 +216,9 @@ const MitzvotApp = () => {
       <td className="py-3 px-4 font-medium">#{mitzvah.number}</td>
       <td className="py-3 px-4">
         <div className="font-medium text-gray-900">{mitzvah.title}</div>
-        <div className="text-sm text-gray-600 mt-1">{mitzvah.traditionalWording}</div>
+        <div className="text-sm text-gray-600 mt-1 italic">"{mitzvah.sourceVerse.substring(0, 60)}..."</div>
       </td>
       <td className="py-3 px-4 text-sm">{mitzvah.book} {mitzvah.chapter}:{mitzvah.verse}</td>
-      <td className="py-3 px-4">
-        <Badge className={getStatusColor(mitzvah.status)}>
-          {getStatusLabel(mitzvah.status)}
-        </Badge>
-      </td>
       <td className="py-3 px-4 text-sm">{getCategoryName(mitzvah.category)}</td>
     </tr>
   );
