@@ -105,6 +105,18 @@
 user_problem_statement: "Comprehensive testing and stabilization of the 613 Biblical Laws learning platform with new interactive features including improved quiz system, progress tracking, flashcards with spaced repetition, and user learning analytics."
 
 backend:
+  - task: "New Biblical Mitzvot Structure Implementation"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ PARTIAL IMPLEMENTATION: New biblical structure is PARTIALLY implemented. ✅ WORKING: Data structure has new fields (sourceVerse, book, chapter, verse), no old fields (traditionalWording, scholarlyNote, status), quiz system has new question types (verse_from_title, book_from_title, category_from_title, title_from_verse), search works across new fields, flashcard system works with new structure. ❌ NOT IMPLEMENTED: Status-based filtering still accepted (should return 400), only 13 categories instead of expected 34, no YHWH/YHUH replacements (uses 'LORD'), stats endpoint still references old status fields. Success rate: 77.1% (37/48 tests passed)."
+
   - task: "Specific Traditional Wording Implementation - Batch 7"
     implemented: false
     working: false
