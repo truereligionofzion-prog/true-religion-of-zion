@@ -65,7 +65,7 @@ const MitzvotApp = () => {
     if (categories.length > 0) {
       loadMitzvot();
     }
-  }, [searchTerm, selectedCategory, selectedStatus, selectedBook, currentPage, categories.length]);
+  }, [searchTerm, selectedCategory, selectedBook, currentPage, categories.length]);
 
   const loadInitialData = async () => {
     try {
