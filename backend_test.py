@@ -186,7 +186,7 @@ class APITester:
         """Test filtering by simplified status types: 'direct' and 'indirect' only"""
         try:
             # Test direct status filtering - should return 421 mitzvot (based on current stats)
-            response = self.session.get(f"{self.base_url}/mitzvot?status=direct&limit=1000")
+            response = self.session.get(f"{self.base_url}/mitzvot?status=direct&limit=100")
             if response.status_code == 200:
                 data = response.json()
                 direct_count = data.get('total', 0)
