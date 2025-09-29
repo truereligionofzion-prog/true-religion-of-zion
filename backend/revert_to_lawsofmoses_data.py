@@ -25,7 +25,7 @@ async def fetch_and_restore_lawsofmoses_data():
         
         # Fetch categories from lawsofmoses
         print("📚 Fetching categories from lawsofmoses...")
-        categories_response = requests.get("https://lawsofmoses.preview.emergentagent.com/api/categories")
+        categories_response = requests.get("https://biblaws.preview.emergentagent.com/api/categories")
         categories_data = categories_response.json()
         
         # Insert categories
@@ -49,7 +49,7 @@ async def fetch_and_restore_lawsofmoses_data():
         
         # Since they only return 20 at a time, we need to check different pages/offsets
         # Let's try to get more data by requesting their full dataset
-        mitzvot_response = requests.get("https://lawsofmoses.preview.emergentagent.com/api/mitzvot")
+        mitzvot_response = requests.get("https://biblaws.preview.emergentagent.com/api/mitzvot")
         mitzvot_data = mitzvot_response.json()
         
         print(f"📊 Received {len(mitzvot_data['mitzvot'])} mitzvot from first request")
