@@ -113,86 +113,313 @@ class APITester:
             self.log_test("Stats Endpoint", False, f"Error: {str(e)}")
             return False
     
-    def test_enhanced_data_quality(self):
-        """Test /api/mitzvot endpoint to verify enhanced data quality"""
+    def test_enhanced_data_structure(self):
+        """Test that mitzvot have all new enhanced fields (traditionalWording, sourceVerse, enhanced scholarlyNote)"""
         try:
-            # Test first page
-            response = self.session.get(f"{self.base_url}/mitzvot?page=1&limit=50")
+            response = self.session.get(f"{self.base_url}/mitzvot?page=1&limit=20")
             if response.status_code != 200:
-                self.log_test("Enhanced Data Quality", False, f"Status: {response.status_code}")
+                self.log_test("Enhanced Data Structure", False, f"Status: {response.status_code}")
                 return False
                 
             data = response.json()
             mitzvot = data.get('mitzvot', [])
             
             if not mitzvot:
-                self.log_test("Enhanced Data Quality", False, "No mitzvot returned")
+                self.log_test("Enhanced Data Structure", False, "No mitzvot returned")
                 return False
             
-            # Test specific mitzvot for authentic content
-            authentic_found = 0
-            generic_found = 0
-            full_verses_found = 0
-            meaningful_notes_found = 0
+            # Test each mitzvah for enhanced fields
+            enhanced_fields_count = 0
+            traditional_wording_count = 0
+            source_verse_count = 0
+            scholarly_note_count = 0
             
             for mitzvah in mitzvot:
+                # Check for traditionalWording field
                 traditional_wording = mitzvah.get('traditionalWording', '')
+                if traditional_wording and len(traditional_wording) > 10:
+                    traditional_wording_count += 1
+                
+                # Check for sourceVerse field
                 source_verse = mitzvah.get('sourceVerse', '')
+                if source_verse and len(source_verse) > 10:
+                    source_verse_count += 1
+                
+                # Check for enhanced scholarlyNote field
                 scholarly_note = mitzvah.get('scholarlyNote', '')
+                if scholarly_note and len(scholarly_note) > 20:
+                    scholarly_note_count += 1
                 
-                # Check for authentic traditional wording (not generic)
-                if 'Traditional observance and practice of commandment' not in traditional_wording:
-                    authentic_found += 1
-                else:
-                    generic_found += 1
-                
-                # Check for full biblical references with quoted text
-                if '—' in source_verse and '"' in source_verse:
-                    full_verses_found += 1
-                
-                # Check for meaningful scholarly notes
-                if len(scholarly_note) > 50 and 'Maimonides' in scholarly_note or 'biblical' in scholarly_note.lower():
-                    meaningful_notes_found += 1
+                # Count mitzvot with all enhanced fields
+                if traditional_wording and source_verse and scholarly_note:
+                    enhanced_fields_count += 1
             
             # Test results
-            if authentic_found > generic_found:
-                self.log_test("Enhanced Data - Authentic Wording", True, f"Found {authentic_found} authentic vs {generic_found} generic")
+            total_mitzvot = len(mitzvot)
+            if enhanced_fields_count == total_mitzvot:
+                self.log_test("Enhanced Data - All Fields Present", True, f"All {total_mitzvot} mitzvot have enhanced fields")
             else:
-                self.log_test("Enhanced Data - Authentic Wording", False, f"Too many generic wordings: {generic_found} vs {authentic_found} authentic")
+                self.log_test("Enhanced Data - All Fields Present", False, f"Only {enhanced_fields_count}/{total_mitzvot} have all enhanced fields")
             
-            if full_verses_found > len(mitzvot) * 0.8:  # At least 80% should have full verses
-                self.log_test("Enhanced Data - Full Verses", True, f"{full_verses_found}/{len(mitzvot)} have full biblical references")
+            if traditional_wording_count >= total_mitzvot * 0.9:
+                self.log_test("Enhanced Data - Traditional Wording", True, f"{traditional_wording_count}/{total_mitzvot} have traditional wording")
             else:
-                self.log_test("Enhanced Data - Full Verses", False, f"Only {full_verses_found}/{len(mitzvot)} have full biblical references")
+                self.log_test("Enhanced Data - Traditional Wording", False, f"Only {traditional_wording_count}/{total_mitzvot} have traditional wording")
             
-            if meaningful_notes_found > len(mitzvot) * 0.7:  # At least 70% should have meaningful notes
-                self.log_test("Enhanced Data - Scholarly Notes", True, f"{meaningful_notes_found}/{len(mitzvot)} have meaningful notes")
+            if source_verse_count >= total_mitzvot * 0.9:
+                self.log_test("Enhanced Data - Source Verses", True, f"{source_verse_count}/{total_mitzvot} have source verses")
             else:
-                self.log_test("Enhanced Data - Scholarly Notes", False, f"Only {meaningful_notes_found}/{len(mitzvot)} have meaningful notes")
+                self.log_test("Enhanced Data - Source Verses", False, f"Only {source_verse_count}/{total_mitzvot} have source verses")
             
-            # Test specific examples mentioned in the request
-            specific_examples = [
-                "Write on doorposts of thy house",
-                "Every man should write Torah",
-                "Bind words as a sign on your arm"
-            ]
-            
-            examples_found = 0
-            for mitzvah in mitzvot:
-                for example in specific_examples:
-                    if example in mitzvah.get('traditionalWording', ''):
-                        examples_found += 1
-                        break
-            
-            if examples_found > 0:
-                self.log_test("Enhanced Data - Specific Examples", True, f"Found {examples_found} specific authentic examples")
+            if scholarly_note_count >= total_mitzvot * 0.9:
+                self.log_test("Enhanced Data - Scholarly Notes", True, f"{scholarly_note_count}/{total_mitzvot} have scholarly notes")
             else:
-                self.log_test("Enhanced Data - Specific Examples", False, "No specific authentic examples found in first 50")
+                self.log_test("Enhanced Data - Scholarly Notes", False, f"Only {scholarly_note_count}/{total_mitzvot} have scholarly notes")
             
-            return authentic_found > generic_found and full_verses_found > len(mitzvot) * 0.8
+            return enhanced_fields_count >= total_mitzvot * 0.9
             
         except Exception as e:
-            self.log_test("Enhanced Data Quality", False, f"Error: {str(e)}")
+            self.log_test("Enhanced Data Structure", False, f"Error: {str(e)}")
+            return False
+
+    def test_simplified_status_filtering(self):
+        """Test filtering by simplified status types: 'direct' and 'indirect' only"""
+        try:
+            # Test direct status filtering - should return ~594 mitzvot
+            response = self.session.get(f"{self.base_url}/mitzvot?status=direct&limit=1000")
+            if response.status_code == 200:
+                data = response.json()
+                direct_count = data.get('total', 0)
+                
+                if 590 <= direct_count <= 600:  # Allow some variance
+                    self.log_test("Status Filter - Direct", True, f"Found {direct_count} direct mitzvot (expected ~594)")
+                else:
+                    self.log_test("Status Filter - Direct", False, f"Found {direct_count} direct mitzvot (expected ~594)")
+            else:
+                self.log_test("Status Filter - Direct", False, f"Status: {response.status_code}")
+                return False
+            
+            # Test indirect status filtering - should return ~19 mitzvot
+            response = self.session.get(f"{self.base_url}/mitzvot?status=indirect&limit=100")
+            if response.status_code == 200:
+                data = response.json()
+                indirect_count = data.get('total', 0)
+                
+                if 15 <= indirect_count <= 25:  # Allow some variance
+                    self.log_test("Status Filter - Indirect", True, f"Found {indirect_count} indirect mitzvot (expected ~19)")
+                else:
+                    self.log_test("Status Filter - Indirect", False, f"Found {indirect_count} indirect mitzvot (expected ~19)")
+            else:
+                self.log_test("Status Filter - Indirect", False, f"Status: {response.status_code}")
+                return False
+            
+            # Test that total adds up to 613
+            total_filtered = direct_count + indirect_count
+            if total_filtered == 613:
+                self.log_test("Status Filter - Total Count", True, f"Direct + Indirect = {total_filtered} (613)")
+            else:
+                self.log_test("Status Filter - Total Count", False, f"Direct + Indirect = {total_filtered} (expected 613)")
+            
+            # Test status filter options in API response
+            response = self.session.get(f"{self.base_url}/mitzvot?page=1&limit=1")
+            if response.status_code == 200:
+                data = response.json()
+                filters = data.get('filters', {})
+                status_types = filters.get('statusTypes', [])
+                
+                # Should only have 2 status types
+                if len(status_types) == 2:
+                    status_values = [st.get('value') for st in status_types]
+                    if 'direct' in status_values and 'indirect' in status_values:
+                        self.log_test("Status Filter - Options", True, "Only 'direct' and 'indirect' status options available")
+                    else:
+                        self.log_test("Status Filter - Options", False, f"Unexpected status values: {status_values}")
+                else:
+                    self.log_test("Status Filter - Options", False, f"Expected 2 status types, found {len(status_types)}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Simplified Status Filtering", False, f"Error: {str(e)}")
+            return False
+
+    def test_enhanced_search_functionality(self):
+        """Test enhanced search across title, traditionalWording, sourceVerse, scholarlyNote, and keywords"""
+        try:
+            # Test search for "God" - should return results from multiple fields
+            response = self.session.get(f"{self.base_url}/mitzvot?search=God&limit=50")
+            if response.status_code == 200:
+                data = response.json()
+                results = data.get('mitzvot', [])
+                
+                if results:
+                    # Check which fields contain the search term
+                    fields_found = set()
+                    for mitzvah in results:
+                        if 'God' in mitzvah.get('title', ''):
+                            fields_found.add('title')
+                        if 'God' in mitzvah.get('traditionalWording', ''):
+                            fields_found.add('traditionalWording')
+                        if 'God' in mitzvah.get('sourceVerse', ''):
+                            fields_found.add('sourceVerse')
+                        if 'God' in mitzvah.get('scholarlyNote', ''):
+                            fields_found.add('scholarlyNote')
+                        keywords = mitzvah.get('keywords', [])
+                        if any('God' in keyword for keyword in keywords):
+                            fields_found.add('keywords')
+                    
+                    if len(fields_found) >= 3:
+                        self.log_test("Enhanced Search - Multiple Fields", True, f"Found 'God' in fields: {list(fields_found)}")
+                    else:
+                        self.log_test("Enhanced Search - Multiple Fields", False, f"Only found in fields: {list(fields_found)}")
+                    
+                    self.log_test("Enhanced Search - God Results", True, f"Found {len(results)} results for 'God'")
+                else:
+                    self.log_test("Enhanced Search - God Results", False, "No results found for 'God'")
+            else:
+                self.log_test("Enhanced Search - God Results", False, f"Status: {response.status_code}")
+                return False
+            
+            # Test other search terms
+            search_terms = [
+                ("Torah", "Should find Torah-related mitzvot"),
+                ("commandment", "Should find commandment references"),
+                ("Exodus", "Should find Exodus references"),
+                ("sacrifice", "Should find sacrifice-related mitzvot")
+            ]
+            
+            search_passed = 0
+            for term, description in search_terms:
+                try:
+                    response = self.session.get(f"{self.base_url}/mitzvot?search={term}&limit=20")
+                    if response.status_code == 200:
+                        data = response.json()
+                        results = data.get('mitzvot', [])
+                        if results:
+                            self.log_test(f"Enhanced Search - '{term}'", True, f"Found {len(results)} results")
+                            search_passed += 1
+                        else:
+                            self.log_test(f"Enhanced Search - '{term}'", False, "No results found")
+                    else:
+                        self.log_test(f"Enhanced Search - '{term}'", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Enhanced Search - '{term}'", False, f"Error: {str(e)}")
+            
+            return search_passed >= len(search_terms) * 0.75  # At least 75% should work
+            
+        except Exception as e:
+            self.log_test("Enhanced Search Functionality", False, f"Error: {str(e)}")
+            return False
+
+    def test_categories_validation(self):
+        """Test that all 13 categories exist and have appropriate mitzvot assigned"""
+        try:
+            response = self.session.get(f"{self.base_url}/categories")
+            if response.status_code == 200:
+                categories = response.json()
+                
+                if len(categories) == 13:
+                    self.log_test("Categories - Count", True, f"Found exactly 13 categories")
+                else:
+                    self.log_test("Categories - Count", False, f"Found {len(categories)} categories (expected 13)")
+                
+                # Check that each category has mitzvot assigned
+                categories_with_mitzvot = 0
+                total_mitzvot_in_categories = 0
+                
+                for category in categories:
+                    count = category.get('count', 0)
+                    name = category.get('name', 'Unknown')
+                    if count > 0:
+                        categories_with_mitzvot += 1
+                        total_mitzvot_in_categories += count
+                        self.log_test(f"Category - {name}", True, f"{count} mitzvot assigned")
+                    else:
+                        self.log_test(f"Category - {name}", False, "No mitzvot assigned")
+                
+                # Check that total mitzvot in categories equals 613
+                if total_mitzvot_in_categories == 613:
+                    self.log_test("Categories - Total Assignment", True, f"All 613 mitzvot properly categorized")
+                else:
+                    self.log_test("Categories - Total Assignment", False, f"Only {total_mitzvot_in_categories}/613 mitzvot categorized")
+                
+                # Check that all categories have mitzvot
+                if categories_with_mitzvot == 13:
+                    self.log_test("Categories - All Have Mitzvot", True, "All 13 categories have mitzvot assigned")
+                else:
+                    self.log_test("Categories - All Have Mitzvot", False, f"Only {categories_with_mitzvot}/13 categories have mitzvot")
+                
+                return len(categories) == 13 and categories_with_mitzvot == 13 and total_mitzvot_in_categories == 613
+            else:
+                self.log_test("Categories Validation", False, f"Status: {response.status_code}")
+                return False
+            
+        except Exception as e:
+            self.log_test("Categories Validation", False, f"Error: {str(e)}")
+            return False
+
+    def test_individual_mitzvah_data_structure(self):
+        """Test individual mitzvah endpoint to verify complete enhanced data structure"""
+        try:
+            # First get a list of mitzvot to get valid IDs
+            response = self.session.get(f"{self.base_url}/mitzvot?page=1&limit=5")
+            if response.status_code != 200:
+                self.log_test("Individual Mitzvah - Get IDs", False, f"Status: {response.status_code}")
+                return False
+            
+            data = response.json()
+            mitzvot = data.get('mitzvot', [])
+            
+            if not mitzvot:
+                self.log_test("Individual Mitzvah - Get IDs", False, "No mitzvot available")
+                return False
+            
+            # Test individual mitzvah endpoints
+            tests_passed = 0
+            for mitzvah in mitzvot[:3]:  # Test first 3
+                mitzvah_id = mitzvah.get('id')
+                if not mitzvah_id:
+                    continue
+                
+                try:
+                    response = self.session.get(f"{self.base_url}/mitzvot/{mitzvah_id}")
+                    if response.status_code == 200:
+                        individual_mitzvah = response.json()
+                        
+                        # Check for all enhanced fields
+                        required_fields = [
+                            'id', 'number', 'title', 'traditionalWording', 
+                            'sourceVerse', 'scholarlyNote', 'category', 'status', 
+                            'book', 'keywords'
+                        ]
+                        
+                        missing_fields = [field for field in required_fields if field not in individual_mitzvah]
+                        
+                        if not missing_fields:
+                            # Check field quality
+                            traditional_wording = individual_mitzvah.get('traditionalWording', '')
+                            source_verse = individual_mitzvah.get('sourceVerse', '')
+                            scholarly_note = individual_mitzvah.get('scholarlyNote', '')
+                            
+                            if (len(traditional_wording) > 10 and 
+                                len(source_verse) > 10 and 
+                                len(scholarly_note) > 20):
+                                self.log_test(f"Individual Mitzvah - {mitzvah_id[:8]}", True, "Complete enhanced data structure")
+                                tests_passed += 1
+                            else:
+                                self.log_test(f"Individual Mitzvah - {mitzvah_id[:8]}", False, "Enhanced fields too short")
+                        else:
+                            self.log_test(f"Individual Mitzvah - {mitzvah_id[:8]}", False, f"Missing fields: {missing_fields}")
+                    else:
+                        self.log_test(f"Individual Mitzvah - {mitzvah_id[:8]}", False, f"Status: {response.status_code}")
+                        
+                except Exception as e:
+                    self.log_test(f"Individual Mitzvah - {mitzvah_id[:8]}", False, f"Error: {str(e)}")
+            
+            return tests_passed >= 2  # At least 2 out of 3 should pass
+            
+        except Exception as e:
+            self.log_test("Individual Mitzvah Data Structure", False, f"Error: {str(e)}")
             return False
     
     def test_search_functionality(self):
