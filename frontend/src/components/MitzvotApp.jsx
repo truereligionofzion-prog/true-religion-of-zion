@@ -734,9 +734,8 @@ const MitzvotApp = () => {
                           <tr>
                             <th className="text-left p-4 font-medium">#</th>
                             <th className="text-left p-4 font-medium">Title</th>
-                            <th className="text-left p-4 font-medium">Traditional Wording</th>
+                            <th className="text-left p-4 font-medium">Biblical Verse</th>
                             <th className="text-left p-4 font-medium">Source</th>
-                            <th className="text-left p-4 font-medium">Status</th>
                             <th className="text-left p-4 font-medium">Category</th>
                           </tr>
                         </thead>
@@ -745,13 +744,8 @@ const MitzvotApp = () => {
                             <tr key={mitzvah.id} className="border-b hover:bg-gray-50">
                               <td className="p-4 text-blue-600 font-bold">#{mitzvah.number}</td>
                               <td className="p-4 font-medium">{mitzvah.title}</td>
-                              <td className="p-4 text-gray-600 italic">"{mitzvah.traditionalWording}"</td>
-                              <td className="p-4 text-sm text-gray-600">{mitzvah.sourceVerse}</td>
-                              <td className="p-4">
-                                <Badge className={getStatusColor(mitzvah.status)}>
-                                  {getStatusLabel(mitzvah.status)}
-                                </Badge>
-                              </td>
+                              <td className="p-4 text-gray-600 italic">"{mitzvah.sourceVerse.substring(0, 80)}..."</td>
+                              <td className="p-4 text-sm text-gray-600">{mitzvah.book} {mitzvah.chapter}:{mitzvah.verse}</td>
                               <td className="p-4">
                                 <Badge variant="outline">{getCategoryName(mitzvah.category)}</Badge>
                               </td>
