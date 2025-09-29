@@ -7,7 +7,7 @@ import requests
 import json
 from datetime import datetime
 
-BACKEND_URL = "https://lawsofmoses.preview.emergentagent.com/api"
+BACKEND_URL = "https://preceptnav.preview.emergentagent.com/api"
 
 def run_final_test():
     session = requests.Session()
