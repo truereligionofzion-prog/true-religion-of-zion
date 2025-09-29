@@ -1663,7 +1663,7 @@ class APITester:
     
     def run_all_tests(self):
         """Run all tests and return summary"""
-        print("🔍 Starting Comprehensive Backend Testing for Enhanced 613 Biblical Laws API")
+        print("🔍 Starting Comprehensive Backend Testing for NEW BIBLICAL STRUCTURE")
         print("=" * 70)
         
         # Initialize database first
@@ -1677,20 +1677,26 @@ class APITester:
         print("\n🔗 Testing API Connectivity...")
         self.test_api_root()
         
+        print("\n🆕 Testing New Biblical Structure Verification...")
+        self.test_new_biblical_structure_verification()
+        
+        print("\n📂 Testing New Categories Structure (34 categories)...")
+        self.test_new_categories_structure()
+        
+        print("\n🧠 Testing New Quiz System (verse_from_title, book_from_title, etc.)...")
+        self.test_new_quiz_system()
+        
+        print("\n🔍 Testing New Search Functionality (title, sourceVerse, book, keywords)...")
+        self.test_new_search_functionality()
+        
+        print("\n🔌 Testing API Endpoints with New Structure...")
+        self.test_api_endpoints_new_structure()
+        
+        print("\n🃏 Testing Flashcard System with New Structure...")
+        self.test_flashcard_system()
+        
         print("\n📈 Testing Statistics Validation...")
         self.test_stats_validation()
-        
-        print("\n✨ Testing Enhanced Data Structure...")
-        self.test_enhanced_data_structure()
-        
-        print("\n🔧 Testing Simplified Status Filtering...")
-        self.test_simplified_status_filtering()
-        
-        print("\n🔍 Testing Enhanced Search Functionality...")
-        self.test_enhanced_search_functionality()
-        
-        print("\n📂 Testing Categories Validation...")
-        self.test_categories_validation()
         
         print("\n📄 Testing Individual Mitzvah Data Structure...")
         self.test_individual_mitzvah_data_structure()
@@ -1698,29 +1704,11 @@ class APITester:
         print("\n🔄 Testing Data Consistency...")
         self.test_data_consistency()
         
-        print("\n🧠 Testing Enhanced Quiz System...")
-        self.test_enhanced_quiz_system()
-        
         print("\n📊 Testing Progress Tracking System...")
         self.test_progress_tracking_system()
         
-        print("\n🃏 Testing Flashcard System...")
-        self.test_flashcard_system()
-        
         print("\n📅 Testing Mitzvah of the Day...")
         self.test_mitzvah_of_the_day()
-        
-        print("\n🔧 Testing Batch 7 Data Correction (Mitzvot 137-186)...")
-        self.test_batch_7_data_correction()
-        
-        print("\n🔍 Testing Search & Filter with Corrected Data...")
-        self.test_search_filter_with_corrected_data()
-        
-        print("\n🎯 Testing Quiz & Flashcard Access to Corrected Data...")
-        self.test_quiz_flashcard_with_corrected_data()
-        
-        print("\n🎯 SPECIFIC BATCH 7 VERIFICATION - Review Request Requirements...")
-        self.test_specific_batch_7_verification()
         
         # Summary
         print("\n" + "=" * 70)
