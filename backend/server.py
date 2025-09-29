@@ -89,11 +89,8 @@ async def get_mitzvot(
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(20, ge=1, le=100, description="Items per page")
 ):
-    """Get all mitzvot with optional filtering and pagination"""
+    """Get all mitzvot with optional filtering and pagination - status parameter removed in new structure"""
     try:
-        # Validate that status parameter is not used (removed in new structure)
-        # This will cause a 422 error if status parameter is provided
-        
         # Build query
         query = {}
         
