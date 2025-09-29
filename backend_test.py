@@ -1106,7 +1106,7 @@ class APITester:
                     self.log_test(f"Search Corrected Data - '{term}'", False, f"Error: {str(e)}")
             
             # Test category filtering for categories that might contain Batch 7 mitzvot
-            categories_to_test = ["temple-worship", "tithes-offerings", "festivals-holy-days"]
+            categories_to_test = ["temple-worship", "tithes-offerings", "festivals"]
             filter_passed = 0
             
             for category in categories_to_test:
