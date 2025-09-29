@@ -417,33 +417,29 @@ async def get_quiz_questions(category: str = "all", limit: int = 5):
                 }
             
             else:  # status_from_title
+                # Simplified status labels per user requirement
                 status_labels = {
                     "direct": "Direct in Bible",
-                    "indirect": "Indirect in Bible", 
-                    "rabbinic": "Rabbinic Origin",
-                    "traditional": "Traditional"
+                    "indirect": "Indirect in Bible"
                 }
                 
                 correct_status = status_labels.get(mitzvah["status"], mitzvah["status"])
                 
-                # Get unique wrong statuses
-                wrong_statuses = []
-                for m in wrong_answers:
-                    wrong_status = status_labels.get(m["status"], m["status"])
-                    if wrong_status != correct_status and wrong_status not in wrong_statuses:
-                        wrong_statuses.append(wrong_status)
+                # For status questions, provide both possible answers
+                all_status_options = ["Direct in Bible", "Indirect in Bible"]
+                wrong_statuses = [status for status in all_status_options if status != correct_status]
                 
-                # Fill with remaining status types if needed
-                all_status_labels = list(status_labels.values())
-                while len(wrong_statuses) < 3:
-                    random_status = random.choice(all_status_labels)
-                    if random_status != correct_status and random_status not in wrong_statuses:
-                        wrong_statuses.append(random_status)
+                # Add additional generic options for multiple choice
+                additional_options = ["Implied in Bible", "Traditional Interpretation"]
+                remaining_slots = 3 - len(wrong_statuses)
+                
+                if remaining_slots > 0:
+                    wrong_statuses.extend(additional_options[:remaining_slots])
                 
                 question = {
                     "id": len(quiz_questions) + 1,
                     "type": "multiple_choice",
-                    "question": f"What is the origin status of: \"{mitzvah['title']}\"?",
+                    "question": f"What is the biblical status of: \"{mitzvah['title']}\"?",
                     "correct_answer": correct_status,
                     "options": [correct_status] + wrong_statuses[:3],
                     "explanation": f"This mitzvah is {correct_status}. {mitzvah['scholarlyNote'][:100]}..."
