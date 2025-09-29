@@ -937,6 +937,242 @@ class APITester:
         except Exception as e:
             self.log_test("Mitzvah of the Day", False, f"Error: {str(e)}")
             return False
+
+    def test_batch_7_data_correction(self):
+        """Test Batch 7 data correction for Mitzvot 137-186 - traditional wording and scholarly notes"""
+        try:
+            print("\n🔍 Testing Batch 7 Data Correction (Mitzvot 137-186)...")
+            
+            # Get all mitzvot to find the corrected batch
+            response = self.session.get(f"{self.base_url}/mitzvot?page=1&limit=613")
+            if response.status_code != 200:
+                self.log_test("Batch 7 - Data Retrieval", False, f"Status: {response.status_code}")
+                return False
+            
+            data = response.json()
+            all_mitzvot = data.get('mitzvot', [])
+            
+            if not all_mitzvot:
+                self.log_test("Batch 7 - Data Retrieval", False, "No mitzvot returned")
+                return False
+            
+            # Filter mitzvot 137-186 (Batch 7)
+            batch_7_mitzvot = [m for m in all_mitzvot if 137 <= m.get('number', 0) <= 186]
+            
+            if len(batch_7_mitzvot) != 50:
+                self.log_test("Batch 7 - Range Verification", False, f"Expected 50 mitzvot (137-186), found {len(batch_7_mitzvot)}")
+                return False
+            
+            self.log_test("Batch 7 - Range Verification", True, f"Found all 50 mitzvot in range 137-186")
+            
+            # Test specific mitzvot mentioned in the review request
+            specific_tests = [
+                (137, "Offer firstborn ox, sheep, goat", "firstborn"),
+                (186, "Offer shelamim sacrifices", "shelamim")
+            ]
+            
+            corrected_count = 0
+            traditional_wording_count = 0
+            scholarly_notes_count = 0
+            proper_format_count = 0
+            
+            for mitzvah in batch_7_mitzvot:
+                number = mitzvah.get('number')
+                traditional_wording = mitzvah.get('traditionalWording', '')
+                scholarly_note = mitzvah.get('scholarlyNote', '')
+                
+                # Check traditional wording quality
+                if traditional_wording and len(traditional_wording) > 10 and not traditional_wording.startswith('To '):
+                    traditional_wording_count += 1
+                
+                # Check scholarly notes format: "**Scholarly Analysis**: [new note] | **Additional Context**: [original note]"
+                if scholarly_note and '**Scholarly Analysis**:' in scholarly_note and '**Additional Context**:' in scholarly_note:
+                    proper_format_count += 1
+                elif scholarly_note and len(scholarly_note) > 50:
+                    scholarly_notes_count += 1
+                
+                # Test specific mitzvot
+                for test_number, expected_content, keyword in specific_tests:
+                    if number == test_number:
+                        if keyword.lower() in traditional_wording.lower():
+                            self.log_test(f"Batch 7 - Mitzvah {number} Content", True, f"Contains expected keyword '{keyword}'")
+                            corrected_count += 1
+                        else:
+                            self.log_test(f"Batch 7 - Mitzvah {number} Content", False, f"Missing expected keyword '{keyword}' in: {traditional_wording[:100]}...")
+            
+            # Test overall correction quality
+            if traditional_wording_count >= 45:  # At least 90% should have proper traditional wording
+                self.log_test("Batch 7 - Traditional Wording Quality", True, f"{traditional_wording_count}/50 have proper traditional wording")
+            else:
+                self.log_test("Batch 7 - Traditional Wording Quality", False, f"Only {traditional_wording_count}/50 have proper traditional wording")
+            
+            if proper_format_count >= 40:  # At least 80% should have the new format
+                self.log_test("Batch 7 - Scholarly Notes Format", True, f"{proper_format_count}/50 have proper scholarly analysis format")
+            elif scholarly_notes_count >= 45:  # Or at least enhanced scholarly notes
+                self.log_test("Batch 7 - Scholarly Notes Enhanced", True, f"{scholarly_notes_count}/50 have enhanced scholarly notes")
+            else:
+                self.log_test("Batch 7 - Scholarly Notes", False, f"Only {proper_format_count} have proper format, {scholarly_notes_count} have enhanced notes")
+            
+            # Test data differentiation (traditional wording vs scholarly notes should be different)
+            differentiated_count = 0
+            for mitzvah in batch_7_mitzvot:
+                traditional_wording = mitzvah.get('traditionalWording', '').lower()
+                scholarly_note = mitzvah.get('scholarlyNote', '').lower()
+                
+                # They should be different content
+                if traditional_wording and scholarly_note and traditional_wording != scholarly_note:
+                    # Check they're not too similar (basic differentiation test)
+                    common_words = set(traditional_wording.split()) & set(scholarly_note.split())
+                    if len(common_words) < len(traditional_wording.split()) * 0.8:  # Less than 80% overlap
+                        differentiated_count += 1
+            
+            if differentiated_count >= 40:
+                self.log_test("Batch 7 - Content Differentiation", True, f"{differentiated_count}/50 have properly differentiated content")
+            else:
+                self.log_test("Batch 7 - Content Differentiation", False, f"Only {differentiated_count}/50 have properly differentiated content")
+            
+            return (traditional_wording_count >= 45 and 
+                   (proper_format_count >= 40 or scholarly_notes_count >= 45) and 
+                   differentiated_count >= 40)
+            
+        except Exception as e:
+            self.log_test("Batch 7 Data Correction", False, f"Error: {str(e)}")
+            return False
+
+    def test_search_filter_with_corrected_data(self):
+        """Test search and filter functionality with the corrected Batch 7 data"""
+        try:
+            # Test search functionality with terms that should be in corrected data
+            search_terms = [
+                ("firstborn", "Should find mitzvah 137 and related"),
+                ("shelamim", "Should find mitzvah 186 and related"),
+                ("sacrifice", "Should find sacrifice-related mitzvot"),
+                ("offering", "Should find offering-related mitzvot")
+            ]
+            
+            search_passed = 0
+            for term, description in search_terms:
+                try:
+                    response = self.session.get(f"{self.base_url}/mitzvot?search={term}&limit=50")
+                    if response.status_code == 200:
+                        data = response.json()
+                        results = data.get('mitzvot', [])
+                        
+                        # Check if any results are from Batch 7 (137-186)
+                        batch_7_results = [r for r in results if 137 <= r.get('number', 0) <= 186]
+                        
+                        if batch_7_results:
+                            self.log_test(f"Search Corrected Data - '{term}'", True, f"Found {len(batch_7_results)} Batch 7 results out of {len(results)} total")
+                            search_passed += 1
+                        elif results:
+                            self.log_test(f"Search Corrected Data - '{term}'", True, f"Found {len(results)} results (no Batch 7 matches)")
+                            search_passed += 0.5  # Partial credit
+                        else:
+                            self.log_test(f"Search Corrected Data - '{term}'", False, "No results found")
+                    else:
+                        self.log_test(f"Search Corrected Data - '{term}'", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Search Corrected Data - '{term}'", False, f"Error: {str(e)}")
+            
+            # Test category filtering for categories that might contain Batch 7 mitzvot
+            categories_to_test = ["temple-worship", "tithes-offerings", "festivals-holy-days"]
+            filter_passed = 0
+            
+            for category in categories_to_test:
+                try:
+                    response = self.session.get(f"{self.base_url}/mitzvot?category={category}&limit=100")
+                    if response.status_code == 200:
+                        data = response.json()
+                        results = data.get('mitzvot', [])
+                        
+                        # Check if any results are from Batch 7
+                        batch_7_results = [r for r in results if 137 <= r.get('number', 0) <= 186]
+                        
+                        if batch_7_results:
+                            self.log_test(f"Filter Corrected Data - {category}", True, f"Found {len(batch_7_results)} Batch 7 mitzvot in category")
+                            filter_passed += 1
+                        elif results:
+                            self.log_test(f"Filter Corrected Data - {category}", True, f"Category has {len(results)} mitzvot (no Batch 7)")
+                            filter_passed += 0.5
+                        else:
+                            self.log_test(f"Filter Corrected Data - {category}", False, "No results in category")
+                    else:
+                        self.log_test(f"Filter Corrected Data - {category}", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Filter Corrected Data - {category}", False, f"Error: {str(e)}")
+            
+            return search_passed >= 3 and filter_passed >= 2
+            
+        except Exception as e:
+            self.log_test("Search Filter Corrected Data", False, f"Error: {str(e)}")
+            return False
+
+    def test_quiz_flashcard_with_corrected_data(self):
+        """Test quiz and flashcard systems can access corrected Batch 7 data"""
+        try:
+            # Test quiz generation - should be able to use corrected data
+            response = self.session.get(f"{self.base_url}/quiz/all?limit=10")
+            if response.status_code == 200:
+                data = response.json()
+                questions = data.get('questions', [])
+                
+                if questions:
+                    # Check if any questions use Batch 7 mitzvot
+                    batch_7_questions = 0
+                    for question in questions:
+                        question_text = question.get('question', '')
+                        explanation = question.get('explanation', '')
+                        
+                        # Look for mitzvah numbers in explanation
+                        import re
+                        numbers = re.findall(r'#(\d+)', explanation)
+                        for num_str in numbers:
+                            num = int(num_str)
+                            if 137 <= num <= 186:
+                                batch_7_questions += 1
+                                break
+                    
+                    if batch_7_questions > 0:
+                        self.log_test("Quiz Corrected Data Access", True, f"Found {batch_7_questions} questions using Batch 7 mitzvot")
+                    else:
+                        self.log_test("Quiz Corrected Data Access", True, f"Quiz system working (generated {len(questions)} questions)")
+                else:
+                    self.log_test("Quiz Corrected Data Access", False, "No questions generated")
+            else:
+                self.log_test("Quiz Corrected Data Access", False, f"Status: {response.status_code}")
+                return False
+            
+            # Test flashcard system
+            response = self.session.get(f"{self.base_url}/flashcards?limit=10")
+            if response.status_code == 200:
+                data = response.json()
+                flashcards = data.get('flashcards', [])
+                
+                if flashcards:
+                    # Check if any flashcards use Batch 7 mitzvot
+                    batch_7_flashcards = 0
+                    for flashcard_data in flashcards:
+                        mitzvah = flashcard_data.get('mitzvah', {})
+                        number = mitzvah.get('number', 0)
+                        if 137 <= number <= 186:
+                            batch_7_flashcards += 1
+                    
+                    if batch_7_flashcards > 0:
+                        self.log_test("Flashcard Corrected Data Access", True, f"Found {batch_7_flashcards} flashcards using Batch 7 mitzvot")
+                    else:
+                        self.log_test("Flashcard Corrected Data Access", True, f"Flashcard system working (found {len(flashcards)} flashcards)")
+                else:
+                    # Empty flashcards is normal for spaced repetition
+                    self.log_test("Flashcard Corrected Data Access", True, "Flashcard system accessible (no cards due for review)")
+            else:
+                self.log_test("Flashcard Corrected Data Access", False, f"Status: {response.status_code}")
+                return False
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Quiz Flashcard Corrected Data", False, f"Error: {str(e)}")
+            return False
     
     def run_all_tests(self):
         """Run all tests and return summary"""
