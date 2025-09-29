@@ -49,10 +49,6 @@ class MitzvotResponse(BaseModel):
 
 class StatsResponse(BaseModel):
     totalMitzvot: int
-    directBiblical: int
-    indirectBiblical: int
-    rabbinic: int
-    traditional: int
     categoriesCount: int
     booksCount: int
 
