@@ -576,13 +576,12 @@ const MitzvotApp = () => {
               <CardContent>
                 <div className="space-y-3">
                   <h3 className="text-xl font-semibold">{mitzvahOfTheDay.title}</h3>
-                  <p className="text-purple-100 italic">"{mitzvahOfTheDay.traditionalWording}"</p>
-                  <p className="text-sm text-purple-200">
-                    <strong>{mitzvahOfTheDay.sourceVerse}</strong>
+                  <p className="text-purple-100 italic bg-white/10 p-3 rounded border-l-4 border-white/30">
+                    "{mitzvahOfTheDay.sourceVerse}"
                   </p>
                   <div className="flex flex-wrap gap-2 pt-2">
                     <Badge variant="secondary" className="bg-white/20 text-white">
-                      {getStatusLabel(mitzvahOfTheDay.status)}
+                      {mitzvahOfTheDay.book} {mitzvahOfTheDay.chapter}:{mitzvahOfTheDay.verse}
                     </Badge>
                     <Badge variant="secondary" className="bg-white/20 text-white">
                       {getCategoryName(mitzvahOfTheDay.category)}
