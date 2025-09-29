@@ -678,20 +678,6 @@ const MitzvotApp = () => {
                     </SelectContent>
                   </Select>
 
-                  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Origins" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Origins</SelectItem>
-                      {statusTypes.map((status) => (
-                        <SelectItem key={status.value} value={status.value}>
-                          {status.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
                   <Select value={selectedBook} onValueChange={setSelectedBook}>
                     <SelectTrigger>
                       <SelectValue placeholder="All Books" />
