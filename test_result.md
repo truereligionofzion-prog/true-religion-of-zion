@@ -356,8 +356,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced 613 Mitzvot API system testing completed"
-    - "All requested enhancements verified and working"
+    - "Data Integrity Correction - Batch 7 (Mitzvot 137-186)"
+    - "Prepare Batch 8 (Mitzvot 187-236) for correction"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
