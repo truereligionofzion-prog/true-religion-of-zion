@@ -105,6 +105,18 @@
 user_problem_statement: "Comprehensive testing and stabilization of the 613 Biblical Laws learning platform with new interactive features including improved quiz system, progress tracking, flashcards with spaced repetition, and user learning analytics."
 
 backend:
+  - task: "Specific Traditional Wording Implementation - Batch 7"
+    implemented: false
+    working: false
+    file: "/app/backend/data_loader.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE: Review request specified exact traditional wording for Mitzvot 137 ('Offer firstborn ox, sheep, goat.') and 186 ('Offer shelamim sacrifices.') but current data shows generic content: Mitzvah 137 = 'Regulation of marriage and family relationships according to Torah law.' and Mitzvah 186 = 'Maintaining ritual purity and dietary holiness as commanded.' Search for 'shelamim' returns 0 results. The Batch 7 data correction re-run did NOT implement the specific traditional wording requested in the review."
+
   - task: "Enhanced Quiz System"
     implemented: true
     working: true
