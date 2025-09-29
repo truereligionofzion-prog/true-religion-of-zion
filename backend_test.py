@@ -1445,6 +1445,221 @@ class APITester:
         except Exception as e:
             self.log_test("Batch 7 Verification", False, f"Error: {str(e)}")
             return False
+
+    def test_new_categories_structure(self):
+        """Test that new categories (34 categories) are created correctly"""
+        try:
+            response = self.session.get(f"{self.base_url}/categories")
+            if response.status_code == 200:
+                categories = response.json()
+                
+                # Test for 34 categories as mentioned in review request
+                if len(categories) == 34:
+                    self.log_test("New Categories - Count", True, f"Found exactly 34 categories")
+                else:
+                    self.log_test("New Categories - Count", False, f"Found {len(categories)} categories (expected 34)")
+                
+                # Check that each category has mitzvot assigned
+                categories_with_mitzvot = 0
+                total_mitzvot_in_categories = 0
+                
+                for category in categories:
+                    count = category.get('count', 0)
+                    name = category.get('name', 'Unknown')
+                    if count > 0:
+                        categories_with_mitzvot += 1
+                        total_mitzvot_in_categories += count
+                        self.log_test(f"New Category - {name}", True, f"{count} mitzvot assigned")
+                    else:
+                        self.log_test(f"New Category - {name}", False, "No mitzvot assigned")
+                
+                # Check that total mitzvot in categories equals 613
+                if total_mitzvot_in_categories == 613:
+                    self.log_test("New Categories - Total Assignment", True, f"All 613 mitzvot properly categorized")
+                else:
+                    self.log_test("New Categories - Total Assignment", False, f"Only {total_mitzvot_in_categories}/613 mitzvot categorized")
+                
+                return len(categories) == 34 and categories_with_mitzvot >= 30 and total_mitzvot_in_categories == 613
+            else:
+                self.log_test("New Categories Structure", False, f"Status: {response.status_code}")
+                return False
+            
+        except Exception as e:
+            self.log_test("New Categories Structure", False, f"Error: {str(e)}")
+            return False
+
+    def test_new_quiz_system(self):
+        """Test the updated quiz system with new question types"""
+        try:
+            # Test quiz generation for different categories
+            categories_to_test = ["all", "faith-god", "torah-study"]
+            quiz_tests_passed = 0
+            
+            for category in categories_to_test:
+                try:
+                    response = self.session.get(f"{self.base_url}/quiz/{category}?limit=5")
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        questions = data.get('questions', [])
+                        
+                        if not questions:
+                            self.log_test(f"New Quiz - {category} Generation", False, "No questions generated")
+                            continue
+                        
+                        # Test for new question types
+                        new_question_types_found = set()
+                        
+                        for question in questions:
+                            question_text = question.get('question', '').lower()
+                            
+                            # Check for new question types
+                            if 'which biblical verse corresponds to' in question_text:
+                                new_question_types_found.add('verse_from_title')
+                            elif 'which book of the bible' in question_text:
+                                new_question_types_found.add('book_from_title')
+                            elif 'which category does this commandment belong to' in question_text:
+                                new_question_types_found.add('category_from_title')
+                            elif 'which mitzvah is derived from this verse' in question_text:
+                                new_question_types_found.add('title_from_verse')
+                        
+                        # Test results
+                        if len(new_question_types_found) >= 2:
+                            self.log_test(f"New Quiz - {category} Question Types", True, f"Found new question types: {list(new_question_types_found)}")
+                            quiz_tests_passed += 1
+                        else:
+                            self.log_test(f"New Quiz - {category} Question Types", False, f"Only found: {list(new_question_types_found)}")
+                        
+                        self.log_test(f"New Quiz - {category} Generation", True, f"Generated {len(questions)} questions successfully")
+                    else:
+                        self.log_test(f"New Quiz - {category} Generation", False, f"Status: {response.status_code}")
+                        
+                except Exception as e:
+                    self.log_test(f"New Quiz - {category}", False, f"Error: {str(e)}")
+            
+            return quiz_tests_passed >= 2  # Should pass most tests
+            
+        except Exception as e:
+            self.log_test("New Quiz System", False, f"Error: {str(e)}")
+            return False
+
+    def test_new_search_functionality(self):
+        """Test search works across title, sourceVerse, book, and keywords"""
+        try:
+            # Test search across new fields
+            search_terms = [
+                ("YHWH", "Should find YHWH in sourceVerse or title"),
+                ("Exodus", "Should find in book field"),
+                ("commandment", "Should find in title or sourceVerse"),
+                ("Torah", "Should find Torah-related content")
+            ]
+            
+            search_passed = 0
+            for term, description in search_terms:
+                try:
+                    response = self.session.get(f"{self.base_url}/mitzvot?search={term}&limit=20")
+                    if response.status_code == 200:
+                        data = response.json()
+                        results = data.get('mitzvot', [])
+                        
+                        if results:
+                            # Check which fields contain the search term
+                            fields_found = set()
+                            for mitzvah in results:
+                                if term.lower() in mitzvah.get('title', '').lower():
+                                    fields_found.add('title')
+                                if term.lower() in mitzvah.get('sourceVerse', '').lower():
+                                    fields_found.add('sourceVerse')
+                                if term.lower() in mitzvah.get('book', '').lower():
+                                    fields_found.add('book')
+                                keywords = mitzvah.get('keywords', [])
+                                if any(term.lower() in keyword.lower() for keyword in keywords):
+                                    fields_found.add('keywords')
+                            
+                            if fields_found:
+                                self.log_test(f"New Search - '{term}'", True, f"Found in fields: {list(fields_found)} ({len(results)} results)")
+                                search_passed += 1
+                            else:
+                                self.log_test(f"New Search - '{term}'", False, f"Found {len(results)} results but no field matches")
+                        else:
+                            self.log_test(f"New Search - '{term}'", False, "No results found")
+                    else:
+                        self.log_test(f"New Search - '{term}'", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"New Search - '{term}'", False, f"Error: {str(e)}")
+            
+            return search_passed >= len(search_terms) * 0.75  # At least 75% should work
+            
+        except Exception as e:
+            self.log_test("New Search Functionality", False, f"Error: {str(e)}")
+            return False
+
+    def test_api_endpoints_new_structure(self):
+        """Test that all API endpoints work with the new structure"""
+        try:
+            tests_passed = 0
+            
+            # Test 1: GET /api/mitzvot should work without status parameter
+            response = self.session.get(f"{self.base_url}/mitzvot?page=1&limit=10")
+            if response.status_code == 200:
+                data = response.json()
+                mitzvot = data.get('mitzvot', [])
+                if mitzvot:
+                    # Check that no old fields are present
+                    sample_mitzvah = mitzvot[0]
+                    old_fields = ['traditionalWording', 'scholarlyNote', 'status']
+                    has_old_fields = any(field in sample_mitzvah for field in old_fields)
+                    
+                    if not has_old_fields:
+                        self.log_test("API Endpoints - GET mitzvot", True, "Returns new structure without old fields")
+                        tests_passed += 1
+                    else:
+                        self.log_test("API Endpoints - GET mitzvot", False, "Still contains old fields")
+                else:
+                    self.log_test("API Endpoints - GET mitzvot", False, "No mitzvot returned")
+            else:
+                self.log_test("API Endpoints - GET mitzvot", False, f"Status: {response.status_code}")
+            
+            # Test 2: Categories endpoint should return new biblical categories
+            response = self.session.get(f"{self.base_url}/categories")
+            if response.status_code == 200:
+                categories = response.json()
+                if len(categories) == 34:  # Expected 34 categories
+                    self.log_test("API Endpoints - Categories", True, f"Returns {len(categories)} new biblical categories")
+                    tests_passed += 1
+                else:
+                    self.log_test("API Endpoints - Categories", False, f"Returns {len(categories)} categories (expected 34)")
+            else:
+                self.log_test("API Endpoints - Categories", False, f"Status: {response.status_code}")
+            
+            # Test 3: Individual mitzvah endpoints should return new structure
+            if mitzvot:
+                test_mitzvah_id = mitzvot[0].get('id')
+                response = self.session.get(f"{self.base_url}/mitzvot/{test_mitzvah_id}")
+                if response.status_code == 200:
+                    individual_mitzvah = response.json()
+                    
+                    # Check for new required fields
+                    new_fields = ['sourceVerse', 'book', 'chapter', 'verse']
+                    has_new_fields = all(field in individual_mitzvah for field in new_fields)
+                    
+                    # Check that old fields are not present
+                    old_fields = ['traditionalWording', 'scholarlyNote', 'status']
+                    has_old_fields = any(field in individual_mitzvah for field in old_fields)
+                    
+                    if has_new_fields and not has_old_fields:
+                        self.log_test("API Endpoints - Individual Mitzvah", True, "Returns new structure with required fields")
+                        tests_passed += 1
+                    else:
+                        self.log_test("API Endpoints - Individual Mitzvah", False, "Missing new fields or contains old fields")
+                else:
+                    self.log_test("API Endpoints - Individual Mitzvah", False, f"Status: {response.status_code}")
+            
+            return tests_passed >= 2
+            
+        except Exception as e:
+            self.log_test("API Endpoints New Structure", False, f"Error: {str(e)}")
+            return False
     
     def run_all_tests(self):
         """Run all tests and return summary"""
