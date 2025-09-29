@@ -970,7 +970,10 @@ const MitzvotApp = () => {
                             <div className="space-y-4">
                               <div className="bg-blue-50 p-4 rounded-lg">
                                 <p className="font-medium text-blue-900 italic">
-                                  "{flashcards[currentFlashcardIndex].mitzvah.traditionalWording}"
+                                  "{flashcards[currentFlashcardIndex].mitzvah.sourceVerse}"
+                                </p>
+                                <p className="text-sm text-blue-700 mt-2">
+                                  {flashcards[currentFlashcardIndex].mitzvah.book} {flashcards[currentFlashcardIndex].mitzvah.chapter}:{flashcards[currentFlashcardIndex].mitzvah.verse}
                                 </p>
                               </div>
                               <div className="bg-gray-50 p-4 rounded-lg">
