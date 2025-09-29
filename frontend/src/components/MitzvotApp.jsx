@@ -181,14 +181,6 @@ const MitzvotApp = () => {
             </p>
           </div>
 
-          <div>
-            <h4 className="font-medium text-gray-700 mb-1 flex items-center">
-              <Info className="w-4 h-4 mr-1" />
-              Scholarly Note:
-            </h4>
-            <p className="text-sm text-gray-600">{mitzvah.scholarlyNote}</p>
-          </div>
-
           <div className="flex flex-wrap gap-2 pt-2">
             <Badge variant="outline" className="text-xs">
               {getCategoryName(mitzvah.category)}
