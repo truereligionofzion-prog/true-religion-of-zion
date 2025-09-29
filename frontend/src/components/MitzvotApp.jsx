@@ -113,7 +113,6 @@ const MitzvotApp = () => {
       const params = {
         search: searchTerm,
         category: selectedCategory,
-        status: selectedStatus,
         book: selectedBook,
         page: currentPage,
         limit: 20
