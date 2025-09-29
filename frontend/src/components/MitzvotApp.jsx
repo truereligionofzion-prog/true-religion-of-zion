@@ -615,8 +615,8 @@ const MitzvotApp = () => {
               </Card>
               <Card className="text-center">
                 <CardContent className="pt-4">
-                  <div className="text-2xl font-bold text-green-600">{stats.directBiblical || 0}</div>
-                  <div className="text-sm text-gray-600">Direct Biblical</div>
+                  <div className="text-2xl font-bold text-green-600">{stats.booksCount || 0}</div>
+                  <div className="text-sm text-gray-600">Books of Torah</div>
                 </CardContent>
               </Card>
               <Card className="text-center">
