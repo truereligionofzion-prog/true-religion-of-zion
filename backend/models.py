@@ -7,14 +7,11 @@ class Mitzvah(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     number: int
     title: str
-    traditionalWording: str
-    sourceVerse: str
+    sourceVerse: str  # Complete verse text with YHWH/YHUH replacements
     book: str
     chapter: int
     verse: str  # Can be "2" or "8-10" for ranges
-    status: str  # "direct", "indirect", "rabbinic", "traditional"
     category: str  # category ID
-    scholarlyNote: str
     keywords: List[str]
     createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
