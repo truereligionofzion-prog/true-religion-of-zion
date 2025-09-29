@@ -50,12 +50,10 @@ const MitzvotApp = () => {
 
   const { toast } = useToast();
 
-  // Status types for display
+  // Status types for display (simplified per user requirement)
   const statusTypes = [
     { value: 'direct', label: 'Direct in Bible', color: 'bg-green-100 text-green-800' },
-    { value: 'indirect', label: 'Indirect in Bible', color: 'bg-blue-100 text-blue-800' },
-    { value: 'rabbinic', label: 'Rabbinic Origin', color: 'bg-purple-100 text-purple-800' },
-    { value: 'traditional', label: 'Traditional', color: 'bg-orange-100 text-orange-800' }
+    { value: 'indirect', label: 'Indirect in Bible', color: 'bg-blue-100 text-blue-800' }
   ];
 
   // Load initial data
