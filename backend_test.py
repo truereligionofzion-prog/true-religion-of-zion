@@ -158,37 +158,52 @@ class APITester:
             return False
     
     def test_stats_validation(self):
-        """Test /api/stats to confirm exactly 613 total mitzvot with proper distribution"""
+        """Test /api/stats to confirm new simplified structure (totalMitzvot, categoriesCount, booksCount only)"""
         try:
             response = self.session.get(f"{self.base_url}/stats")
             if response.status_code == 200:
                 data = response.json()
-                total_mitzvot = data.get('totalMitzvot', 0)
-                direct = data.get('directBiblical', 0)
-                indirect = data.get('indirectBiblical', 0)
-                rabbinic = data.get('rabbinic', 0)
-                traditional = data.get('traditional', 0)
                 
-                # Test total count
+                # Test new simplified structure
+                required_fields = ['totalMitzvot', 'categoriesCount', 'booksCount']
+                old_fields = ['directBiblical', 'indirectBiblical', 'rabbinic', 'traditional']
+                
+                # Check required fields are present
+                missing_required = [field for field in required_fields if field not in data]
+                if not missing_required:
+                    self.log_test("Stats - New Structure Fields", True, "All required fields present")
+                else:
+                    self.log_test("Stats - New Structure Fields", False, f"Missing fields: {missing_required}")
+                
+                # Check old fields are removed
+                present_old_fields = [field for field in old_fields if field in data]
+                if not present_old_fields:
+                    self.log_test("Stats - Old Fields Removed", True, "Old status fields properly removed")
+                else:
+                    self.log_test("Stats - Old Fields Removed", False, f"Old fields still present: {present_old_fields}")
+                
+                # Test values
+                total_mitzvot = data.get('totalMitzvot', 0)
+                categories_count = data.get('categoriesCount', 0)
+                books_count = data.get('booksCount', 0)
+                
                 if total_mitzvot == 613:
                     self.log_test("Stats - Total Count", True, "Exactly 613 mitzvot")
                 else:
                     self.log_test("Stats - Total Count", False, f"Expected 613, got {total_mitzvot}")
                 
-                # Test distribution adds up
-                sum_categories = direct + indirect + rabbinic + traditional
-                if sum_categories == total_mitzvot:
-                    self.log_test("Stats - Distribution Sum", True, f"Categories sum to {sum_categories}")
+                if categories_count > 0:
+                    self.log_test("Stats - Categories Count", True, f"{categories_count} categories")
                 else:
-                    self.log_test("Stats - Distribution Sum", False, f"Categories sum to {sum_categories}, total is {total_mitzvot}")
+                    self.log_test("Stats - Categories Count", False, "No categories counted")
                 
-                # Test reasonable distribution
-                if direct > 0 and indirect > 0:
-                    self.log_test("Stats - Distribution Variety", True, f"Direct: {direct}, Indirect: {indirect}, Rabbinic: {rabbinic}, Traditional: {traditional}")
+                if books_count > 0:
+                    self.log_test("Stats - Books Count", True, f"{books_count} books")
                 else:
-                    self.log_test("Stats - Distribution Variety", False, "Missing direct or indirect mitzvot")
+                    self.log_test("Stats - Books Count", False, "No books counted")
                 
-                return total_mitzvot == 613 and sum_categories == total_mitzvot
+                return (not missing_required and not present_old_fields and 
+                       total_mitzvot == 613 and categories_count > 0 and books_count > 0)
             else:
                 self.log_test("Stats Endpoint", False, f"Status: {response.status_code}")
                 return False
