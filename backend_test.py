@@ -1263,6 +1263,9 @@ class APITester:
         print("\n🎯 Testing Quiz & Flashcard Access to Corrected Data...")
         self.test_quiz_flashcard_with_corrected_data()
         
+        print("\n🎯 SPECIFIC BATCH 7 VERIFICATION - Review Request Requirements...")
+        self.test_specific_batch_7_verification()
+        
         # Summary
         print("\n" + "=" * 70)
         print("📋 TEST SUMMARY")
