@@ -148,7 +148,7 @@ const MitzvotApp = () => {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, selectedStatus, selectedBook]);
+  }, [selectedCategory, selectedBook]);
 
   const getStatusColor = (status) => {
     const statusType = statusTypes.find(s => s.value === status);
