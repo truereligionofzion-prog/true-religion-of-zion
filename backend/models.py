@@ -19,14 +19,11 @@ class Mitzvah(BaseModel):
 class MitzvahCreate(BaseModel):
     number: int
     title: str
-    traditionalWording: str
     sourceVerse: str
     book: str
     chapter: int
     verse: str
-    status: str
     category: str
-    scholarlyNote: str
     keywords: List[str]
 
 class Category(BaseModel):
