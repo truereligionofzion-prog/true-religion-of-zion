@@ -826,7 +826,7 @@ class APITester:
         return tests_passed >= len(specific_tests) * 0.75  # At least 75% should pass
 
     def test_enhanced_quiz_system(self):
-        """Test the enhanced quiz system with diverse answer choices and question types"""
+        """Test the enhanced quiz system with new question types for biblical structure"""
         try:
             # Test quiz generation for different categories
             categories_to_test = ["all", "faith-god", "torah-study", "invalid-category"]
@@ -853,10 +853,12 @@ class APITester:
                             self.log_test(f"Quiz - {category} Generation", False, "No questions generated")
                             continue
                         
-                        # Test question structure and diversity
+                        # Test new question types for biblical structure
                         question_types_found = set()
-                        unique_answers_per_question = []
-                        status_questions_found = 0
+                        verse_from_title_found = 0
+                        book_from_title_found = 0
+                        category_from_title_found = 0
+                        title_from_verse_found = 0
                         
                         for question in questions:
                             # Check required fields
@@ -864,29 +866,26 @@ class APITester:
                             if all(field in question for field in required_fields):
                                 question_text = question.get('question', '').lower()
                                 
-                                # Check question type diversity
-                                if 'traditional wording' in question_text and 'which mitzvah' in question_text:
-                                    question_types_found.add('title_from_traditional')
-                                elif 'traditional wording for' in question_text:
-                                    question_types_found.add('traditional_from_title')
-                                elif 'category' in question_text:
+                                # Check for new biblical structure question types
+                                if 'biblical verse corresponds to' in question_text:
+                                    question_types_found.add('verse_from_title')
+                                    verse_from_title_found += 1
+                                elif 'which book of the bible' in question_text:
+                                    question_types_found.add('book_from_title')
+                                    book_from_title_found += 1
+                                elif 'which category does this commandment belong' in question_text:
                                     question_types_found.add('category_from_title')
-                                elif 'biblical status' in question_text:
-                                    question_types_found.add('status_from_title')
-                                    status_questions_found += 1
-                                    
-                                    # Test enhanced status questions - should only have 2 biblical status options
-                                    options = question.get('options', [])
-                                    biblical_status_options = [opt for opt in options if 'Direct in Bible' in opt or 'Indirect in Bible' in opt]
-                                    if len(biblical_status_options) >= 1:
-                                        self.log_test(f"Quiz - {category} Status Question Format", True, f"Found biblical status options: {biblical_status_options}")
-                                    else:
-                                        self.log_test(f"Quiz - {category} Status Question Format", False, f"No biblical status options found in: {options}")
+                                    category_from_title_found += 1
+                                elif 'which mitzvah is derived from this verse' in question_text:
+                                    question_types_found.add('title_from_verse')
+                                    title_from_verse_found += 1
                                 
                                 # Check answer diversity (no duplicates)
                                 options = question.get('options', [])
                                 unique_options = len(set(options))
-                                unique_answers_per_question.append(unique_options == len(options))
+                                if unique_options != len(options):
+                                    self.log_test(f"Quiz - {category} Answer Uniqueness", False, "Found duplicate answers")
+                                    continue
                                 
                                 # Verify correct answer is in options
                                 correct_answer = question.get('correct_answer')
@@ -894,22 +893,32 @@ class APITester:
                                     self.log_test(f"Quiz - {category} Answer Validity", False, "Correct answer not in options")
                                     continue
                         
-                        # Test results
+                        # Test results for new question types
+                        if verse_from_title_found > 0:
+                            self.log_test(f"Quiz - {category} Verse from Title", True, f"Found {verse_from_title_found} verse_from_title questions")
+                        else:
+                            self.log_test(f"Quiz - {category} Verse from Title", False, "No verse_from_title questions found")
+                        
+                        if book_from_title_found > 0:
+                            self.log_test(f"Quiz - {category} Book from Title", True, f"Found {book_from_title_found} book_from_title questions")
+                        else:
+                            self.log_test(f"Quiz - {category} Book from Title", False, "No book_from_title questions found")
+                        
+                        if category_from_title_found > 0:
+                            self.log_test(f"Quiz - {category} Category from Title", True, f"Found {category_from_title_found} category_from_title questions")
+                        else:
+                            self.log_test(f"Quiz - {category} Category from Title", False, "No category_from_title questions found")
+                        
+                        if title_from_verse_found > 0:
+                            self.log_test(f"Quiz - {category} Title from Verse", True, f"Found {title_from_verse_found} title_from_verse questions")
+                        else:
+                            self.log_test(f"Quiz - {category} Title from Verse", False, "No title_from_verse questions found")
+                        
                         if len(question_types_found) >= 2:
-                            self.log_test(f"Quiz - {category} Question Diversity", True, f"Found {len(question_types_found)} question types")
-                        else:
-                            self.log_test(f"Quiz - {category} Question Diversity", False, f"Only {len(question_types_found)} question types")
-                        
-                        if status_questions_found > 0:
-                            self.log_test(f"Quiz - {category} Status Questions", True, f"Found {status_questions_found} status-based questions")
-                        else:
-                            self.log_test(f"Quiz - {category} Status Questions", False, "No status-based questions found")
-                        
-                        if all(unique_answers_per_question):
-                            self.log_test(f"Quiz - {category} Answer Uniqueness", True, "All questions have unique answer options")
+                            self.log_test(f"Quiz - {category} Question Type Diversity", True, f"Found {len(question_types_found)} new question types")
                             quiz_tests_passed += 1
                         else:
-                            self.log_test(f"Quiz - {category} Answer Uniqueness", False, "Found duplicate answers in some questions")
+                            self.log_test(f"Quiz - {category} Question Type Diversity", False, f"Only {len(question_types_found)} question types")
                         
                         self.log_test(f"Quiz - {category} Generation", True, f"Generated {len(questions)} questions successfully")
                         quiz_tests_passed += 1
