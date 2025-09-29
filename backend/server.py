@@ -85,7 +85,6 @@ async def initialize_data():
 async def get_mitzvot(
     search: Optional[str] = Query(None, description="Search term"),
     category: Optional[str] = Query(None, description="Filter by category"),
-    status: Optional[str] = Query(None, description="Filter by status"),
     book: Optional[str] = Query(None, description="Filter by book"),
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(20, ge=1, le=100, description="Items per page")
@@ -98,9 +97,6 @@ async def get_mitzvot(
         if category and category != "all":
             query["category"] = category
             
-        if status and status != "all":
-            query["status"] = status
-            
         if book and book != "all":
             query["book"] = book
         
@@ -109,9 +105,7 @@ async def get_mitzvot(
             search_regex = {"$regex": search, "$options": "i"}
             query["$or"] = [
                 {"title": search_regex},
-                {"traditionalWording": search_regex},
                 {"sourceVerse": search_regex},
-                {"scholarlyNote": search_regex},
                 {"book": search_regex},
                 {"keywords": {"$in": [re.compile(search, re.IGNORECASE)]}}
             ]
@@ -145,12 +139,6 @@ async def get_mitzvot(
         books = await mitzvot_collection.distinct("book")
         books.sort()
         
-        # Simplified status types based on user requirement
-        status_types = [
-            {"value": "direct", "label": "Direct in Bible", "color": "bg-green-100 text-green-800"},
-            {"value": "indirect", "label": "Indirect in Bible", "color": "bg-blue-100 text-blue-800"}
-        ]
-        
         return MitzvotResponse(
             mitzvot=mitzvot,
             total=total,
@@ -158,7 +146,6 @@ async def get_mitzvot(
             totalPages=total_pages,
             filters={
                 "categories": categories,
-                "statusTypes": status_types,
                 "books": books
             }
         )
