@@ -52,6 +52,83 @@ class APITester:
         except Exception as e:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
+
+    def test_new_biblical_structure_verification(self):
+        """Test that the new biblical structure is working correctly"""
+        try:
+            # Test 1: Verify no more status-based filtering
+            response = self.session.get(f"{self.base_url}/mitzvot?status=direct&limit=10")
+            if response.status_code == 400:
+                self.log_test("New Structure - No Status Filtering", True, "Status parameter properly rejected")
+            else:
+                self.log_test("New Structure - No Status Filtering", False, f"Status parameter still accepted: {response.status_code}")
+                return False
+            
+            # Test 2: Get sample mitzvot to verify new structure
+            response = self.session.get(f"{self.base_url}/mitzvot?page=1&limit=20")
+            if response.status_code != 200:
+                self.log_test("New Structure - Data Retrieval", False, f"Status: {response.status_code}")
+                return False
+                
+            data = response.json()
+            mitzvot = data.get('mitzvot', [])
+            
+            if not mitzvot:
+                self.log_test("New Structure - Data Retrieval", False, "No mitzvot returned")
+                return False
+            
+            # Test 3: Verify new structure fields
+            structure_tests_passed = 0
+            yhwh_replacements_found = 0
+            proper_verse_structure = 0
+            
+            for mitzvah in mitzvot:
+                # Check for required new fields
+                required_fields = ['sourceVerse', 'book', 'chapter', 'verse']
+                has_all_fields = all(field in mitzvah for field in required_fields)
+                
+                # Check that old fields are removed
+                old_fields = ['traditionalWording', 'scholarlyNote', 'status']
+                has_old_fields = any(field in mitzvah for field in old_fields)
+                
+                if has_all_fields and not has_old_fields:
+                    structure_tests_passed += 1
+                
+                # Check for YHWH/YHUH replacements
+                source_verse = mitzvah.get('sourceVerse', '')
+                title = mitzvah.get('title', '')
+                if 'YHWH' in source_verse or 'YHUH' in source_verse or 'YHWH' in title or 'YHUH' in title:
+                    yhwh_replacements_found += 1
+                
+                # Check proper verse structure (should have book, chapter, verse)
+                book = mitzvah.get('book', '')
+                chapter = mitzvah.get('chapter')
+                verse = mitzvah.get('verse')
+                if book and chapter and verse and isinstance(chapter, int) and isinstance(verse, int):
+                    proper_verse_structure += 1
+            
+            # Test results
+            total_mitzvot = len(mitzvot)
+            if structure_tests_passed == total_mitzvot:
+                self.log_test("New Structure - Field Structure", True, f"All {total_mitzvot} mitzvot have new structure")
+            else:
+                self.log_test("New Structure - Field Structure", False, f"Only {structure_tests_passed}/{total_mitzvot} have new structure")
+            
+            if yhwh_replacements_found > 0:
+                self.log_test("New Structure - YHWH Replacements", True, f"Found {yhwh_replacements_found} mitzvot with YHWH/YHUH")
+            else:
+                self.log_test("New Structure - YHWH Replacements", False, "No YHWH/YHUH replacements found")
+            
+            if proper_verse_structure >= total_mitzvot * 0.9:
+                self.log_test("New Structure - Verse Structure", True, f"{proper_verse_structure}/{total_mitzvot} have proper verse structure")
+            else:
+                self.log_test("New Structure - Verse Structure", False, f"Only {proper_verse_structure}/{total_mitzvot} have proper verse structure")
+            
+            return structure_tests_passed >= total_mitzvot * 0.9
+            
+        except Exception as e:
+            self.log_test("New Biblical Structure Verification", False, f"Error: {str(e)}")
+            return False
     
     def test_initialize_endpoint(self):
         """Test /api/initialize endpoint to verify 613 mitzvot are loaded correctly"""
