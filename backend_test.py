@@ -1223,6 +1223,15 @@ class APITester:
         print("\n📅 Testing Mitzvah of the Day...")
         self.test_mitzvah_of_the_day()
         
+        print("\n🔧 Testing Batch 7 Data Correction (Mitzvot 137-186)...")
+        self.test_batch_7_data_correction()
+        
+        print("\n🔍 Testing Search & Filter with Corrected Data...")
+        self.test_search_filter_with_corrected_data()
+        
+        print("\n🎯 Testing Quiz & Flashcard Access to Corrected Data...")
+        self.test_quiz_flashcard_with_corrected_data()
+        
         # Summary
         print("\n" + "=" * 70)
         print("📋 TEST SUMMARY")
