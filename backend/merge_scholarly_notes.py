@@ -92,7 +92,7 @@ async def restore_original_and_merge():
         
         print(f"📚 Step 2: Merging original notes with enhanced academic references...")
         
-        for mitzvah_data in original_mitzvah_with_notes:
+        for mitzvah_data in original_mitzvot_with_notes:
             number = mitzvah_data["number"]
             original_note = mitzvah_data["originalScholarlyNote"]
             enhanced_note = ENHANCED_SCHOLARLY_NOTES.get(number, "")
