@@ -124,10 +124,88 @@ class APITester:
             else:
                 self.log_test("New Structure - Verse Structure", False, f"Only {proper_verse_structure}/{total_mitzvot} have proper verse structure")
             
-            return structure_tests_passed >= total_mitzvot * 0.9
+    def test_yhwh_replacements_verification(self):
+        """Test YHWH/YHUH replacements in titles and sourceVerse fields"""
+        try:
+            # Get sample mitzvot to check for YHWH/YHUH replacements
+            response = self.session.get(f"{self.base_url}/mitzvot?page=1&limit=50")
+            if response.status_code != 200:
+                self.log_test("YHWH Replacements - Data Retrieval", False, f"Status: {response.status_code}")
+                return False
+                
+            data = response.json()
+            mitzvot = data.get('mitzvot', [])
+            
+            if not mitzvot:
+                self.log_test("YHWH Replacements - Data Retrieval", False, "No mitzvot returned")
+                return False
+            
+            # Check for YHWH/YHUH in titles and sourceVerse
+            yhwh_in_titles = 0
+            yhwh_in_verses = 0
+            old_terms_found = 0
+            
+            for mitzvah in mitzvot:
+                title = mitzvah.get('title', '')
+                source_verse = mitzvah.get('sourceVerse', '')
+                
+                # Check for YHWH/YHUH
+                if 'YHWH' in title or 'YHUH' in title:
+                    yhwh_in_titles += 1
+                if 'YHWH' in source_verse or 'YHUH' in source_verse:
+                    yhwh_in_verses += 1
+                
+                # Check for old terms that should be replaced
+                old_terms = ['God', 'Lord', 'LORD']
+                for term in old_terms:
+                    if term in title or term in source_verse:
+                        old_terms_found += 1
+                        break  # Count each mitzvah only once
+            
+            # Test search for YHWH terms
+            yhwh_search_response = self.session.get(f"{self.base_url}/mitzvot?search=YHWH&limit=20")
+            yhwh_search_results = 0
+            if yhwh_search_response.status_code == 200:
+                yhwh_search_data = yhwh_search_response.json()
+                yhwh_search_results = len(yhwh_search_data.get('mitzvot', []))
+            
+            # Test search for Elohim
+            elohim_search_response = self.session.get(f"{self.base_url}/mitzvot?search=Elohim&limit=20")
+            elohim_search_results = 0
+            if elohim_search_response.status_code == 200:
+                elohim_search_data = elohim_search_response.json()
+                elohim_search_results = len(elohim_search_data.get('mitzvot', []))
+            
+            # Log results
+            if yhwh_in_titles > 0:
+                self.log_test("YHWH Replacements - Titles", True, f"Found {yhwh_in_titles} titles with YHWH/YHUH")
+            else:
+                self.log_test("YHWH Replacements - Titles", False, "No YHWH/YHUH found in titles")
+            
+            if yhwh_in_verses > 0:
+                self.log_test("YHWH Replacements - Source Verses", True, f"Found {yhwh_in_verses} verses with YHWH/YHUH")
+            else:
+                self.log_test("YHWH Replacements - Source Verses", False, "No YHWH/YHUH found in source verses")
+            
+            if old_terms_found == 0:
+                self.log_test("YHWH Replacements - Old Terms Removed", True, "No old terms (God/Lord/LORD) found")
+            else:
+                self.log_test("YHWH Replacements - Old Terms Removed", False, f"Found {old_terms_found} mitzvot with old terms")
+            
+            if yhwh_search_results > 0:
+                self.log_test("YHWH Search - YHWH Results", True, f"Search for 'YHWH' returned {yhwh_search_results} results")
+            else:
+                self.log_test("YHWH Search - YHWH Results", False, "Search for 'YHWH' returned no results")
+            
+            if elohim_search_results > 0:
+                self.log_test("YHWH Search - Elohim Results", True, f"Search for 'Elohim' returned {elohim_search_results} results")
+            else:
+                self.log_test("YHWH Search - Elohim Results", False, "Search for 'Elohim' returned no results")
+            
+            return (yhwh_in_titles > 0 or yhwh_in_verses > 0) and old_terms_found == 0
             
         except Exception as e:
-            self.log_test("New Biblical Structure Verification", False, f"Error: {str(e)}")
+            self.log_test("YHWH Replacements Verification", False, f"Error: {str(e)}")
             return False
     
     def test_initialize_endpoint(self):
