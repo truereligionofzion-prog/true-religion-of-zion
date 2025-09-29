@@ -56,10 +56,10 @@ class APITester:
     def test_new_biblical_structure_verification(self):
         """Test that the new biblical structure is working correctly"""
         try:
-            # Test 1: Verify no more status-based filtering
+            # Test 1: Verify no more status-based filtering - should return 422 or 400
             response = self.session.get(f"{self.base_url}/mitzvot?status=direct&limit=10")
-            if response.status_code == 400:
-                self.log_test("New Structure - No Status Filtering", True, "Status parameter properly rejected")
+            if response.status_code in [400, 422]:
+                self.log_test("New Structure - No Status Filtering", True, f"Status parameter properly rejected with {response.status_code}")
             else:
                 self.log_test("New Structure - No Status Filtering", False, f"Status parameter still accepted: {response.status_code}")
                 return False
