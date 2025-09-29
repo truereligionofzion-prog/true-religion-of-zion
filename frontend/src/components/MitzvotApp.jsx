@@ -147,16 +147,6 @@ const MitzvotApp = () => {
     setCurrentPage(1);
   }, [selectedCategory, selectedBook]);
 
-  const getStatusColor = (status) => {
-    const statusType = statusTypes.find(s => s.value === status);
-    return statusType ? statusType.color : 'bg-gray-100 text-gray-800';
-  };
-
-  const getStatusLabel = (status) => {
-    const statusType = statusTypes.find(s => s.value === status);
-    return statusType ? statusType.label : status;
-  };
-
   const getCategoryName = (categorySlug) => {
     const category = categories.find(c => c.slug === categorySlug);
     return category ? category.name : categorySlug;
