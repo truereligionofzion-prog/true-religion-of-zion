@@ -164,8 +164,8 @@ const MitzvotApp = () => {
           <CardTitle className="text-lg font-semibold text-gray-900 leading-tight">
             #{mitzvah.number}: {mitzvah.title}
           </CardTitle>
-          <Badge className={`ml-2 ${getStatusColor(mitzvah.status)}`}>
-            {getStatusLabel(mitzvah.status)}
+          <Badge className="ml-2 bg-blue-100 text-blue-800">
+            {mitzvah.book} {mitzvah.chapter}:{mitzvah.verse}
           </Badge>
         </div>
       </CardHeader>
