@@ -321,6 +321,9 @@ const MitzvotApp = () => {
     
     setShowResult(true);
     
+    // Auto-advance timing: 3-4 seconds for correct answers, 5-6 seconds for wrong answers
+    const autoAdvanceDelay = isCorrect ? 3500 : 5500; // 3.5s correct, 5.5s incorrect
+    
     setTimeout(() => {
       if (currentQuestionIndex < quizData.questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -334,7 +337,7 @@ const MitzvotApp = () => {
           description: `Your score: ${finalScore}/${quizData.questions.length}`,
         });
       }
-    }, 2000);
+    }, autoAdvanceDelay);
   };
 
   const resetQuiz = () => {
