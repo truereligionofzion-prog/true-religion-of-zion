@@ -7,7 +7,7 @@ import requests
 import json
 from datetime import datetime, timezone, timedelta
 
-BACKEND_URL = "https://biblaws.preview.emergentagent.com/api"
+BACKEND_URL = "https://torah-data-fix.preview.emergentagent.com/api"
 
 def test_flashcard_due_dates():
     session = requests.Session()
