@@ -453,20 +453,32 @@ class APITester:
                         # Test question structure and diversity
                         question_types_found = set()
                         unique_answers_per_question = []
+                        status_questions_found = 0
                         
                         for question in questions:
                             # Check required fields
                             required_fields = ['id', 'type', 'question', 'correct_answer', 'options', 'explanation']
                             if all(field in question for field in required_fields):
+                                question_text = question.get('question', '').lower()
+                                
                                 # Check question type diversity
-                                if 'title_from_traditional' in question.get('question', ''):
+                                if 'traditional wording' in question_text and 'which mitzvah' in question_text:
                                     question_types_found.add('title_from_traditional')
-                                elif 'traditional wording' in question.get('question', ''):
+                                elif 'traditional wording for' in question_text:
                                     question_types_found.add('traditional_from_title')
-                                elif 'category' in question.get('question', ''):
+                                elif 'category' in question_text:
                                     question_types_found.add('category_from_title')
-                                elif 'origin status' in question.get('question', ''):
+                                elif 'biblical status' in question_text:
                                     question_types_found.add('status_from_title')
+                                    status_questions_found += 1
+                                    
+                                    # Test enhanced status questions - should only have 2 biblical status options
+                                    options = question.get('options', [])
+                                    biblical_status_options = [opt for opt in options if 'Direct in Bible' in opt or 'Indirect in Bible' in opt]
+                                    if len(biblical_status_options) >= 1:
+                                        self.log_test(f"Quiz - {category} Status Question Format", True, f"Found biblical status options: {biblical_status_options}")
+                                    else:
+                                        self.log_test(f"Quiz - {category} Status Question Format", False, f"No biblical status options found in: {options}")
                                 
                                 # Check answer diversity (no duplicates)
                                 options = question.get('options', [])
@@ -484,6 +496,11 @@ class APITester:
                             self.log_test(f"Quiz - {category} Question Diversity", True, f"Found {len(question_types_found)} question types")
                         else:
                             self.log_test(f"Quiz - {category} Question Diversity", False, f"Only {len(question_types_found)} question types")
+                        
+                        if status_questions_found > 0:
+                            self.log_test(f"Quiz - {category} Status Questions", True, f"Found {status_questions_found} status-based questions")
+                        else:
+                            self.log_test(f"Quiz - {category} Status Questions", False, "No status-based questions found")
                         
                         if all(unique_answers_per_question):
                             self.log_test(f"Quiz - {category} Answer Uniqueness", True, "All questions have unique answer options")
