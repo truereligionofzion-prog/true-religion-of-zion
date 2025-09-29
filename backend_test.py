@@ -124,6 +124,12 @@ class APITester:
             else:
                 self.log_test("New Structure - Verse Structure", False, f"Only {proper_verse_structure}/{total_mitzvot} have proper verse structure")
             
+            return structure_tests_passed >= total_mitzvot * 0.9
+            
+        except Exception as e:
+            self.log_test("New Biblical Structure Verification", False, f"Error: {str(e)}")
+            return False
+
     def test_yhwh_replacements_verification(self):
         """Test YHWH/YHUH replacements in titles and sourceVerse fields"""
         try:
