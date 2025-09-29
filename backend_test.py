@@ -1205,6 +1205,164 @@ class APITester:
             self.log_test("Quiz Flashcard Corrected Data", False, f"Error: {str(e)}")
             return False
     
+    def test_specific_batch_7_verification(self):
+        """Test specific Batch 7 data correction as requested in review"""
+        try:
+            print("\n🎯 SPECIFIC BATCH 7 VERIFICATION - Testing Review Request Requirements")
+            print("=" * 70)
+            
+            # Get all mitzvot to find specific ones
+            all_mitzvot = []
+            page = 1
+            while True:
+                response = self.session.get(f"{self.base_url}/mitzvot?page={page}&limit=100")
+                if response.status_code != 200:
+                    self.log_test("Batch 7 Verification - Data Retrieval", False, f"Status: {response.status_code}")
+                    return False
+                
+                data = response.json()
+                mitzvot = data.get('mitzvot', [])
+                if not mitzvot:
+                    break
+                    
+                all_mitzvot.extend(mitzvot)
+                
+                if page >= data.get('totalPages', 1):
+                    break
+                page += 1
+            
+            # Find specific mitzvot mentioned in review request
+            mitzvah_137 = None
+            mitzvah_186 = None
+            
+            for mitzvah in all_mitzvot:
+                if mitzvah.get('number') == 137:
+                    mitzvah_137 = mitzvah
+                elif mitzvah.get('number') == 186:
+                    mitzvah_186 = mitzvah
+            
+            # Test Mitzvah 137 - Should be "Offer firstborn ox, sheep, goat."
+            if mitzvah_137:
+                traditional_wording = mitzvah_137.get('traditionalWording', '')
+                scholarly_note = mitzvah_137.get('scholarlyNote', '')
+                full_content = f"{traditional_wording} {scholarly_note}".lower()
+                
+                print(f"\n📋 MITZVAH 137 ANALYSIS:")
+                print(f"Traditional Wording: {traditional_wording}")
+                print(f"Scholarly Note: {scholarly_note[:200]}...")
+                
+                # Check for expected content
+                expected_terms = ['firstborn', 'ox', 'sheep', 'goat', 'offer']
+                found_terms = [term for term in expected_terms if term in full_content]
+                
+                if len(found_terms) >= 3:  # Should find at least 3 of the 5 terms
+                    self.log_test("Mitzvah 137 - Expected Content", True, f"Found terms: {found_terms}")
+                else:
+                    self.log_test("Mitzvah 137 - Expected Content", False, f"Only found: {found_terms}, expected: {expected_terms}")
+                
+                # Check if traditional wording matches expected format
+                if 'firstborn' in traditional_wording.lower() and any(animal in traditional_wording.lower() for animal in ['ox', 'sheep', 'goat']):
+                    self.log_test("Mitzvah 137 - Traditional Wording Format", True, "Contains firstborn and animals")
+                else:
+                    self.log_test("Mitzvah 137 - Traditional Wording Format", False, "Missing expected firstborn/animals format")
+            else:
+                self.log_test("Mitzvah 137 - Existence", False, "Mitzvah 137 not found")
+            
+            # Test Mitzvah 186 - Should be "Offer shelamim sacrifices."
+            if mitzvah_186:
+                traditional_wording = mitzvah_186.get('traditionalWording', '')
+                scholarly_note = mitzvah_186.get('scholarlyNote', '')
+                full_content = f"{traditional_wording} {scholarly_note}".lower()
+                
+                print(f"\n📋 MITZVAH 186 ANALYSIS:")
+                print(f"Traditional Wording: {traditional_wording}")
+                print(f"Scholarly Note: {scholarly_note[:200]}...")
+                
+                # Check for expected content
+                expected_terms = ['shelamim', 'sacrifice', 'offer', 'peace']
+                found_terms = [term for term in expected_terms if term in full_content]
+                
+                if len(found_terms) >= 2:  # Should find at least 2 of the 4 terms
+                    self.log_test("Mitzvah 186 - Expected Content", True, f"Found terms: {found_terms}")
+                else:
+                    self.log_test("Mitzvah 186 - Expected Content", False, f"Only found: {found_terms}, expected: {expected_terms}")
+                
+                # Check if traditional wording matches expected format
+                if 'shelamim' in traditional_wording.lower() or ('peace' in traditional_wording.lower() and 'sacrifice' in traditional_wording.lower()):
+                    self.log_test("Mitzvah 186 - Traditional Wording Format", True, "Contains shelamim or peace sacrifice")
+                else:
+                    self.log_test("Mitzvah 186 - Traditional Wording Format", False, "Missing expected shelamim/peace sacrifice format")
+            else:
+                self.log_test("Mitzvah 186 - Existence", False, "Mitzvah 186 not found")
+            
+            # Test search functionality for specific terms
+            search_tests = [
+                ("shelamim", "Should return mitzvah 186 and related"),
+                ("firstborn", "Should return mitzvah 137 and related")
+            ]
+            
+            search_success = 0
+            for term, description in search_tests:
+                response = self.session.get(f"{self.base_url}/mitzvot?search={term}&limit=50")
+                if response.status_code == 200:
+                    data = response.json()
+                    results = data.get('mitzvot', [])
+                    
+                    if results:
+                        # Check if we found the specific mitzvot
+                        found_numbers = [r.get('number') for r in results]
+                        if term == "shelamim" and 186 in found_numbers:
+                            self.log_test(f"Search - {term} (Mitzvah 186)", True, f"Found mitzvah 186 in {len(results)} results")
+                            search_success += 1
+                        elif term == "firstborn" and 137 in found_numbers:
+                            self.log_test(f"Search - {term} (Mitzvah 137)", True, f"Found mitzvah 137 in {len(results)} results")
+                            search_success += 1
+                        else:
+                            self.log_test(f"Search - {term}", True, f"Found {len(results)} results (target mitzvah not in results)")
+                            search_success += 0.5
+                    else:
+                        self.log_test(f"Search - {term}", False, "No results found")
+                else:
+                    self.log_test(f"Search - {term}", False, f"Status: {response.status_code}")
+            
+            # Test quiz system can access corrected data
+            quiz_response = self.session.get(f"{self.base_url}/quiz/all?limit=20")
+            if quiz_response.status_code == 200:
+                quiz_data = quiz_response.json()
+                questions = quiz_data.get('questions', [])
+                
+                # Check if any questions reference mitzvot 137 or 186
+                batch_7_questions = 0
+                for question in questions:
+                    explanation = question.get('explanation', '')
+                    if '#137' in explanation or '#186' in explanation:
+                        batch_7_questions += 1
+                
+                if questions:
+                    self.log_test("Quiz - Corrected Data Access", True, f"Generated {len(questions)} questions, {batch_7_questions} from target mitzvot")
+                else:
+                    self.log_test("Quiz - Corrected Data Access", False, "No quiz questions generated")
+            else:
+                self.log_test("Quiz - Corrected Data Access", False, f"Status: {quiz_response.status_code}")
+            
+            # Overall assessment
+            mitzvah_137_ok = mitzvah_137 is not None
+            mitzvah_186_ok = mitzvah_186 is not None
+            search_ok = search_success >= 1.5
+            
+            overall_success = mitzvah_137_ok and mitzvah_186_ok and search_ok
+            
+            if overall_success:
+                self.log_test("Batch 7 Verification - Overall", True, "Core requirements verified")
+            else:
+                self.log_test("Batch 7 Verification - Overall", False, "Some requirements not met")
+            
+            return overall_success
+            
+        except Exception as e:
+            self.log_test("Batch 7 Verification", False, f"Error: {str(e)}")
+            return False
+    
     def run_all_tests(self):
         """Run all tests and return summary"""
         print("🔍 Starting Comprehensive Backend Testing for Enhanced 613 Biblical Laws API")
