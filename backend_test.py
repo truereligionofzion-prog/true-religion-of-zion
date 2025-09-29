@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for 613 Biblical Laws API
-Tests the enhanced data with authentic traditional wording and biblical sources
+Comprehensive Backend Testing for 613 Biblical Laws API - NEW BIBLICAL STRUCTURE
+Tests the new biblical mitzvot structure implementation with:
+- No more origin-based filtering (status field removed)
+- New categories based on user's list (34 categories)
+- Sample mitzvot with proper structure (sourceVerse, book, chapter, verse)
+- YHWH/YHUH replacements applied correctly
+- Updated quiz system with new question types
+- Updated API endpoints
 """
 
 import requests
