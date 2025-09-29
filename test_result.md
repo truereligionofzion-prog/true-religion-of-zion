@@ -380,8 +380,8 @@ metadata:
 
 test_plan:
   current_focus:
+    - "New Biblical Mitzvot Structure Implementation - Complete remaining items"
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
-    - "Prepare Batch 8 (Mitzvot 187-236) for correction"
   stuck_tasks: 
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
   test_all: false
