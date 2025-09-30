@@ -516,7 +516,91 @@ After the doings of the land of Egypt, wherein ye dwelt, shall ye not do: and af
 Proverbs 3:31
 Envy thou not the oppressor, and choose none of his ways.
 Psalms 106:35
-But were mingled among the heathen, and learned their works."""
+But were mingled among the heathen, and learned their works.
+Avenge
+2Maccabees 1:28
+Punish them that oppress us, and with pride do us wrong.
+2Thessalonians 1:6
+Seeing it is a righteous thing with God to recompense tribulation to them that trouble you;
+2Thessalonians 1:8
+In flaming fire taking vengeance on them that know not God, and that obey not the gospel of our Lord Jesus Christ:
+Deuteronomy 30:7
+And the Lord thy God will put all these curses upon thine enemies, and on them that hate thee, which persecuted thee.
+Ecclesiasticus (Sirach) 39:28
+There be spirits that are created for vengeance, which in their fury lay on sore strokes; in the time of destruction they pour out their force, and appease the wrath of him that made them.
+Ezekiel 25:14
+And I will lay my vengeance upon Edom by the hand of my people Israel: and they shall do in Edom according to mine anger and according to my fury; and they shall know my vengeance, saith the Lord God.
+Isaiah 14:21
+Prepare slaughter for his children for the iniquity of their fathers; that they do not rise, nor possess the land, nor fill the face of the world with cities.
+Jeremiah 10:25
+Pour out thy fury upon the heathen that know thee not, and upon the families that call not on thy name: for they have eaten up Jacob, and devoured him, and consumed him, and have made his habitation desolate.
+Jeremiah 30:16
+Therefore all they that devour thee shall be devoured; and all thine adversaries, every one of them, shall go into captivity; and they that spoil thee shall be a spoil, and all that prey upon thee will I give for a prey.
+Jeremiah 46:10
+For this is the day of the Lord God of hosts, a day of vengeance, that he may avenge him of his adversaries: and the sword shall devour, and it shall be satiate and made drunk with their blood: for the Lord God of hosts hath a sacrifice in the north country by the river Euphrates.
+Leviticus 19:18
+Thou shalt not avenge, nor bear any grudge against the children of thy people, but thou shalt love thy neighbour as thyself: I am the Lord.
+Luke 18:7
+And shall not God avenge his own elect, which cry day and night unto him, though he bear long with them?
+Psalms 44:5
+Through thee will we push down our enemies: through thy name will we tread them under that rise up against us.
+Psalms 149:7
+To execute vengeance upon the heathen, and punishments upon the people;
+Revelations 13:10
+He that leadeth into captivity shall go into captivity: he that killeth with the sword must be killed with the sword. Here is the patience and the faith of the saints.
+Revelations 19:2
+For true and righteous are his judgments: for he hath judged the great whore, which did corrupt the earth with her fornication, and hath avenged the blood of his servants at her hand.
+Romans 12:19
+Dearly beloved, avenge not yourselves, but rather give place unto wrath: for it is written, Vengeance is mine; I will repay, saith the Lord.
+Zephaniah 3:8
+Therefore wait ye upon me, saith the Lord, until the day that I rise up to the prey: for my determination is to gather the nations, that I may assemble the kingdoms, to pour upon them mine indignation, even all my fierce anger: for all the earth shall be devoured with the fire of my jealousy.
+Backdoor Marriage
+Deuteronomy 22:28
+If a man find a damsel that is a virgin, which is not betrothed, and lay hold on her, and lie with her, and they be found;
+Ecclesiasticus (Sirach) 26:23
+A wicked woman is given as a portion to a wicked man: but a godly woman is given to him that feareth the Lord.
+Exodus 22:16
+And if a man entice a maid that is not betrothed, and lie with her, he shall surely endow her to be his wife.
+Baptism
+1Corinthians 10:2
+And were all baptized unto Moses in the cloud and in the sea;
+1Peter 3:21
+The like figure whereunto even baptism doth also now save us (not the putting away of the filth of the flesh, but the answer of a good conscience toward God,) by the resurrection of Jesus Christ:
+Jeremiah 2:22
+For though thou wash thee with nitre, and take thee much soap, yet thine iniquity is marked before me, saith the Lord God.
+John 3:30
+He must increase, but I must decrease.
+John 4:2
+(Though Jesus himself baptized not, but his disciples,)
+Matthew 3:6
+And were baptized of him in Jordan, confessing their sins.
+Matthew 3:11
+I indeed baptize you with water unto repentance. but he that cometh after me is mightier than I, whose shoes I am not worthy to bear: he shall baptize you with the Holy Ghost, and with fire:
+Base Men
+Daniel 4:17
+This matter is by the decree of the watchers, and the demand by the word of the holy ones: to the intent that the living may know that the most High ruleth in the kingdom of men, and giveth it to whomsoever he will, and setteth up over it the basest of men.
+Ezekiel 7:24
+Wherefore I will bring the worst of the heathen, and they shall possess their houses: I will also make the pomp of the strong to cease; and their holy places shall be defiled.
+Job 30:8
+They were children of fools, yea, children of base men: they were viler than the earth.
+Basic Necessities
+Deuteronomy 28:48
+Therefore shalt thou serve thine enemies which the Lord shall send against thee, in hunger, and in thirst, and in nakedness, and in want of all things: and he shall put a yoke of iron upon thy neck, until he have destroyed thee.
+Ecclesiasticus (Sirach) 29:21
+The chief thing for life is water, and bread, and clothing, and an house to cover shame.
+Ecclesiasticus (Sirach) 39:26
+The principal things for the whole use of man's life are water, fire, iron, and salt, flour of wheat, honey, milk, and the blood of the grape, and oil, and clothing.
+Exodus 21:10
+If he take him another wife; her food, her raiment, and her duty of marriage, shall he not diminish.
+Matthew 6:11
+Give us this day our daily bread.
+Beard
+2Samuel 10:4
+Wherefore Hanun took David's servants, and shaved off the one half of their beards, and cut off their garments in the middle, even to their buttocks, and sent them away.
+Leviticus 19:27
+Ye shall not round the corners of your heads, neither shalt thou mar the corners of thy beard.
+Leviticus 21:5
+They shall not make baldness upon their head, neither shall they shave off the corner of their beard, nor make any cuttings in their flesh."""
     
     # Process the precepts text 
     await processor.process_raw_precepts(precepts_text)
