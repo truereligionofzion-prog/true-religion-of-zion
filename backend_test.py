@@ -14,6 +14,7 @@ import requests
 import json
 import sys
 import os
+import asyncio
 from typing import Dict, List, Any
 
 # Get backend URL from environment
