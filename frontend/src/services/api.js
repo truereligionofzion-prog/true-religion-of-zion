@@ -117,6 +117,32 @@ class ApiService {
     });
   }
 
+  // ===== PRECEPTS API METHODS =====
+  
+  // Get all precepts with filtering and pagination
+  async getPrecepts(params = {}) {
+    const queryParams = new URLSearchParams();
+    
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '' && value !== 'all') {
+        queryParams.append(key, value);
+      }
+    });
+
+    const endpoint = `/precepts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
+  }
+
+  // Get specific precept by ID
+  async getPrecept(id) {
+    return this.request(`/precepts/${id}`);
+  }
+
+  // Get precepts statistics
+  async getPreceptsStats() {
+    return this.request('/precepts-stats');
+  }
+
   // Initialize database (development/admin use)
   async initializeData() {
     return this.request('/initialize', { method: 'POST' });
