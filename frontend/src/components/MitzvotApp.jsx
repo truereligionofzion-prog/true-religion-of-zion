@@ -198,6 +198,38 @@ const MitzvotApp = () => {
     return category ? category.name : categorySlug;
   };
 
+  // Precepts verse interaction handlers
+  const toggleVerseExpansion = (preceptId, verseIndex) => {
+    const key = `${preceptId}_${verseIndex}`;
+    setExpandedVerses(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const navigateVerse = (preceptId, direction) => {
+    const precept = precepts.find(p => p.id === preceptId);
+    if (!precept?.verses?.length) return;
+
+    const currentIndex = preceptVerseIndex[preceptId] || 0;
+    let newIndex;
+
+    if (direction === 'prev') {
+      newIndex = currentIndex > 0 ? currentIndex - 1 : precept.verses.length - 1;
+    } else {
+      newIndex = currentIndex < precept.verses.length - 1 ? currentIndex + 1 : 0;
+    }
+
+    setPreceptVerseIndex(prev => ({
+      ...prev,
+      [preceptId]: newIndex
+    }));
+  };
+
+  const getVerseReference = (verse) => {
+    return `${verse.book} ${verse.chapter}:${verse.verse}`;
+  };
+
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
