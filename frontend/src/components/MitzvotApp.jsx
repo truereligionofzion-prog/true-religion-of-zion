@@ -676,6 +676,40 @@ const MitzvotApp = () => {
     }
   };
 
+  const reviewPreceptsFlashcard = async (correct) => {
+    if (!flashcards[currentFlashcardIndex]) return;
+    
+    try {
+      toast({
+        title: correct ? "Excellent! ✅" : "Keep studying! 📚",
+        description: correct ? "You're mastering biblical precepts!" : "Review the verses and try again later.",
+      });
+      
+      // Move to next flashcard
+      setTimeout(() => {
+        if (currentFlashcardIndex < flashcards.length - 1) {
+          setCurrentFlashcardIndex(currentFlashcardIndex + 1);
+          setShowFlashcardAnswer(false);
+        } else {
+          // Finished all flashcards
+          toast({
+            title: "Precepts Study Complete! 🎉",
+            description: "Great work studying biblical precepts! Continue exploring to deepen your understanding.",
+          });
+          setActiveTab('explore');
+        }
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error reviewing precepts flashcard:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save review. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const loadUserProgress = async () => {
     if (!isAuthenticated) return;
     
