@@ -391,6 +391,16 @@ const MitzvotApp = () => {
     try {
       setLoading(true);
       
+      // Check if precepts data is available
+      if (!precepts || precepts.length === 0) {
+        toast({
+          title: "Loading Precepts...",
+          description: "Precepts data is still loading. Please wait and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Generate precepts quiz questions from current precepts data
       const filteredPrecepts = testament === 'all' 
         ? precepts 
@@ -399,7 +409,7 @@ const MitzvotApp = () => {
       if (filteredPrecepts.length === 0) {
         toast({
           title: "No Precepts Found",
-          description: `No precepts available for ${testament} testament.`,
+          description: `No precepts available for ${testament} testament filter.`,
           variant: "destructive",
         });
         return;
@@ -407,6 +417,15 @@ const MitzvotApp = () => {
 
       // Generate quiz questions from precepts
       const questions = generatePreceptsQuizQuestions(filteredPrecepts, 5);
+      
+      if (questions.length === 0) {
+        toast({
+          title: "Unable to Generate Quiz",
+          description: "Could not create quiz questions from available precepts data.",
+          variant: "destructive",
+        });
+        return;
+      }
       
       setQuizData({ questions });
       setCurrentQuestionIndex(0);
