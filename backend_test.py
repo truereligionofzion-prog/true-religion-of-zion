@@ -2222,14 +2222,8 @@ class APITester:
         print("🔗 PRECEPTS INTEGRATION TESTING")
         print("=" * 70)
         
-        print("\n🗂️ Testing Precepts Integration...")
-        self.test_precepts_integration()
-        
-        print("\n🤝 Testing Mitzvot-Precepts Coexistence...")
-        self.test_mitzvot_precepts_coexistence()
-        
-        print("\n📜 Testing YHWH Replacements in Both Collections...")
-        self.test_yhwh_replacements_both_collections()
+        print("\n🗂️ Testing Phase 2: Precepts Integration System...")
+        self.test_precepts_integration_system()
         
         # Summary
         print("\n" + "=" * 70)
