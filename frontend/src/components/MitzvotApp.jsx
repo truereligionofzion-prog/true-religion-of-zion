@@ -485,7 +485,7 @@ const MitzvotApp = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <Loader className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading the 613 Laws of the Bible...</p>
+          <p className="text-gray-600">Loading Biblical Study Suite...</p>
         </div>
       </div>
     );
