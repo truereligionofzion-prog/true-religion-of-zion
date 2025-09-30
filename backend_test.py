@@ -2058,6 +2058,20 @@ class APITester:
         print("\n📅 Testing Mitzvah of the Day...")
         self.test_mitzvah_of_the_day()
         
+        # PRECEPTS INTEGRATION TESTING
+        print("\n" + "=" * 70)
+        print("🔗 PRECEPTS INTEGRATION TESTING")
+        print("=" * 70)
+        
+        print("\n🗂️ Testing Precepts Integration...")
+        self.test_precepts_integration()
+        
+        print("\n🤝 Testing Mitzvot-Precepts Coexistence...")
+        self.test_mitzvot_precepts_coexistence()
+        
+        print("\n📜 Testing YHWH Replacements in Both Collections...")
+        self.test_yhwh_replacements_both_collections()
+        
         # Summary
         print("\n" + "=" * 70)
         print("📋 TEST SUMMARY")
