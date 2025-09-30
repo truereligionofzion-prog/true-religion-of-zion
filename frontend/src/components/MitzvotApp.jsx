@@ -387,6 +387,128 @@ const MitzvotApp = () => {
     }
   };
 
+  const startPreceptsQuiz = async (testament = 'all') => {
+    try {
+      setLoading(true);
+      
+      // Generate precepts quiz questions from current precepts data
+      const filteredPrecepts = testament === 'all' 
+        ? precepts 
+        : precepts.filter(p => p.testament === testament);
+
+      if (filteredPrecepts.length === 0) {
+        toast({
+          title: "No Precepts Found",
+          description: `No precepts available for ${testament} testament.`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Generate quiz questions from precepts
+      const questions = generatePreceptsQuizQuestions(filteredPrecepts, 5);
+      
+      setQuizData({ questions });
+      setCurrentQuestionIndex(0);
+      setSelectedAnswer('');
+      setShowResult(false);
+      setScore(0);
+      setActiveTab('quiz');
+      
+      toast({
+        title: "Precepts Quiz Started!",
+        description: `Starting quiz with ${questions.length} questions about biblical precepts.`,
+      });
+    } catch (error) {
+      console.error('Error starting precepts quiz:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start precepts quiz. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generatePreceptsQuizQuestions = (precepts, count) => {
+    const questions = [];
+    const shuffledPrecepts = [...precepts].sort(() => Math.random() - 0.5);
+    
+    for (let i = 0; i < Math.min(count, shuffledPrecepts.length); i++) {
+      const precept = shuffledPrecepts[i];
+      
+      // Generate different types of questions
+      const questionTypes = [
+        () => generateVerseToTitleQuestion(precept, precepts),
+        () => generateTitleToTestamentQuestion(precept, precepts),
+        () => generateTopicToTitleQuestion(precept, precepts)
+      ];
+      
+      const randomType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+      const question = randomType();
+      
+      if (question) {
+        questions.push(question);
+      }
+    }
+    
+    return questions;
+  };
+
+  const generateVerseToTitleQuestion = (correctPrecept, allPrecepts) => {
+    if (!correctPrecept.verses || correctPrecept.verses.length === 0) return null;
+    
+    const randomVerse = correctPrecept.verses[Math.floor(Math.random() * correctPrecept.verses.length)];
+    const wrongAnswers = allPrecepts
+      .filter(p => p.id !== correctPrecept.id)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3);
+    
+    const answers = [correctPrecept, ...wrongAnswers]
+      .sort(() => Math.random() - 0.5)
+      .map(p => p.title);
+    
+    return {
+      question: `Which precept is associated with this verse: "${randomVerse.text?.substring(0, 100)}..." (${randomVerse.book} ${randomVerse.chapter}:${randomVerse.verse})`,
+      answers,
+      correctAnswer: correctPrecept.title
+    };
+  };
+
+  const generateTitleToTestamentQuestion = (correctPrecept, allPrecepts) => {
+    const answers = ['Old Testament', 'New Testament', 'Mixed Testament']
+      .sort(() => Math.random() - 0.5);
+    
+    const correctAnswer = correctPrecept.testament.charAt(0).toUpperCase() + correctPrecept.testament.slice(1) + ' Testament';
+    
+    return {
+      question: `Which testament classification best describes the precept "${correctPrecept.title}"?`,
+      answers,
+      correctAnswer
+    };
+  };
+
+  const generateTopicToTitleQuestion = (correctPrecept, allPrecepts) => {
+    if (!correctPrecept.topics || correctPrecept.topics.length === 0) return null;
+    
+    const randomTopic = correctPrecept.topics[Math.floor(Math.random() * correctPrecept.topics.length)];
+    const wrongAnswers = allPrecepts
+      .filter(p => p.id !== correctPrecept.id)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3);
+    
+    const answers = [correctPrecept, ...wrongAnswers]
+      .sort(() => Math.random() - 0.5)
+      .map(p => p.title);
+    
+    return {
+      question: `Which precept is most associated with the topic "${randomTopic.replace('-', ' ')}"?`,
+      answers,
+      correctAnswer: correctPrecept.title
+    };
+  };
+
   const submitAnswer = () => {
     if (!selectedAnswer || !quizData) return;
     
