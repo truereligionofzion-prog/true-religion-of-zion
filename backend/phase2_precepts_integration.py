@@ -73,6 +73,64 @@ class PreceptsProcessor:
         pattern = r'^[1-3]?[A-Za-z\s()]+\s+\d+:\d+$'
         return bool(re.match(pattern, line))
     
+    def _is_precept_title(self, line: str) -> bool:
+        """Check if line is likely a precept title"""
+        # Bible book names to exclude
+        bible_books = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy', 
+                      '1Chronicles', '2Chronicles', '1Kings', '2Kings', '1Samuel', 
+                      '2Samuel', 'Psalms', 'Proverbs', 'Ecclesiastes', 'Isaiah', 
+                      'Jeremiah', 'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos', 
+                      'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk', 'Zephaniah', 
+                      'Haggai', 'Zechariah', 'Malachi', 'Matthew', 'Mark', 'Luke', 
+                      'John', 'Acts', 'Romans', '1Corinthians', '2Corinthians', 
+                      'Galatians', 'Ephesians', 'Philippians', 'Colossians', 
+                      '1Thessalonians', '2Thessalonians', '1Timothy', '2Timothy', 
+                      'Titus', 'Philemon', 'Hebrews', 'James', '1Peter', '2Peter', 
+                      '1John', '2John', '3John', 'Jude', 'Revelations',
+                      'Tobit', 'Judith', 'Wisdom of Solomon', 'Ecclesiasticus', 
+                      'Baruch', '1Maccabees', '2Maccabees', '1Esdras', '2Esdras',
+                      'Prayer of Manasseh', 'Epistle of Jeremiah', 'Bel and the Dragon',
+                      'Susanna', 'Esther (Greek)', 'Songs of Solomon']
+        
+        # Not a Bible reference
+        if self._is_bible_reference(line):
+            return False
+        
+        # Not starting with a Bible book name  
+        if any(line.startswith(book) for book in bible_books):
+            return False
+        
+        # Heuristics for precept titles vs verse text:
+        # Precept titles are typically:
+        # - Shorter (usually 1-3 words, occasionally more)
+        # - Don't contain certain verse-like words
+        # - Don't end with periods (usually)
+        # - Are not overly long sentences
+        
+        verse_indicators = [
+            'thou shalt', 'thou', 'thee', 'thy', 'ye shall', 'saith the',
+            'and he said', 'therefore', 'for whosoever', 'but', 'and',
+            'wherefore', 'behold', 'verily', 'thus saith'
+        ]
+        
+        line_lower = line.lower()
+        
+        # If it contains typical verse language, it's probably verse text
+        if any(indicator in line_lower for indicator in verse_indicators):
+            return False
+        
+        # If it's very long (more than 8 words), it's probably verse text
+        word_count = len(line.split())
+        if word_count > 8:
+            return False
+        
+        # If it ends with punctuation typical of verses, it's probably verse text
+        if line.endswith(('.', ';', ':', '?', '!')):
+            return False
+            
+        # Otherwise, it's likely a precept title
+        return True
+    
     def _parse_bible_reference(self, reference: str) -> Dict[str, Any]:
         """Parse a bible reference into structured components"""
         # Pattern to match references like "Genesis 1:1" or "1Corinthians 15:33"
