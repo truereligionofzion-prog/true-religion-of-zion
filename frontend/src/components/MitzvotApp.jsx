@@ -796,11 +796,8 @@ const MitzvotApp = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All Testaments</SelectItem>
-                          {filters.testaments && filters.testaments.map((testament) => (
-                            <SelectItem key={testament} value={testament}>
-                              {testament.charAt(0).toUpperCase() + testament.slice(1)} Testament
-                            </SelectItem>
-                          ))}
+                          <SelectItem value="old">Old Testament</SelectItem>
+                          <SelectItem value="new">New Testament</SelectItem>
                         </SelectContent>
                       </Select>
                       <div></div> {/* Empty div to maintain grid layout */}
