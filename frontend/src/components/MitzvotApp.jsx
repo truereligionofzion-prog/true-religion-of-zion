@@ -1308,7 +1308,7 @@ const MitzvotApp = () => {
                               <div className="text-sm opacity-75">Mixed questions from all 613 mitzvot</div>
                             </div>
                           </Button>
-                          {categories.slice(0, 6).map((category) => (
+                          {(categories || []).slice(0, 6).map((category) => (
                             <Button
                               key={category.id}
                               variant="outline"
