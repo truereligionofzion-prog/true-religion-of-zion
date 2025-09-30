@@ -1092,7 +1092,7 @@ const MitzvotApp = () => {
                       </Card>
                     ))
                   ) : (
-                    precepts.map((precept) => {
+                    (precepts || []).map((precept) => {
                       const currentVerseIndex = preceptVerseIndex[precept.id] || 0;
                       const currentVerse = precept.verses?.[currentVerseIndex];
                       const expandKey = `${precept.id}_${currentVerseIndex}`;
