@@ -354,10 +354,8 @@ For I testify unto every man that heareth the words of the prophecy of this book
 Revelations 22:19
 And if any man shall take away from the words of the book of this prophecy, God shall take away his part out of the book of life, and out of the holy city, and from the things which are written in this book."""
     
-    # Process first 5 precepts for testing (full implementation would include all)
-    test_precepts = precepts_text
-    
-    await processor.process_raw_precepts(test_precepts)
+    # Process the precepts text 
+    await processor.process_raw_precepts(precepts_text)
     
     print("\n" + "="*60)
     print("✅ Phase 2: Precepts Integration Complete")
@@ -369,8 +367,4 @@ And if any man shall take away from the words of the book of this prophecy, God 
 
 if __name__ == "__main__":
     asyncio.run(main())
-"""
-
-<function_calls>
-<invoke name="execute_bash">
 <parameter name="command">cd /app/backend && python phase2_precepts_integration.py
