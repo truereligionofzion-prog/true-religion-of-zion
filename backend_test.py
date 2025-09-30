@@ -1768,6 +1768,244 @@ class APITester:
         except Exception as e:
             self.log_test("API Endpoints New Structure", False, f"Error: {str(e)}")
             return False
+
+    def test_precepts_integration(self):
+        """Test the precepts integration system"""
+        try:
+            print("\n🔍 Testing Precepts Integration System...")
+            
+            # Test 1: Check if precepts collection exists and has data
+            # We'll use a direct MongoDB query approach since there might not be API endpoints yet
+            import pymongo
+            from pymongo import MongoClient
+            
+            try:
+                # Connect to MongoDB using the same connection as the backend
+                mongo_client = MongoClient("mongodb://localhost:27017")
+                db = mongo_client.test_database
+                precepts_collection = db.precepts
+                
+                # Check if precepts collection exists
+                collection_names = db.list_collection_names()
+                if 'precepts' in collection_names:
+                    self.log_test("Precepts - Collection Exists", True, "Precepts collection found in database")
+                else:
+                    self.log_test("Precepts - Collection Exists", False, "Precepts collection not found")
+                    return False
+                
+                # Check precepts count
+                precepts_count = precepts_collection.count_documents({})
+                if precepts_count > 0:
+                    self.log_test("Precepts - Data Count", True, f"Found {precepts_count} precepts in database")
+                else:
+                    self.log_test("Precepts - Data Count", False, "No precepts found in database")
+                    return False
+                
+                # Test 2: Verify precepts data structure
+                sample_precepts = list(precepts_collection.find().limit(5))
+                structure_tests_passed = 0
+                yhwh_replacements_found = 0
+                
+                for precept in sample_precepts:
+                    # Check required fields
+                    required_fields = ['id', 'title', 'verses', 'topics', 'testament']
+                    has_all_fields = all(field in precept for field in required_fields)
+                    
+                    if has_all_fields:
+                        structure_tests_passed += 1
+                    
+                    # Check for YHWH/YHUH replacements in verses
+                    verses = precept.get('verses', [])
+                    for verse in verses:
+                        verse_text = verse.get('text', '')
+                        if 'YHWH' in verse_text or 'YHUH' in verse_text or 'Elohim' in verse_text:
+                            yhwh_replacements_found += 1
+                            break
+                
+                if structure_tests_passed == len(sample_precepts):
+                    self.log_test("Precepts - Data Structure", True, f"All {len(sample_precepts)} sample precepts have proper structure")
+                else:
+                    self.log_test("Precepts - Data Structure", False, f"Only {structure_tests_passed}/{len(sample_precepts)} have proper structure")
+                
+                if yhwh_replacements_found > 0:
+                    self.log_test("Precepts - YHWH Replacements", True, f"Found {yhwh_replacements_found} precepts with divine name replacements")
+                else:
+                    self.log_test("Precepts - YHWH Replacements", False, "No YHWH/YHUH/Elohim replacements found in precepts")
+                
+                # Test 3: Verify indexes exist
+                indexes = precepts_collection.list_indexes()
+                index_names = [idx['key'] for idx in indexes]
+                expected_indexes = ['title', 'topics', 'testament', 'verses.book']
+                
+                indexes_found = 0
+                for expected_idx in expected_indexes:
+                    for idx in index_names:
+                        if expected_idx in str(idx):
+                            indexes_found += 1
+                            break
+                
+                if indexes_found >= len(expected_indexes) * 0.75:
+                    self.log_test("Precepts - Database Indexes", True, f"Found {indexes_found}/{len(expected_indexes)} expected indexes")
+                else:
+                    self.log_test("Precepts - Database Indexes", False, f"Only {indexes_found}/{len(expected_indexes)} indexes found")
+                
+                # Test 4: Verify precepts and mitzvot collections are independent
+                mitzvot_collection = db.mitzvot
+                mitzvot_count = mitzvot_collection.count_documents({})
+                
+                if mitzvot_count > 0 and precepts_count > 0:
+                    self.log_test("Precepts - Collection Independence", True, f"Both collections exist independently: {mitzvot_count} mitzvot, {precepts_count} precepts")
+                else:
+                    self.log_test("Precepts - Collection Independence", False, f"Collections not independent: {mitzvot_count} mitzvot, {precepts_count} precepts")
+                
+                # Test 5: Verify testament classification
+                testament_counts = {}
+                for precept in precepts_collection.find():
+                    testament = precept.get('testament', 'unknown')
+                    testament_counts[testament] = testament_counts.get(testament, 0) + 1
+                
+                if len(testament_counts) > 1:
+                    self.log_test("Precepts - Testament Classification", True, f"Testament distribution: {testament_counts}")
+                else:
+                    self.log_test("Precepts - Testament Classification", False, f"Limited testament classification: {testament_counts}")
+                
+                mongo_client.close()
+                return True
+                
+            except Exception as e:
+                self.log_test("Precepts - Database Connection", False, f"MongoDB connection error: {str(e)}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Precepts Integration", False, f"Error: {str(e)}")
+            return False
+
+    def test_mitzvot_precepts_coexistence(self):
+        """Test that mitzvot and precepts can coexist without conflicts"""
+        try:
+            print("\n🔍 Testing Mitzvot-Precepts Coexistence...")
+            
+            # Test 1: Verify existing mitzvot endpoints still work
+            response = self.session.get(f"{self.base_url}/mitzvot?page=1&limit=10")
+            if response.status_code == 200:
+                data = response.json()
+                mitzvot = data.get('mitzvot', [])
+                if mitzvot:
+                    self.log_test("Coexistence - Mitzvot Endpoints", True, f"Mitzvot API still working: {len(mitzvot)} mitzvot retrieved")
+                else:
+                    self.log_test("Coexistence - Mitzvot Endpoints", False, "Mitzvot API returns empty results")
+                    return False
+            else:
+                self.log_test("Coexistence - Mitzvot Endpoints", False, f"Mitzvot API error: {response.status_code}")
+                return False
+            
+            # Test 2: Verify stats endpoint still works
+            response = self.session.get(f"{self.base_url}/stats")
+            if response.status_code == 200:
+                data = response.json()
+                total_mitzvot = data.get('totalMitzvot', 0)
+                if total_mitzvot == 613:
+                    self.log_test("Coexistence - Stats Endpoint", True, f"Stats API working: {total_mitzvot} mitzvot")
+                else:
+                    self.log_test("Coexistence - Stats Endpoint", False, f"Unexpected mitzvot count: {total_mitzvot}")
+            else:
+                self.log_test("Coexistence - Stats Endpoint", False, f"Stats API error: {response.status_code}")
+                return False
+            
+            # Test 3: Verify quiz system still works
+            response = self.session.get(f"{self.base_url}/quiz/all?limit=3")
+            if response.status_code == 200:
+                data = response.json()
+                questions = data.get('questions', [])
+                if questions:
+                    self.log_test("Coexistence - Quiz System", True, f"Quiz system working: {len(questions)} questions generated")
+                else:
+                    self.log_test("Coexistence - Quiz System", False, "Quiz system returns no questions")
+            else:
+                self.log_test("Coexistence - Quiz System", False, f"Quiz API error: {response.status_code}")
+                return False
+            
+            # Test 4: Verify progress tracking still works
+            response = self.session.get(f"{self.base_url}/progress")
+            if response.status_code == 200:
+                data = response.json()
+                total_mitzvot = data.get('totalMitzvot', 0)
+                if total_mitzvot == 613:
+                    self.log_test("Coexistence - Progress Tracking", True, f"Progress tracking working: {total_mitzvot} mitzvot tracked")
+                else:
+                    self.log_test("Coexistence - Progress Tracking", False, f"Unexpected progress count: {total_mitzvot}")
+            else:
+                self.log_test("Coexistence - Progress Tracking", False, f"Progress API error: {response.status_code}")
+                return False
+            
+            # Test 5: Verify flashcard system still works
+            response = self.session.get(f"{self.base_url}/flashcards?limit=5")
+            if response.status_code == 200:
+                data = response.json()
+                # Flashcards might be empty due to spaced repetition, but API should work
+                self.log_test("Coexistence - Flashcard System", True, "Flashcard API responding correctly")
+            else:
+                self.log_test("Coexistence - Flashcard System", False, f"Flashcard API error: {response.status_code}")
+                return False
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Mitzvot-Precepts Coexistence", False, f"Error: {str(e)}")
+            return False
+
+    def test_yhwh_replacements_both_collections(self):
+        """Test YHWH/YHUH replacements in both mitzvot and precepts"""
+        try:
+            print("\n🔍 Testing YHWH Replacements in Both Collections...")
+            
+            # Test mitzvot YHWH replacements via API
+            response = self.session.get(f"{self.base_url}/mitzvot?search=YHWH&limit=20")
+            mitzvot_yhwh_count = 0
+            if response.status_code == 200:
+                data = response.json()
+                mitzvot_yhwh_count = len(data.get('mitzvot', []))
+            
+            response = self.session.get(f"{self.base_url}/mitzvot?search=Elohim&limit=20")
+            mitzvot_elohim_count = 0
+            if response.status_code == 200:
+                data = response.json()
+                mitzvot_elohim_count = len(data.get('mitzvot', []))
+            
+            if mitzvot_yhwh_count > 0 or mitzvot_elohim_count > 0:
+                self.log_test("YHWH Both Collections - Mitzvot", True, f"Found {mitzvot_yhwh_count} YHWH + {mitzvot_elohim_count} Elohim in mitzvot")
+            else:
+                self.log_test("YHWH Both Collections - Mitzvot", False, "No YHWH/Elohim found in mitzvot via search")
+            
+            # Test precepts YHWH replacements via direct database query
+            try:
+                import pymongo
+                from pymongo import MongoClient
+                
+                mongo_client = MongoClient("mongodb://localhost:27017")
+                db = mongo_client.test_database
+                precepts_collection = db.precepts
+                
+                # Count precepts with YHWH/YHUH/Elohim in verse text
+                precepts_with_yhwh = precepts_collection.count_documents({
+                    "verses.text": {"$regex": "YHWH|YHUH|Elohim", "$options": "i"}
+                })
+                
+                if precepts_with_yhwh > 0:
+                    self.log_test("YHWH Both Collections - Precepts", True, f"Found {precepts_with_yhwh} precepts with divine name replacements")
+                else:
+                    self.log_test("YHWH Both Collections - Precepts", False, "No divine name replacements found in precepts")
+                
+                mongo_client.close()
+                
+            except Exception as e:
+                self.log_test("YHWH Both Collections - Precepts DB", False, f"Database query error: {str(e)}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("YHWH Replacements Both Collections", False, f"Error: {str(e)}")
+            return False
     
     def run_all_tests(self):
         """Run all tests and return summary"""
