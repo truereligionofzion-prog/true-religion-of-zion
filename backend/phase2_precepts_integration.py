@@ -182,6 +182,7 @@ class PreceptsProcessor:
         precepts = []
         current_title = None
         current_verses = []
+        current_ref = None
         
         lines = raw_precepts_text.strip().split('\n')
         
@@ -190,9 +191,9 @@ class PreceptsProcessor:
             if not line:
                 continue
                 
-            # Check if this line is a bible reference + text pattern
+            # Check if this line is a bible reference pattern
             if re.match(r'^[1-3]?[A-Za-z\s()]+\s+\d+:\d+$', line):
-                # This is a bible reference, next line should be the text
+                # This is a bible reference
                 current_ref = line
                 
             elif current_ref and not re.match(r'^[1-3]?[A-Za-z\s()]+\s+\d+:\d+$', line):
@@ -298,7 +299,7 @@ async def main():
     """Main processing function"""
     processor = PreceptsProcessor()
     
-    # The complete precepts text provided by the user
+    # Sample precepts text for testing (user will provide the complete text)
     precepts_text = """Abomination
 Deuteronomy 14:3
 Thou shalt not eat any abominable thing.
@@ -367,4 +368,3 @@ And if any man shall take away from the words of the book of this prophecy, God 
 
 if __name__ == "__main__":
     asyncio.run(main())
-<parameter name="command">cd /app/backend && python phase2_precepts_integration.py
