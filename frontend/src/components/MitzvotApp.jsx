@@ -49,6 +49,10 @@ const MitzvotApp = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [authMode, setAuthMode] = useState('login');
+  
+  // Precepts interaction state
+  const [expandedVerses, setExpandedVerses] = useState({}); // Track which verses are expanded
+  const [preceptVerseIndex, setPreceptVerseIndex] = useState({}); // Track current verse index for each precept
 
   const { toast } = useToast();
 
