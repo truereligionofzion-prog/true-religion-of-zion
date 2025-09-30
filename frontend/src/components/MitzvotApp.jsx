@@ -649,30 +649,61 @@ const MitzvotApp = () => {
           <TabsContent value="explore">
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <Card className="text-center">
-                <CardContent className="pt-4">
-                  <div className="text-2xl font-bold text-blue-600">{stats.totalMitzvot || 0}</div>
-                  <div className="text-sm text-gray-600">Total Mitzvot</div>
-                </CardContent>
-              </Card>
-              <Card className="text-center">
-                <CardContent className="pt-4">
-                  <div className="text-2xl font-bold text-green-600">{stats.booksCount || 0}</div>
-                  <div className="text-sm text-gray-600">Books of Torah</div>
-                </CardContent>
-              </Card>
-              <Card className="text-center">
-                <CardContent className="pt-4">
-                  <div className="text-2xl font-bold text-purple-600">{stats.categoriesCount || 0}</div>
-                  <div className="text-sm text-gray-600">Categories</div>
-                </CardContent>
-              </Card>
-              <Card className="text-center">
-                <CardContent className="pt-4">
-                  <div className="text-2xl font-bold text-orange-600">{mitzvot.length}</div>
-                  <div className="text-sm text-gray-600">Current Results</div>
-                </CardContent>
-              </Card>
+              {contentType === 'mitzvot' ? (
+                <>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-blue-600">{stats.totalMitzvot || 0}</div>
+                      <div className="text-sm text-gray-600">Total Mitzvot</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-green-600">{stats.booksCount || 0}</div>
+                      <div className="text-sm text-gray-600">Books of Torah</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-purple-600">{stats.categoriesCount || 0}</div>
+                      <div className="text-sm text-gray-600">Categories</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-orange-600">{mitzvot.length}</div>
+                      <div className="text-sm text-gray-600">Current Results</div>
+                    </CardContent>
+                  </Card>
+                </>
+              ) : (
+                <>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-blue-600">{preceptsStats.totalPrecepts || 0}</div>
+                      <div className="text-sm text-gray-600">Total Precepts</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-green-600">{preceptsStats.totalVerses || 0}</div>
+                      <div className="text-sm text-gray-600">Verse References</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-purple-600">{preceptsStats.uniqueTopics || 0}</div>
+                      <div className="text-sm text-gray-600">Unique Topics</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-orange-600">{precepts.length}</div>
+                      <div className="text-sm text-gray-600">Current Results</div>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
             </div>
 
             {/* Search and Filters */}
