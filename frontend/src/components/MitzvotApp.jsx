@@ -136,6 +136,35 @@ const MitzvotApp = () => {
     }
   };
 
+  const loadPrecepts = async () => {
+    try {
+      setLoading(true);
+
+      const params = {
+        search: searchTerm,
+        testament: selectedCategory, // Using selectedCategory for testament filter
+        page: currentPage,
+        limit: 20
+      };
+
+      const response = await apiService.getPrecepts(params);
+      
+      setPrecepts(response.precepts);
+      setTotalPages(response.totalPages);
+      setFilters(response.filters);
+      
+    } catch (error) {
+      console.error('Error loading precepts:', error);
+      toast({
+        title: "Error Loading Precepts",
+        description: "Failed to load precepts data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle search with debouncing
   useEffect(() => {
     const timeoutId = setTimeout(() => {
