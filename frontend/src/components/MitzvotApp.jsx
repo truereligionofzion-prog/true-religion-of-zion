@@ -71,11 +71,12 @@ const MitzvotApp = () => {
     try {
       setLoading(true);
       
-      // Load stats, categories, mitzvah of the day, and user progress in parallel
+      // Load stats, categories, mitzvah of the day, precepts stats, and user progress in parallel
       const promises = [
         apiService.getStats(),
         apiService.getCategories(),
-        apiService.getMitzvahOfTheDay()
+        apiService.getMitzvahOfTheDay(),
+        apiService.getPreceptsStats()
       ];
       
       // Only load progress if authenticated
@@ -88,13 +89,14 @@ const MitzvotApp = () => {
       setStats(responses[0]);
       setCategories(responses[1]);
       setMitzvahOfTheDay(responses[2]);
+      setPreceptsStats(responses[3]);
       
-      if (isAuthenticated && responses[3]) {
-        setUserProgress(responses[3]);
+      if (isAuthenticated && responses[responses.length - 1]) {
+        setUserProgress(responses[responses.length - 1]);
       }
       
-      // Load initial mitzvot data
-      await loadMitzvot();
+      // Load initial content based on content type
+      await loadContent();
       
     } catch (error) {
       console.error('Error loading initial data:', error);
@@ -103,6 +105,14 @@ const MitzvotApp = () => {
         description: "Failed to load initial data. Please refresh the page.",
         variant: "destructive",
       });
+    }
+  };
+
+  const loadContent = async () => {
+    if (contentType === 'mitzvot') {
+      await loadMitzvot();
+    } else {
+      await loadPrecepts();
     }
   };
 
