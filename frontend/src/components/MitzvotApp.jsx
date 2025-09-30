@@ -485,20 +485,27 @@ const MitzvotApp = () => {
   };
 
   const generateVerseToTitleQuestion = (correctPrecept, allPrecepts) => {
-    if (!correctPrecept.verses || correctPrecept.verses.length === 0) return null;
+    if (!correctPrecept || !correctPrecept.verses || correctPrecept.verses.length === 0) return null;
     
     const randomVerse = correctPrecept.verses[Math.floor(Math.random() * correctPrecept.verses.length)];
+    if (!randomVerse || !randomVerse.text) return null;
+    
     const wrongAnswers = allPrecepts
-      .filter(p => p.id !== correctPrecept.id)
+      .filter(p => p && p.id !== correctPrecept.id && p.title)
       .sort(() => Math.random() - 0.5)
       .slice(0, 3);
+    
+    if (wrongAnswers.length < 3) return null;
     
     const answers = [correctPrecept, ...wrongAnswers]
       .sort(() => Math.random() - 0.5)
       .map(p => p.title);
     
+    const verseText = randomVerse.text.substring(0, 100);
+    const verseRef = `${randomVerse.book || ''} ${randomVerse.chapter || ''}:${randomVerse.verse || ''}`;
+    
     return {
-      question: `Which precept is associated with this verse: "${randomVerse.text?.substring(0, 100)}..." (${randomVerse.book} ${randomVerse.chapter}:${randomVerse.verse})`,
+      question: `Which precept is associated with this verse: "${verseText}..." (${verseRef})`,
       answers,
       correctAnswer: correctPrecept.title
     };
