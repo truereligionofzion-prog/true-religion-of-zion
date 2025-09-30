@@ -512,8 +512,9 @@ const MitzvotApp = () => {
   };
 
   const generateTitleToTestamentQuestion = (correctPrecept, allPrecepts) => {
-    const answers = ['Old Testament', 'New Testament', 'Mixed Testament']
-      .sort(() => Math.random() - 0.5);
+    if (!correctPrecept || !correctPrecept.testament || !correctPrecept.title) return null;
+    
+    const answers = ['Old Testament', 'New Testament', 'Mixed Testament'];
     
     const correctAnswer = correctPrecept.testament.charAt(0).toUpperCase() + correctPrecept.testament.slice(1) + ' Testament';
     
