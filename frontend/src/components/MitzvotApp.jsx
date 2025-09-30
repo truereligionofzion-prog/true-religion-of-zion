@@ -451,6 +451,10 @@ const MitzvotApp = () => {
   };
 
   const generatePreceptsQuizQuestions = (precepts, count) => {
+    if (!precepts || precepts.length === 0) {
+      return [];
+    }
+
     const questions = [];
     const shuffledPrecepts = [...precepts].sort(() => Math.random() - 0.5);
     
@@ -465,10 +469,15 @@ const MitzvotApp = () => {
       ];
       
       const randomType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
-      const question = randomType();
       
-      if (question) {
-        questions.push(question);
+      try {
+        const question = randomType();
+        if (question) {
+          questions.push(question);
+        }
+      } catch (error) {
+        console.error('Error generating question:', error);
+        // Continue with next question
       }
     }
     
