@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for 613 Biblical Laws API - NEW BIBLICAL STRUCTURE
-Tests the new biblical mitzvot structure implementation with:
-- No more origin-based filtering (status field removed)
-- New categories based on user's list (34 categories)
-- Sample mitzvot with proper structure (sourceVerse, book, chapter, verse)
-- YHWH/YHUH replacements applied correctly
-- Updated quiz system with new question types
-- Updated API endpoints
+Comprehensive Backend Testing for 613 Biblical Laws API - PRECEPTS INTEGRATION
+Tests the precepts integration system to ensure:
+- Existing mitzvot endpoints still work correctly (/api/mitzvot, /api/stats, etc.)
+- New precepts data is properly stored and accessible via database
+- Both mitzvot and precepts collections exist and are independent
+- YHWH/YHUH replacements work in both mitzvot and precepts data
+- MongoDB indexing is working for both collections
+- No conflicts between mitzvot and precepts functionality
 """
 
 import requests
