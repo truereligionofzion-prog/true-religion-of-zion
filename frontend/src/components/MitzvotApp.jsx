@@ -1012,7 +1012,7 @@ const MitzvotApp = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All Categories</SelectItem>
-                          {categories.map((category) => (
+                          {(categories || []).map((category) => (
                             <SelectItem key={category.id} value={category.slug}>
                               {category.name}
                             </SelectItem>
