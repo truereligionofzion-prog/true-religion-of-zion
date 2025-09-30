@@ -1445,7 +1445,7 @@ const MitzvotApp = () => {
                           Card {currentFlashcardIndex + 1} of {flashcards.length}
                         </CardTitle>
                         <Badge variant="outline">
-                          #{flashcards[currentFlashcardIndex].mitzvah.number}
+                          {flashcards[currentFlashcardIndex].type === 'precept' ? '📜' : `#${flashcards[currentFlashcardIndex].mitzvah?.number}`}
                         </Badge>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
@@ -1458,57 +1458,126 @@ const MitzvotApp = () => {
                     <CardContent>
                       <div className="space-y-6">
                         <div className="text-center">
-                          <h3 className="text-xl font-semibold mb-4">
-                            {flashcards[currentFlashcardIndex].mitzvah.title}
-                          </h3>
-                          
-                          {!showFlashcardAnswer ? (
-                            <div className="space-y-4">
-                              <p className="text-gray-600">
-                                What is the traditional wording for this mitzvah?
-                              </p>
-                              <Button 
-                                onClick={() => setShowFlashcardAnswer(true)}
-                                variant="outline"
-                                className="w-full h-12"
-                              >
-                                Show Answer
-                              </Button>
-                            </div>
-                          ) : (
-                            <div className="space-y-4">
-                              <div className="bg-blue-50 p-4 rounded-lg">
-                                <p className="font-medium text-blue-900 italic">
-                                  "{flashcards[currentFlashcardIndex].mitzvah.sourceVerse}"
-                                </p>
-                                <p className="text-sm text-blue-700 mt-2">
-                                  {flashcards[currentFlashcardIndex].mitzvah.book} {flashcards[currentFlashcardIndex].mitzvah.chapter}:{flashcards[currentFlashcardIndex].mitzvah.verse}
-                                </p>
-                              </div>
-                              <div className="bg-gray-50 p-4 rounded-lg">
-                                <p className="text-sm text-gray-700">
-                                  <strong>Source:</strong> {flashcards[currentFlashcardIndex].mitzvah.sourceVerse}
-                                </p>
-                              </div>
+                          {flashcards[currentFlashcardIndex].type === 'precept' ? (
+                            // Precepts flashcard
+                            <>
+                              <h3 className="text-xl font-semibold mb-4">
+                                📜 {flashcards[currentFlashcardIndex].precept.title}
+                              </h3>
                               
-                              <div className="flex gap-4 justify-center pt-4">
-                                <Button 
-                                  onClick={() => reviewFlashcard(false)}
-                                  variant="outline"
-                                  className="flex items-center gap-2 h-12 px-6"
-                                >
-                                  <span className="text-red-500">❌</span>
-                                  Incorrect
-                                </Button>
-                                <Button 
-                                  onClick={() => reviewFlashcard(true)}
-                                  className="flex items-center gap-2 h-12 px-6"
-                                >
-                                  <span className="text-green-500">✅</span>
-                                  Correct
-                                </Button>
-                              </div>
-                            </div>
+                              {!showFlashcardAnswer ? (
+                                <div className="space-y-4">
+                                  <p className="text-gray-600">
+                                    What testament classification and key verses are associated with this precept?
+                                  </p>
+                                  <Button 
+                                    onClick={() => setShowFlashcardAnswer(true)}
+                                    variant="outline"
+                                    className="w-full h-12"
+                                  >
+                                    Show Answer
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="space-y-4">
+                                  <div className="bg-purple-50 p-4 rounded-lg">
+                                    <div className="space-y-2">
+                                      <Badge className="capitalize">
+                                        {flashcards[currentFlashcardIndex].precept.testament} Testament
+                                      </Badge>
+                                      <p className="text-sm text-purple-700">
+                                        {flashcards[currentFlashcardIndex].precept.verses?.length || 0} verse references
+                                      </p>
+                                    </div>
+                                  </div>
+                                  
+                                  {flashcards[currentFlashcardIndex].precept.verses?.[0] && (
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                      <p className="text-sm text-gray-700 italic">
+                                        "{flashcards[currentFlashcardIndex].precept.verses[0].text?.substring(0, 120)}..."
+                                      </p>
+                                      <p className="text-xs text-gray-500 mt-2">
+                                        {getVerseReference(flashcards[currentFlashcardIndex].precept.verses[0])}
+                                      </p>
+                                    </div>
+                                  )}
+                                  
+                                  <div className="flex gap-4 justify-center pt-4">
+                                    <Button 
+                                      onClick={() => reviewPreceptsFlashcard(false)}
+                                      variant="outline"
+                                      className="flex items-center gap-2 h-12 px-6"
+                                    >
+                                      <span className="text-red-500">❌</span>
+                                      Difficult
+                                    </Button>
+                                    <Button 
+                                      onClick={() => reviewPreceptsFlashcard(true)}
+                                      className="flex items-center gap-2 h-12 px-6"
+                                    >
+                                      <span className="text-green-500">✅</span>
+                                      Got It
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            // Mitzvot flashcard (original)
+                            <>
+                              <h3 className="text-xl font-semibold mb-4">
+                                {flashcards[currentFlashcardIndex].mitzvah.title}
+                              </h3>
+                              
+                              {!showFlashcardAnswer ? (
+                                <div className="space-y-4">
+                                  <p className="text-gray-600">
+                                    What is the traditional wording for this mitzvah?
+                                  </p>
+                                  <Button 
+                                    onClick={() => setShowFlashcardAnswer(true)}
+                                    variant="outline"
+                                    className="w-full h-12"
+                                  >
+                                    Show Answer
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="space-y-4">
+                                  <div className="bg-blue-50 p-4 rounded-lg">
+                                    <p className="font-medium text-blue-900 italic">
+                                      "{flashcards[currentFlashcardIndex].mitzvah.sourceVerse}"
+                                    </p>
+                                    <p className="text-sm text-blue-700 mt-2">
+                                      {flashcards[currentFlashcardIndex].mitzvah.book} {flashcards[currentFlashcardIndex].mitzvah.chapter}:{flashcards[currentFlashcardIndex].mitzvah.verse}
+                                    </p>
+                                  </div>
+                                  <div className="bg-gray-50 p-4 rounded-lg">
+                                    <p className="text-sm text-gray-700">
+                                      <strong>Source:</strong> {flashcards[currentFlashcardIndex].mitzvah.sourceVerse}
+                                    </p>
+                                  </div>
+                                  
+                                  <div className="flex gap-4 justify-center pt-4">
+                                    <Button 
+                                      onClick={() => reviewFlashcard(false)}
+                                      variant="outline"
+                                      className="flex items-center gap-2 h-12 px-6"
+                                    >
+                                      <span className="text-red-500">❌</span>
+                                      Incorrect
+                                    </Button>
+                                    <Button 
+                                      onClick={() => reviewFlashcard(true)}
+                                      className="flex items-center gap-2 h-12 px-6"
+                                    >
+                                      <span className="text-green-500">✅</span>
+                                      Correct
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
