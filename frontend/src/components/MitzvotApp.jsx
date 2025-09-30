@@ -526,13 +526,17 @@ const MitzvotApp = () => {
   };
 
   const generateTopicToTitleQuestion = (correctPrecept, allPrecepts) => {
-    if (!correctPrecept.topics || correctPrecept.topics.length === 0) return null;
+    if (!correctPrecept || !correctPrecept.topics || correctPrecept.topics.length === 0) return null;
     
     const randomTopic = correctPrecept.topics[Math.floor(Math.random() * correctPrecept.topics.length)];
+    if (!randomTopic) return null;
+    
     const wrongAnswers = allPrecepts
-      .filter(p => p.id !== correctPrecept.id)
+      .filter(p => p && p.id !== correctPrecept.id && p.title)
       .sort(() => Math.random() - 0.5)
       .slice(0, 3);
+    
+    if (wrongAnswers.length < 3) return null;
     
     const answers = [correctPrecept, ...wrongAnswers]
       .sort(() => Math.random() - 0.5)
