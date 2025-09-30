@@ -1244,7 +1244,7 @@ const MitzvotApp = () => {
                               </tr>
                             ))
                           ) : (
-                            precepts.map((precept) => (
+                            (precepts || []).map((precept) => (
                               <tr key={precept.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4 font-medium">{precept.title}</td>
                                 <td className="p-4 text-sm text-gray-600">
