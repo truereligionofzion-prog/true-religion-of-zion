@@ -714,7 +714,7 @@ const MitzvotApp = () => {
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
-                        placeholder="Search mitzvot, keywords, or verses..."
+                        placeholder={contentType === 'mitzvot' ? "Search mitzvot, keywords, or verses..." : "Search precepts, topics, or verses..."}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10"
@@ -722,33 +722,54 @@ const MitzvotApp = () => {
                     </div>
                   </div>
                   
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Categories" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.slug}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {contentType === 'mitzvot' ? (
+                    <>
+                      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Categories" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Categories</SelectItem>
+                          {categories.map((category) => (
+                            <SelectItem key={category.id} value={category.slug}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
 
-                  <Select value={selectedBook} onValueChange={setSelectedBook}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Books" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Books</SelectItem>
-                      {filters.books && filters.books.map((book) => (
-                        <SelectItem key={book} value={book}>
-                          {book}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                      <Select value={selectedBook} onValueChange={setSelectedBook}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Books" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Books</SelectItem>
+                          {filters.books && filters.books.map((book) => (
+                            <SelectItem key={book} value={book}>
+                              {book}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </>
+                  ) : (
+                    <>
+                      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Testaments" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Testaments</SelectItem>
+                          {filters.testaments && filters.testaments.map((testament) => (
+                            <SelectItem key={testament} value={testament}>
+                              {testament.charAt(0).toUpperCase() + testament.slice(1)} Testament
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div></div> {/* Empty div to maintain grid layout */}
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
