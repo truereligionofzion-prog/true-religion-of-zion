@@ -1063,7 +1063,7 @@ const MitzvotApp = () => {
               <TabsContent value="cards" className="mt-6">
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {contentType === 'mitzvot' ? (
-                    mitzvot.map((mitzvah) => (
+                    (mitzvot || []).map((mitzvah) => (
                       <Card key={mitzvah.id} className="hover:shadow-lg transition-shadow">
                         <CardHeader>
                           <div className="flex items-start justify-between">
@@ -1232,7 +1232,7 @@ const MitzvotApp = () => {
                         </thead>
                         <tbody>
                           {contentType === 'mitzvot' ? (
-                            mitzvot.map((mitzvah) => (
+                            (mitzvot || []).map((mitzvah) => (
                               <tr key={mitzvah.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4 text-blue-600 font-bold">#{mitzvah.number}</td>
                                 <td className="p-4 font-medium">{mitzvah.title}</td>
