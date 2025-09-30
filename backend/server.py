@@ -214,6 +214,126 @@ async def get_stats():
         logger.error(f"Error getting stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== PRECEPTS API ENDPOINTS =====
+
+@api_router.get("/precepts")
+async def get_precepts(
+    testament: Optional[str] = Query(None, description="Filter by testament: old, new, mixed"),
+    search: Optional[str] = Query(None, description="Search in title, topics, and verse text"),
+    page: int = Query(1, ge=1, description="Page number"),
+    limit: int = Query(20, ge=1, le=100, description="Items per page")
+):
+    """Get all precepts with optional filtering and pagination"""
+    try:
+        # Build query
+        query = {}
+        
+        if testament and testament != "all":
+            query["testament"] = testament
+        
+        # Enhanced text search across all fields
+        if search:
+            search_regex = {"$regex": search, "$options": "i"}
+            query["$or"] = [
+                {"title": search_regex},
+                {"topics": {"$in": [re.compile(search, re.IGNORECASE)]}},
+                {"verses.text": search_regex},
+                {"verses.book": search_regex}
+            ]
+        
+        # Get total count
+        total = await precepts_collection.count_documents(query)
+        
+        # Calculate pagination
+        skip = (page - 1) * limit
+        total_pages = math.ceil(total / limit)
+        
+        # Get precepts
+        cursor = precepts_collection.find(query).sort("title", 1).skip(skip).limit(limit)
+        precepts_data = await cursor.to_list(length=limit)
+        
+        # Clean MongoDB documents
+        precepts = []
+        for p in precepts_data:
+            if '_id' in p:
+                del p['_id']
+            precepts.append(p)
+        
+        # Get filter options
+        testaments = await precepts_collection.distinct("testament")
+        testaments.sort()
+        
+        return {
+            "precepts": precepts,
+            "total": total,
+            "page": page,
+            "totalPages": total_pages,
+            "filters": {
+                "testaments": testaments
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting precepts: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/precepts/{precept_id}")
+async def get_precept(precept_id: str):
+    """Get a specific precept by ID"""
+    try:
+        precept = await precepts_collection.find_one({"id": precept_id})
+        
+        if not precept:
+            raise HTTPException(status_code=404, detail="Precept not found")
+        
+        # Remove MongoDB _id field
+        if '_id' in precept:
+            del precept['_id']
+        
+        return precept
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting precept {precept_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/precepts-stats")
+async def get_precepts_stats():
+    """Get precepts summary statistics"""
+    try:
+        total_precepts = await precepts_collection.count_documents({})
+        
+        # Count by testament
+        old_testament = await precepts_collection.count_documents({"testament": "old"})
+        new_testament = await precepts_collection.count_documents({"testament": "new"})
+        mixed_testament = await precepts_collection.count_documents({"testament": "mixed"})
+        
+        # Count unique topics
+        all_topics = []
+        async for precept in precepts_collection.find({}, {"topics": 1}):
+            if precept.get("topics"):
+                all_topics.extend(precept["topics"])
+        unique_topics = len(set(all_topics))
+        
+        # Count total verses
+        total_verses = 0
+        async for precept in precepts_collection.find({}, {"verse_count": 1}):
+            total_verses += precept.get("verse_count", 0)
+        
+        return {
+            "totalPrecepts": total_precepts,
+            "oldTestament": old_testament,
+            "newTestament": new_testament,
+            "mixedTestament": mixed_testament,
+            "uniqueTopics": unique_topics,
+            "totalVerses": total_verses
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting precepts stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/mitzvah-of-the-day", response_model=Mitzvah)
 async def get_mitzvah_of_the_day():
     """Get the daily featured mitzvah"""
