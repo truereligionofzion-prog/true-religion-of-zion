@@ -849,44 +849,115 @@ const MitzvotApp = () => {
                       </Card>
                     ))
                   ) : (
-                    precepts.map((precept) => (
-                      <Card key={precept.id} className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                          <div className="flex items-start justify-between">
-                            <CardTitle className="text-lg leading-tight">
-                              <span className="text-purple-600 font-bold">📜</span> {precept.title}
-                            </CardTitle>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            <div>
-                              <p className="text-sm font-medium text-gray-700 mb-1">Key Verses ({precept.verses?.length || 0} references):</p>
-                              {precept.verses?.slice(0, 2).map((verse, idx) => (
-                                <div key={idx} className="mb-2">
-                                  <p className="text-xs text-gray-500 mb-1">{verse.book} {verse.chapter}:{verse.verse}</p>
-                                  <p className="text-sm text-gray-600 italic bg-gray-50 p-2 rounded border-l-4 border-purple-200">"{verse.text?.substring(0, 100)}..."</p>
+                    precepts.map((precept) => {
+                      const currentVerseIndex = preceptVerseIndex[precept.id] || 0;
+                      const currentVerse = precept.verses?.[currentVerseIndex];
+                      const expandKey = `${precept.id}_${currentVerseIndex}`;
+                      const isExpanded = expandedVerses[expandKey];
+
+                      return (
+                        <Card key={precept.id} className="hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                            <div className="flex items-start justify-between">
+                              <CardTitle className="text-lg leading-tight">
+                                <span className="text-purple-600 font-bold">📜</span> {precept.title}
+                              </CardTitle>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              {/* Verse Navigation */}
+                              {precept.verses?.length > 0 && (
+                                <div>
+                                  <div className="flex items-center justify-between mb-2">
+                                    <p className="text-sm font-medium text-gray-700">
+                                      Verses ({precept.verses.length} references):
+                                    </p>
+                                    {precept.verses.length > 1 && (
+                                      <div className="flex items-center gap-2">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => navigateVerse(precept.id, 'prev')}
+                                          className="h-6 w-6 p-0"
+                                        >
+                                          <ChevronLeft className="h-3 w-3" />
+                                        </Button>
+                                        <span className="text-xs text-gray-500">
+                                          {currentVerseIndex + 1} of {precept.verses.length}
+                                        </span>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => navigateVerse(precept.id, 'next')}
+                                          className="h-6 w-6 p-0"
+                                        >
+                                          <ChevronRight className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Current Verse Display */}
+                                  {currentVerse && (
+                                    <div className="mb-2">
+                                      <div className="flex items-center justify-between mb-1">
+                                        <p className="text-xs text-gray-500 font-medium">
+                                          {getVerseReference(currentVerse)}
+                                        </p>
+                                        <div className="flex items-center gap-1">
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => toggleVerseExpansion(precept.id, currentVerseIndex)}
+                                            className="h-6 px-2 text-xs"
+                                          >
+                                            <Expand className="h-3 w-3 mr-1" />
+                                            {isExpanded ? 'Collapse' : 'Expand'}
+                                          </Button>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 px-2 text-xs text-blue-600"
+                                            title="View in Bible (Coming Soon)"
+                                          >
+                                            <ExternalLink className="h-3 w-3 mr-1" />
+                                            Bible
+                                          </Button>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="text-sm text-gray-600 italic bg-gray-50 p-3 rounded border-l-4 border-purple-200">
+                                        <p>
+                                          "{isExpanded ? currentVerse.text : (currentVerse.text?.substring(0, 120) + (currentVerse.text?.length > 120 ? '...' : ''))}"
+                                        </p>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
-                              ))}
-                              {precept.verses?.length > 2 && (
-                                <p className="text-xs text-gray-500 italic">+{precept.verses.length - 2} more verses</p>
                               )}
-                            </div>
-                            
-                            <div className="flex flex-wrap gap-2 pt-2">
-                              <Badge variant="secondary" className="capitalize">
-                                {precept.testament} Testament
-                              </Badge>
-                              {precept.topics?.slice(0, 2).map((topic) => (
-                                <Badge key={topic} variant="outline" className="capitalize">
-                                  {topic.replace('-', ' ')}
+                              
+                              {/* Topics and Testament Badges */}
+                              <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+                                <Badge variant="secondary" className="capitalize">
+                                  {precept.testament} Testament
                                 </Badge>
-                              ))}
+                                {precept.topics?.slice(0, 2).map((topic) => (
+                                  <Badge key={topic} variant="outline" className="capitalize">
+                                    {topic.replace('-', ' ')}
+                                  </Badge>
+                                ))}
+                                {precept.topics?.length > 2 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{precept.topics.length - 2} more
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
+                          </CardContent>
+                        </Card>
+                      );
+                    })
                   )}
                 </div>
               </TabsContent>
