@@ -6,7 +6,7 @@ Debug specific API issues
 import requests
 import json
 
-BACKEND_URL = "https://biblical-study-suite.preview.emergentagent.com/api"
+BACKEND_URL = "https://torah-precepts-app.preview.emergentagent.com/api"
 
 def test_specific_issues():
     session = requests.Session()
