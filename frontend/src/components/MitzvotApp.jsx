@@ -60,12 +60,12 @@ const MitzvotApp = () => {
     loadInitialData();
   }, []);
 
-  // Load mitzvot when filters change
+  // Load content when filters change or content type changes
   useEffect(() => {
     if (categories.length > 0) {
-      loadMitzvot();
+      loadContent();
     }
-  }, [searchTerm, selectedCategory, selectedBook, currentPage, categories.length]);
+  }, [contentType, searchTerm, selectedCategory, selectedBook, currentPage, categories.length]);
 
   const loadInitialData = async () => {
     try {
