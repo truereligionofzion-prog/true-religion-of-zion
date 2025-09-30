@@ -1361,16 +1361,28 @@ const MitzvotApp = () => {
                   <CardHeader>
                     <CardTitle className="text-2xl">📚 Flashcard Review</CardTitle>
                     <p className="text-gray-600">
-                      Use spaced repetition to master the mitzvot! The algorithm will show you cards when you need to review them.
+                      {contentType === 'mitzvot' 
+                        ? 'Use spaced repetition to master the mitzvot! The algorithm will show you cards when you need to review them.'
+                        : 'Use spaced repetition to master biblical precepts! Study key verses and topics with our adaptive learning system.'
+                      }
                     </p>
                   </CardHeader>
                   <CardContent>
-                    <Button onClick={startFlashcards} className="h-16 w-full">
-                      <div className="text-center">
-                        <div className="font-semibold">Start Flashcard Review</div>
-                        <div className="text-sm opacity-75">Review cards due today</div>
-                      </div>
-                    </Button>
+                    {contentType === 'mitzvot' ? (
+                      <Button onClick={startFlashcards} className="h-16 w-full">
+                        <div className="text-center">
+                          <div className="font-semibold">Start Flashcard Review</div>
+                          <div className="text-sm opacity-75">Review mitzvot cards due today</div>
+                        </div>
+                      </Button>
+                    ) : (
+                      <Button onClick={startPreceptsFlashcards} className="h-16 w-full">
+                        <div className="text-center">
+                          <div className="font-semibold">Start Precepts Review</div>
+                          <div className="text-sm opacity-75">Study biblical precepts and verses</div>
+                        </div>
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               </div>
