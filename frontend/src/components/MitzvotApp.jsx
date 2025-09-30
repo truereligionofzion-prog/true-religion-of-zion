@@ -576,6 +576,55 @@ const MitzvotApp = () => {
     }
   };
 
+  const startPreceptsFlashcards = async () => {
+    try {
+      setLoading(true);
+      
+      // Generate precepts flashcards from current data
+      const preceptsFlashcards = generatePreceptsFlashcards(precepts, 10);
+      
+      if (preceptsFlashcards.length === 0) {
+        toast({
+          title: "No Precepts Available",
+          description: "No precepts available for flashcard review.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setFlashcards(preceptsFlashcards);
+      setCurrentFlashcardIndex(0);
+      setShowFlashcardAnswer(false);
+      setActiveTab('flashcards');
+      
+      toast({
+        title: "Precepts Flashcards Ready!",
+        description: `Starting precepts review with ${preceptsFlashcards.length} cards.`,
+      });
+    } catch (error) {
+      console.error('Error starting precepts flashcards:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load precepts flashcards. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generatePreceptsFlashcards = (precepts, count) => {
+    const shuffledPrecepts = [...precepts].sort(() => Math.random() - 0.5);
+    
+    return shuffledPrecepts.slice(0, count).map((precept, index) => ({
+      id: `precept_${precept.id}_${index}`,
+      precept: precept,
+      type: 'precept',
+      difficulty: 1,
+      nextReview: new Date()
+    }));
+  };
+
   const reviewFlashcard = async (correct) => {
     if (!flashcards[currentFlashcardIndex]) return;
     
