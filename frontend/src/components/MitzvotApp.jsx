@@ -1389,11 +1389,11 @@ const MitzvotApp = () => {
                     <CardContent>
                       <div className="space-y-6">
                         <h3 className="text-xl font-semibold">
-                          {quizData.questions[currentQuestionIndex].question}
+                          {quizData.questions?.[currentQuestionIndex]?.question || 'Loading question...'}
                         </h3>
                         
                         <div className="grid gap-3">
-                          {(quizData.questions[currentQuestionIndex].answers || []).map((option, index) => (
+                          {(quizData.questions?.[currentQuestionIndex]?.answers || []).map((option, index) => (
                             <Button
                               key={index}
                               variant={selectedAnswer === option ? "default" : "outline"}
