@@ -498,12 +498,13 @@ const MitzvotApp = () => {
         <div className="flex justify-between items-start mb-8">
           <div className="text-center flex-1">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              The 613 Laws of the Bible
+              {contentType === 'mitzvot' ? 'The 613 Laws of the Bible' : 'Biblical Precepts'}
             </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Explore the complete collection of biblical commandments with their sources 
-              and categorization. Search by content, filter by origin, 
-              and discover the rich tradition of biblical law.
+              {contentType === 'mitzvot' 
+                ? 'Explore the complete collection of biblical commandments with their sources and categorization. Search by content, filter by origin, and discover the rich tradition of biblical law.'
+                : 'Discover comprehensive biblical precepts organized by topic with verse references and divine name accuracy. Search through teachings that span both Old and New Testament wisdom.'
+              }
             </p>
           </div>
           
