@@ -1114,9 +1114,9 @@ const MitzvotApp = () => {
                                 <div>
                                   <div className="flex items-center justify-between mb-2">
                                     <p className="text-sm font-medium text-gray-700">
-                                      Verses ({precept.verses.length} references):
+                                      Verses ({precept.verses?.length || 0} references):
                                     </p>
-                                    {precept.verses.length > 1 && (
+                                    {precept.verses && precept.verses.length > 1 && (
                                       <div className="flex items-center gap-2">
                                         <Button
                                           variant="ghost"
