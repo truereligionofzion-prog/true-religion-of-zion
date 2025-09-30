@@ -1127,7 +1127,7 @@ const MitzvotApp = () => {
                                           <ChevronLeft className="h-3 w-3" />
                                         </Button>
                                         <span className="text-xs text-gray-500">
-                                          {currentVerseIndex + 1} of {precept.verses.length}
+                                          {currentVerseIndex + 1} of {precept.verses?.length || 0}
                                         </span>
                                         <Button
                                           variant="ghost"
