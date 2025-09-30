@@ -14,7 +14,7 @@ from typing import List, Dict, Any
 # MongoDB connection
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(MONGO_URL)
-db = client.mitzvot_database
+db = client[os.environ.get('DB_NAME', 'test_database')]
 
 class PreceptsProcessor:
     def __init__(self):
