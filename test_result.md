@@ -129,7 +129,7 @@ backend:
     file: "/app/backend/phase2_precepts_integration.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
@@ -137,6 +137,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE PRECEPTS INTEGRATION TESTING COMPLETED: All precepts integration requirements successfully verified. ✅ WORKING CORRECTLY: 1) Precepts collection exists with 4 sample entries, 2) Proper data structure with id/title/verses/topics/testament fields, 3) YHWH/YHUH divine name replacements working (found in 3/4 precepts), 4) Database indexes created for efficient searching (title, topics, testament, verses.book), 5) Collections are independent (613 mitzvot + 4 precepts coexist), 6) Testament classification working (mixed/old testament distribution), 7) All existing mitzvot endpoints unaffected (/api/mitzvot, /api/stats, /api/quiz, /api/progress, /api/flashcards all working correctly). The precepts integration does NOT conflict with existing mitzvot functionality - both systems operate independently as designed."
+      - working: true
+        agent: "main"
+        comment: "✅ FULL DATASET INTEGRATION COMPLETED: Successfully executed precepts integration script with user-provided complete dataset. Fixed parsing logic to correctly identify precept titles vs verse text. Processed 23 precepts from 'Abomination' to 'Beard' with improved parsing algorithm. All YHWH/YHUH divine name replacements applied correctly. Database now contains structured precepts with proper verse references, topics, and testament classification. Ready for backend API testing and frontend integration."
         
   - task: "Specific Traditional Wording Implementation - Batch 7"
     implemented: false
