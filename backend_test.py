@@ -2103,7 +2103,7 @@ class APITester:
 
 def main():
     """Main test execution"""
-    print("🚀 613 Biblical Laws API - NEW BIBLICAL STRUCTURE Testing")
+    print("🚀 613 Biblical Laws API - PRECEPTS INTEGRATION Testing")
     print(f"Testing against: {BACKEND_URL}")
     print()
     
@@ -2111,7 +2111,7 @@ def main():
     success = tester.run_all_tests()
     
     if success:
-        print("\n🎉 ALL TESTS PASSED! The new biblical mitzvot structure is working correctly.")
+        print("\n🎉 ALL TESTS PASSED! The precepts integration is working correctly with existing mitzvot functionality.")
         sys.exit(0)
     else:
         print("\n⚠️  SOME TESTS FAILED. Please review the issues above.")
