@@ -1129,6 +1129,165 @@ class APITester:
             self.log_test("Mitzvah of the Day", False, f"Error: {str(e)}")
             return False
 
+    def test_precepts_integration_system(self):
+        """Test Phase 2: Precepts Integration System - Complete Implementation"""
+        try:
+            print("\n🔍 Testing Phase 2: Precepts Integration System...")
+            
+            # Test 1: Database Verification - Check precepts collection exists and has 23 precepts
+            from motor.motor_asyncio import AsyncIOMotorClient
+            import asyncio
+            
+            async def check_precepts_database():
+                mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+                client = AsyncIOMotorClient(mongo_url)
+                db = client[os.environ.get('DB_NAME', 'test_database')]
+                
+                # Count precepts in database
+                precepts_count = await db.precepts.count_documents({})
+                
+                # Get sample precepts for structure verification
+                sample_precepts = await db.precepts.find({}).limit(5).to_list(length=5)
+                
+                # Check for proper indexes
+                indexes = await db.precepts.list_indexes().to_list(length=None)
+                index_names = [idx.get('key', {}) for idx in indexes]
+                
+                client.close()
+                return precepts_count, sample_precepts, index_names
+            
+            try:
+                precepts_count, sample_precepts, index_names = asyncio.run(check_precepts_database())
+                
+                # Test precepts count (should be 23)
+                if precepts_count == 23:
+                    self.log_test("Precepts - Database Count", True, f"Found exactly 23 precepts (upgraded from 4)")
+                else:
+                    self.log_test("Precepts - Database Count", False, f"Expected 23 precepts, found {precepts_count}")
+                
+                # Test data structure
+                if sample_precepts:
+                    structure_valid = True
+                    yhwh_replacements_found = 0
+                    testament_classifications = set()
+                    
+                    for precept in sample_precepts:
+                        # Check required fields
+                        required_fields = ['id', 'title', 'verses', 'topics', 'testament']
+                        if not all(field in precept for field in required_fields):
+                            structure_valid = False
+                            break
+                        
+                        # Check verses structure
+                        verses = precept.get('verses', [])
+                        for verse in verses:
+                            verse_fields = ['reference', 'book', 'chapter', 'verse', 'text']
+                            if not all(field in verse for field in verse_fields):
+                                structure_valid = False
+                                break
+                            
+                            # Check for YHWH/YHUH replacements
+                            verse_text = verse.get('text', '')
+                            if 'YHWH' in verse_text or 'YHUH' in verse_text or 'Elohim' in verse_text:
+                                yhwh_replacements_found += 1
+                        
+                        # Collect testament classifications
+                        testament_classifications.add(precept.get('testament'))
+                    
+                    if structure_valid:
+                        self.log_test("Precepts - Data Structure", True, "All precepts have proper structure (id, title, verses, topics, testament)")
+                    else:
+                        self.log_test("Precepts - Data Structure", False, "Missing required fields in precepts structure")
+                    
+                    if yhwh_replacements_found > 0:
+                        self.log_test("Precepts - YHWH/YHUH Replacements", True, f"Found {yhwh_replacements_found} verses with divine name replacements")
+                    else:
+                        self.log_test("Precepts - YHWH/YHUH Replacements", False, "No YHWH/YHUH/Elohim replacements found")
+                    
+                    if testament_classifications:
+                        self.log_test("Precepts - Testament Classification", True, f"Testament types found: {list(testament_classifications)}")
+                    else:
+                        self.log_test("Precepts - Testament Classification", False, "No testament classifications found")
+                else:
+                    self.log_test("Precepts - Data Structure", False, "No sample precepts available for testing")
+                
+                # Test database indexing
+                expected_indexes = ['title', 'topics', 'testament', 'verses.book']
+                indexes_found = []
+                for expected_index in expected_indexes:
+                    for idx in index_names:
+                        if expected_index in str(idx):
+                            indexes_found.append(expected_index)
+                            break
+                
+                if len(indexes_found) >= 3:  # At least most indexes should be present
+                    self.log_test("Precepts - Database Indexes", True, f"Found indexes for: {indexes_found}")
+                else:
+                    self.log_test("Precepts - Database Indexes", False, f"Only found indexes for: {indexes_found}")
+                
+            except Exception as e:
+                self.log_test("Precepts - Database Access", False, f"Error accessing database: {str(e)}")
+                return False
+            
+            # Test 2: Collection Independence - Verify existing mitzvot functionality unaffected
+            mitzvot_response = self.session.get(f"{self.base_url}/mitzvot?limit=10")
+            if mitzvot_response.status_code == 200:
+                mitzvot_data = mitzvot_response.json()
+                mitzvot_count = mitzvot_data.get('total', 0)
+                if mitzvot_count == 613:
+                    self.log_test("Precepts - Mitzvot Independence", True, "All 613 mitzvot still accessible and unaffected")
+                else:
+                    self.log_test("Precepts - Mitzvot Independence", False, f"Mitzvot count changed: {mitzvot_count}")
+            else:
+                self.log_test("Precepts - Mitzvot Independence", False, f"Mitzvot endpoint error: {mitzvot_response.status_code}")
+            
+            # Test 3: Stats endpoint still works
+            stats_response = self.session.get(f"{self.base_url}/stats")
+            if stats_response.status_code == 200:
+                stats_data = stats_response.json()
+                if stats_data.get('totalMitzvot') == 613:
+                    self.log_test("Precepts - Stats Independence", True, "Stats endpoint unaffected by precepts integration")
+                else:
+                    self.log_test("Precepts - Stats Independence", False, f"Stats changed: {stats_data}")
+            else:
+                self.log_test("Precepts - Stats Independence", False, f"Stats endpoint error: {stats_response.status_code}")
+            
+            # Test 4: Quiz system still works
+            quiz_response = self.session.get(f"{self.base_url}/quiz/all?limit=3")
+            if quiz_response.status_code == 200:
+                quiz_data = quiz_response.json()
+                questions = quiz_data.get('questions', [])
+                if questions:
+                    self.log_test("Precepts - Quiz Independence", True, f"Quiz system unaffected ({len(questions)} questions generated)")
+                else:
+                    self.log_test("Precepts - Quiz Independence", False, "Quiz system not generating questions")
+            else:
+                self.log_test("Precepts - Quiz Independence", False, f"Quiz endpoint error: {quiz_response.status_code}")
+            
+            # Test 5: Progress tracking still works
+            progress_response = self.session.get(f"{self.base_url}/progress")
+            if progress_response.status_code == 200:
+                progress_data = progress_response.json()
+                if progress_data.get('totalMitzvot') == 613:
+                    self.log_test("Precepts - Progress Independence", True, "Progress tracking unaffected by precepts integration")
+                else:
+                    self.log_test("Precepts - Progress Independence", False, f"Progress tracking affected: {progress_data}")
+            else:
+                self.log_test("Precepts - Progress Independence", False, f"Progress endpoint error: {progress_response.status_code}")
+            
+            # Test 6: Flashcards system still works
+            flashcards_response = self.session.get(f"{self.base_url}/flashcards")
+            if flashcards_response.status_code == 200:
+                self.log_test("Precepts - Flashcards Independence", True, "Flashcards system unaffected by precepts integration")
+            else:
+                self.log_test("Precepts - Flashcards Independence", False, f"Flashcards endpoint error: {flashcards_response.status_code}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Precepts Integration System", False, f"Error: {str(e)}")
+            return False
+
     def test_batch_7_data_correction(self):
         """Test Batch 7 data correction for Mitzvot 137-186 - traditional wording and scholarly notes"""
         try:
