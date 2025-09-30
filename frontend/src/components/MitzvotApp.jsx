@@ -1393,7 +1393,7 @@ const MitzvotApp = () => {
                         </h3>
                         
                         <div className="grid gap-3">
-                          {quizData.questions[currentQuestionIndex].options.map((option, index) => (
+                          {(quizData.questions[currentQuestionIndex].answers || []).map((option, index) => (
                             <Button
                               key={index}
                               variant={selectedAnswer === option ? "default" : "outline"}
