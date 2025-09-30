@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, BookOpen, Tag, Info, Loader, User, UserPlus, LogIn, ChevronDown } from 'lucide-react';
+import { Search, Filter, BookOpen, Tag, Info, Loader, User, UserPlus, LogIn, ChevronDown, ChevronLeft, ChevronRight, Expand, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
