@@ -783,34 +783,75 @@ const MitzvotApp = () => {
 
               <TabsContent value="cards" className="mt-6">
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {mitzvot.map((mitzvah) => (
-                    <Card key={mitzvah.id} className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <CardTitle className="text-lg leading-tight">
-                            <span className="text-blue-600 font-bold">#{mitzvah.number}</span> {mitzvah.title}
-                          </CardTitle>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">Biblical Source ({mitzvah.book} {mitzvah.chapter}:{mitzvah.verse}):</p>
-                            <p className="text-sm text-gray-600 italic bg-gray-50 p-2 rounded border-l-4 border-blue-200">"{mitzvah.sourceVerse}"</p>
+                  {contentType === 'mitzvot' ? (
+                    mitzvot.map((mitzvah) => (
+                      <Card key={mitzvah.id} className="hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <CardTitle className="text-lg leading-tight">
+                              <span className="text-blue-600 font-bold">#{mitzvah.number}</span> {mitzvah.title}
+                            </CardTitle>
                           </div>
-                          
-                          <div className="flex flex-wrap gap-2 pt-2">
-                            <Badge variant="secondary">
-                              {mitzvah.book} {mitzvah.chapter}:{mitzvah.verse}
-                            </Badge>
-                            <Badge variant="outline">
-                              {getCategoryName(mitzvah.category)}
-                            </Badge>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm font-medium text-gray-700 mb-1">Biblical Source ({mitzvah.book} {mitzvah.chapter}:{mitzvah.verse}):</p>
+                              <p className="text-sm text-gray-600 italic bg-gray-50 p-2 rounded border-l-4 border-blue-200">"{mitzvah.sourceVerse}"</p>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-2 pt-2">
+                              <Badge variant="secondary">
+                                {mitzvah.book} {mitzvah.chapter}:{mitzvah.verse}
+                              </Badge>
+                              <Badge variant="outline">
+                                {getCategoryName(mitzvah.category)}
+                              </Badge>
+                            </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    precepts.map((precept) => (
+                      <Card key={precept.id} className="hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <CardTitle className="text-lg leading-tight">
+                              <span className="text-purple-600 font-bold">📜</span> {precept.title}
+                            </CardTitle>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm font-medium text-gray-700 mb-1">Key Verses ({precept.verses?.length || 0} references):</p>
+                              {precept.verses?.slice(0, 2).map((verse, idx) => (
+                                <div key={idx} className="mb-2">
+                                  <p className="text-xs text-gray-500 mb-1">{verse.book} {verse.chapter}:{verse.verse}</p>
+                                  <p className="text-sm text-gray-600 italic bg-gray-50 p-2 rounded border-l-4 border-purple-200">"{verse.text?.substring(0, 100)}..."</p>
+                                </div>
+                              ))}
+                              {precept.verses?.length > 2 && (
+                                <p className="text-xs text-gray-500 italic">+{precept.verses.length - 2} more verses</p>
+                              )}
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-2 pt-2">
+                              <Badge variant="secondary" className="capitalize">
+                                {precept.testament} Testament
+                              </Badge>
+                              {precept.topics?.slice(0, 2).map((topic) => (
+                                <Badge key={topic} variant="outline" className="capitalize">
+                                  {topic.replace('-', ' ')}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
                 </div>
               </TabsContent>
 
