@@ -25,6 +25,7 @@ class PreceptsProcessor:
         """Parse the provided precepts text into structured data"""
         precepts = []
         current_precept = None
+        current_reference = None
         
         lines = precepts_text.strip().split('\n')
         
@@ -32,28 +33,21 @@ class PreceptsProcessor:
             line = line.strip()
             if not line:
                 continue
-                
-            # Check if this is a new precept title
-            if not line.startswith(('Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy', 
-                                  '1Chronicles', '2Chronicles', '1Kings', '2Kings', '1Samuel', 
-                                  '2Samuel', 'Psalms', 'Proverbs', 'Ecclesiastes', 'Isaiah', 
-                                  'Jeremiah', 'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos', 
-                                  'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk', 'Zephaniah', 
-                                  'Haggai', 'Zechariah', 'Malachi', 'Matthew', 'Mark', 'Luke', 
-                                  'John', 'Acts', 'Romans', '1Corinthians', '2Corinthians', 
-                                  'Galatians', 'Ephesians', 'Philippians', 'Colossians', 
-                                  '1Thessalonians', '2Thessalonians', '1Timothy', '2Timothy', 
-                                  'Titus', 'Philemon', 'Hebrews', 'James', '1Peter', '2Peter', 
-                                  '1John', '2John', '3John', 'Jude', 'Revelations',
-                                  # Apocryphal books
-                                  'Tobit', 'Judith', 'Wisdom of Solomon', 'Ecclesiasticus', 
-                                  'Baruch', '1Maccabees', '2Maccabees', '1Esdras', '2Esdras',
-                                  'Prayer of Manasseh', 'Epistle of Jeremiah', 'Bel and the Dragon',
-                                  'Susanna', 'Esther (Greek)', 'Songs of Solomon')):
-                # This is a new precept title
+            
+            # Check if this is a Bible reference
+            if self._is_bible_reference(line):
+                current_reference = self._parse_bible_reference(line)
+                if current_precept:
+                    current_precept['verses'].append(current_reference)
+                continue
+            
+            # Check if this is likely a precept title (not a Bible reference and not verse text)
+            if self._is_precept_title(line):
+                # Save previous precept if it exists
                 if current_precept and current_precept.get('verses'):
                     precepts.append(current_precept)
                 
+                # Start new precept
                 current_precept = {
                     'id': str(uuid4()),
                     'title': line,
@@ -61,30 +55,11 @@ class PreceptsProcessor:
                     'topics': self._extract_topics(line),
                     'testament': 'mixed'  # Will be determined based on verses
                 }
+                current_reference = None
             
-            elif current_precept and self._is_bible_reference(line):
-                # This is a bible verse reference
-                verse_ref = line
-            
-            elif current_precept and not self._is_bible_reference(line) and line:
-                # This is verse text, associate with the last reference
-                if len(current_precept['verses']) > 0:
-                    current_precept['verses'][-1]['text'] = line
-                else:
-                    # Sometimes verse text comes before reference, create placeholder
-                    current_precept['verses'].append({
-                        'reference': 'Unknown',
-                        'book': 'Unknown',
-                        'chapter': 0,
-                        'verse': 0,
-                        'text': line
-                    })
-            
-            elif self._is_bible_reference(line):
-                # This is a standalone bible reference
-                parsed_ref = self._parse_bible_reference(line)
-                if current_precept:
-                    current_precept['verses'].append(parsed_ref)
+            elif current_precept and current_reference:
+                # This should be verse text for the current reference
+                current_reference['text'] = line
         
         # Add the last precept
         if current_precept and current_precept.get('verses'):
