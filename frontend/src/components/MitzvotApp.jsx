@@ -1251,7 +1251,7 @@ const MitzvotApp = () => {
                                   {precept.verses?.length || 0} references
                                   {precept.verses?.[0] && (
                                     <div className="text-xs text-gray-500 mt-1">
-                                      {precept.verses[0].book} {precept.verses[0].chapter}:{precept.verses[0].verse}
+                                      {precept.verses[0].book || ''} {precept.verses[0].chapter || ''}:{precept.verses[0].verse || ''}
                                     </div>
                                   )}
                                 </td>
