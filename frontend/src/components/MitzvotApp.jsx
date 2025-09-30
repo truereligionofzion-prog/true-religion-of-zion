@@ -862,25 +862,66 @@ const MitzvotApp = () => {
                       <table className="w-full">
                         <thead className="border-b bg-gray-50">
                           <tr>
-                            <th className="text-left p-4 font-medium">#</th>
-                            <th className="text-left p-4 font-medium">Title</th>
-                            <th className="text-left p-4 font-medium">Biblical Verse</th>
-                            <th className="text-left p-4 font-medium">Source</th>
-                            <th className="text-left p-4 font-medium">Category</th>
+                            {contentType === 'mitzvot' ? (
+                              <>
+                                <th className="text-left p-4 font-medium">#</th>
+                                <th className="text-left p-4 font-medium">Title</th>
+                                <th className="text-left p-4 font-medium">Biblical Verse</th>
+                                <th className="text-left p-4 font-medium">Source</th>
+                                <th className="text-left p-4 font-medium">Category</th>
+                              </>
+                            ) : (
+                              <>
+                                <th className="text-left p-4 font-medium">Topic</th>
+                                <th className="text-left p-4 font-medium">Verses</th>
+                                <th className="text-left p-4 font-medium">Testament</th>
+                                <th className="text-left p-4 font-medium">Topics</th>
+                              </>
+                            )}
                           </tr>
                         </thead>
                         <tbody>
-                          {mitzvot.map((mitzvah) => (
-                            <tr key={mitzvah.id} className="border-b hover:bg-gray-50">
-                              <td className="p-4 text-blue-600 font-bold">#{mitzvah.number}</td>
-                              <td className="p-4 font-medium">{mitzvah.title}</td>
-                              <td className="p-4 text-gray-600 italic">"{mitzvah.sourceVerse.substring(0, 80)}..."</td>
-                              <td className="p-4 text-sm text-gray-600">{mitzvah.book} {mitzvah.chapter}:{mitzvah.verse}</td>
-                              <td className="p-4">
-                                <Badge variant="outline">{getCategoryName(mitzvah.category)}</Badge>
-                              </td>
-                            </tr>
-                          ))}
+                          {contentType === 'mitzvot' ? (
+                            mitzvot.map((mitzvah) => (
+                              <tr key={mitzvah.id} className="border-b hover:bg-gray-50">
+                                <td className="p-4 text-blue-600 font-bold">#{mitzvah.number}</td>
+                                <td className="p-4 font-medium">{mitzvah.title}</td>
+                                <td className="p-4 text-gray-600 italic">"{mitzvah.sourceVerse.substring(0, 80)}..."</td>
+                                <td className="p-4 text-sm text-gray-600">{mitzvah.book} {mitzvah.chapter}:{mitzvah.verse}</td>
+                                <td className="p-4">
+                                  <Badge variant="outline">{getCategoryName(mitzvah.category)}</Badge>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            precepts.map((precept) => (
+                              <tr key={precept.id} className="border-b hover:bg-gray-50">
+                                <td className="p-4 font-medium">{precept.title}</td>
+                                <td className="p-4 text-sm text-gray-600">
+                                  {precept.verses?.length || 0} references
+                                  {precept.verses?.[0] && (
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      {precept.verses[0].book} {precept.verses[0].chapter}:{precept.verses[0].verse}
+                                    </div>
+                                  )}
+                                </td>
+                                <td className="p-4">
+                                  <Badge variant="secondary" className="capitalize">
+                                    {precept.testament}
+                                  </Badge>
+                                </td>
+                                <td className="p-4">
+                                  <div className="flex flex-wrap gap-1">
+                                    {precept.topics?.slice(0, 2).map((topic) => (
+                                      <Badge key={topic} variant="outline" className="text-xs capitalize">
+                                        {topic.replace('-', ' ')}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          )}
                         </tbody>
                       </table>
                     </div>
