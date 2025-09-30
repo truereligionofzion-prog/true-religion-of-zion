@@ -1046,30 +1046,76 @@ const MitzvotApp = () => {
                   <CardHeader>
                     <CardTitle className="text-2xl">🧠 Test Your Knowledge</CardTitle>
                     <p className="text-gray-600">
-                      Challenge yourself with questions about the 613 mitzvot. Choose a category or test your overall knowledge!
+                      {contentType === 'mitzvot' 
+                        ? 'Challenge yourself with questions about the 613 mitzvot. Choose a category or test your overall knowledge!'
+                        : 'Test your understanding of biblical precepts. Choose a testament focus or test your comprehensive knowledge!'
+                      }
                     </p>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Button onClick={() => startQuiz('all')} className="h-16">
-                        <div className="text-center">
-                          <div className="font-semibold">All Categories</div>
-                          <div className="text-sm opacity-75">Mixed questions from all 613 mitzvot</div>
-                        </div>
-                      </Button>
-                      {categories.slice(0, 6).map((category) => (
-                        <Button
-                          key={category.id}
-                          variant="outline"
-                          onClick={() => startQuiz(category.slug)}
-                          className="h-16"
-                        >
-                          <div className="text-center">
-                            <div className="font-semibold">{category.name}</div>
-                            <div className="text-sm opacity-75">Focus on this category</div>
-                          </div>
-                        </Button>
-                      ))}
+                      {contentType === 'mitzvot' ? (
+                        <>
+                          <Button onClick={() => startQuiz('all')} className="h-16">
+                            <div className="text-center">
+                              <div className="font-semibold">All Categories</div>
+                              <div className="text-sm opacity-75">Mixed questions from all 613 mitzvot</div>
+                            </div>
+                          </Button>
+                          {categories.slice(0, 6).map((category) => (
+                            <Button
+                              key={category.id}
+                              variant="outline"
+                              onClick={() => startQuiz(category.slug)}
+                              className="h-16"
+                            >
+                              <div className="text-center">
+                                <div className="font-semibold">{category.name}</div>
+                                <div className="text-sm opacity-75">Focus on this category</div>
+                              </div>
+                            </Button>
+                          ))}
+                        </>
+                      ) : (
+                        <>
+                          <Button onClick={() => startPreceptsQuiz('all')} className="h-16">
+                            <div className="text-center">
+                              <div className="font-semibold">All Precepts</div>
+                              <div className="text-sm opacity-75">Mixed questions from all biblical precepts</div>
+                            </div>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => startPreceptsQuiz('old')}
+                            className="h-16"
+                          >
+                            <div className="text-center">
+                              <div className="font-semibold">Old Testament</div>
+                              <div className="text-sm opacity-75">Focus on Old Testament precepts</div>
+                            </div>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => startPreceptsQuiz('new')}
+                            className="h-16"
+                          >
+                            <div className="text-center">
+                              <div className="font-semibold">New Testament</div>
+                              <div className="text-sm opacity-75">Focus on New Testament precepts</div>
+                            </div>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => startPreceptsQuiz('mixed')}
+                            className="h-16"
+                          >
+                            <div className="text-center">
+                              <div className="font-semibold">Mixed Testament</div>
+                              <div className="text-sm opacity-75">Precepts spanning both testaments</div>
+                            </div>
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
