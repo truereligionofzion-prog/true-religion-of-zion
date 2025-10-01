@@ -423,7 +423,11 @@ async def get_bible_verses(
         seen_verses = set()
         unique_verses = []
         for verse in verses_data:
-            verse_key = (verse.get('book'), verse.get('chapter'), verse.get('verse'))
+            # Handle None values to prevent comparison errors
+            book = verse.get('book') or ''
+            chapter = verse.get('chapter') or 0
+            verse_num = verse.get('verse') or 0
+            verse_key = (book, chapter, verse_num)
             if verse_key not in seen_verses:
                 seen_verses.add(verse_key)
                 unique_verses.append(verse)
