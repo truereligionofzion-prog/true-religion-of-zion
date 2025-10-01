@@ -28,22 +28,22 @@ class ScholarlyDivineNameReplacer:
             # Handle compound forms FIRST (more specific patterns)
             # Based on Deuteronomy 6:4 ancient Hebrew: יְהוָה אֱלֹהֵינוּ יְהוָה אֶחָד
             
-            # YHWH + Elohim combinations - exact ancient manuscript patterns
+            # YHWH + Elohim combinations - use replacement_pairs for exact matching
             {
-                'english_forms': [
-                    r'\bthe\s+LORD\s+our\s+God\b',  # "the LORD our God" -> "YHWH our Elohim" 
-                    r'\bLORD\s+our\s+God\b',       # "LORD our God" -> "YHWH our Elohim"
-                    r'\bthe\s+LORD\s+thy\s+God\b', # "the LORD thy God" -> "YHWH thy Elohim"
-                    r'\bLORD\s+thy\s+God\b',       # "LORD thy God" -> "YHWH thy Elohim"
-                    r'\bthe\s+LORD\s+your\s+God\b',# "the LORD your God" -> "YHWH your Elohim"
-                    r'\bLORD\s+your\s+God\b',      # "LORD your God" -> "YHWH your Elohim"
-                    r'\bthe\s+LORD\s+my\s+God\b',  # "the LORD my God" -> "YHWH my Elohim"
-                    r'\bLORD\s+my\s+God\b',        # "LORD my God" -> "YHWH my Elohim"
-                    r'\bLORD\s+God\b',             # "LORD God" -> "YHWH Elohim"
-                    r'\bLord\s+GOD\b'              # "Lord GOD" -> "YHWH Elohim"
-                ],
-                'hebrew_original': 'YHWH Elohim',
-                'replacement': 'YHWH our Elohim'  # Follow Deuteronomy 6:4 pattern
+                'english_forms': [],  # Empty since we use replacement_pairs
+                'hebrew_original': 'YHWH Elohim combinations',
+                'replacement_pairs': [
+                    ('the LORD our God', 'YHWH our Elohim'),
+                    ('LORD our God', 'YHWH our Elohim'),
+                    ('the LORD thy God', 'YHWH thy Elohim'),
+                    ('LORD thy God', 'YHWH thy Elohim'),
+                    ('the LORD your God', 'YHWH your Elohim'),
+                    ('LORD your God', 'YHWH your Elohim'),
+                    ('the LORD my God', 'YHWH my Elohim'),
+                    ('LORD my God', 'YHWH my Elohim'),
+                    ('LORD God', 'YHWH Elohim'),
+                    ('Lord GOD', 'YHWH Elohim')
+                ]
             },
             
             # Remove "the" before YHWH (based on Hebrew - no definite article with YHWH)
