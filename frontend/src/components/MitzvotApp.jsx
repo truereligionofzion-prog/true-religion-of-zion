@@ -1770,7 +1770,9 @@ const MitzvotApp = () => {
                     <p className="text-gray-600">
                       {contentType === 'mitzvot' 
                         ? 'Use spaced repetition to master the mitzvot! The algorithm will show you cards when you need to review them.'
-                        : 'Use spaced repetition to master biblical precepts! Study key verses and topics with our adaptive learning system.'
+                        : contentType === 'precepts'
+                        ? 'Use spaced repetition to master biblical precepts! Study key verses and topics with our adaptive learning system.'
+                        : 'Use spaced repetition to master Bible knowledge! Study verses, books, and scriptural content with adaptive learning.'
                       }
                     </p>
                   </CardHeader>
