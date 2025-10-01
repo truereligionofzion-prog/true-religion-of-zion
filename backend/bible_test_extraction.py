@@ -22,6 +22,8 @@ class BibleExtractor:
         # Book mapping (from website analysis)
         self.book_mapping = {
             'Genesis': 60,
+            'Exodus': 61,
+            'Psalms': 78,  # Guessing Psalms ID
             'Tobit': 99,  # Apocrypha book for testing
         }
     
