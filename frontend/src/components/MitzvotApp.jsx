@@ -1580,63 +1580,97 @@ const MitzvotApp = () => {
               </TabsContent>
 
               <TabsContent value="reading" className="mt-6">
-                {contentType === 'bible' && (
-                  <Card>
-                    <CardContent className="p-6">
-                      <div className="space-y-6">
-                        {/* Book Navigation */}
-                        <div className="border-b pb-4">
-                          <h3 className="text-lg font-semibold mb-3">Books</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {filters.books && filters.books.slice(0, 10).map((book) => (
-                              <Button
-                                key={book}
-                                variant={selectedBook === book ? "default" : "outline"}
-                                size="sm"
-                                onClick={() => setSelectedBook(book)}
-                                className="text-xs"
-                              >
-                                {book}
-                              </Button>
+                {/* Book-style Bible Reading Interface */}
+                <div className="max-w-4xl mx-auto">
+                  
+                  {/* Book Navigation */}
+                  <div className="flex flex-wrap gap-2 mb-6 justify-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedBook('Genesis')}
+                      className={selectedBook === 'Genesis' ? 'bg-blue-100' : ''}
+                    >
+                      <BookOpen className="w-4 h-4 mr-2" />
+                      Genesis
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedBook('Tobit')}
+                      className={selectedBook === 'Tobit' ? 'bg-blue-100' : ''}
+                    >
+                      <BookOpen className="w-4 h-4 mr-2" />
+                      Tobit
+                    </Button>
+                  </div>
+
+                  {/* Reading Content - Grouped by Book and Chapter */}
+                  {(() => {
+                    // Group verses by book and chapter
+                    const groupedVerses = {};
+                    (bibleVerses || []).forEach(verse => {
+                      const bookChapter = `${verse.book}_${verse.chapter}`;
+                      if (!groupedVerses[bookChapter]) {
+                        groupedVerses[bookChapter] = {
+                          book: verse.book,
+                          chapter: verse.chapter,
+                          testament: verse.testament,
+                          verses: []
+                        };
+                      }
+                      
+                      // Avoid duplicate verses
+                      const existingVerse = groupedVerses[bookChapter].verses.find(v => v.verse === verse.verse);
+                      if (!existingVerse) {
+                        groupedVerses[bookChapter].verses.push(verse);
+                      }
+                    });
+
+                    // Sort verses within each chapter
+                    Object.values(groupedVerses).forEach(chapter => {
+                      chapter.verses.sort((a, b) => a.verse - b.verse);
+                    });
+
+                    return Object.values(groupedVerses).map((chapter) => (
+                      <Card key={`${chapter.book}_${chapter.chapter}`} className="p-8 bg-white shadow-sm border mb-8">
+                        <div className="prose prose-lg max-w-none">
+                          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center border-b pb-4">
+                            {chapter.book} {chapter.chapter}
+                            <span className="text-sm font-normal text-gray-600 ml-2">
+                              ({chapter.testament.charAt(0).toUpperCase() + chapter.testament.slice(1)} Testament)
+                            </span>
+                          </h2>
+                          
+                          {/* Verses in continuous reading format */}
+                          <div className="space-y-1 leading-relaxed text-gray-800">
+                            {chapter.verses.map((verse) => (
+                              <p key={`${chapter.book}_${chapter.chapter}_${verse.verse}`} className="text-base">
+                                <span className="font-bold text-blue-600 mr-2">{verse.verse}</span>
+                                <span className="text-gray-800">{verse.text}</span>
+                                {verse.has_precept && (
+                                  <span className="ml-2 inline-block">
+                                    <Badge variant="outline" className="text-xs text-green-700 border-green-300">
+                                      Precepts
+                                    </Badge>
+                                  </span>
+                                )}
+                              </p>
                             ))}
-                            {filters.books && filters.books.length > 10 && (
-                              <Button variant="outline" size="sm" className="text-xs">
-                                +{filters.books.length - 10} more
-                              </Button>
-                            )}
                           </div>
                         </div>
-
-                        {/* Reading Content */}
-                        <div className="prose prose-lg max-w-none">
-                          {selectedBook !== 'all' && (
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                              ## {selectedBook}
-                            </h2>
-                          )}
-                          
-                          {(bibleVerses || []).map((verse, index) => (
-                            <div key={verse.id} className="mb-4">
-                              <p className="text-base leading-relaxed text-gray-800">
-                                <span className="font-bold text-blue-600 mr-2">
-                                  {verse.verse}
-                                </span>
-                                {verse.text}
-                              </p>
-                            </div>
-                          ))}
-                          
-                          {bibleVerses.length === 0 && !loading && (
-                            <div className="text-center py-12 text-gray-500">
-                              <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                              <p>Select a book to begin reading, or use the search to find specific verses.</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                      </Card>
+                    ));
+                  })()}
+                  
+                  {(!bibleVerses || bibleVerses.length === 0) && (
+                    <div className="text-center py-12">
+                      <Card className="p-8">
+                        <p className="text-gray-500">No verses available. Please select a book or adjust your search filters.</p>
+                      </Card>
+                    </div>
+                  )}
+                </div>
               </TabsContent>
             </Tabs>
 
