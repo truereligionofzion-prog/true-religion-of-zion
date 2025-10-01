@@ -239,6 +239,13 @@ const MitzvotApp = () => {
     }
   }, [contentType]);
 
+  // Set initial view mode for Bible
+  useEffect(() => {
+    if (contentType === 'bible' && viewMode !== 'reading') {
+      setViewMode('reading');
+    }
+  }, []);
+
   const getCategoryName = (categorySlug) => {
     const category = categories.find(c => c.slug === categorySlug);
     return category ? category.name : categorySlug;
