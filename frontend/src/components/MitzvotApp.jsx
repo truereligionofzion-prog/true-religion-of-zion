@@ -1275,6 +1275,9 @@ const MitzvotApp = () => {
               <TabsList>
                 <TabsTrigger value="cards">Card View</TabsTrigger>
                 <TabsTrigger value="table">Table View</TabsTrigger>
+                {contentType === 'bible' && (
+                  <TabsTrigger value="reading">Reading View</TabsTrigger>
+                )}
               </TabsList>
 
               <TabsContent value="cards" className="mt-6">
