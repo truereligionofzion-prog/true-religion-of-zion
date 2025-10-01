@@ -1,0 +1,273 @@
+{
+  "total_books": 53,
+  "total_verses": 1375,
+  "book_mapping": {
+    "50": {
+      "name": "Ecclesiastes",
+      "verses": 18,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=50&page=0"
+    },
+    "51": {
+      "name": "Ecclesiasticus (Sirach)",
+      "verses": 30,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=51&page=0"
+    },
+    "52": {
+      "name": "Ephesians",
+      "verses": 23,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=52&page=0"
+    },
+    "53": {
+      "name": "Epistle of Jeremiah",
+      "verses": 73,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=53&page=0"
+    },
+    "54": {
+      "name": "Esther",
+      "verses": 22,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=54&page=0"
+    },
+    "55": {
+      "name": "Esther (Greek)",
+      "verses": 10,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=55&page=0"
+    },
+    "56": {
+      "name": "Exodus",
+      "verses": 22,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=56&page=0"
+    },
+    "57": {
+      "name": "Ezekiel",
+      "verses": 28,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=57&page=0"
+    },
+    "58": {
+      "name": "Ezra",
+      "verses": 11,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=58&page=0"
+    },
+    "59": {
+      "name": "Galatians",
+      "verses": 24,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=59&page=0"
+    },
+    "60": {
+      "name": "Genesis",
+      "verses": 31,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=60&page=0"
+    },
+    "61": {
+      "name": "Habakkuk",
+      "verses": 17,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=61&page=0"
+    },
+    "62": {
+      "name": "Haggai",
+      "verses": 15,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=62&page=0"
+    },
+    "63": {
+      "name": "Hebrews",
+      "verses": 14,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=63&page=0"
+    },
+    "64": {
+      "name": "Hosea",
+      "verses": 11,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=64&page=0"
+    },
+    "65": {
+      "name": "Isaiah",
+      "verses": 31,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=65&page=0"
+    },
+    "66": {
+      "name": "James",
+      "verses": 27,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=66&page=0"
+    },
+    "67": {
+      "name": "Jeremiah",
+      "verses": 19,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=67&page=0"
+    },
+    "68": {
+      "name": "Job",
+      "verses": 22,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=68&page=0"
+    },
+    "69": {
+      "name": "Joel",
+      "verses": 20,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=69&page=0"
+    },
+    "70": {
+      "name": "John",
+      "verses": 51,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=70&page=0"
+    },
+    "71": {
+      "name": "Jonah",
+      "verses": 17,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=71&page=0"
+    },
+    "72": {
+      "name": "Joshua",
+      "verses": 18,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=72&page=0"
+    },
+    "73": {
+      "name": "Jude",
+      "verses": 25,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=73&page=0"
+    },
+    "74": {
+      "name": "Judges",
+      "verses": 36,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=74&page=0"
+    },
+    "75": {
+      "name": "Judith",
+      "verses": 16,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=75&page=0"
+    },
+    "76": {
+      "name": "Lamentations",
+      "verses": 22,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=76&page=0"
+    },
+    "77": {
+      "name": "Leviticus",
+      "verses": 17,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=77&page=0"
+    },
+    "78": {
+      "name": "Luke",
+      "verses": 80,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=78&page=0"
+    },
+    "79": {
+      "name": "Malachi",
+      "verses": 14,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=79&page=0"
+    },
+    "80": {
+      "name": "Mark",
+      "verses": 45,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=80&page=0"
+    },
+    "81": {
+      "name": "Matthew",
+      "verses": 25,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=81&page=0"
+    },
+    "82": {
+      "name": "Micah",
+      "verses": 16,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=82&page=0"
+    },
+    "83": {
+      "name": "Nahum",
+      "verses": 15,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=83&page=0"
+    },
+    "84": {
+      "name": "Nehemiah",
+      "verses": 11,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=84&page=0"
+    },
+    "85": {
+      "name": "Numbers",
+      "verses": 54,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=85&page=0"
+    },
+    "86": {
+      "name": "Obadiah",
+      "verses": 21,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=86&page=0"
+    },
+    "87": {
+      "name": "Philemon",
+      "verses": 25,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=87&page=0"
+    },
+    "88": {
+      "name": "Philippians",
+      "verses": 30,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=88&page=0"
+    },
+    "89": {
+      "name": "Prayer of Azariah",
+      "verses": 68,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=89&page=0"
+    },
+    "90": {
+      "name": "Prayer of Manasseh",
+      "verses": 14,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=90&page=0"
+    },
+    "91": {
+      "name": "Proverbs",
+      "verses": 33,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=91&page=0"
+    },
+    "92": {
+      "name": "Psalms",
+      "verses": 6,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=92&page=0"
+    },
+    "93": {
+      "name": "Revelations",
+      "verses": 20,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=93&page=0"
+    },
+    "94": {
+      "name": "Romans",
+      "verses": 32,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=94&page=0"
+    },
+    "95": {
+      "name": "Ruth",
+      "verses": 22,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=95&page=0"
+    },
+    "96": {
+      "name": "Songs of Solomon",
+      "verses": 17,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=96&page=0"
+    },
+    "97": {
+      "name": "Susanna",
+      "verses": 64,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=97&page=0"
+    },
+    "98": {
+      "name": "Titus",
+      "verses": 16,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=98&page=0"
+    },
+    "99": {
+      "name": "Tobit",
+      "verses": 22,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=99&page=0"
+    },
+    "100": {
+      "name": "Wisdom of Solomon",
+      "verses": 16,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=100&page=0"
+    },
+    "101": {
+      "name": "Zechariah",
+      "verses": 21,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=101&page=0"
+    },
+    "102": {
+      "name": "Zephaniah",
+      "verses": 18,
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=102&page=0"
+    }
+  },
+  "id_ranges": [],
+  "ready_for_extraction": false
+}
