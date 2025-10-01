@@ -52,8 +52,8 @@ class ScholarlyDivineNameReplacer:
                 'hebrew_original': 'YHWH patterns',
                 'replacement_pairs': [
                     ('the LORD', 'YHWH'),
-                    # Keep Hebrew word order: "YHWH our Elohim, YHWH echad" = "YHWH our Elohim, YHWH is one"
-                    ('is one LORD', 'is one YHWH'),  # Actually this is correct based on Hebrew
+                    # Hebrew structure: "YHWH Eloheinu YHWH Echad" = "YHWH our Elohim, YHWH one"  
+                    ('YHWH our Elohim is one YHWH', 'YHWH our Elohim, YHWH is one'),  # Fix word order
                 ]
             },
             
