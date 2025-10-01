@@ -1384,7 +1384,7 @@ const MitzvotApp = () => {
                                 </td>
                               </tr>
                             ))
-                          ) : (
+                          ) : contentType === 'precepts' ? (
                             (precepts || []).map((precept) => (
                               <tr key={precept.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4 font-medium">{precept.title}</td>
@@ -1409,6 +1409,31 @@ const MitzvotApp = () => {
                                       </Badge>
                                     ))}
                                   </div>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            (bibleVerses || []).map((verse) => (
+                              <tr key={verse.id} className="border-b hover:bg-gray-50">
+                                <td className="p-4 font-medium text-green-700">
+                                  {verse.book} {verse.chapter}:{verse.verse}
+                                </td>
+                                <td className="p-4 text-sm text-gray-600 italic">
+                                  "{verse.text?.substring(0, 100)}..."
+                                </td>
+                                <td className="p-4">
+                                  <Badge variant="secondary" className="capitalize">
+                                    {verse.testament}
+                                  </Badge>
+                                </td>
+                                <td className="p-4">
+                                  {verse.has_precept ? (
+                                    <Badge variant="outline" className="text-green-700 border-green-300">
+                                      Has Precepts
+                                    </Badge>
+                                  ) : (
+                                    <span className="text-xs text-gray-400">None</span>
+                                  )}
                                 </td>
                               </tr>
                             ))
