@@ -1490,7 +1490,7 @@ const MitzvotApp = () => {
                             </Button>
                           ))}
                         </>
-                      ) : (
+                      ) : contentType === 'precepts' ? (
                         <>
                           <Button onClick={() => startPreceptsQuiz('all')} className="h-16">
                             <div className="text-center">
@@ -1526,6 +1526,45 @@ const MitzvotApp = () => {
                             <div className="text-center">
                               <div className="font-semibold">Mixed Testament</div>
                               <div className="text-sm opacity-75">Precepts spanning both testaments</div>
+                            </div>
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button onClick={() => startBibleQuiz('all')} className="h-16">
+                            <div className="text-center">
+                              <div className="font-semibold">All Books</div>
+                              <div className="text-sm opacity-75">Questions from all 80 books of the Bible</div>
+                            </div>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => startBibleQuiz('old')}
+                            className="h-16"
+                          >
+                            <div className="text-center">
+                              <div className="font-semibold">Old Testament</div>
+                              <div className="text-sm opacity-75">Focus on Old Testament books</div>
+                            </div>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => startBibleQuiz('new')}
+                            className="h-16"
+                          >
+                            <div className="text-center">
+                              <div className="font-semibold">New Testament</div>
+                              <div className="text-sm opacity-75">Focus on New Testament books</div>
+                            </div>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => startBibleQuiz('apocrypha')}
+                            className="h-16"
+                          >
+                            <div className="text-center">
+                              <div className="font-semibold">Apocrypha</div>
+                              <div className="text-sm opacity-75">Focus on Apocryphal books</div>
                             </div>
                           </Button>
                         </>
