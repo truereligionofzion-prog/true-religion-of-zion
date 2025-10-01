@@ -121,27 +121,45 @@ class ScholarlyDivineNameReplacer:
             # Skip Elohim preservation if requested
             if preserve_elohim and pattern_group.get('preserve', False):
                 continue
-                
-            for english_pattern in pattern_group['english_forms']:
-                matches = re.findall(english_pattern, processed_text)
-                if matches:
-                    count = len(matches)
-                    hebrew_original = pattern_group['hebrew_original']
-                    replacement = pattern_group['replacement']
-                    
-                    # Apply replacement
-                    processed_text = re.sub(english_pattern, replacement, processed_text)
-                    
-                    # Track statistics
-                    if hebrew_original not in replacements:
-                        replacements[hebrew_original] = {
-                            'count': 0,
-                            'replacement': replacement,
-                            'english_forms': []
-                        }
-                    
-                    replacements[hebrew_original]['count'] += count
-                    replacements[hebrew_original]['english_forms'].extend(matches)
+            
+            # Handle replacement pairs (for possessive forms)
+            if 'replacement_pairs' in pattern_group:
+                for find_str, replace_str in pattern_group['replacement_pairs']:
+                    if find_str in processed_text:
+                        processed_text = processed_text.replace(find_str, replace_str)
+                        
+                        hebrew_original = pattern_group['hebrew_original']
+                        if hebrew_original not in replacements:
+                            replacements[hebrew_original] = {
+                                'count': 0,
+                                'replacement': replace_str,
+                                'english_forms': []
+                            }
+                        replacements[hebrew_original]['count'] += 1
+                        replacements[hebrew_original]['english_forms'].append(find_str)
+            
+            # Handle regular pattern replacements
+            elif 'replacement' in pattern_group:
+                for english_pattern in pattern_group['english_forms']:
+                    matches = re.findall(english_pattern, processed_text)
+                    if matches:
+                        count = len(matches)
+                        hebrew_original = pattern_group['hebrew_original']
+                        replacement = pattern_group['replacement']
+                        
+                        # Apply replacement
+                        processed_text = re.sub(english_pattern, replacement, processed_text)
+                        
+                        # Track statistics
+                        if hebrew_original not in replacements:
+                            replacements[hebrew_original] = {
+                                'count': 0,
+                                'replacement': replacement,
+                                'english_forms': []
+                            }
+                        
+                        replacements[hebrew_original]['count'] += count
+                        replacements[hebrew_original]['english_forms'].extend(matches)
         
         total_replacements = sum(r['count'] for r in replacements.values())
         
