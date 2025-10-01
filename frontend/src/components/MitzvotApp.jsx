@@ -1949,6 +1949,61 @@ const MitzvotApp = () => {
 
             {/* Pagination */}
             <Pagination />
+
+            {/* Phase 3C: Cross-References Panel */}
+            {showCrossReferences && crossReferences.length > 0 && (
+              <div className="mt-8">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        🔗 Cross-References 
+                        <Badge variant="secondary">{crossReferences.length}</Badge>
+                      </CardTitle>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setShowCrossReferences(false)}
+                      >
+                        ✕ Close
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {crossReferences.map((crossRef, index) => (
+                        <div key={index} className="border-l-4 border-green-500 pl-4 py-2">
+                          <div className="flex items-start justify-between mb-2">
+                            <h4 className="font-semibold text-green-700">
+                              📖 {crossRef.bible_verse.book} {crossRef.bible_verse.chapter}:{crossRef.bible_verse.verse}
+                            </h4>
+                            <Badge variant="outline" className="ml-2">
+                              {crossRef.connection_count} connection{crossRef.connection_count !== 1 ? 's' : ''}
+                            </Badge>
+                          </div>
+                          
+                          <blockquote className="italic text-gray-700 mb-3 bg-gray-50 p-3 rounded">
+                            "{highlightDivineNames(crossRef.bible_verse.text)}"
+                          </blockquote>
+                          
+                          <div className="space-y-2">
+                            <p className="text-sm font-medium text-gray-600">Related Precepts:</p>
+                            {crossRef.related_precepts.map((precept, pIndex) => (
+                              <div key={pIndex} className="bg-purple-50 p-2 rounded border border-purple-200">
+                                <p className="font-medium text-purple-800">{precept.title}</p>
+                                <p className="text-xs text-purple-600">
+                                  Topic: {precept.topic} • {precept.verse_count} verse{precept.verse_count !== 1 ? 's' : ''}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </TabsContent>
 
           {/* Quiz Tab Content */}
