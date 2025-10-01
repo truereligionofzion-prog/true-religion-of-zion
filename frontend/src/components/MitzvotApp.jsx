@@ -230,6 +230,15 @@ const MitzvotApp = () => {
     setCurrentPage(1);
   }, [selectedCategory, selectedBook]);
 
+  // Set default view mode based on content type
+  useEffect(() => {
+    if (contentType === 'bible') {
+      setViewMode('reading');
+    } else {
+      setViewMode('cards');
+    }
+  }, [contentType]);
+
   const getCategoryName = (categorySlug) => {
     const category = categories.find(c => c.slug === categorySlug);
     return category ? category.name : categorySlug;
