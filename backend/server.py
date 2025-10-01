@@ -561,6 +561,275 @@ async def get_bible_stats():
         logger.error(f"Error getting bible stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== PHASE 3C: ADVANCED BIBLE ENHANCEMENTS =====
+
+@api_router.get("/bible/search/advanced")
+async def advanced_bible_search(
+    search_text: Optional[str] = Query(None, description="Text to search for"),
+    books: Optional[str] = Query(None, description="Comma-separated list of books"),
+    testament: Optional[str] = Query(None, description="Filter by testament: old, new, apocrypha"),
+    chapters: Optional[str] = Query(None, description="Chapter range (e.g., '1-5' or '1,3,5')"),
+    has_precept: Optional[bool] = Query(None, description="Filter verses with precept connections"),
+    divine_names: Optional[bool] = Query(None, description="Filter verses with divine names (YHWH, Elohim, YHUH)"),
+    exact_match: Optional[bool] = Query(False, description="Use exact phrase matching"),
+    page: int = Query(1, ge=1, description="Page number"),
+    limit: int = Query(20, ge=1, le=100, description="Items per page")
+):
+    """Advanced search with multiple filters and divine name highlighting"""
+    try:
+        # Build advanced query
+        query = {}
+        
+        # Text search with exact/fuzzy matching
+        if search_text:
+            if exact_match:
+                query["text"] = {"$regex": f"\\b{re.escape(search_text)}\\b", "$options": "i"}
+            else:
+                # Split search terms and search for any
+                terms = search_text.split()
+                term_queries = [{"text": {"$regex": term, "$options": "i"}} for term in terms]
+                query["$or"] = term_queries
+        
+        # Books filter
+        if books:
+            book_list = [book.strip() for book in books.split(",")]
+            query["book"] = {"$in": book_list}
+        
+        # Testament filter
+        if testament and testament != "all":
+            query["testament"] = testament
+        
+        # Precept filter
+        if has_precept is not None:
+            query["has_precept"] = has_precept
+        
+        # Divine names filter
+        if divine_names:
+            divine_name_query = {
+                "$or": [
+                    {"text": {"$regex": "YHWH", "$options": "i"}},
+                    {"text": {"$regex": "Elohim", "$options": "i"}}, 
+                    {"text": {"$regex": "YHUH", "$options": "i"}}
+                ]
+            }
+            if "$or" in query:
+                query = {"$and": [query, divine_name_query]}
+            else:
+                query.update(divine_name_query)
+        
+        # Get total count
+        total = await bible_verses_collection.count_documents(query)
+        
+        # Pagination
+        skip = (page - 1) * limit
+        total_pages = math.ceil(total / limit)
+        
+        # Get results with sorting
+        cursor = bible_verses_collection.find(query).sort([("book", 1), ("chapter", 1), ("verse", 1)]).skip(skip).limit(limit)
+        verses_data = await cursor.to_list(length=limit)
+        
+        # Clean and enhance results
+        enhanced_verses = []
+        for verse in verses_data:
+            if '_id' in verse:
+                del verse['_id']
+            
+            # Add divine name highlighting info
+            verse_text = verse.get('text', '')
+            verse['divine_names'] = {
+                'has_yhwh': 'YHWH' in verse_text,
+                'has_elohim': 'Elohim' in verse_text,
+                'has_yhuh': 'YHUH' in verse_text
+            }
+            
+            enhanced_verses.append(verse)
+        
+        # Get search statistics
+        search_stats = {
+            'total_matches': total,
+            'books_matched': len(await bible_verses_collection.distinct("book", query)),
+            'testaments_matched': len(await bible_verses_collection.distinct("testament", query))
+        }
+        
+        return {
+            "verses": enhanced_verses,
+            "total": total,
+            "page": page,
+            "totalPages": total_pages,
+            "searchStats": search_stats,
+            "query_info": {
+                "search_text": search_text,
+                "exact_match": exact_match,
+                "books_filter": books,
+                "testament_filter": testament,
+                "divine_names_filter": divine_names
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in advanced bible search: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/bible/cross-references")
+async def get_cross_references(
+    book: Optional[str] = Query(None, description="Book name"),
+    chapter: Optional[int] = Query(None, description="Chapter number"),
+    verse: Optional[int] = Query(None, description="Verse number")
+):
+    """Get cross-references between Bible verses and precepts"""
+    try:
+        # Build query for Bible verse
+        bible_query = {}
+        if book:
+            bible_query["book"] = book
+        if chapter:
+            bible_query["chapter"] = chapter
+        if verse:
+            bible_query["verse"] = verse
+        
+        # Add precept filter
+        bible_query["has_precept"] = True
+        
+        # Get Bible verses with precept connections
+        bible_verses = await bible_verses_collection.find(bible_query).sort([("book", 1), ("chapter", 1), ("verse", 1)]).to_list(length=100)
+        
+        cross_references = []
+        for bible_verse in bible_verses:
+            # Find related precepts by searching for this verse reference
+            verse_ref = f"{bible_verse['book']} {bible_verse['chapter']}:{bible_verse['verse']}"
+            
+            # Search precepts that reference this verse
+            precept_query = {
+                "verses.book": bible_verse['book'],
+                "verses.chapter": bible_verse['chapter'], 
+                "verses.verse": bible_verse['verse']
+            }
+            
+            related_precepts = await precepts_collection.find(precept_query).to_list(length=10)
+            
+            if related_precepts:
+                # Clean precepts data
+                clean_precepts = []
+                for precept in related_precepts:
+                    if '_id' in precept:
+                        del precept['_id']
+                    clean_precepts.append({
+                        'title': precept.get('title'),
+                        'topic': precept.get('topic'), 
+                        'verse_count': len(precept.get('verses', []))
+                    })
+                
+                # Clean Bible verse data
+                if '_id' in bible_verse:
+                    del bible_verse['_id']
+                
+                cross_references.append({
+                    'bible_verse': bible_verse,
+                    'related_precepts': clean_precepts,
+                    'connection_count': len(clean_precepts)
+                })
+        
+        return {
+            "cross_references": cross_references,
+            "total_connections": len(cross_references),
+            "search_criteria": {
+                "book": book,
+                "chapter": chapter,
+                "verse": verse
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting cross references: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/bible/divine-names/search")
+async def search_divine_names(
+    divine_name: Optional[str] = Query(None, description="Specific divine name: YHWH, Elohim, YHUH"),
+    book: Optional[str] = Query(None, description="Filter by book"),
+    testament: Optional[str] = Query(None, description="Filter by testament"),
+    page: int = Query(1, ge=1, description="Page number"),
+    limit: int = Query(50, ge=1, le=100, description="Items per page")
+):
+    """Search specifically for divine names with statistics"""
+    try:
+        # Build divine name query
+        query = {}
+        
+        if divine_name:
+            query["text"] = {"$regex": divine_name, "$options": "i"}
+        else:
+            # Search for any divine name
+            query["$or"] = [
+                {"text": {"$regex": "YHWH", "$options": "i"}},
+                {"text": {"$regex": "Elohim", "$options": "i"}},
+                {"text": {"$regex": "YHUH", "$options": "i"}}
+            ]
+        
+        # Additional filters
+        if book:
+            query["book"] = book
+        if testament and testament != "all":
+            query["testament"] = testament
+        
+        # Get results with pagination
+        total = await bible_verses_collection.count_documents(query)
+        skip = (page - 1) * limit
+        total_pages = math.ceil(total / limit)
+        
+        cursor = bible_verses_collection.find(query).sort([("book", 1), ("chapter", 1), ("verse", 1)]).skip(skip).limit(limit)
+        verses_data = await cursor.to_list(length=limit)
+        
+        # Analyze divine name occurrences
+        divine_name_stats = {
+            'yhwh_count': 0,
+            'elohim_count': 0,
+            'yhuh_count': 0,
+            'total_verses': len(verses_data)
+        }
+        
+        enhanced_verses = []
+        for verse in verses_data:
+            if '_id' in verse:
+                del verse['_id']
+            
+            # Count divine names in this verse
+            verse_text = verse.get('text', '')
+            yhwh_in_verse = verse_text.count('YHWH')
+            elohim_in_verse = verse_text.count('Elohim') 
+            yhuh_in_verse = verse_text.count('YHUH')
+            
+            divine_name_stats['yhwh_count'] += yhwh_in_verse
+            divine_name_stats['elohim_count'] += elohim_in_verse
+            divine_name_stats['yhuh_count'] += yhuh_in_verse
+            
+            # Add divine name info to verse
+            verse['divine_name_analysis'] = {
+                'yhwh_count': yhwh_in_verse,
+                'elohim_count': elohim_in_verse,
+                'yhuh_count': yhuh_in_verse,
+                'total_divine_names': yhwh_in_verse + elohim_in_verse + yhuh_in_verse
+            }
+            
+            enhanced_verses.append(verse)
+        
+        return {
+            "verses": enhanced_verses,
+            "total": total,
+            "page": page,
+            "totalPages": total_pages,
+            "divine_name_statistics": divine_name_stats,
+            "search_info": {
+                "divine_name_filter": divine_name,
+                "book_filter": book,
+                "testament_filter": testament
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error searching divine names: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/mitzvah-of-the-day", response_model=Mitzvah)
 async def get_mitzvah_of_the_day():
     """Get the daily featured mitzvah"""
