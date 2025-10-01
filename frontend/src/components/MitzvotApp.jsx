@@ -48,6 +48,20 @@ const MitzvotApp = () => {
   const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
   const [showFlashcardAnswer, setShowFlashcardAnswer] = useState(false);
   
+  // Phase 3C: Advanced search and enhancements
+  const [advancedSearchOpen, setAdvancedSearchOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState({
+    books: '',
+    testament: 'all',
+    chapters: '',
+    hasPrecept: null,
+    divineNames: false,
+    exactMatch: false
+  });
+  const [crossReferences, setCrossReferences] = useState([]);
+  const [showCrossReferences, setShowCrossReferences] = useState(false);
+  const [divineNameHighlight, setDivineNameHighlight] = useState(true);
+  
   // Authentication UI state
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
