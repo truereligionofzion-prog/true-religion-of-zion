@@ -99,48 +99,39 @@ class BibleExtractor:
         """Extract all verses from the chapter page"""
         verses = []
         
-        # Look for the actual chapter heading (e.g., "## Genesis 1")
-        chapter_heading = soup.find(['h1', 'h2', 'h3'], string=re.compile(r'^\w+\s+\d+$'))
+        # Find all verse elements using the specific HTML structure
+        verse_divs = soup.find_all('div', class_='verse') + soup.find_all('div', class_='verse has-precept')
         
-        if not chapter_heading:
-            print("Warning: Could not find chapter heading")
+        if not verse_divs:
+            print("Warning: No verse divs found")
             return verses
         
-        # Get text content starting from after the chapter heading
-        content_start = chapter_heading.parent
-        
-        # Extract all text after the chapter heading
-        full_text = ""
-        for element in content_start.find_all_next(text=True):
-            parent = element.parent
-            # Stop at contact info or navigation elements
-            if parent.name in ['a'] and 'mailto:' in str(element):
-                break
-            if 'contact' in str(element).lower() or 'support' in str(element).lower():
-                break
-            full_text += str(element) + " "
-        
-        # Parse verses using regex - looking for number followed by verse text
-        verse_pattern = r'(\d+)([A-Z][^0-9]+?)(?=\d+[A-Z]|\Z)'
-        matches = re.findall(verse_pattern, full_text, re.DOTALL)
-        
-        for match in matches:
-            verse_num_str, verse_text = match
-            verse_num = int(verse_num_str)
+        for verse_div in verse_divs:
+            try:
+                # Extract verse number
+                verse_num_span = verse_div.find('span', class_='verse-number')
+                verse_text_span = verse_div.find('span', class_='verse-text')
+                
+                if verse_num_span and verse_text_span:
+                    verse_num = int(verse_num_span.get_text().strip())
+                    verse_text = verse_text_span.get_text().strip()
+                    
+                    # Clean up the text
+                    verse_text = re.sub(r'\s+', ' ', verse_text)
+                    
+                    if verse_text:
+                        verses.append({
+                            'verse': verse_num,
+                            'text': verse_text,
+                            'has_precept': 'has-precept' in verse_div.get('class', [])
+                        })
             
-            # Clean up the text
-            verse_text = re.sub(r'\s+', ' ', verse_text.strip())
-            
-            # Skip if it's too short or contains navigation words
-            nav_words = ['VERSES', 'CHAPTERS', 'Book', 'Contact', 'Support', 'mailto']
-            if any(word in verse_text for word in nav_words):
+            except (ValueError, AttributeError) as e:
+                print(f"Warning: Error parsing verse div: {e}")
                 continue
-            
-            if len(verse_text) > 10:  # Minimum meaningful verse length
-                verses.append({
-                    'verse': verse_num,
-                    'text': verse_text
-                })
+        
+        # Sort verses by number to ensure proper order
+        verses.sort(key=lambda x: x['verse'])
         
         return verses
     
