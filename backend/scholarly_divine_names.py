@@ -25,9 +25,19 @@ class ScholarlyDivineNameReplacer:
         
         # Primary divine names from ancient Hebrew
         self.divine_patterns = [
-            # Handle compound forms FIRST (more specific patterns)
-            # Based on Deuteronomy 6:4 ancient Hebrew: יְהוָה אֱלֹהֵינוּ יְהוָה אֶחָד
+            # MOST SPECIFIC FIRST: Deuteronomy 6:4 (Shema) exact pattern
+            # Hebrew: שְׁמַע יִשְׂרָאֵל יְהוָה אֱלֹהֵינוּ יְהוָה אֶחָד
+            {
+                'english_forms': [],  
+                'hebrew_original': 'Shema (Deuteronomy 6:4)',
+                'replacement_pairs': [
+                    ('The LORD our God is one LORD', 'YHWH our Elohim, YHWH is one'),
+                    ('the LORD our God is one LORD', 'YHWH our Elohim, YHWH is one'),
+                    ('LORD our God is one LORD', 'YHWH our Elohim, YHWH is one'),
+                ]
+            },
             
+            # Handle compound forms SECOND (more specific patterns)
             # YHWH + Elohim combinations - use replacement_pairs for exact matching
             {
                 'english_forms': [],  # Empty since we use replacement_pairs
