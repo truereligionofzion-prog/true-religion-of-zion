@@ -1418,19 +1418,29 @@ const MitzvotApp = () => {
                               ? 'bg-green-100 border border-green-300'
                               : 'bg-red-100 border border-red-300'
                           }`}>
-                            <p className={`font-semibold ${
-                              selectedAnswer === (quizData.questions[currentQuestionIndex].correct_answer || quizData.questions[currentQuestionIndex].correctAnswer)
-                                ? 'text-green-800'
-                                : 'text-red-800'
-                            }`}>
-                              {selectedAnswer === (quizData.questions[currentQuestionIndex].correct_answer || quizData.questions[currentQuestionIndex].correctAnswer)
-                                ? '✅ Correct!'
-                                : '❌ Incorrect'
-                              }
-                            </p>
-                            <p className="text-sm mt-2 text-gray-700">
-                              {quizData.questions[currentQuestionIndex].explanation}
-                            </p>
+                            <div className="flex items-center gap-2 mb-2">
+                              {selectedAnswer === (quizData.questions[currentQuestionIndex].correct_answer || quizData.questions[currentQuestionIndex].correctAnswer) ? (
+                                <>
+                                  <span className="text-green-600">✅</span>
+                                  <span className="font-semibold text-green-800">Correct!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-red-600">❌</span>
+                                  <span className="font-semibold text-red-800">Incorrect</span>
+                                </>
+                              )}
+                            </div>
+                            {selectedAnswer !== (quizData.questions[currentQuestionIndex].correct_answer || quizData.questions[currentQuestionIndex].correctAnswer) && (
+                              <p className="text-sm text-gray-700">
+                                The correct answer is: <strong>{quizData.questions[currentQuestionIndex].correct_answer || quizData.questions[currentQuestionIndex].correctAnswer}</strong>
+                              </p>
+                            )}
+                            {(quizData.questions[currentQuestionIndex].explanation) && (
+                              <p className="text-sm mt-2 text-gray-600 italic">
+                                {quizData.questions[currentQuestionIndex].explanation}
+                              </p>
+                            )}
                           </div>
                         )}
 
