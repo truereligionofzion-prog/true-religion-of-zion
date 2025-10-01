@@ -121,10 +121,11 @@ class ScholarlyDivineNameReplacer:
             if preserve_elohim and pattern_group.get('preserve', False):
                 continue
             
-            # Handle replacement pairs (for possessive forms)
+            # Handle replacement pairs FIRST (more specific patterns)
             if 'replacement_pairs' in pattern_group:
                 for find_str, replace_str in pattern_group['replacement_pairs']:
                     if find_str in processed_text:
+                        count = processed_text.count(find_str)
                         processed_text = processed_text.replace(find_str, replace_str)
                         
                         hebrew_original = pattern_group['hebrew_original']
@@ -134,8 +135,8 @@ class ScholarlyDivineNameReplacer:
                                 'replacement': replace_str,
                                 'english_forms': []
                             }
-                        replacements[hebrew_original]['count'] += 1
-                        replacements[hebrew_original]['english_forms'].append(find_str)
+                        replacements[hebrew_original]['count'] += count
+                        replacements[hebrew_original]['english_forms'].extend([find_str] * count)
             
             # Handle regular pattern replacements
             elif 'replacement' in pattern_group:
