@@ -25,45 +25,66 @@ class ScholarlyDivineNameReplacer:
         
         # Primary divine names from ancient Hebrew
         self.divine_patterns = [
-            # YHWH (Tetragrammaton) - appears 6,500+ times in Hebrew Bible
-            # English translations typically use "LORD" (all caps) to represent YHWH
+            # Handle compound forms FIRST (more specific patterns)
+            # Based on Deuteronomy 6:4 ancient Hebrew: יְהוָה אֱלֹהֵינוּ יְהוָה אֶחָד
+            
+            # YHWH + Elohim combinations - exact ancient manuscript patterns
+            {
+                'english_forms': [
+                    r'\bthe\s+LORD\s+our\s+God\b',  # "the LORD our God" -> "YHWH our Elohim" 
+                    r'\bLORD\s+our\s+God\b',       # "LORD our God" -> "YHWH our Elohim"
+                    r'\bthe\s+LORD\s+thy\s+God\b', # "the LORD thy God" -> "YHWH thy Elohim"
+                    r'\bLORD\s+thy\s+God\b',       # "LORD thy God" -> "YHWH thy Elohim"
+                    r'\bthe\s+LORD\s+your\s+God\b',# "the LORD your God" -> "YHWH your Elohim"
+                    r'\bLORD\s+your\s+God\b',      # "LORD your God" -> "YHWH your Elohim"
+                    r'\bthe\s+LORD\s+my\s+God\b',  # "the LORD my God" -> "YHWH my Elohim"
+                    r'\bLORD\s+my\s+God\b',        # "LORD my God" -> "YHWH my Elohim"
+                    r'\bLORD\s+God\b',             # "LORD God" -> "YHWH Elohim"
+                    r'\bLord\s+GOD\b'              # "Lord GOD" -> "YHWH Elohim"
+                ],
+                'hebrew_original': 'YHWH Elohim',
+                'replacement': 'YHWH our Elohim'  # Follow Deuteronomy 6:4 pattern
+            },
+            
+            # Remove "the" before YHWH (based on Hebrew - no definite article with YHWH)
+            {
+                'english_forms': [r'\bthe\s+LORD\b'],
+                'hebrew_original': 'YHWH',
+                'replacement': 'YHWH'  # Remove definite article
+            },
+            
+            # YHWH (Tetragrammaton) - standalone occurrences
             {
                 'english_forms': [r'\bLORD\b'],
                 'hebrew_original': 'YHWH',
                 'scholarly_pronunciation': 'Yahweh',
-                'replacement': 'YHWH'  # Use the actual Hebrew letters in English
+                'replacement': 'YHWH'
             },
             
-            # YHWH + Elohim combinations (compound names)
+            # Adonai (my Lord) - reverence substitute for YHWH
+            {
+                'english_forms': [r'\bLord\b(?!\s+(?:God|GOD|thy|your|our|my))'],
+                'hebrew_original': 'Adonai', 
+                'replacement': 'YHUH'
+            },
+            
+            # Elohim (God/Gods) - plural of majesty, but preserve possessive forms
             {
                 'english_forms': [
-                    r'\bLORD\s+God\b',
-                    r'\bLord\s+GOD\b', 
-                    r'\bthe\s+LORD\s+God\b',
-                    r'\bLORD\s+thy\s+God\b',
-                    r'\bLORD\s+your\s+God\b',
-                    r'\bLORD\s+our\s+God\b'
+                    r'\bour\s+God\b',   # "our God" -> "our Elohim"
+                    r'\bthy\s+God\b',   # "thy God" -> "thy Elohim" 
+                    r'\byour\s+God\b',  # "your God" -> "your Elohim"
+                    r'\bmy\s+God\b',    # "my God" -> "my Elohim"
                 ],
-                'hebrew_original': 'YHWH Elohim',
-                'replacement': 'YHWH Elohim'
+                'hebrew_original': 'Elohim with possessive',
+                'replacement': lambda m: m.group(0).replace('God', 'Elohim')
             },
             
-            # Adonai (my Lord) - reverence substitute for YHWH since 2nd century BCE
-            # Some English translations use "Lord" (title case) for Adonai
-            {
-                'english_forms': [r'\bLord\b(?!\s+(?:God|GOD))'],
-                'hebrew_original': 'Adonai', 
-                'scholarly_note': 'Reverence substitute for YHWH',
-                'replacement': 'YHUH'  # Alternative rendering respecting the substitute tradition
-            },
-            
-            # Elohim (God/Gods) - plural of majesty
-            # Replace "God" with "Elohim" to show the Hebrew name
+            # Standalone Elohim
             {
                 'english_forms': [r'\bGod\b'],
                 'hebrew_original': 'Elohim',
-                'replacement': 'Elohim',  # Show the actual Hebrew name
-                'preserve': False  # We want to replace this
+                'replacement': 'Elohim'
             },
             
             # El (God/Mighty One) - singular form
@@ -71,13 +92,6 @@ class ScholarlyDivineNameReplacer:
                 'english_forms': [r'\bGOD\b(?!\s+(?:of|Lord))'],
                 'hebrew_original': 'El',
                 'replacement': 'El'
-            },
-            
-            # Shortened forms in names and expressions
-            {
-                'english_forms': [r'\b(Hallelu)jah\b', r'\b([A-Z][a-z]*i)ah\b'],
-                'hebrew_original': 'Yah (shortened YHWH)',
-                'replacement': r'\1YAH'  # Preserve the Yah ending in names like Elijah -> EliYAH
             }
         ]
     
