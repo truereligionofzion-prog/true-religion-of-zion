@@ -46,13 +46,14 @@ class ScholarlyDivineNameReplacer:
                 ]
             },
             
-            # Handle remaining "the LORD" cases and specific Shema pattern
+            # Handle remaining "the LORD" cases and preserve Hebrew word order
             {
-                'english_forms': [],  # Empty since we use replacement_pairs
+                'english_forms': [],  # Empty since we use replacement_pairs  
                 'hebrew_original': 'YHWH patterns',
                 'replacement_pairs': [
                     ('the LORD', 'YHWH'),
-                    ('is one LORD', 'is one'),  # Based on Hebrew אֶחָד (echad) - just "one"
+                    # Keep Hebrew word order: "YHWH our Elohim, YHWH echad" = "YHWH our Elohim, YHWH is one"
+                    ('is one LORD', 'is one YHWH'),  # Actually this is correct based on Hebrew
                 ]
             },
             
