@@ -295,38 +295,19 @@ class PreceptsProcessor:
         return precepts
     
     def _apply_divine_name_replacements(self, text: str) -> str:
-        """Apply accurate divine name replacements based on Hebrew source"""
+        """
+        Apply scholarly divine name replacements based on ancient Hebrew manuscripts
+        (Dead Sea Scrolls, Masoretic Text) and biblical textual criticism
+        """
         if not text:
             return text
             
-        # Based on Hebrew source and biblical accuracy:
-        # - "LORD" (all caps) = YHWH (Tetragrammaton) 
-        # - "God" = Elohim (should remain as "God")
-        # - "Lord God" = YHWH Elohim (combination)
-        # - "Lord" (title case) = Adonai -> YHUH
+        from scholarly_divine_names import ScholarlyDivineNameReplacer
         
-        replacements = [
-            # Handle "Lord God" combination first (YHWH Elohim)
-            (r'\bLord\s+God\b', 'YHWH Elohim'),
-            (r'\bLord\s+thy\s+God\b', 'YHWH thy Elohim'),
-            (r'\bLord\s+your\s+God\b', 'YHWH your Elohim'),
-            (r'\bLord\s+our\s+God\b', 'YHWH our Elohim'),
-            (r'\bthe\s+Lord\s+God\b', 'YHWH Elohim'),
-            (r'\bLord\s+my\s+God\b', 'YHWH my Elohim'),
-            
-            # Handle standalone "LORD" (all caps - Tetragrammaton)  
-            (r'\bLORD\b', 'YHWH'),
-            
-            # Handle "Lord" (title case - Adonai)
-            (r'\bLord\b(?!\s+(?:God|thy|your|our|my))', 'YHUH'),
-            
-            # Keep "God" as is - it represents Elohim correctly
-            # No replacement for standalone "God"
-        ]
+        replacer = ScholarlyDivineNameReplacer()
+        result = replacer.apply_replacements(text, preserve_elohim=True)
         
-        result = text
-        for pattern, replacement in replacements:
-            result = re.sub(pattern, replacement, result, flags=re.IGNORECASE)
+        return result['text']
             
         return result
 
