@@ -26,12 +26,25 @@ class BibleExtractor:
         }
     
     def apply_divine_name_replacements(self, text: str) -> str:
-        """Apply YHWH/YHUH divine name replacements like in precepts"""
-        # Replace common divine name references
+        """Apply accurate divine name replacements based on Hebrew source"""
+        # Based on Hebrew source and thepreceptbible.com analysis:
+        # - "LORD" (all caps) = YHWH (Tetragrammaton)
+        # - "God" = Elohim (should remain as "God" - represents Elohim in Hebrew)
+        # - "Lord God" = YHWH Elohim (combination)
+        # - "Lord" (title case) = Adonai -> YHUH
+        
         replacements = {
-            r'\bLORD\b': 'YHWH',  # All caps LORD -> YHWH
-            r'\bGod\b': 'YHWH',   # Some God references -> YHWH
-            r'\bLord\b': 'YHUH',  # Mixed case Lord -> YHUH
+            # Handle "Lord God" combination first (YHWH Elohim)
+            r'\bLord God\b': 'YHWH Elohim',
+            
+            # Handle standalone "LORD" (all caps - Tetragrammaton)
+            r'\bLORD\b': 'YHWH',
+            
+            # Handle "Lord" (title case - Adonai)
+            r'\bLord\b': 'YHUH',
+            
+            # Keep "God" as is - it represents Elohim correctly
+            # No replacement for standalone "God"
         }
         
         processed_text = text
