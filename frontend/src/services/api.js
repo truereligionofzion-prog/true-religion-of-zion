@@ -188,6 +188,50 @@ class ApiService {
     return this.request('/bible/stats');
   }
 
+  // ===== PHASE 3C: ADVANCED BIBLE SEARCH METHODS =====
+  
+  // Advanced Bible search with multiple filters
+  async getAdvancedBibleSearch(params = {}) {
+    const queryParams = new URLSearchParams();
+    
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '' && value !== 'all') {
+        queryParams.append(key, value);
+      }
+    });
+
+    const endpoint = `/bible/search/advanced${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
+  }
+
+  // Get cross-references between Bible verses and precepts
+  async getCrossReferences(params = {}) {
+    const queryParams = new URLSearchParams();
+    
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '' && value !== 'all') {
+        queryParams.append(key, value);
+      }
+    });
+
+    const endpoint = `/bible/cross-references${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
+  }
+
+  // Search for specific divine names (YHWH, Elohim, YHUH)
+  async searchDivineNames(params = {}) {
+    const queryParams = new URLSearchParams();
+    
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '' && value !== 'all') {
+        queryParams.append(key, value);
+      }
+    });
+
+    const endpoint = `/bible/divine-names/search${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
+  }
+
   // Initialize database (development/admin use)
   async initializeData() {
     return this.request('/initialize', { method: 'POST' });
