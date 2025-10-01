@@ -30,6 +30,8 @@ db = client[os.environ['DB_NAME']]
 mitzvot_collection = db.mitzvot
 categories_collection = db.categories
 precepts_collection = db.precepts
+bible_verses_collection = db.bible_verses
+bible_books_collection = db.bible_books
 
 # Create the main app
 app = FastAPI(title="613 Biblical Laws API")
