@@ -1,0 +1,595 @@
+{
+  "discovered_count": 81,
+  "expected_count": 80,
+  "found_expected": 64,
+  "missing_books": [
+    "1 Kings",
+    "2 Kings",
+    "3 John",
+    "2 Samuel",
+    "1 John",
+    "2 Maccabees",
+    "1 Peter",
+    "2 Esdras",
+    "1 Samuel",
+    "1 Chronicles",
+    "2 Peter",
+    "1 Esdras",
+    "1 Maccabees",
+    "Additions to Esther",
+    "2 John",
+    "2 Chronicles"
+  ],
+  "total_verses": 2169,
+  "completeness_percent": 80.0,
+  "book_mapping": {
+    "22": {
+      "id": 22,
+      "name": "1Chronicles",
+      "verse_count": 54,
+      "first_verse": "1Adam, Sheth, Enosh,",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=22&page=0"
+    },
+    "23": {
+      "id": 23,
+      "name": "1Corinthians",
+      "verse_count": 31,
+      "first_verse": "1Paul called to be an apostle of Jesus Christ through the will of God, and Sosthenes our brother,",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=23&page=0"
+    },
+    "24": {
+      "id": 24,
+      "name": "1Esdras",
+      "verse_count": 58,
+      "first_verse": "1And Josias held the feast of the passover in Jerusalem unto his Lord, and offered the passover the ",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=24&page=0"
+    },
+    "25": {
+      "id": 25,
+      "name": "1John",
+      "verse_count": 10,
+      "first_verse": "1That which was from the beginning, which we have heard, which we have seen with our eyes, which we ",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=25&page=0"
+    },
+    "26": {
+      "id": 26,
+      "name": "1Kings",
+      "verse_count": 53,
+      "first_verse": "1Now king David was old and stricken in years; and they covered him with clothes, but he gat no heat",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=26&page=0"
+    },
+    "27": {
+      "id": 27,
+      "name": "1Maccabees",
+      "verse_count": 64,
+      "first_verse": "1And it happened, after that Alexander son of Philip, the Macedonian, who came out of the land of Ch",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=27&page=0"
+    },
+    "28": {
+      "id": 28,
+      "name": "1Peter",
+      "verse_count": 25,
+      "first_verse": "1Peter, an apostle of Jesus Christ, to the strangers scattered throughout Pontus, Galatia, Cappadoci",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=28&page=0"
+    },
+    "29": {
+      "id": 29,
+      "name": "1Samuel",
+      "verse_count": 28,
+      "first_verse": "1Now there was a certain man of Ramathaimzophim, of mount Ephraim, and his name was Elkanah, the son",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=29&page=0"
+    },
+    "30": {
+      "id": 30,
+      "name": "1Thessalonians",
+      "verse_count": 10,
+      "first_verse": "1Paul, and Silvanus, and Timotheus, unto the church of the Thessalonians which is in God the Father ",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=30&page=0"
+    },
+    "31": {
+      "id": 31,
+      "name": "1Timothy",
+      "verse_count": 20,
+      "first_verse": "1Paul, an apostle of Jesus Christ by the commandment of God our Saviour, and Lord Jesus Christ, whic",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=31&page=0"
+    },
+    "32": {
+      "id": 32,
+      "name": "2Chronicles",
+      "verse_count": 17,
+      "first_verse": "1And Solomon the son of David was strengthened in his kingdom, and the Lord his God was with him, an",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=32&page=0"
+    },
+    "33": {
+      "id": 33,
+      "name": "2Corinthians",
+      "verse_count": 24,
+      "first_verse": "1Paul, an apostle of Jesus Christ by the will of God, and Timothy our brother, unto the church of Go",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=33&page=0"
+    },
+    "34": {
+      "id": 34,
+      "name": "2Esdras",
+      "verse_count": 40,
+      "first_verse": "1The second book of the prophet Esdras, the son of Saraias, the son of Azarias, the son of Helchias,",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=34&page=0"
+    },
+    "35": {
+      "id": 35,
+      "name": "2John",
+      "verse_count": 13,
+      "first_verse": "1The elder unto the elect lady and her children, whom I love in the truth; and not I only, but also ",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=35&page=0"
+    },
+    "36": {
+      "id": 36,
+      "name": "2Kings",
+      "verse_count": 18,
+      "first_verse": "1Then Moab rebelled against Israel after the death of Ahab.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=36&page=0"
+    },
+    "37": {
+      "id": 37,
+      "name": "2Maccabees",
+      "verse_count": 36,
+      "first_verse": "1The brethren, the Jews that be at Jerusalem and in the land of Judea, wish unto the brethren, the J",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=37&page=0"
+    },
+    "38": {
+      "id": 38,
+      "name": "2Peter",
+      "verse_count": 21,
+      "first_verse": "1Simon Peter, a servant and an apostle of Jesus Christ, to them that have obtained like precious fai",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=38&page=0"
+    },
+    "39": {
+      "id": 39,
+      "name": "2Samuel",
+      "verse_count": 27,
+      "first_verse": "1Now it came to pass after the death of Saul, when David was returned from the slaughter of the Amal",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=39&page=0"
+    },
+    "40": {
+      "id": 40,
+      "name": "2Thessalonians",
+      "verse_count": 12,
+      "first_verse": "1Paul, and Silvanus, and Timotheus, unto the church of the Thessalonians in God our Father and the L",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=40&page=0"
+    },
+    "41": {
+      "id": 41,
+      "name": "2Timothy",
+      "verse_count": 18,
+      "first_verse": "1Paul, an apostle of Jesus Christ by the will of God, according to the promise of life which is in C",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=41&page=0"
+    },
+    "42": {
+      "id": 42,
+      "name": "3John",
+      "verse_count": 14,
+      "first_verse": "1The elder unto the wellbeloved Gaius, whom I love in the truth.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=42&page=0"
+    },
+    "43": {
+      "id": 43,
+      "name": "Acts",
+      "verse_count": 26,
+      "first_verse": "1The former treatise have I made, O Theophilus, of all that Jesus began both to do and teach,",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=43&page=0"
+    },
+    "44": {
+      "id": 44,
+      "name": "Amos",
+      "verse_count": 15,
+      "first_verse": "1The words of Amos, who was among the herdmen of Tekoa, which he saw concerning Israel in the days o",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=44&page=0"
+    },
+    "45": {
+      "id": 45,
+      "name": "Baruch",
+      "verse_count": 22,
+      "first_verse": "1And these are the words of the book, which Baruch the son of Nerias, the son of Maasias, the son of",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=45&page=0"
+    },
+    "46": {
+      "id": 46,
+      "name": "Bel and the Dragon",
+      "verse_count": 42,
+      "first_verse": "1And king Astyages was gathered to his fathers, and Cyrus of Persia received his kingdom.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=46&page=0"
+    },
+    "47": {
+      "id": 47,
+      "name": "Colossians",
+      "verse_count": 29,
+      "first_verse": "1Paul, an apostle of Jesus Christ by the will of God, and Timotheus our brother,",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=47&page=0"
+    },
+    "48": {
+      "id": 48,
+      "name": "Daniel",
+      "verse_count": 21,
+      "first_verse": "1In the third year of the reign of Jehoiakim king of Judah came Nebuchadnezzar king of Babylon unto ",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=48&page=0"
+    },
+    "49": {
+      "id": 49,
+      "name": "Deuteronomy",
+      "verse_count": 46,
+      "first_verse": "1These be the words which Moses spake unto all Israel on this side Jordan in the wilderness, in the ",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=49&page=0"
+    },
+    "50": {
+      "id": 50,
+      "name": "Ecclesiastes",
+      "verse_count": 18,
+      "first_verse": "1The words of the Preacher, the son of David, king in Jerusalem.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=50&page=0"
+    },
+    "51": {
+      "id": 51,
+      "name": "Ecclesiasticus (Sirach)",
+      "verse_count": 30,
+      "first_verse": "1[A Prologue made by an uncertain author]. This Jesus was the son of Sirach, and grandchild to Jesus",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=51&page=0"
+    },
+    "52": {
+      "id": 52,
+      "name": "Ephesians",
+      "verse_count": 23,
+      "first_verse": "1Paul, an apostle of Jesus Christ by the will of God, to the saints which are at Ephesus, and to the",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=52&page=0"
+    },
+    "53": {
+      "id": 53,
+      "name": "Epistle of Jeremiah",
+      "verse_count": 73,
+      "first_verse": "1A copy of an epistle, which Jeremy sent unto them which were to be led captives into Babylon by the",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=53&page=0"
+    },
+    "54": {
+      "id": 54,
+      "name": "Esther",
+      "verse_count": 22,
+      "first_verse": "1Now it came to pass in the days of Ahasuerus, (this is Ahasuerus which reigned, from India even unt",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=54&page=0"
+    },
+    "55": {
+      "id": 55,
+      "name": "Esther (Greek)",
+      "verse_count": 10,
+      "first_verse": "4Then Mardocheus said, God hath done these things.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=55&page=0"
+    },
+    "56": {
+      "id": 56,
+      "name": "Exodus",
+      "verse_count": 22,
+      "first_verse": "1Now these are the names of the children of Israel, which came into Egypt; every man and his househo",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=56&page=0"
+    },
+    "57": {
+      "id": 57,
+      "name": "Ezekiel",
+      "verse_count": 28,
+      "first_verse": "1Now it came to pass in the thirtieth year, in the fourth month, in the fifth day of the month, as I",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=57&page=0"
+    },
+    "58": {
+      "id": 58,
+      "name": "Ezra",
+      "verse_count": 11,
+      "first_verse": "1Now in the first year of Cyrus king of Persia, that the word of the Lord by the mouth of Jeremiah m",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=58&page=0"
+    },
+    "59": {
+      "id": 59,
+      "name": "Galatians",
+      "verse_count": 24,
+      "first_verse": "1Paul, an apostle, (not of men, neither by man, but by Jesus Christ, and God the Father, who raised ",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=59&page=0"
+    },
+    "60": {
+      "id": 60,
+      "name": "Genesis",
+      "verse_count": 31,
+      "first_verse": "1In the beginning God created the heaven and the earth.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=60&page=0"
+    },
+    "61": {
+      "id": 61,
+      "name": "Habakkuk",
+      "verse_count": 17,
+      "first_verse": "1The burden which Habakkuk the prophet did see.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=61&page=0"
+    },
+    "62": {
+      "id": 62,
+      "name": "Haggai",
+      "verse_count": 15,
+      "first_verse": "1In the second year of Darius the king, in the sixth month, in the first day of the month, came the ",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=62&page=0"
+    },
+    "63": {
+      "id": 63,
+      "name": "Hebrews",
+      "verse_count": 14,
+      "first_verse": "1God, who at sundry times and in divers manners spake in time past unto the fathers by the prophets,",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=63&page=0"
+    },
+    "64": {
+      "id": 64,
+      "name": "Hosea",
+      "verse_count": 11,
+      "first_verse": "1The word of the Lord that came unto Hosea, the son of Beeri, in the days of Uzziah, Jotham, Ahaz, a",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=64&page=0"
+    },
+    "65": {
+      "id": 65,
+      "name": "Isaiah",
+      "verse_count": 31,
+      "first_verse": "1The vision of Isaiah the son of Amoz, which he saw concerning Judah and Jerusalem in the days of Uz",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=65&page=0"
+    },
+    "66": {
+      "id": 66,
+      "name": "James",
+      "verse_count": 27,
+      "first_verse": "1James, a servant of God and of the Lord Jesus Christ, to the twelve tribes which are scattered abro",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=66&page=0"
+    },
+    "67": {
+      "id": 67,
+      "name": "Jeremiah",
+      "verse_count": 19,
+      "first_verse": "1The words of Jeremiah the son of Hilkiah, of the priests that were in Anathoth in the land of Benja",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=67&page=0"
+    },
+    "68": {
+      "id": 68,
+      "name": "Job",
+      "verse_count": 22,
+      "first_verse": "1There was a man in the land of Uz, whose name was Job; and that man was perfect and upright, and on",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=68&page=0"
+    },
+    "69": {
+      "id": 69,
+      "name": "Joel",
+      "verse_count": 20,
+      "first_verse": "1The word of the Lord that came to Joel the son of Pethuel.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=69&page=0"
+    },
+    "70": {
+      "id": 70,
+      "name": "John",
+      "verse_count": 51,
+      "first_verse": "1In the beginning was the Word, and the Word was with God, and the Word was God.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=70&page=0"
+    },
+    "71": {
+      "id": 71,
+      "name": "Jonah",
+      "verse_count": 17,
+      "first_verse": "1Now the word of the Lord came unto Jonah the son of Amittai, saying,",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=71&page=0"
+    },
+    "72": {
+      "id": 72,
+      "name": "Joshua",
+      "verse_count": 18,
+      "first_verse": "1Now after the death of Moses the servant of the Lord it came to pass, that the Lord spake unto Josh",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=72&page=0"
+    },
+    "73": {
+      "id": 73,
+      "name": "Jude",
+      "verse_count": 25,
+      "first_verse": "1Jude, the servant of Jesus Christ, and brother of James, to them that are sanctified by God the Fat",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=73&page=0"
+    },
+    "74": {
+      "id": 74,
+      "name": "Judges",
+      "verse_count": 36,
+      "first_verse": "1Now after the death of Joshua it came to pass, that the children of Israel asked the Lord, saying, ",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=74&page=0"
+    },
+    "75": {
+      "id": 75,
+      "name": "Judith",
+      "verse_count": 16,
+      "first_verse": "1In the twelfth year of the reign of Nabuchodonosor, who reigned in Nineve, the great city; in the d",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=75&page=0"
+    },
+    "76": {
+      "id": 76,
+      "name": "Lamentations",
+      "verse_count": 22,
+      "first_verse": "1How doth the city sit solitary, that was full of people! how is she become as a widow! she that was",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=76&page=0"
+    },
+    "77": {
+      "id": 77,
+      "name": "Leviticus",
+      "verse_count": 17,
+      "first_verse": "1And the Lord called unto Moses, and spake unto him out of the tabernacle of the congregation, sayin",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=77&page=0"
+    },
+    "78": {
+      "id": 78,
+      "name": "Luke",
+      "verse_count": 80,
+      "first_verse": "1Forasmuch as many have taken in hand to set forth in order a declaration of those things which are ",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=78&page=0"
+    },
+    "79": {
+      "id": 79,
+      "name": "Malachi",
+      "verse_count": 14,
+      "first_verse": "1The burden of the word of the Lord to Israel by Malachi.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=79&page=0"
+    },
+    "80": {
+      "id": 80,
+      "name": "Mark",
+      "verse_count": 45,
+      "first_verse": "1The beginning of the gospel of Jesus Christ, the Son of God;",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=80&page=0"
+    },
+    "81": {
+      "id": 81,
+      "name": "Matthew",
+      "verse_count": 25,
+      "first_verse": "1The book of the generation of Jesus Christ, the son of David, the son of Abraham.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=81&page=0"
+    },
+    "82": {
+      "id": 82,
+      "name": "Micah",
+      "verse_count": 16,
+      "first_verse": "1The word of the Lord that came to Micah the Morasthite in the days of Jotham, Ahaz, and Hezekiah, k",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=82&page=0"
+    },
+    "83": {
+      "id": 83,
+      "name": "Nahum",
+      "verse_count": 15,
+      "first_verse": "1The burden of Nineveh. The book of the vision of Nahum the Elkoshite.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=83&page=0"
+    },
+    "84": {
+      "id": 84,
+      "name": "Nehemiah",
+      "verse_count": 11,
+      "first_verse": "1The words of Nehemiah the son of Hachaliah. And it came to pass in the month Chisleu, in the twenti",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=84&page=0"
+    },
+    "85": {
+      "id": 85,
+      "name": "Numbers",
+      "verse_count": 54,
+      "first_verse": "1And the Lord spake unto Moses in the wilderness of Sinai, in the tabernacle of the congregation, on",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=85&page=0"
+    },
+    "86": {
+      "id": 86,
+      "name": "Obadiah",
+      "verse_count": 21,
+      "first_verse": "1The vision of Obadiah. Thus saith the Lord God concerning Edom; We have heard a rumour from the Lor",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=86&page=0"
+    },
+    "87": {
+      "id": 87,
+      "name": "Philemon",
+      "verse_count": 25,
+      "first_verse": "1Paul, a prisoner of Jesus Christ, and Timothy our brother, unto Philemon our dearly beloved, and fe",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=87&page=0"
+    },
+    "88": {
+      "id": 88,
+      "name": "Philippians",
+      "verse_count": 30,
+      "first_verse": "1Paul and Timotheus, the servants of Jesus Christ, to all the saints in Christ Jesus which are at Ph",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=88&page=0"
+    },
+    "89": {
+      "id": 89,
+      "name": "Prayer of Azariah",
+      "verse_count": 68,
+      "first_verse": "1And they walked in the midst of the fire, praising God, and blessing the Lord.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=89&page=0"
+    },
+    "90": {
+      "id": 90,
+      "name": "Prayer of Manasseh",
+      "verse_count": 14,
+      "first_verse": "1O Lord, Almighty God of our fathers, Abraham, Isaac, and Jacob, and of their righteous seed;",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=90&page=0"
+    },
+    "91": {
+      "id": 91,
+      "name": "Proverbs",
+      "verse_count": 33,
+      "first_verse": "1The proverbs of Solomon the son of David, king of Israel;",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=91&page=0"
+    },
+    "92": {
+      "id": 92,
+      "name": "Psalms",
+      "verse_count": 6,
+      "first_verse": "1Blessed is the man that walketh not in the counsel of the ungodly, nor standeth in the way of sinne",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=92&page=0"
+    },
+    "93": {
+      "id": 93,
+      "name": "Revelations",
+      "verse_count": 20,
+      "first_verse": "1The Revelation of Jesus Christ, which God gave unto him, to shew unto his servants things which mus",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=93&page=0"
+    },
+    "94": {
+      "id": 94,
+      "name": "Romans",
+      "verse_count": 32,
+      "first_verse": "1Paul, a servant of Jesus Christ, called to be an apostle, separated unto the gospel of God,",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=94&page=0"
+    },
+    "95": {
+      "id": 95,
+      "name": "Ruth",
+      "verse_count": 22,
+      "first_verse": "1Now it came to pass in the days when the judges ruled, that there was a famine in the land. And a c",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=95&page=0"
+    },
+    "96": {
+      "id": 96,
+      "name": "Songs of Solomon",
+      "verse_count": 17,
+      "first_verse": "1The song of songs, which is Solomon's.",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=96&page=0"
+    },
+    "97": {
+      "id": 97,
+      "name": "Susanna",
+      "verse_count": 64,
+      "first_verse": "1There dwelt a man in Babylon, called Joacim:",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=97&page=0"
+    },
+    "98": {
+      "id": 98,
+      "name": "Titus",
+      "verse_count": 16,
+      "first_verse": "1Paul, a servant of God, and an apostle of Jesus Christ, according to the faith of God's elect, and ",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=98&page=0"
+    },
+    "99": {
+      "id": 99,
+      "name": "Tobit",
+      "verse_count": 22,
+      "first_verse": "1The book of the words of Tobit, son of Tobiel, the son of Ananiel, the son of Aduel, the son of Gab",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=99&page=0"
+    },
+    "100": {
+      "id": 100,
+      "name": "Wisdom of Solomon",
+      "verse_count": 16,
+      "first_verse": "1Love righteousness, ye that be judges of the earth: think of the Lord with a good (heart,) and in s",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=100&page=0"
+    },
+    "101": {
+      "id": 101,
+      "name": "Zechariah",
+      "verse_count": 21,
+      "first_verse": "1In the eighth month, in the second year of Darius, came the word of the Lord unto Zechariah, the so",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=101&page=0"
+    },
+    "102": {
+      "id": 102,
+      "name": "Zephaniah",
+      "verse_count": 18,
+      "first_verse": "1The word of the Lord which came unto Zephaniah the son of Cushi, the son of Gedaliah, the son of Am",
+      "url": "https://thepreceptbible.com/bible?field_book_target_id=102&page=0"
+    }
+  },
+  "ready_for_full_extraction": false
+}
