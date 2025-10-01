@@ -96,11 +96,17 @@ class ScholarlyDivineNameReplacer:
                 ]
             },
             
-            # Standalone Elohim
+            # Standalone Elohim and plural forms
             {
-                'english_forms': [r'\bGod\b'],
-                'hebrew_original': 'Elohim',
-                'replacement': 'Elohim'
+                'english_forms': [],
+                'hebrew_original': 'Elohim (singular and plural)',
+                'replacement_pairs': [
+                    ('other gods', 'other elohim'),  # אֱלֹהִים אֲחֵרִים - Exodus 20:3
+                    ('false gods', 'false elohim'),
+                    ('foreign gods', 'foreign elohim'),
+                    ('God', 'Elohim'),  # Singular
+                    ('gods', 'elohim'),  # Plural (lowercase when not referring to YHWH)
+                ]
             },
             
             # El (God/Mighty One) - singular form
