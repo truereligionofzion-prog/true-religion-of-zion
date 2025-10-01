@@ -1571,6 +1571,66 @@ const MitzvotApp = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
+
+              <TabsContent value="reading" className="mt-6">
+                {contentType === 'bible' && (
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="space-y-6">
+                        {/* Book Navigation */}
+                        <div className="border-b pb-4">
+                          <h3 className="text-lg font-semibold mb-3">Books</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {filters.books && filters.books.slice(0, 10).map((book) => (
+                              <Button
+                                key={book}
+                                variant={selectedBook === book ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setSelectedBook(book)}
+                                className="text-xs"
+                              >
+                                {book}
+                              </Button>
+                            ))}
+                            {filters.books && filters.books.length > 10 && (
+                              <Button variant="outline" size="sm" className="text-xs">
+                                +{filters.books.length - 10} more
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Reading Content */}
+                        <div className="prose prose-lg max-w-none">
+                          {selectedBook !== 'all' && (
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                              ## {selectedBook}
+                            </h2>
+                          )}
+                          
+                          {(bibleVerses || []).map((verse, index) => (
+                            <div key={verse.id} className="mb-4">
+                              <p className="text-base leading-relaxed text-gray-800">
+                                <span className="font-bold text-blue-600 mr-2">
+                                  {verse.verse}
+                                </span>
+                                {verse.text}
+                              </p>
+                            </div>
+                          ))}
+                          
+                          {bibleVerses.length === 0 && !loading && (
+                            <div className="text-center py-12 text-gray-500">
+                              <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                              <p>Select a book to begin reading, or use the search to find specific verses.</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
             </Tabs>
 
             {/* Pagination */}
