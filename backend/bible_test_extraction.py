@@ -28,32 +28,16 @@ class BibleExtractor:
         }
     
     def apply_divine_name_replacements(self, text: str) -> str:
-        """Apply accurate divine name replacements based on Hebrew source"""
-        # Based on Hebrew source and thepreceptbible.com analysis:
-        # - "LORD" (all caps) = YHWH (Tetragrammaton)
-        # - "God" = Elohim (should remain as "God" - represents Elohim in Hebrew)
-        # - "Lord God" = YHWH Elohim (combination)
-        # - "Lord" (title case) = Adonai -> YHUH
+        """
+        Apply scholarly divine name replacements based on ancient Hebrew manuscripts
+        (Dead Sea Scrolls, Masoretic Text) and biblical textual criticism
+        """
+        from scholarly_divine_names import ScholarlyDivineNameReplacer
         
-        replacements = {
-            # Handle "Lord God" combination first (YHWH Elohim)
-            r'\bLord God\b': 'YHWH Elohim',
-            
-            # Handle standalone "LORD" (all caps - Tetragrammaton)
-            r'\bLORD\b': 'YHWH',
-            
-            # Handle "Lord" (title case - Adonai)
-            r'\bLord\b': 'YHUH',
-            
-            # Keep "God" as is - it represents Elohim correctly
-            # No replacement for standalone "God"
-        }
+        replacer = ScholarlyDivineNameReplacer()
+        result = replacer.apply_replacements(text, preserve_elohim=True)
         
-        processed_text = text
-        for pattern, replacement in replacements.items():
-            processed_text = re.sub(pattern, replacement, processed_text)
-        
-        return processed_text
+        return result['text']
     
     def extract_chapter(self, book_name: str, chapter_num: int = 1) -> Dict[str, Any]:
         """Extract a specific chapter from a book"""
