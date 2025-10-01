@@ -57,13 +57,13 @@ class ScholarlyDivineNameReplacer:
                 'replacement': 'YHUH'  # Alternative rendering respecting the substitute tradition
             },
             
-            # Elohim (God/Gods) - plural of majesty, remains as is
-            # This is correctly translated as "God" and should not be changed
+            # Elohim (God/Gods) - plural of majesty
+            # Replace "God" with "Elohim" to show the Hebrew name
             {
                 'english_forms': [r'\bGod\b'],
                 'hebrew_original': 'Elohim',
-                'replacement': 'God',  # Keep as God - this is correct for Elohim
-                'preserve': True  # Flag to indicate this should remain unchanged
+                'replacement': 'Elohim',  # Show the actual Hebrew name
+                'preserve': False  # We want to replace this
             },
             
             # El (God/Mighty One) - singular form
