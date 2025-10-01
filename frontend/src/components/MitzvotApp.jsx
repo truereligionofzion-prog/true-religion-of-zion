@@ -772,6 +772,55 @@ const MitzvotApp = () => {
     }));
   };
 
+  const startBibleFlashcards = async () => {
+    try {
+      setLoading(true);
+      
+      // Generate Bible flashcards from current data
+      const bibleFlashcardsData = generateBibleFlashcards(bibleVerses, 10);
+      
+      if (bibleFlashcardsData.length === 0) {
+        toast({
+          title: "No Bible Verses Available",
+          description: "No Bible verses available for flashcard review.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setFlashcards(bibleFlashcardsData);
+      setCurrentFlashcardIndex(0);
+      setShowFlashcardAnswer(false);
+      setActiveTab('flashcards');
+      
+      toast({
+        title: "Bible Flashcards Ready!",
+        description: `Starting Bible review with ${bibleFlashcardsData.length} cards.`,
+      });
+    } catch (error) {
+      console.error('Error starting Bible flashcards:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load Bible flashcards. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateBibleFlashcards = (verses, count) => {
+    const shuffledVerses = [...verses].sort(() => Math.random() - 0.5);
+    
+    return shuffledVerses.slice(0, count).map((verse, index) => ({
+      id: `bible_${verse.id}_${index}`,
+      verse: verse,
+      type: 'bible',
+      difficulty: 1,
+      nextReview: new Date()
+    }));
+  };
+
   const reviewFlashcard = async (correct) => {
     if (!flashcards[currentFlashcardIndex]) return;
     
