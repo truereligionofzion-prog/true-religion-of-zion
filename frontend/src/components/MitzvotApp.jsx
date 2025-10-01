@@ -1108,7 +1108,7 @@ const MitzvotApp = () => {
                         </SelectContent>
                       </Select>
                     </>
-                  ) : (
+                  ) : contentType === 'precepts' ? (
                     <>
                       <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                         <SelectTrigger>
@@ -1121,6 +1121,34 @@ const MitzvotApp = () => {
                         </SelectContent>
                       </Select>
                       <div></div> {/* Empty div to maintain grid layout */}
+                    </>
+                  ) : (
+                    <>
+                      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Testaments" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Testaments</SelectItem>
+                          <SelectItem value="old">Old Testament</SelectItem>
+                          <SelectItem value="new">New Testament</SelectItem>
+                          <SelectItem value="apocrypha">Apocrypha</SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      <Select value={selectedBook} onValueChange={setSelectedBook}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All Books" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Books</SelectItem>
+                          {filters.books && filters.books.map((book) => (
+                            <SelectItem key={book} value={book}>
+                              {book}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </>
                   )}
                 </div>
