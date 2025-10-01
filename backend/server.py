@@ -336,6 +336,220 @@ async def get_precepts_stats():
         logger.error(f"Error getting precepts stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===== BIBLE API ENDPOINTS =====
+
+@api_router.get("/bible/books")
+async def get_bible_books(
+    testament: Optional[str] = Query(None, description="Filter by testament: old, new, apocrypha")
+):
+    """Get all Bible books with metadata"""
+    try:
+        # Build query
+        query = {}
+        if testament and testament != "all":
+            query["testament"] = testament
+        
+        # Get books
+        cursor = bible_books_collection.find(query).sort("order", 1)
+        books_data = await cursor.to_list(length=None)
+        
+        # Clean MongoDB documents
+        books = []
+        for book in books_data:
+            if '_id' in book:
+                del book['_id']
+            books.append(book)
+        
+        # Get available testaments
+        testaments = await bible_books_collection.distinct("testament")
+        testaments.sort()
+        
+        return {
+            "books": books,
+            "total": len(books),
+            "filters": {
+                "testaments": testaments
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting bible books: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/bible/verses")
+async def get_bible_verses(
+    book: Optional[str] = Query(None, description="Filter by book name"),
+    chapter: Optional[int] = Query(None, description="Filter by chapter number"),
+    testament: Optional[str] = Query(None, description="Filter by testament: old, new, apocrypha"),
+    search: Optional[str] = Query(None, description="Search in verse text"),
+    has_precept: Optional[bool] = Query(None, description="Filter verses with precept connections"),
+    page: int = Query(1, ge=1, description="Page number"),
+    limit: int = Query(20, ge=1, le=100, description="Items per page")
+):
+    """Get Bible verses with filtering and pagination"""
+    try:
+        # Build query
+        query = {}
+        
+        if book:
+            query["book"] = book
+        
+        if chapter is not None:
+            query["chapter"] = chapter
+        
+        if testament and testament != "all":
+            query["testament"] = testament
+            
+        if has_precept is not None:
+            query["has_precept"] = has_precept
+        
+        # Text search
+        if search:
+            search_regex = {"$regex": search, "$options": "i"}
+            query["text"] = search_regex
+        
+        # Get total count
+        total = await bible_verses_collection.count_documents(query)
+        
+        # Calculate pagination
+        skip = (page - 1) * limit
+        total_pages = math.ceil(total / limit)
+        
+        # Get verses
+        cursor = bible_verses_collection.find(query).sort([("book", 1), ("chapter", 1), ("verse", 1)]).skip(skip).limit(limit)
+        verses_data = await cursor.to_list(length=limit)
+        
+        # Clean MongoDB documents
+        verses = []
+        for verse in verses_data:
+            if '_id' in verse:
+                del verse['_id']
+            verses.append(verse)
+        
+        # Get filter options
+        books = await bible_verses_collection.distinct("book")
+        testaments = await bible_verses_collection.distinct("testament")
+        books.sort()
+        testaments.sort()
+        
+        return {
+            "verses": verses,
+            "total": total,
+            "page": page,
+            "totalPages": total_pages,
+            "filters": {
+                "books": books,
+                "testaments": testaments
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting bible verses: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/bible/verses/{book}/{chapter}")
+async def get_bible_chapter(book: str, chapter: int):
+    """Get all verses for a specific chapter"""
+    try:
+        # Get verses for the chapter
+        query = {"book": book, "chapter": chapter}
+        cursor = bible_verses_collection.find(query).sort("verse", 1)
+        verses_data = await cursor.to_list(length=None)
+        
+        if not verses_data:
+            raise HTTPException(status_code=404, detail=f"{book} {chapter} not found")
+        
+        # Clean MongoDB documents
+        verses = []
+        for verse in verses_data:
+            if '_id' in verse:
+                del verse['_id']
+            verses.append(verse)
+        
+        # Get chapter metadata
+        book_data = await bible_books_collection.find_one({"name": book})
+        testament = book_data.get("testament", "unknown") if book_data else "unknown"
+        
+        return {
+            "book": book,
+            "chapter": chapter,
+            "testament": testament,
+            "verses": verses,
+            "verse_count": len(verses)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting chapter {book} {chapter}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/bible/verse/{book}/{chapter}/{verse}")
+async def get_bible_verse(book: str, chapter: int, verse: int):
+    """Get a specific verse"""
+    try:
+        query = {"book": book, "chapter": chapter, "verse": verse}
+        verse_data = await bible_verses_collection.find_one(query)
+        
+        if not verse_data:
+            raise HTTPException(status_code=404, detail=f"{book} {chapter}:{verse} not found")
+        
+        # Remove MongoDB _id field
+        if '_id' in verse_data:
+            del verse_data['_id']
+        
+        return verse_data
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting verse {book} {chapter}:{verse}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/bible/stats")
+async def get_bible_stats():
+    """Get Bible summary statistics"""
+    try:
+        total_books = await bible_books_collection.count_documents({})
+        total_verses = await bible_verses_collection.count_documents({})
+        
+        # Count by testament
+        old_testament_books = await bible_books_collection.count_documents({"testament": "old"})
+        new_testament_books = await bible_books_collection.count_documents({"testament": "new"})
+        apocrypha_books = await bible_books_collection.count_documents({"testament": "apocrypha"})
+        
+        old_testament_verses = await bible_verses_collection.count_documents({"testament": "old"})
+        new_testament_verses = await bible_verses_collection.count_documents({"testament": "new"})
+        apocrypha_verses = await bible_verses_collection.count_documents({"testament": "apocrypha"})
+        
+        # Count verses with precepts
+        verses_with_precepts = await bible_verses_collection.count_documents({"has_precept": True})
+        
+        # Get unique chapters count
+        pipeline = [
+            {"$group": {"_id": {"book": "$book", "chapter": "$chapter"}}},
+            {"$count": "total_chapters"}
+        ]
+        result = await bible_verses_collection.aggregate(pipeline).to_list(1)
+        total_chapters = result[0]["total_chapters"] if result else 0
+        
+        return {
+            "totalBooks": total_books,
+            "totalChapters": total_chapters,
+            "totalVerses": total_verses,
+            "oldTestamentBooks": old_testament_books,
+            "newTestamentBooks": new_testament_books,
+            "apocryphaBooks": apocrypha_books,
+            "oldTestamentVerses": old_testament_verses,
+            "newTestamentVerses": new_testament_verses,
+            "apocryphaVerses": apocrypha_verses,
+            "versesWithPrecepts": verses_with_precepts
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting bible stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/mitzvah-of-the-day", response_model=Mitzvah)
 async def get_mitzvah_of_the_day():
     """Get the daily featured mitzvah"""
