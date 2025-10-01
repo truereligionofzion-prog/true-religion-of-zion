@@ -98,6 +98,7 @@ const MitzvotApp = () => {
       setCategories(responses[1]);
       setMitzvahOfTheDay(responses[2]);
       setPreceptsStats(responses[3]);
+      setBibleStats(responses[4]);
       
       if (isAuthenticated && responses[responses.length - 1]) {
         setUserProgress(responses[responses.length - 1]);
