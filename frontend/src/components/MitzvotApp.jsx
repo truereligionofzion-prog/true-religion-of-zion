@@ -1354,12 +1354,19 @@ const MitzvotApp = () => {
                                 <th className="text-left p-4 font-medium">Source</th>
                                 <th className="text-left p-4 font-medium">Category</th>
                               </>
-                            ) : (
+                            ) : contentType === 'precepts' ? (
                               <>
                                 <th className="text-left p-4 font-medium">Topic</th>
                                 <th className="text-left p-4 font-medium">Verses</th>
                                 <th className="text-left p-4 font-medium">Testament</th>
                                 <th className="text-left p-4 font-medium">Topics</th>
+                              </>
+                            ) : (
+                              <>
+                                <th className="text-left p-4 font-medium">Reference</th>
+                                <th className="text-left p-4 font-medium">Text</th>
+                                <th className="text-left p-4 font-medium">Testament</th>
+                                <th className="text-left p-4 font-medium">Precepts</th>
                               </>
                             )}
                           </tr>
