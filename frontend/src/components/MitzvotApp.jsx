@@ -182,6 +182,36 @@ const MitzvotApp = () => {
     }
   };
 
+  const loadBibleVerses = async () => {
+    try {
+      setLoading(true);
+
+      const params = {
+        search: searchTerm,
+        testament: selectedCategory,
+        book: selectedBook,
+        page: currentPage,
+        limit: 20
+      };
+
+      const response = await apiService.getBibleVerses(params);
+      
+      setBibleVerses(response.verses);
+      setTotalPages(response.totalPages);
+      setFilters(response.filters);
+      
+    } catch (error) {
+      console.error('Error loading Bible verses:', error);
+      toast({
+        title: "Error Loading Bible",
+        description: "Failed to load Bible verses. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle search with debouncing
   useEffect(() => {
     const timeoutId = setTimeout(() => {
