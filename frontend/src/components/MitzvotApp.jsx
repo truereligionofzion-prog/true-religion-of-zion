@@ -1289,11 +1289,11 @@ const MitzvotApp = () => {
             {/* View Mode Tabs */}
             <Tabs value={viewMode} onValueChange={setViewMode} className="w-full">
               <TabsList>
-                <TabsTrigger value="cards">Card View</TabsTrigger>
-                <TabsTrigger value="table">Table View</TabsTrigger>
                 {contentType === 'bible' && (
                   <TabsTrigger value="reading">Reading View</TabsTrigger>
                 )}
+                <TabsTrigger value="cards">Card View</TabsTrigger>
+                <TabsTrigger value="table">Table View</TabsTrigger>
               </TabsList>
 
               <TabsContent value="cards" className="mt-6">
