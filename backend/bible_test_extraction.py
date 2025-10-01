@@ -22,7 +22,7 @@ class BibleExtractor:
         # Book mapping (from website analysis)
         self.book_mapping = {
             'Genesis': 60,
-            'Tobit': 72,  # Apocrypha book for testing
+            'Tobit': 99,  # Apocrypha book for testing
         }
     
     def apply_divine_name_replacements(self, text: str) -> str:
