@@ -46,11 +46,14 @@ class ScholarlyDivineNameReplacer:
                 ]
             },
             
-            # Remove "the" before YHWH (based on Hebrew - no definite article with YHWH)
+            # Handle remaining "the LORD" cases and specific Shema pattern
             {
-                'english_forms': [r'\bthe\s+LORD\b'],
-                'hebrew_original': 'YHWH',
-                'replacement': 'YHWH'  # Remove definite article
+                'english_forms': [],  # Empty since we use replacement_pairs
+                'hebrew_original': 'YHWH patterns',
+                'replacement_pairs': [
+                    ('the LORD', 'YHWH'),
+                    ('is one LORD', 'is one'),  # Based on Hebrew אֶחָד (echad) - just "one"
+                ]
             },
             
             # YHWH (Tetragrammaton) - standalone occurrences
