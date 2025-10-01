@@ -1460,7 +1460,9 @@ const MitzvotApp = () => {
                     <p className="text-gray-600">
                       {contentType === 'mitzvot' 
                         ? 'Challenge yourself with questions about the 613 mitzvot. Choose a category or test your overall knowledge!'
-                        : 'Test your understanding of biblical precepts. Choose a testament focus or test your comprehensive knowledge!'
+                        : contentType === 'precepts'
+                        ? 'Test your understanding of biblical precepts. Choose a testament focus or test your comprehensive knowledge!'
+                        : 'Test your knowledge of the Bible with Apocrypha. Explore questions about verses, books, and scriptural content!'
                       }
                     </p>
                   </CardHeader>
