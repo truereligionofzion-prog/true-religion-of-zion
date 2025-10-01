@@ -1308,7 +1308,7 @@ const MitzvotApp = () => {
                         </CardContent>
                       </Card>
                     ))
-                  ) : (
+                  ) : contentType === 'precepts' ? (
                     (precepts || []).map((precept) => {
                       const currentVerseIndex = preceptVerseIndex[precept.id] || 0;
                       const currentVerse = precept.verses?.[currentVerseIndex];
