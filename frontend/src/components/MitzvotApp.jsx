@@ -1555,7 +1555,6 @@ const MitzvotApp = () => {
                     </div>
                   </div>
                 )}
-                </div>
               </CardContent>
             </Card>
 
