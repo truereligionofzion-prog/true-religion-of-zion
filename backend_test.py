@@ -56,6 +56,260 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
+    def test_bible_verses_endpoint_error(self):
+        """Test /api/bible/verses endpoint to reproduce the 500 error"""
+        try:
+            print("\n🔍 Testing Bible Verses API Endpoint...")
+            
+            # Test 1: Basic endpoint call to reproduce the error
+            response = self.session.get(f"{self.base_url}/bible/verses")
+            if response.status_code == 500:
+                error_text = response.text
+                if "'<' not supported between instances of 'str' and 'NoneType'" in error_text:
+                    self.log_test("Bible Verses - Error Reproduction", True, "Successfully reproduced the comparison error")
+                else:
+                    self.log_test("Bible Verses - Error Reproduction", False, f"Different error: {error_text[:200]}")
+            elif response.status_code == 200:
+                self.log_test("Bible Verses - Error Reproduction", False, "Endpoint working - error may be intermittent")
+            else:
+                self.log_test("Bible Verses - Error Reproduction", False, f"Unexpected status: {response.status_code}")
+            
+            # Test 2: Try with different parameters to isolate the issue
+            test_params = [
+                {},
+                {"page": 1, "limit": 10},
+                {"book": "Genesis"},
+                {"chapter": 1},
+                {"testament": "old"},
+                {"search": "God"},
+                {"has_precept": True}
+            ]
+            
+            working_params = []
+            failing_params = []
+            
+            for params in test_params:
+                try:
+                    param_str = "&".join([f"{k}={v}" for k, v in params.items()]) if params else "no params"
+                    response = self.session.get(f"{self.base_url}/bible/verses", params=params)
+                    
+                    if response.status_code == 200:
+                        working_params.append(param_str)
+                        self.log_test(f"Bible Verses - Params ({param_str})", True, "Working")
+                    elif response.status_code == 500:
+                        failing_params.append(param_str)
+                        self.log_test(f"Bible Verses - Params ({param_str})", False, "500 Error")
+                    else:
+                        self.log_test(f"Bible Verses - Params ({param_str})", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Bible Verses - Params ({param_str})", False, f"Exception: {str(e)}")
+                    failing_params.append(param_str)
+            
+            # Summary of parameter testing
+            if working_params:
+                self.log_test("Bible Verses - Working Parameters", True, f"Working: {working_params}")
+            if failing_params:
+                self.log_test("Bible Verses - Failing Parameters", False, f"Failing: {failing_params}")
+            
+            return len(failing_params) > 0  # Return True if we found the error
+            
+        except Exception as e:
+            self.log_test("Bible Verses Endpoint Error Test", False, f"Error: {str(e)}")
+            return False
+
+    def test_bible_database_content(self):
+        """Check Bible verses database content for None/null values"""
+        try:
+            print("\n🔍 Checking Bible Database Content...")
+            
+            from motor.motor_asyncio import AsyncIOMotorClient
+            import asyncio
+            
+            async def check_bible_database():
+                mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+                client = AsyncIOMotorClient(mongo_url)
+                db = client[os.environ.get('DB_NAME', 'test_database')]
+                
+                # Check if bible_verses collection exists
+                collections = await db.list_collection_names()
+                bible_verses_exists = 'bible_verses' in collections
+                
+                if not bible_verses_exists:
+                    client.close()
+                    return False, "bible_verses collection not found", {}
+                
+                # Count total verses
+                total_verses = await db.bible_verses.count_documents({})
+                
+                # Check for None/null values in sorting fields
+                none_book = await db.bible_verses.count_documents({"book": None})
+                none_chapter = await db.bible_verses.count_documents({"chapter": None})
+                none_verse = await db.bible_verses.count_documents({"verse": None})
+                
+                # Check for missing fields
+                missing_book = await db.bible_verses.count_documents({"book": {"$exists": False}})
+                missing_chapter = await db.bible_verses.count_documents({"chapter": {"$exists": False}})
+                missing_verse = await db.bible_verses.count_documents({"verse": {"$exists": False}})
+                
+                # Get sample documents with problematic data
+                problematic_docs = []
+                
+                # Find documents with None values
+                async for doc in db.bible_verses.find({
+                    "$or": [
+                        {"book": None},
+                        {"chapter": None}, 
+                        {"verse": None}
+                    ]
+                }).limit(5):
+                    problematic_docs.append({
+                        "id": str(doc.get("_id", "unknown")),
+                        "book": doc.get("book"),
+                        "chapter": doc.get("chapter"),
+                        "verse": doc.get("verse"),
+                        "text": doc.get("text", "")[:50] + "..." if doc.get("text") else None
+                    })
+                
+                # Check for string vs int type issues in chapter/verse
+                string_chapters = await db.bible_verses.count_documents({"chapter": {"$type": "string"}})
+                string_verses = await db.bible_verses.count_documents({"verse": {"$type": "string"}})
+                
+                client.close()
+                
+                return True, "success", {
+                    "total_verses": total_verses,
+                    "none_book": none_book,
+                    "none_chapter": none_chapter,
+                    "none_verse": none_verse,
+                    "missing_book": missing_book,
+                    "missing_chapter": missing_chapter,
+                    "missing_verse": missing_verse,
+                    "string_chapters": string_chapters,
+                    "string_verses": string_verses,
+                    "problematic_docs": problematic_docs
+                }
+            
+            try:
+                success, message, data = asyncio.run(check_bible_database())
+                
+                if not success:
+                    self.log_test("Bible Database - Collection Check", False, message)
+                    return False
+                
+                # Test results
+                total_verses = data.get("total_verses", 0)
+                if total_verses > 0:
+                    self.log_test("Bible Database - Collection Exists", True, f"Found {total_verses} verses")
+                else:
+                    self.log_test("Bible Database - Collection Exists", False, "No verses found")
+                    return False
+                
+                # Check for None values (these cause the sorting error)
+                none_issues = data.get("none_book", 0) + data.get("none_chapter", 0) + data.get("none_verse", 0)
+                if none_issues > 0:
+                    self.log_test("Bible Database - None Values", False, 
+                                f"Found {data.get('none_book', 0)} None books, {data.get('none_chapter', 0)} None chapters, {data.get('none_verse', 0)} None verses")
+                else:
+                    self.log_test("Bible Database - None Values", True, "No None values found in sorting fields")
+                
+                # Check for missing fields
+                missing_issues = data.get("missing_book", 0) + data.get("missing_chapter", 0) + data.get("missing_verse", 0)
+                if missing_issues > 0:
+                    self.log_test("Bible Database - Missing Fields", False,
+                                f"Found {data.get('missing_book', 0)} missing books, {data.get('missing_chapter', 0)} missing chapters, {data.get('missing_verse', 0)} missing verses")
+                else:
+                    self.log_test("Bible Database - Missing Fields", True, "All required fields present")
+                
+                # Check for type issues
+                type_issues = data.get("string_chapters", 0) + data.get("string_verses", 0)
+                if type_issues > 0:
+                    self.log_test("Bible Database - Type Issues", False,
+                                f"Found {data.get('string_chapters', 0)} string chapters, {data.get('string_verses', 0)} string verses (should be integers)")
+                else:
+                    self.log_test("Bible Database - Type Issues", True, "Chapter and verse fields have correct types")
+                
+                # Show problematic documents
+                problematic_docs = data.get("problematic_docs", [])
+                if problematic_docs:
+                    self.log_test("Bible Database - Problematic Documents", False, f"Found {len(problematic_docs)} documents with None values")
+                    for i, doc in enumerate(problematic_docs):
+                        print(f"   Document {i+1}: book={doc['book']}, chapter={doc['chapter']}, verse={doc['verse']}")
+                else:
+                    self.log_test("Bible Database - Problematic Documents", True, "No problematic documents found")
+                
+                return none_issues == 0 and missing_issues == 0
+                
+            except Exception as e:
+                self.log_test("Bible Database Content Check", False, f"Database error: {str(e)}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Bible Database Content Check", False, f"Error: {str(e)}")
+            return False
+
+    def test_related_bible_endpoints(self):
+        """Test related Bible endpoints to see if they work"""
+        try:
+            print("\n🔍 Testing Related Bible Endpoints...")
+            
+            # Test /api/bible/books
+            response = self.session.get(f"{self.base_url}/bible/books")
+            if response.status_code == 200:
+                data = response.json()
+                books = data.get('books', [])
+                self.log_test("Bible Books Endpoint", True, f"Found {len(books)} books")
+            else:
+                self.log_test("Bible Books Endpoint", False, f"Status: {response.status_code}")
+            
+            # Test /api/bible/stats
+            response = self.session.get(f"{self.base_url}/bible/stats")
+            if response.status_code == 200:
+                data = response.json()
+                total_verses = data.get('totalVerses', 0)
+                total_books = data.get('totalBooks', 0)
+                self.log_test("Bible Stats Endpoint", True, f"Stats: {total_books} books, {total_verses} verses")
+            else:
+                self.log_test("Bible Stats Endpoint", False, f"Status: {response.status_code}")
+            
+            # Test /api/bible/verses/{book}/{chapter} with known good data
+            test_chapters = [
+                ("Genesis", 1),
+                ("Exodus", 1),
+                ("Matthew", 1)
+            ]
+            
+            working_chapters = 0
+            for book, chapter in test_chapters:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verses/{book}/{chapter}")
+                    if response.status_code == 200:
+                        data = response.json()
+                        verses = data.get('verses', [])
+                        self.log_test(f"Bible Chapter - {book} {chapter}", True, f"Found {len(verses)} verses")
+                        working_chapters += 1
+                    else:
+                        self.log_test(f"Bible Chapter - {book} {chapter}", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Bible Chapter - {book} {chapter}", False, f"Error: {str(e)}")
+            
+            # Test /api/bible/verse/{book}/{chapter}/{verse} with specific verse
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Genesis/1/1")
+                if response.status_code == 200:
+                    data = response.json()
+                    verse_text = data.get('text', '')
+                    self.log_test("Bible Specific Verse", True, f"Genesis 1:1 text length: {len(verse_text)}")
+                else:
+                    self.log_test("Bible Specific Verse", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Bible Specific Verse", False, f"Error: {str(e)}")
+            
+            return working_chapters > 0
+            
+        except Exception as e:
+            self.log_test("Related Bible Endpoints", False, f"Error: {str(e)}")
+            return False
+
     def test_new_biblical_structure_verification(self):
         """Test that the new biblical structure is working correctly"""
         try:
