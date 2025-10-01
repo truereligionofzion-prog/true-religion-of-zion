@@ -6,7 +6,7 @@ Focused testing of new interactive features
 import requests
 import json
 
-BACKEND_URL = "https://biblestudy-precepts.preview.emergentagent.com/api"
+BACKEND_URL = "https://covenant-app.preview.emergentagent.com/api"
 
 def test_new_features():
     session = requests.Session()

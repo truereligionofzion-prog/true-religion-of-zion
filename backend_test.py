@@ -18,7 +18,7 @@ import asyncio
 from typing import Dict, List, Any
 
 # Get backend URL from environment
-BACKEND_URL = "https://biblestudy-precepts.preview.emergentagent.com/api"
+BACKEND_URL = "https://covenant-app.preview.emergentagent.com/api"
 
 class APITester:
     def __init__(self, base_url: str):
