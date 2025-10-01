@@ -56,6 +56,7 @@ const MitzvotApp = () => {
   // Precepts interaction state
   const [expandedVerses, setExpandedVerses] = useState({}); // Track which verses are expanded
   const [preceptVerseIndex, setPreceptVerseIndex] = useState({}); // Track current verse index for each precept
+  const [viewMode, setViewMode] = useState('cards'); // Track current view mode
 
   const { toast } = useToast();
 
