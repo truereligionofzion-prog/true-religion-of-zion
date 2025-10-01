@@ -1246,6 +1246,38 @@ const MitzvotApp = () => {
                         </Card>
                       );
                     })
+                  ) : (
+                    (bibleVerses || []).map((verse) => (
+                      <Card key={verse.id} className="hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <CardTitle className="text-lg leading-tight">
+                              <span className="text-green-600 font-bold">📖</span> {verse.book} {verse.chapter}:{verse.verse}
+                            </CardTitle>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm text-gray-600 italic bg-gray-50 p-3 rounded border-l-4 border-green-200">
+                                "{verse.text}"
+                              </p>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+                              <Badge variant="secondary" className="capitalize">
+                                {verse.testament} Testament
+                              </Badge>
+                              {verse.has_precept && (
+                                <Badge variant="outline" className="text-green-700 border-green-300">
+                                  Has Precepts
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
                   )}
                 </div>
               </TabsContent>
