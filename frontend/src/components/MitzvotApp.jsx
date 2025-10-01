@@ -587,6 +587,72 @@ const MitzvotApp = () => {
     };
   };
 
+  const startBibleQuiz = async (testament = 'all') => {
+    try {
+      setLoading(true);
+      
+      // Create a simple demo quiz for Bible
+      const demoQuestions = [
+        {
+          question: "In which book does YHWH create the heaven and the earth?",
+          answers: ["Genesis", "Exodus", "Psalms", "Isaiah"],
+          correctAnswer: "Genesis"
+        },
+        {
+          question: "How many books are included in the complete Bible with Apocrypha?",
+          answers: ["66", "73", "80", "81"],
+          correctAnswer: "80"
+        },
+        {
+          question: "Which testament contains the book of Tobit?",
+          answers: ["Old Testament", "New Testament", "Apocrypha"],
+          correctAnswer: "Apocrypha"
+        },
+        {
+          question: "What divine name is used in place of 'LORD' in this Bible?",
+          answers: ["YHWH", "Jehovah", "Adonai", "Elohim"],
+          correctAnswer: "YHWH"
+        },
+        {
+          question: "Which book contains the verse 'In the beginning was the Word'?",
+          answers: ["Genesis", "John", "Proverbs", "Isaiah"],
+          correctAnswer: "John"
+        }
+      ];
+      
+      // Filter questions based on testament if needed
+      let filteredQuestions = demoQuestions;
+      if (testament === 'old') {
+        filteredQuestions = [demoQuestions[0], demoQuestions[1], demoQuestions[3]]; // Focus on OT
+      } else if (testament === 'new') {
+        filteredQuestions = [demoQuestions[4], demoQuestions[1]]; // Focus on NT
+      } else if (testament === 'apocrypha') {
+        filteredQuestions = [demoQuestions[2], demoQuestions[1]]; // Focus on Apocrypha
+      }
+      
+      setQuizData({ questions: filteredQuestions });
+      setCurrentQuestionIndex(0);
+      setSelectedAnswer('');
+      setShowResult(false);
+      setScore(0);
+      setActiveTab('quiz');
+      
+      toast({
+        title: "Bible Quiz Started!",
+        description: `Starting quiz with ${filteredQuestions.length} questions about the Bible with Apocrypha.`,
+      });
+    } catch (error) {
+      console.error('Error starting Bible quiz:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start Bible quiz. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const submitAnswer = () => {
     if (!selectedAnswer || !quizData) return;
     
