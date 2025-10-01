@@ -2512,20 +2512,82 @@ class APITester:
         return passed >= total * 0.8  # 80% success rate required
 
 def main():
-    """Main test execution"""
-    print("🚀 613 Biblical Laws API - PRECEPTS INTEGRATION Testing")
-    print(f"Testing against: {BACKEND_URL}")
-    print()
+    """Run focused Bible verses API testing to diagnose the 500 error"""
+    print("🚀 Starting Bible Verses API Error Diagnosis")
+    print("=" * 80)
+    print("Focus: Diagnosing 500 error in /api/bible/verses endpoint")
+    print("Error: '<' not supported between instances of 'str' and 'NoneType'")
+    print("=" * 80)
     
     tester = APITester(BACKEND_URL)
-    success = tester.run_all_tests()
     
-    if success:
-        print("\n🎉 ALL TESTS PASSED! The precepts integration is working correctly with existing mitzvot functionality.")
-        sys.exit(0)
-    else:
-        print("\n⚠️  SOME TESTS FAILED. Please review the issues above.")
-        sys.exit(1)
+    # Test basic connectivity first
+    if not tester.test_api_root():
+        print("❌ Cannot connect to API. Exiting.")
+        return
+    
+    # Run focused Bible verses tests
+    test_functions = [
+        tester.test_bible_verses_endpoint_error,
+        tester.test_bible_database_content,
+        tester.test_related_bible_endpoints
+    ]
+    
+    passed_tests = 0
+    total_tests = len(test_functions)
+    
+    for test_func in test_functions:
+        try:
+            if test_func():
+                passed_tests += 1
+        except Exception as e:
+            print(f"❌ Test {test_func.__name__} failed with exception: {e}")
+    
+    # Print summary
+    print("\n" + "=" * 80)
+    print("📊 BIBLE VERSES API DIAGNOSIS SUMMARY")
+    print("=" * 80)
+    
+    # Print individual test results
+    print("\n📋 DETAILED RESULTS:")
+    for result in tester.test_results:
+        status = "✅" if result["passed"] else "❌"
+        print(f"{status} {result['test']}")
+        if result["details"]:
+            print(f"   └─ {result['details']}")
+    
+    # Analysis and recommendations
+    print("\n" + "=" * 80)
+    print("🔍 ANALYSIS AND RECOMMENDATIONS")
+    print("=" * 80)
+    
+    print("\n📍 ROOT CAUSE ANALYSIS:")
+    print("The error '<' not supported between instances of 'str' and 'NoneType'")
+    print("occurs in the sorting operation at line 419 of server.py:")
+    print("cursor = bible_verses_collection.find(query).sort([('book', 1), ('chapter', 1), ('verse', 1)])")
+    print("\nThis happens when MongoDB tries to sort documents where some have:")
+    print("- book field = string value (e.g., 'Genesis')")
+    print("- book field = None/null value")
+    print("- chapter field = integer value (e.g., 1)")
+    print("- chapter field = None/null value")
+    print("- verse field = integer value (e.g., 1)")
+    print("- verse field = None/null value")
+    
+    print("\n🛠️  RECOMMENDED FIXES:")
+    print("1. Add data validation before sorting:")
+    print("   query['book'] = {'$ne': None}")
+    print("   query['chapter'] = {'$ne': None}")
+    print("   query['verse'] = {'$ne': None}")
+    
+    print("\n2. Or handle None values in the query:")
+    print("   cursor = bible_verses_collection.find(query).sort([")
+    print("       ('book', 1), ('chapter', 1), ('verse', 1)")
+    print("   ]).skip(skip).limit(limit)")
+    print("   # Add: .collation({'locale': 'en', 'numericOrdering': True})")
+    
+    print("\n3. Clean up database by removing/fixing documents with None values")
+    
+    print("\n4. Add error handling around the sorting operation")
 
 if __name__ == "__main__":
     main()
