@@ -19,12 +19,15 @@ const MitzvotApp = () => {
   const { user, isAuthenticated } = useAuth();
   
   // State management
-  const [contentType, setContentType] = useState('mitzvot'); // 'mitzvot' or 'precepts'
+  const [contentType, setContentType] = useState('mitzvot'); // 'mitzvot', 'precepts', or 'bible'
   const [mitzvot, setMitzvot] = useState([]);
   const [precepts, setPrecepts] = useState([]);
+  const [bibleVerses, setBibleVerses] = useState([]);
+  const [bibleBooks, setBibleBooks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [stats, setStats] = useState({});
   const [preceptsStats, setPreceptsStats] = useState({});
+  const [bibleStats, setBibleStats] = useState({});
   const [mitzvahOfTheDay, setMitzvahOfTheDay] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
