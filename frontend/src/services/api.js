@@ -143,6 +143,51 @@ class ApiService {
     return this.request('/precepts-stats');
   }
 
+  // ===== BIBLE API METHODS =====
+  
+  // Get all Bible books
+  async getBibleBooks(params = {}) {
+    const queryParams = new URLSearchParams();
+    
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '' && value !== 'all') {
+        queryParams.append(key, value);
+      }
+    });
+
+    const endpoint = `/bible/books${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
+  }
+
+  // Get Bible verses with filtering and pagination
+  async getBibleVerses(params = {}) {
+    const queryParams = new URLSearchParams();
+    
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '' && value !== 'all') {
+        queryParams.append(key, value);
+      }
+    });
+
+    const endpoint = `/bible/verses${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
+  }
+
+  // Get specific Bible chapter
+  async getBibleChapter(book, chapter) {
+    return this.request(`/bible/verses/${encodeURIComponent(book)}/${chapter}`);
+  }
+
+  // Get specific Bible verse
+  async getBibleVerse(book, chapter, verse) {
+    return this.request(`/bible/verse/${encodeURIComponent(book)}/${chapter}/${verse}`);
+  }
+
+  // Get Bible statistics
+  async getBibleStats() {
+    return this.request('/bible/stats');
+  }
+
   // Initialize database (development/admin use)
   async initializeData() {
     return this.request('/initialize', { method: 'POST' });
