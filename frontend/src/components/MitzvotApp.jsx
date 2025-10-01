@@ -230,6 +230,116 @@ const MitzvotApp = () => {
     }
   };
 
+  // Phase 3C: Advanced search functionality
+  const loadAdvancedBibleSearch = async () => {
+    try {
+      setLoading(true);
+      
+      const params = {
+        search_text: searchTerm,
+        books: advancedFilters.books,
+        testament: advancedFilters.testament,
+        chapters: advancedFilters.chapters,
+        has_precept: advancedFilters.hasPrecept,
+        divine_names: advancedFilters.divineNames,
+        exact_match: advancedFilters.exactMatch,
+        page: currentPage,
+        limit: 20
+      };
+      
+      // Remove empty parameters
+      Object.keys(params).forEach(key => {
+        if (params[key] === '' || params[key] === null || params[key] === 'all') {
+          delete params[key];
+        }
+      });
+      
+      const response = await apiService.getAdvancedBibleSearch(params);
+      
+      setBibleVerses(response.verses);
+      setTotalPages(response.totalPages);
+      
+      toast({
+        title: "Advanced Search Complete",
+        description: `Found ${response.total} verses matching your criteria`,
+      });
+      
+    } catch (error) {
+      console.error('Error in advanced search:', error);
+      toast({
+        title: "Advanced Search Error",
+        description: "Failed to perform advanced search. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadCrossReferences = async (book, chapter, verse) => {
+    try {
+      setLoading(true);
+      
+      const params = {};
+      if (book) params.book = book;
+      if (chapter) params.chapter = chapter; 
+      if (verse) params.verse = verse;
+      
+      const response = await apiService.getCrossReferences(params);
+      setCrossReferences(response.cross_references);
+      setShowCrossReferences(true);
+      
+      toast({
+        title: "Cross-References Loaded",
+        description: `Found ${response.total_connections} connections`,
+      });
+      
+    } catch (error) {
+      console.error('Error loading cross references:', error);
+      toast({
+        title: "Cross-References Error", 
+        description: "Failed to load cross-references. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const searchDivineNames = async (divineName = null) => {
+    try {
+      setLoading(true);
+      
+      const params = {
+        divine_name: divineName,
+        book: selectedBook !== 'all' ? selectedBook : null,
+        testament: selectedCategory !== 'all' ? selectedCategory : null,
+        page: currentPage,
+        limit: 20
+      };
+      
+      const response = await apiService.searchDivineNames(params);
+      
+      setBibleVerses(response.verses);
+      setTotalPages(response.totalPages);
+      
+      toast({
+        title: "Divine Names Search",
+        description: `Found ${response.total} verses with divine names`,
+      });
+      
+    } catch (error) {
+      console.error('Error searching divine names:', error);
+      toast({
+        title: "Divine Names Search Error",
+        description: "Failed to search divine names. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle search with debouncing
   useEffect(() => {
     const timeoutId = setTimeout(() => {
