@@ -1,35 +1,330 @@
 {
-  "extraction_timestamp": "2025-10-01 01:25:58",
+  "extraction_timestamp": "2025-10-01 01:26:35",
   "chapters": {
     "Genesis_1": {
       "book": "Genesis",
       "chapter": 1,
       "title": "Genesis 1",
-      "verses": [],
-      "verse_count": 0,
+      "verses": [
+        {
+          "verse": 1,
+          "text": "In the beginning YHWH created the heaven and the earth.",
+          "has_precept": true
+        },
+        {
+          "verse": 1,
+          "text": "In the beginning YHWH created the heaven and the earth.",
+          "has_precept": true
+        },
+        {
+          "verse": 2,
+          "text": "And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of YHWH moved upon the face of the waters.",
+          "has_precept": false
+        },
+        {
+          "verse": 3,
+          "text": "And YHWH said, Let there be light: and there was light.",
+          "has_precept": false
+        },
+        {
+          "verse": 4,
+          "text": "And YHWH saw the light, that it was good: and YHWH divided the light from the darkness.",
+          "has_precept": false
+        },
+        {
+          "verse": 5,
+          "text": "And YHWH called the light Day, and the darkness he called Night. And the evening and the morning were the first day.",
+          "has_precept": true
+        },
+        {
+          "verse": 5,
+          "text": "And YHWH called the light Day, and the darkness he called Night. And the evening and the morning were the first day.",
+          "has_precept": true
+        },
+        {
+          "verse": 6,
+          "text": "And YHWH said, Let there be a firmament in the midst of the waters, and let it divide the waters from the waters.",
+          "has_precept": false
+        },
+        {
+          "verse": 7,
+          "text": "And YHWH made the firmament, and divided the waters which were under the firmament from the waters which were above the firmament: and it was so.",
+          "has_precept": false
+        },
+        {
+          "verse": 8,
+          "text": "And YHWH called the firmament Heaven. And the evening and the morning were the second day.",
+          "has_precept": false
+        },
+        {
+          "verse": 9,
+          "text": "And YHWH said, Let the waters under the heaven be gathered together unto one place, and let the dry land appear: and it was so.",
+          "has_precept": false
+        },
+        {
+          "verse": 10,
+          "text": "And YHWH called the dry land Earth; and the gathering together of the waters called he Seas: and YHWH saw that it was good.",
+          "has_precept": false
+        },
+        {
+          "verse": 11,
+          "text": "And YHWH said, Let the earth bring forth grass, the herb yielding seed, and the fruit tree yielding fruit after his kind, whose seed is in itself, upon the earth: and it was so.",
+          "has_precept": false
+        },
+        {
+          "verse": 12,
+          "text": "And the earth brought forth grass, and herb yielding seed after his kind, and the tree yielding fruit, whose seed was in itself, after his kind: and YHWH saw that it was good.",
+          "has_precept": false
+        },
+        {
+          "verse": 13,
+          "text": "And the evening and the morning were the third day.",
+          "has_precept": false
+        },
+        {
+          "verse": 14,
+          "text": "And YHWH said, Let there be lights in the firmament of the heaven to divide the day from the night; and let them be for signs, and for seasons, and for days, and years:",
+          "has_precept": false
+        },
+        {
+          "verse": 15,
+          "text": "And let them be for lights in the firmament of the heaven to give light upon the earth: and it was so.",
+          "has_precept": false
+        },
+        {
+          "verse": 16,
+          "text": "And YHWH made two great lights; the greater light to rule the day, and the lesser light to rule the night: he made the stars also.",
+          "has_precept": true
+        },
+        {
+          "verse": 16,
+          "text": "And YHWH made two great lights; the greater light to rule the day, and the lesser light to rule the night: he made the stars also.",
+          "has_precept": true
+        },
+        {
+          "verse": 17,
+          "text": "And YHWH set them in the firmament of the heaven to give light upon the earth,",
+          "has_precept": false
+        },
+        {
+          "verse": 18,
+          "text": "And to rule over the day and over the night, and to divide the light from the darkness: and YHWH saw that it was good.",
+          "has_precept": false
+        },
+        {
+          "verse": 19,
+          "text": "And the evening and the morning were the fourth day.",
+          "has_precept": false
+        },
+        {
+          "verse": 20,
+          "text": "And YHWH said, Let the waters bring forth abundantly the moving creature that hath life, and fowl that may fly above the earth in the open firmament of heaven.",
+          "has_precept": false
+        },
+        {
+          "verse": 21,
+          "text": "And YHWH created great whales, and every living creature that moveth, which the waters brought forth abundantly, after their kind, and every winged fowl after his kind: and YHWH saw that it was good.",
+          "has_precept": false
+        },
+        {
+          "verse": 22,
+          "text": "And YHWH blessed them, saying, Be fruitful, and multiply, and fill the waters in the seas, and let fowl multiply in the earth.",
+          "has_precept": false
+        },
+        {
+          "verse": 23,
+          "text": "And the evening and the morning were the fifth day.",
+          "has_precept": false
+        },
+        {
+          "verse": 24,
+          "text": "And YHWH said, Let the earth bring forth the living creature after his kind, cattle, and creeping thing, and beast of the earth after his kind: and it was so.",
+          "has_precept": false
+        },
+        {
+          "verse": 25,
+          "text": "And YHWH made the beast of the earth after his kind, and cattle after their kind, and every thing that creepeth upon the earth after his kind: and YHWH saw that it was good.",
+          "has_precept": false
+        },
+        {
+          "verse": 26,
+          "text": "And YHWH said, Let us make man in our image, after our likeness: and let them have dominion over the fish of the sea, and over the fowl of the air, and over the cattle, and over all the earth, and over every creeping thing that creepeth upon the earth.",
+          "has_precept": false
+        },
+        {
+          "verse": 27,
+          "text": "So YHWH created man in his own image, in the image of YHWH created he him; male and female created he them.",
+          "has_precept": true
+        },
+        {
+          "verse": 27,
+          "text": "So YHWH created man in his own image, in the image of YHWH created he him; male and female created he them.",
+          "has_precept": true
+        },
+        {
+          "verse": 28,
+          "text": "And YHWH blessed them, and YHWH said unto them, Be fruitful, and multiply, and replenish the earth, and subdue it: and have dominion over the fish of the sea, and over the fowl of the air, and over every living thing that moveth upon the earth.",
+          "has_precept": false
+        },
+        {
+          "verse": 29,
+          "text": "And YHWH said, Behold, I have given you every herb bearing seed, which is upon the face of all the earth, and every tree, in the which is the fruit of a tree yielding seed; to you it shall be for meat.",
+          "has_precept": false
+        },
+        {
+          "verse": 30,
+          "text": "And to every beast of the earth, and to every fowl of the air, and to every thing that creepeth upon the earth, wherein there is life, I have given every green herb for meat: and it was so.",
+          "has_precept": false
+        },
+        {
+          "verse": 31,
+          "text": "And YHWH saw every thing that he had made, and, behold, it was very good. And the evening and the morning were the sixth day.",
+          "has_precept": false
+        }
+      ],
+      "verse_count": 35,
       "source_url": "https://thepreceptbible.com/bible?field_book_target_id=60&page=0"
     },
     "Tobit_1": {
       "book": "Tobit",
       "chapter": 1,
       "title": "Tobit 1",
-      "verses": [],
-      "verse_count": 0,
+      "verses": [
+        {
+          "verse": 1,
+          "text": "The book of the words of Tobit, son of Tobiel, the son of Ananiel, the son of Aduel, the son of Gabael, of the seed of Asael, of the tribe of Nephthali;",
+          "has_precept": false
+        },
+        {
+          "verse": 2,
+          "text": "Who in the time of Enemessar king of the Assyrians was led captive out of Thisbe, which is at the right hand of that city, which is called properly Nephthali in Galilee above Aser.",
+          "has_precept": false
+        },
+        {
+          "verse": 3,
+          "text": "I Tobit have walked all the days of my life in the ways of truth and justice, and I did many almsdeeds to my brethren, and my nation, who came with me to Nineve, into the land of the Assyrians.",
+          "has_precept": false
+        },
+        {
+          "verse": 4,
+          "text": "And when I was in mine own country, in the land of Israel being but young, all the tribe of Nephthali my father fell from the house of Jerusalem, which was chosen out of all the tribes of Israel, that all the tribes should sacrifice there, where the temple of the habitation of the most High was consecrated and built for all ages.",
+          "has_precept": true
+        },
+        {
+          "verse": 4,
+          "text": "And when I was in mine own country, in the land of Israel being but young, all the tribe of Nephthali my father fell from the house of Jerusalem, which was chosen out of all the tribes of Israel, that all the tribes should sacrifice there, where the temple of the habitation of the most High was consecrated and built for all ages.",
+          "has_precept": true
+        },
+        {
+          "verse": 5,
+          "text": "Now all the tribes which together revolted, and the house of my father Nephthali, sacrificed unto the heifer Baal.",
+          "has_precept": false
+        },
+        {
+          "verse": 6,
+          "text": "But I alone went often to Jerusalem at the feasts, as it was ordained unto all the people of Israel by an everlasting decree, having the firstfruits and tenths of increase, with that which was first shorn; and them gave I at the altar to the priests the children of Aaron.",
+          "has_precept": false
+        },
+        {
+          "verse": 7,
+          "text": "The first tenth part of all increase I gave to the sons of Aaron, who ministered at Jerusalem: another tenth part I sold away, and went, and spent it every year at Jerusalem:",
+          "has_precept": false
+        },
+        {
+          "verse": 8,
+          "text": "And the third I gave unto them to whom it was meet, as Debora my father's mother had commanded me, because I was left an orphan by my father.",
+          "has_precept": false
+        },
+        {
+          "verse": 9,
+          "text": "Furthermore, when I was come to the age of a man, I married Anna of mine own kindred, and of her I begat Tobias.",
+          "has_precept": false
+        },
+        {
+          "verse": 10,
+          "text": "And when we were carried away captives to Nineve, all my brethren and those that were of my kindred did eat of the bread of the Gentiles.",
+          "has_precept": false
+        },
+        {
+          "verse": 11,
+          "text": "But I kept myself from eating;",
+          "has_precept": false
+        },
+        {
+          "verse": 12,
+          "text": "Because I remembered YHWH with all my heart.",
+          "has_precept": false
+        },
+        {
+          "verse": 13,
+          "text": "And the most High gave me grace and favour before Enemessar, so that I was his purveyor.",
+          "has_precept": false
+        },
+        {
+          "verse": 14,
+          "text": "And I went into Media, and left in trust with Gabael, the brother of Gabrias, at Rages a city of Media ten talents of silver.",
+          "has_precept": false
+        },
+        {
+          "verse": 15,
+          "text": "Now when Enemessar was dead, Sennacherib his son reigned in his stead; whose estate was troubled, that I could not go into Media.",
+          "has_precept": false
+        },
+        {
+          "verse": 16,
+          "text": "And in the time of Enemessar I gave many alms to my brethren, and gave my bread to the hungry,",
+          "has_precept": false
+        },
+        {
+          "verse": 17,
+          "text": "And my clothes to the naked: and if I saw any of my nation dead, or cast about the walls of Nineve, I buried him.",
+          "has_precept": false
+        },
+        {
+          "verse": 18,
+          "text": "And if the king Sennacherib had slain any, when he was come, and fled from Judea, I buried them privily; for in his wrath he killed many; but the bodies were not found, when they were sought for of the king.",
+          "has_precept": false
+        },
+        {
+          "verse": 19,
+          "text": "And when one of the Ninevites went and complained of me to the king, that I buried them, and hid myself; understanding that I was sought for to be put to death, I withdrew myself for fear.",
+          "has_precept": false
+        },
+        {
+          "verse": 20,
+          "text": "Then all my goods were forcibly taken away, neither was there any thing left me, beside my wife Anna and my son Tobias.",
+          "has_precept": false
+        },
+        {
+          "verse": 21,
+          "text": "And there passed not five and fifty days, before two of his sons killed him, and they fled into the mountains of Ararath; and Sarchedonus his son reigned in his stead; who appointed over his father's accounts, and over all his affairs, Achiacharus my brother Anael's son.",
+          "has_precept": false
+        },
+        {
+          "verse": 22,
+          "text": "And Achiacharus intreating for me, I returned to Nineve. Now Achiacharus was cupbearer, and keeper of the signet, and steward, and overseer of the accounts: and Sarchedonus appointed him next unto him: and he was my brother's son.",
+          "has_precept": false
+        }
+      ],
+      "verse_count": 23,
       "source_url": "https://thepreceptbible.com/bible?field_book_target_id=99&page=0"
     }
   },
   "summary": {
     "total_chapters_extracted": 2,
-    "total_verses_extracted": 0,
+    "total_verses_extracted": 58,
     "books_tested": [
       "Tobit",
       "Genesis"
     ],
-    "average_verses_per_chapter": 0.0
+    "average_verses_per_chapter": 29.0
   },
   "validation": {
-    "issues": [],
-    "divine_name_replacements": 0,
-    "data_quality_score": 100
+    "issues": [
+      "Genesis_1: Verse numbering gaps detected",
+      "Tobit_1: Verse numbering gaps detected"
+    ],
+    "divine_name_replacements": 31,
+    "data_quality_score": 80
   }
 }
