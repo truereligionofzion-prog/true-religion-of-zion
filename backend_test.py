@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for 613 Biblical Laws API - PRECEPTS INTEGRATION
-Tests the precepts integration system to ensure:
-- Existing mitzvot endpoints still work correctly (/api/mitzvot, /api/stats, etc.)
-- New precepts data is properly stored and accessible via database
-- Both mitzvot and precepts collections exist and are independent
-- YHWH/YHUH replacements work in both mitzvot and precepts data
-- MongoDB indexing is working for both collections
-- No conflicts between mitzvot and precepts functionality
+Backend Testing for Bible Verses API Issue - CRITICAL ERROR DIAGNOSIS
+Tests the Bible verses API endpoint to diagnose the 500 error:
+"ERROR:server:Error getting bible verses: '<' not supported between instances of 'str' and 'NoneType'"
+
+Focus areas:
+- Test /api/bible/verses endpoint to reproduce the error
+- Check database content for any data issues (null values, missing fields)
+- Identify the line of code causing the comparison error
+- Test related Bible endpoints (/api/bible/books, /api/bible-stats)
+- Check for any None/null values in the Bible verses collection
 """
 
 import requests
