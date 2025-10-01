@@ -1404,8 +1404,135 @@ const MitzvotApp = () => {
                           ))}
                         </SelectContent>
                       </Select>
+                      
+                      {/* Phase 3C: Advanced Bible Features */}
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setAdvancedSearchOpen(!advancedSearchOpen)}
+                        >
+                          <Filter className="w-4 h-4 mr-2" />
+                          Advanced
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => searchDivineNames()}
+                          title="Search for YHWH, Elohim, YHUH"
+                        >
+                          ✨ Divine Names
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => loadCrossReferences()}
+                          title="Show cross-references with precepts"
+                        >
+                          🔗 Cross-Refs
+                        </Button>
+                      </div>
                     </>
                   )}
+                </div>
+
+                {/* Phase 3C: Advanced Search Panel */}
+                {contentType === 'bible' && advancedSearchOpen && (
+                  <div className="mt-4 p-4 border rounded-lg bg-gray-50">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Books (comma-separated)</label>
+                        <Input
+                          placeholder="e.g., Genesis, Exodus, Matthew"
+                          value={advancedFilters.books}
+                          onChange={(e) => setAdvancedFilters({...advancedFilters, books: e.target.value})}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Chapters</label>
+                        <Input
+                          placeholder="e.g., 1-5 or 1,3,5"
+                          value={advancedFilters.chapters}
+                          onChange={(e) => setAdvancedFilters({...advancedFilters, chapters: e.target.value})}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Testament</label>
+                        <Select 
+                          value={advancedFilters.testament} 
+                          onValueChange={(value) => setAdvancedFilters({...advancedFilters, testament: value})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Testaments</SelectItem>
+                            <SelectItem value="old">Old Testament</SelectItem>
+                            <SelectItem value="new">New Testament</SelectItem>
+                            <SelectItem value="apocrypha">Apocrypha</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-4 mb-4">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={advancedFilters.hasPrecept === true}
+                          onChange={(e) => setAdvancedFilters({...advancedFilters, hasPrecept: e.target.checked ? true : null})}
+                        />
+                        <span className="text-sm">Has Precept Connection</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={advancedFilters.divineNames}
+                          onChange={(e) => setAdvancedFilters({...advancedFilters, divineNames: e.target.checked})}
+                        />
+                        <span className="text-sm">Contains Divine Names</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={advancedFilters.exactMatch}
+                          onChange={(e) => setAdvancedFilters({...advancedFilters, exactMatch: e.target.checked})}
+                        />
+                        <span className="text-sm">Exact Phrase Match</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={divineNameHighlight}
+                          onChange={(e) => setDivineNameHighlight(e.target.checked)}
+                        />
+                        <span className="text-sm">Highlight Divine Names</span>
+                      </label>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button onClick={loadAdvancedBibleSearch}>
+                        <Search className="w-4 h-4 mr-2" />
+                        Advanced Search
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setAdvancedFilters({
+                            books: '',
+                            testament: 'all',
+                            chapters: '',
+                            hasPrecept: null,
+                            divineNames: false,
+                            exactMatch: false
+                          });
+                        }}
+                      >
+                        Reset Filters
+                      </Button>
+                    </div>
+                  </div>
+                )}
                 </div>
               </CardContent>
             </Card>
