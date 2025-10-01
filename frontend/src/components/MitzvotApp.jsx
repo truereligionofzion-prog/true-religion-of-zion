@@ -1784,11 +1784,18 @@ const MitzvotApp = () => {
                           <div className="text-sm opacity-75">Review mitzvot cards due today</div>
                         </div>
                       </Button>
-                    ) : (
+                    ) : contentType === 'precepts' ? (
                       <Button onClick={startPreceptsFlashcards} className="h-16 w-full">
                         <div className="text-center">
                           <div className="font-semibold">Start Precepts Review</div>
                           <div className="text-sm opacity-75">Study biblical precepts and verses</div>
+                        </div>
+                      </Button>
+                    ) : (
+                      <Button onClick={startBibleFlashcards} className="h-16 w-full">
+                        <div className="text-center">
+                          <div className="font-semibold">Start Bible Review</div>
+                          <div className="text-sm opacity-75">Study Bible verses and books</div>
                         </div>
                       </Button>
                     )}
