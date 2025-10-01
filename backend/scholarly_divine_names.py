@@ -68,7 +68,7 @@ class ScholarlyDivineNameReplacer:
                 'replacement': 'YHUH'
             },
             
-            # Elohim (God/Gods) - plural of majesty, but preserve possessive forms
+            # Elohim with possessives - preserve the relationship words
             {
                 'english_forms': [
                     r'\bour\s+God\b',   # "our God" -> "our Elohim"
@@ -77,7 +77,12 @@ class ScholarlyDivineNameReplacer:
                     r'\bmy\s+God\b',    # "my God" -> "my Elohim"
                 ],
                 'hebrew_original': 'Elohim with possessive',
-                'replacement': lambda m: m.group(0).replace('God', 'Elohim')
+                'replacement_pairs': [
+                    ('our God', 'our Elohim'),
+                    ('thy God', 'thy Elohim'),
+                    ('your God', 'your Elohim'),
+                    ('my God', 'my Elohim')
+                ]
             },
             
             # Standalone Elohim
