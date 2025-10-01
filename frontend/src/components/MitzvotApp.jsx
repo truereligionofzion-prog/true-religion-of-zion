@@ -73,6 +73,28 @@ const MitzvotApp = () => {
 
   const { toast } = useToast();
 
+  // Phase 3C: Divine name highlighting function
+  const highlightDivineNames = (text) => {
+    if (!divineNameHighlight || !text) return text;
+    
+    const divineNames = [
+      { name: 'YHWH', color: 'text-red-600 font-semibold', title: 'The Tetragrammaton - Divine Name of God' },
+      { name: 'Elohim', color: 'text-blue-600 font-semibold', title: 'Hebrew: God/Gods (plural of majesty)' },
+      { name: 'YHUH', color: 'text-purple-600 font-semibold', title: 'Adonai - Reverence substitute for YHWH' }
+    ];
+    
+    let highlightedText = text;
+    
+    divineNames.forEach(divine => {
+      const regex = new RegExp(`\\b${divine.name}\\b`, 'g');
+      highlightedText = highlightedText.replace(regex, 
+        `<span class="${divine.color}" title="${divine.title}">${divine.name}</span>`
+      );
+    });
+    
+    return <span dangerouslySetInnerHTML={{ __html: highlightedText }} />;
+  };
+
   // Status types removed - no longer using origin-based filtering
   // All mitzvot are considered biblical commands
 
