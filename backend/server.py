@@ -415,9 +415,20 @@ async def get_bible_verses(
         skip = (page - 1) * limit
         total_pages = math.ceil(total / limit)
         
-        # Get verses
+        # Get verses with proper sorting and deduplication
         cursor = bible_verses_collection.find(query).sort([("book", 1), ("chapter", 1), ("verse", 1)]).skip(skip).limit(limit)
         verses_data = await cursor.to_list(length=limit)
+        
+        # Remove any duplicate verses (same book, chapter, verse)
+        seen_verses = set()
+        unique_verses = []
+        for verse in verses_data:
+            verse_key = (verse.get('book'), verse.get('chapter'), verse.get('verse'))
+            if verse_key not in seen_verses:
+                seen_verses.add(verse_key)
+                unique_verses.append(verse)
+        
+        verses_data = unique_verses
         
         # Clean MongoDB documents
         verses = []
