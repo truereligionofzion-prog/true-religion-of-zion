@@ -56,14 +56,16 @@ class ScholarlyDivineNameReplacer:
                 ]
             },
             
-            # Handle remaining "the LORD" cases and preserve Hebrew word order
+            # Fix definite article issues - Hebrew has no definite article with YHWH
             {
                 'english_forms': [],  # Empty since we use replacement_pairs  
-                'hebrew_original': 'YHWH patterns',
+                'hebrew_original': 'YHWH definite article fixes',
                 'replacement_pairs': [
-                    ('the LORD', 'YHWH'),
-                    # Hebrew structure: "YHWH Eloheinu YHWH Echad" = "YHWH our Elohim, YHWH one"  
-                    ('YHWH our Elohim is one YHWH', 'YHWH our Elohim, YHWH is one'),  # Fix word order
+                    ('the YHWH', 'YHWH'),      # Remove definite article (lowercase)
+                    ('The YHWH', 'YHWH'),      # Remove definite article (capitalized)
+                    ('the LORD', 'YHWH'),      # Convert remaining LORD references
+                    # Hebrew structure fixes
+                    ('YHWH our Elohim is one YHWH', 'YHWH our Elohim, YHWH is one'),
                 ]
             },
             
