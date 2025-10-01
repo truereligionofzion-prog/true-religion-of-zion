@@ -68,18 +68,13 @@ class ScholarlyDivineNameReplacer:
                 'replacement': 'YHUH'
             },
             
-            # Elohim with possessives - preserve the relationship words
+            # Standalone possessive Elohim (only if not already handled above)
             {
-                'english_forms': [
-                    r'\bour\s+God\b',   # "our God" -> "our Elohim"
-                    r'\bthy\s+God\b',   # "thy God" -> "thy Elohim" 
-                    r'\byour\s+God\b',  # "your God" -> "your Elohim"
-                    r'\bmy\s+God\b',    # "my God" -> "my Elohim"
-                ],
+                'english_forms': [],  # Empty since we use replacement_pairs
                 'hebrew_original': 'Elohim with possessive',
                 'replacement_pairs': [
                     ('our God', 'our Elohim'),
-                    ('thy God', 'thy Elohim'),
+                    ('thy God', 'thy Elohim'), 
                     ('your God', 'your Elohim'),
                     ('my God', 'my Elohim')
                 ]
