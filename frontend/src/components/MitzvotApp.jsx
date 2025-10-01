@@ -1414,16 +1414,16 @@ const MitzvotApp = () => {
 
                         {showResult && (
                           <div className={`p-4 rounded-lg ${
-                            selectedAnswer === quizData.questions[currentQuestionIndex].correct_answer
+                            selectedAnswer === (quizData.questions[currentQuestionIndex].correct_answer || quizData.questions[currentQuestionIndex].correctAnswer)
                               ? 'bg-green-100 border border-green-300'
                               : 'bg-red-100 border border-red-300'
                           }`}>
                             <p className={`font-semibold ${
-                              selectedAnswer === quizData.questions[currentQuestionIndex].correct_answer
+                              selectedAnswer === (quizData.questions[currentQuestionIndex].correct_answer || quizData.questions[currentQuestionIndex].correctAnswer)
                                 ? 'text-green-800'
                                 : 'text-red-800'
                             }`}>
-                              {selectedAnswer === quizData.questions[currentQuestionIndex].correct_answer
+                              {selectedAnswer === (quizData.questions[currentQuestionIndex].correct_answer || quizData.questions[currentQuestionIndex].correctAnswer)
                                 ? '✅ Correct!'
                                 : '❌ Incorrect'
                               }
