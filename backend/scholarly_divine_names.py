@@ -114,6 +114,18 @@ class ScholarlyDivineNameReplacer:
                 'english_forms': [r'\bGOD\b(?!\s+(?:of|Lord))'],
                 'hebrew_original': 'El',
                 'replacement': 'El'
+            },
+            
+            # Divine pronoun capitalization (when referring to YHWH/Elohim)
+            {
+                'english_forms': [],
+                'hebrew_original': 'Divine pronouns',
+                'replacement_pairs': [
+                    ('before me.', 'before Me.'),  # Exodus 20:3 context
+                    ('before me"', 'before Me"'),
+                    ('with me', 'with Me'),
+                    (' me ', ' Me '),  # Be careful with this one
+                ]
             }
         ]
     
