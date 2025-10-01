@@ -554,7 +554,9 @@ const MitzvotApp = () => {
     if (!selectedAnswer || !quizData) return;
     
     const currentQuestion = quizData.questions[currentQuestionIndex];
-    const isCorrect = selectedAnswer === currentQuestion.correct_answer;
+    // Handle both formats: correct_answer (mitzvot) and correctAnswer (precepts)
+    const correctAnswer = currentQuestion.correct_answer || currentQuestion.correctAnswer;
+    const isCorrect = selectedAnswer === correctAnswer;
     
     if (isCorrect) {
       setScore(score + 1);
@@ -575,8 +577,9 @@ const MitzvotApp = () => {
         const finalScore = isCorrect ? score + 1 : score;
         toast({
           title: "Quiz Completed!",
-          description: `Your score: ${finalScore}/${quizData.questions.length}`,
+          description: `You scored ${finalScore} out of ${quizData.questions.length}!`,
         });
+        resetQuiz();
       }
     }, autoAdvanceDelay);
   };
