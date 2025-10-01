@@ -1724,7 +1724,7 @@ const MitzvotApp = () => {
                           <div className="space-y-4">
                             <div>
                               <p className="text-sm text-gray-600 italic bg-gray-50 p-3 rounded border-l-4 border-green-200">
-                                "{verse.text}"
+                                "{highlightDivineNames(verse.text)}"
                               </p>
                             </div>
                             
