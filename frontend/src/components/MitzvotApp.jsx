@@ -120,8 +120,10 @@ const MitzvotApp = () => {
   const loadContent = async () => {
     if (contentType === 'mitzvot') {
       await loadMitzvot();
-    } else {
+    } else if (contentType === 'precepts') {
       await loadPrecepts();
+    } else {
+      await loadBibleVerses();
     }
   };
 
