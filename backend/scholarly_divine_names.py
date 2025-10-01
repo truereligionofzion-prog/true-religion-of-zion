@@ -81,7 +81,7 @@ class ScholarlyDivineNameReplacer:
             }
         ]
     
-    def apply_replacements(self, text: str, preserve_elohim: bool = True) -> Dict[str, any]:
+    def apply_replacements(self, text: str, preserve_elohim: bool = False) -> Dict[str, any]:
         """
         Apply scholarly-based divine name replacements to text
         
