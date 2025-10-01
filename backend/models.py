@@ -168,3 +168,42 @@ class AuthResponse(BaseModel):
     token: str
     user: UserProfile
     expiresIn: int = 86400  # 24 hours
+
+# ===== BIBLE MODELS =====
+
+class BibleVerse(BaseModel):
+    """Individual verse model"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    book: str
+    chapter: int
+    verse: int
+    text: str
+    has_precept: bool = False
+    testament: str  # 'old', 'new', 'apocrypha'
+    createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class BibleBook(BaseModel):
+    """Book model for metadata"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    testament: str  # 'old', 'new', 'apocrypha'
+    order: int  # Order in Bible (1-80)
+    chapter_count: int
+    verse_count: int
+    source_id: int  # thepreceptbible.com field_book_target_id
+    createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class BibleResponse(BaseModel):
+    verses: List[BibleVerse]
+    total: int
+    page: int
+    totalPages: int
+    filters: dict
+
+class BibleStatsResponse(BaseModel):
+    totalBooks: int
+    totalChapters: int
+    totalVerses: int
+    oldTestamentBooks: int
+    newTestamentBooks: int
+    apocryphaBooks: int
