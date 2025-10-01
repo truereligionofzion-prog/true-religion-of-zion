@@ -78,12 +78,13 @@ const MitzvotApp = () => {
     try {
       setLoading(true);
       
-      // Load stats, categories, mitzvah of the day, precepts stats, and user progress in parallel
+      // Load stats, categories, mitzvah of the day, precepts stats, bible stats, and user progress in parallel
       const promises = [
         apiService.getStats(),
         apiService.getCategories(),
         apiService.getMitzvahOfTheDay(),
-        apiService.getPreceptsStats()
+        apiService.getPreceptsStats(),
+        apiService.getBibleStats()
       ];
       
       // Only load progress if authenticated
