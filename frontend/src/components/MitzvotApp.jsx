@@ -1003,7 +1003,7 @@ const MitzvotApp = () => {
                     </CardContent>
                   </Card>
                 </>
-              ) : (
+              ) : contentType === 'precepts' ? (
                 <>
                   <Card className="text-center">
                     <CardContent className="pt-4">
@@ -1026,6 +1026,33 @@ const MitzvotApp = () => {
                   <Card className="text-center">
                     <CardContent className="pt-4">
                       <div className="text-2xl font-bold text-orange-600">{precepts.length}</div>
+                      <div className="text-sm text-gray-600">Current Results</div>
+                    </CardContent>
+                  </Card>
+                </>
+              ) : (
+                <>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-blue-600">{bibleStats.totalBooks || 0}</div>
+                      <div className="text-sm text-gray-600">Total Books</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-green-600">{bibleStats.totalVerses || 0}</div>
+                      <div className="text-sm text-gray-600">Total Verses</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-purple-600">{bibleStats.apocryphaBooks || 0}</div>
+                      <div className="text-sm text-gray-600">Apocrypha Books</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="text-center">
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold text-orange-600">{bibleVerses.length}</div>
                       <div className="text-sm text-gray-600">Current Results</div>
                     </CardContent>
                   </Card>
