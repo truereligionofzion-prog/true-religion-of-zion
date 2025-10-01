@@ -99,29 +99,44 @@ class BibleExtractor:
         """Extract all verses from the chapter page"""
         verses = []
         
-        # Find the main content area
-        content = soup.find('div', class_='field-item') or soup.find('main') or soup
+        # Look for the actual chapter heading (e.g., "## Genesis 1")
+        chapter_heading = soup.find(['h1', 'h2', 'h3'], string=re.compile(r'^\w+\s+\d+$'))
         
-        if not content:
-            print("Warning: Could not find main content area")
+        if not chapter_heading:
+            print("Warning: Could not find chapter heading")
             return verses
         
-        # Look for verse patterns in the text
-        text_content = content.get_text()
+        # Get text content starting from after the chapter heading
+        content_start = chapter_heading.parent
         
-        # Split by verse numbers (1, 2, 3, etc. at start of paragraphs)
-        verse_pattern = r'^(\d+)(.+?)(?=^\d+|\Z)'
-        matches = re.findall(verse_pattern, text_content, re.MULTILINE | re.DOTALL)
+        # Extract all text after the chapter heading
+        full_text = ""
+        for element in content_start.find_all_next(text=True):
+            parent = element.parent
+            # Stop at contact info or navigation elements
+            if parent.name in ['a'] and 'mailto:' in str(element):
+                break
+            if 'contact' in str(element).lower() or 'support' in str(element).lower():
+                break
+            full_text += str(element) + " "
+        
+        # Parse verses using regex - looking for number followed by verse text
+        verse_pattern = r'(\d+)([A-Z][^0-9]+?)(?=\d+[A-Z]|\Z)'
+        matches = re.findall(verse_pattern, full_text, re.DOTALL)
         
         for match in matches:
-            verse_num = int(match[0])
-            verse_text = match[1].strip()
+            verse_num_str, verse_text = match
+            verse_num = int(verse_num_str)
             
             # Clean up the text
-            verse_text = re.sub(r'\s+', ' ', verse_text)  # Normalize whitespace
-            verse_text = verse_text.strip()
+            verse_text = re.sub(r'\s+', ' ', verse_text.strip())
             
-            if verse_text and len(verse_text) > 5:  # Skip very short/empty verses
+            # Skip if it's too short or contains navigation words
+            nav_words = ['VERSES', 'CHAPTERS', 'Book', 'Contact', 'Support', 'mailto']
+            if any(word in verse_text for word in nav_words):
+                continue
+            
+            if len(verse_text) > 10:  # Minimum meaningful verse length
                 verses.append({
                     'verse': verse_num,
                     'text': verse_text
