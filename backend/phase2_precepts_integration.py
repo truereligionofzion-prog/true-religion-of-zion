@@ -295,14 +295,18 @@ class PreceptsProcessor:
         return precepts
     
     def _apply_divine_name_replacements(self, text: str) -> str:
-        """Apply YHWH/YHUH divine name replacements"""
+        """Apply accurate divine name replacements based on Hebrew source"""
         if not text:
             return text
             
-        # Primary divine name replacements
+        # Based on Hebrew source and biblical accuracy:
+        # - "LORD" (all caps) = YHWH (Tetragrammaton) 
+        # - "God" = Elohim (should remain as "God")
+        # - "Lord God" = YHWH Elohim (combination)
+        # - "Lord" (title case) = Adonai -> YHUH
+        
         replacements = [
-            # LORD (all caps) patterns - these represent the Tetragrammaton YHWH
-            (r'\bLORD\b', 'YHWH'),
+            # Handle "Lord God" combination first (YHWH Elohim)
             (r'\bLord\s+God\b', 'YHWH Elohim'),
             (r'\bLord\s+thy\s+God\b', 'YHWH thy Elohim'),
             (r'\bLord\s+your\s+God\b', 'YHWH your Elohim'),
@@ -310,16 +314,14 @@ class PreceptsProcessor:
             (r'\bthe\s+Lord\s+God\b', 'YHWH Elohim'),
             (r'\bLord\s+my\s+God\b', 'YHWH my Elohim'),
             
-            # God replacements with Elohim
-            (r'\bGod\b', 'Elohim'),
-            (r'\bthy\s+God\b', 'thy Elohim'),
-            (r'\byour\s+God\b', 'your Elohim'),
-            (r'\bour\s+God\b', 'our Elohim'),
-            (r'\bmy\s+God\b', 'my Elohim'),
-            (r'\bthe\s+God\b', 'the Elohim'),
+            # Handle standalone "LORD" (all caps - Tetragrammaton)  
+            (r'\bLORD\b', 'YHWH'),
             
-            # Specific Lord contexts (not in all caps)
+            # Handle "Lord" (title case - Adonai)
             (r'\bLord\b(?!\s+(?:God|thy|your|our|my))', 'YHUH'),
+            
+            # Keep "God" as is - it represents Elohim correctly
+            # No replacement for standalone "God"
         ]
         
         result = text
