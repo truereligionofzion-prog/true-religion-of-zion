@@ -1003,11 +1003,11 @@ class APITester:
             self.log_test("API Performance", False, f"Error: {str(e)}")
             return False
 
-    def run_final_comprehensive_bible_dataset_tests(self):
-        """Run final comprehensive Bible dataset tests as per review request - 80-book target achievement"""
+    def run_corrected_bible_parsing_tests(self):
+        """Run corrected Bible parsing results tests as per review request - KJV 1611 Divine Names content integrity"""
         print("=" * 80)
-        print("🔍 FINAL COMPREHENSIVE BIBLE DATASET TESTING - 80-BOOK TARGET ACHIEVEMENT")
-        print("Testing the final comprehensive Bible dataset results after the complete 80-book loading process")
+        print("🔍 CORRECTED BIBLE PARSING RESULTS TESTING - KJV 1611 DIVINE NAMES CONTENT INTEGRITY")
+        print("Testing the corrected Bible parsing results to verify content integrity")
         print("=" * 80)
         
         # Test basic connectivity first
@@ -1018,20 +1018,20 @@ class APITester:
         # Run the 5 main review request tests
         test_results = []
         
-        # Test 1: Complete Dataset Verification (80-book target)
-        test_results.append(self.test_complete_dataset_verification())
+        # Test 1: KJV Data Quality Verification (5 books loaded correctly)
+        test_results.append(self.test_kjv_data_quality_verification())
         
-        # Test 2: Massive Verse Count Verification (46,384 verses target)
-        test_results.append(self.test_massive_verse_count_verification())
+        # Test 2: Critical Content Integrity Test (Genesis 1:1, Matthew 1:1, no cross-contamination)
+        test_results.append(self.test_critical_content_integrity())
         
-        # Test 3: Testament Distribution Verification (39 OT + 27 NT + 14 Apocrypha)
+        # Test 3: Testament Distribution (3 OT + 2 NT = 5 books total)
         test_results.append(self.test_testament_distribution_verification())
         
-        # Test 4: Sample Book Quality Check (High-value books from different testaments)
-        test_results.append(self.test_sample_book_quality_check())
+        # Test 4: Data Quality Assessment (proper text content and structure)
+        test_results.append(self.test_data_quality_assessment())
         
-        # Test 5: Database Performance with Large Dataset (46,000+ verses)
-        test_results.append(self.test_database_performance_with_large_dataset())
+        # Test 5: API Performance (search functionality and pagination across ~7,764 verses)
+        test_results.append(self.test_api_performance())
         
         # Calculate overall results
         passed_tests = sum(test_results)
@@ -1039,7 +1039,7 @@ class APITester:
         success_rate = (passed_tests / total_tests) * 100
         
         print("\n" + "=" * 80)
-        print("📊 FINAL COMPREHENSIVE BIBLE DATASET TESTING SUMMARY")
+        print("📊 CORRECTED BIBLE PARSING RESULTS TESTING SUMMARY")
         print("=" * 80)
         
         # Count individual test results
@@ -1052,11 +1052,11 @@ class APITester:
         
         # Show category results
         categories = [
-            "Complete Dataset Verification (80-book target)",
-            "Massive Verse Count Verification (46,384 verses target)", 
-            "Testament Distribution Verification (39+27+14 books)",
-            "Sample Book Quality Check (High-value books)",
-            "Database Performance with Large Dataset (46,000+ verses)"
+            "KJV Data Quality Verification (5 books loaded correctly)",
+            "Critical Content Integrity Test (Genesis 1:1, Matthew 1:1, no cross-contamination)", 
+            "Testament Distribution (3 OT + 2 NT = 5 books total)",
+            "Data Quality Assessment (proper text content and structure)",
+            "API Performance (search functionality and pagination across ~7,764 verses)"
         ]
         
         for i, (category, result) in enumerate(zip(categories, test_results)):
@@ -1066,42 +1066,42 @@ class APITester:
         print("\n🔍 KEY FINDINGS:")
         
         # Analyze results for key findings
-        if test_results[0]:  # Complete Dataset Verification
-            print("✅ 80-book target achievement verified - Yah Scriptures shows substantial book coverage")
+        if test_results[0]:  # KJV Data Quality Verification
+            print("✅ KJV 1611 Divine Names version verified - 5 books loaded correctly with realistic verse counts")
         else:
-            print("❌ 80-book target not achieved - insufficient book coverage in Yah Scriptures")
+            print("❌ KJV data quality issues - missing books or incorrect verse counts")
         
-        if test_results[1]:  # Massive Verse Count Verification
-            print("✅ Massive verse count improvements verified - approaching or achieving 46,384 verses target")
+        if test_results[1]:  # Critical Content Integrity Test
+            print("✅ Content integrity verified - Genesis 1:1 and Matthew 1:1 contain expected content, no cross-contamination detected")
         else:
-            print("❌ Massive verse count target not achieved - insufficient verses in Yah Scriptures")
+            print("❌ Content integrity issues - incorrect verse content or cross-contamination detected")
         
-        if test_results[2]:  # Testament Distribution Verification
-            print("✅ Testament distribution verified - proper coverage across Old Testament, New Testament, and Apocrypha")
+        if test_results[2]:  # Testament Distribution
+            print("✅ Testament distribution verified - proper 3 Old Testament + 2 New Testament book distribution")
         else:
-            print("❌ Testament distribution incomplete - missing books from expected testament categories")
+            print("❌ Testament distribution incorrect - books not properly categorized by testament")
         
-        if test_results[3]:  # Sample Book Quality Check
-            print("✅ High-value books from different testaments verified - Genesis, Psalms, Matthew, Romans, Tobit, Wisdom accessible")
+        if test_results[3]:  # Data Quality Assessment
+            print("✅ Data quality excellent - verses have proper text content, sequential numbering, and correct structure")
         else:
-            print("❌ Sample book quality issues - high-value books missing or poor quality content")
+            print("❌ Data quality issues - empty content, incorrect numbering, or structural problems")
         
-        if test_results[4]:  # Database Performance with Large Dataset
-            print("✅ Database performance excellent with large dataset - pagination, search, and filtering handle 46,000+ verses efficiently")
+        if test_results[4]:  # API Performance
+            print("✅ API performance excellent - search functionality and pagination work efficiently across the dataset")
         else:
-            print("❌ Database performance issues with large dataset - slow responses or functionality problems")
+            print("❌ API performance issues - slow responses or functionality problems with search/pagination")
         
-        print(f"\n🎯 80-BOOK TARGET ACHIEVEMENT ASSESSMENT:")
+        print(f"\n🎯 CORRECTED BIBLE PARSING ASSESSMENT:")
         if success_rate >= 80:
-            print(f"🎉 EXCELLENT: {success_rate:.1f}% success rate - 80-book target achievement CONFIRMED!")
-            print("🎉 The final comprehensive Bible dataset with 46,384 verses is working excellently")
-            print("🎉 This represents a major breakthrough toward complete biblical coverage")
+            print(f"🎉 EXCELLENT: {success_rate:.1f}% success rate - Corrected Bible parsing is working excellently!")
+            print("🎉 Clean, accurate biblical content without cross-contamination achieved")
+            print("🎉 Realistic verse counts approaching web-verified standards confirmed")
         elif success_rate >= 60:
-            print(f"⚠️  GOOD: {success_rate:.1f}% success rate - Substantial progress toward 80-book target")
+            print(f"⚠️  GOOD: {success_rate:.1f}% success rate - Substantial improvements in Bible parsing")
             print("⚠️  Most components working but some issues remain")
         else:
-            print(f"❌ NEEDS WORK: {success_rate:.1f}% success rate - 80-book target not achieved")
-            print("❌ Significant issues remain in the comprehensive Bible dataset")
+            print(f"❌ NEEDS WORK: {success_rate:.1f}% success rate - Corrected Bible parsing has significant issues")
+            print("❌ Content integrity or data quality problems need to be addressed")
         
         return success_rate >= 60
 
