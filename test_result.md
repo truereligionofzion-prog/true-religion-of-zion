@@ -454,6 +454,8 @@ test_plan:
 
 agent_communication:
   - agent: "main"
+    message: "COMPLETED YAH SCRIPTURES NEW TESTAMENT EXTRACTION: Successfully extracted complete New Testament from yah_scriptures.pdf (pages 2169-2847). Fixed PDF parsing logic after detailed structure analysis. Extracted all 26 NT books with 5,328 verses total. Yah Scriptures version now complete with 10,015 total verses (2,678 OT + 5,328 NT + 2,009 Apocrypha). Applied divine name standardization ({vWHY} → YHWH). Backend API confirmed working with new data. Need comprehensive testing of Bible functionality with completed Yah Scriptures version."
+  - agent: "main"
     message: "Implemented comprehensive learning platform with quiz improvements, progress tracking, flashcards with spaced repetition, and progress dashboard. Fixed quiz answer diversity issue. Need thorough testing of all new learning features and user flows."
   - agent: "testing"
     message: "Completed comprehensive backend testing of new interactive features. Enhanced Quiz System working well with diverse questions and unique answers. Progress GET endpoint working, but POST has ObjectId serialization issues. Flashcard system structure correct but no cards generated yet. Several critical issues need fixing before frontend integration."
