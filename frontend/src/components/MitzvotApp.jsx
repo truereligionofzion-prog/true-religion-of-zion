@@ -1853,7 +1853,7 @@ const MitzvotApp = () => {
                                   {verse.book} {verse.chapter}:{verse.verse}
                                 </td>
                                 <td className="p-4 text-sm text-gray-600 italic">
-                                  "{highlightDivineNames(verse?.text?.substring(0, 100) || '')}..."
+                                  "{renderHighlightedText(verse?.text?.substring(0, 100) || '')}..."
                                 </td>
                                 <td className="p-4">
                                   <Badge variant="secondary" className="capitalize">
