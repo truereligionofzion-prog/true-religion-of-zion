@@ -491,6 +491,114 @@ class APITester:
             self.log_test("KJV 1611 Testament Filtering", False, f"Error: {str(e)}")
             return False
 
+    def test_kjv1611_performance_and_search(self):
+        """TEST: KJV 1611 Performance with larger dataset and search functionality"""
+        try:
+            print("\n🔍 KJV 1611 ENHANCED PERFORMANCE AND SEARCH TESTING...")
+            
+            import time
+            
+            # Test 1: API response time with larger dataset
+            start_time = time.time()
+            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=100")
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                if response_time < 5.0:  # Should respond within 5 seconds
+                    self.log_test("KJV 1611 Enhanced - API Response Time", True, f"Response time: {response_time:.2f}s (good performance)")
+                else:
+                    self.log_test("KJV 1611 Enhanced - API Response Time", False, f"Response time: {response_time:.2f}s (too slow)")
+            else:
+                self.log_test("KJV 1611 Enhanced - API Response Time", False, f"Status: {response.status_code}")
+            
+            # Test 2: Search functionality across enhanced dataset
+            search_terms = ["God", "Lord", "Jesus", "Israel", "covenant"]
+            search_tests_passed = 0
+            
+            for term in search_terms:
+                try:
+                    start_time = time.time()
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&search={term}&limit=50")
+                    search_time = time.time() - start_time
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        total = data.get('total', 0)
+                        verses = data.get('verses', [])
+                        
+                        if total > 0 and verses:
+                            self.log_test(f"KJV 1611 Enhanced - Search '{term}'", True, f"Found {total} results in {search_time:.2f}s")
+                            search_tests_passed += 1
+                            
+                            # Verify search results contain the term
+                            term_found_in_results = 0
+                            for verse in verses[:5]:  # Check first 5 results
+                                verse_text = verse.get('text', '').lower()
+                                if term.lower() in verse_text:
+                                    term_found_in_results += 1
+                            
+                            if term_found_in_results > 0:
+                                self.log_test(f"KJV 1611 Enhanced - Search '{term}' Accuracy", True, f"Term found in {term_found_in_results}/5 results")
+                            else:
+                                self.log_test(f"KJV 1611 Enhanced - Search '{term}' Accuracy", False, "Term not found in search results")
+                        else:
+                            self.log_test(f"KJV 1611 Enhanced - Search '{term}'", False, f"No results found for '{term}'")
+                    else:
+                        self.log_test(f"KJV 1611 Enhanced - Search '{term}'", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"KJV 1611 Enhanced - Search '{term}'", False, f"Error: {str(e)}")
+            
+            # Test 3: Pagination performance with large dataset
+            try:
+                start_time = time.time()
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&page=50&limit=20")
+                pagination_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    verses = data.get('verses', [])
+                    current_page = data.get('page', 0)
+                    total_pages = data.get('totalPages', 0)
+                    
+                    if verses and current_page == 50:
+                        self.log_test("KJV 1611 Enhanced - Deep Pagination", True, f"Page 50 loaded in {pagination_time:.2f}s, Total pages: {total_pages}")
+                    else:
+                        self.log_test("KJV 1611 Enhanced - Deep Pagination", False, f"Pagination issue: page {current_page}, verses: {len(verses)}")
+                else:
+                    self.log_test("KJV 1611 Enhanced - Deep Pagination", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("KJV 1611 Enhanced - Deep Pagination", False, f"Error: {str(e)}")
+            
+            # Test 4: Database indexes efficiency (test multiple book filters)
+            book_filter_tests = ['Genesis', 'Matthew', 'Psalms']
+            book_filter_passed = 0
+            
+            for book in book_filter_tests:
+                try:
+                    start_time = time.time()
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book}&limit=100")
+                    filter_time = time.time() - start_time
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        total = data.get('total', 0)
+                        
+                        if total > 0 and filter_time < 3.0:  # Should be fast with proper indexing
+                            self.log_test(f"KJV 1611 Enhanced - Book Filter '{book}'", True, f"Found {total} verses in {filter_time:.2f}s")
+                            book_filter_passed += 1
+                        else:
+                            self.log_test(f"KJV 1611 Enhanced - Book Filter '{book}'", False, f"Slow response: {filter_time:.2f}s or no results")
+                    else:
+                        self.log_test(f"KJV 1611 Enhanced - Book Filter '{book}'", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"KJV 1611 Enhanced - Book Filter '{book}'", False, f"Error: {str(e)}")
+            
+            return search_tests_passed >= 3 and book_filter_passed >= 2 and response_time < 5.0
+            
+        except Exception as e:
+            self.log_test("KJV 1611 Performance and Search", False, f"Error: {str(e)}")
+            return False
+
     def test_kjv1611_api_response_structure(self):
         """TEST: KJV 1611 API response structure and required fields"""
         try:
