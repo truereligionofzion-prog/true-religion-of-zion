@@ -80,8 +80,10 @@ const MitzvotApp = () => {
       return text;
     }
     
-    // Generate unique key prefix to avoid conflicts across verses
-    const keyPrefix = uniqueId || Math.random().toString(36).substr(2, 9);
+    // Generate truly unique key prefix to avoid conflicts across verses
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substr(2, 9);
+    const keyPrefix = uniqueId ? `${uniqueId}-${timestamp}-${random}` : `${timestamp}-${random}`;
     
     // Split text by divine names and create highlighted segments
     const divineNames = ['YHWH', 'Elohim', 'YHUH'];
@@ -98,13 +100,13 @@ const MitzvotApp = () => {
           for (let i = 0; i < segments.length; i++) {
             if (segments[i]) newParts.push(segments[i]);
             if (i < matches.length) {
-              // Create highlighted span with UNIQUE key across all verses
+              // Create highlighted span with TRULY UNIQUE key across all verses
               const colorClass = divineName === 'YHWH' ? 'text-red-600 font-semibold' :
                                divineName === 'Elohim' ? 'text-blue-600 font-semibold' :
                                'text-purple-600 font-semibold';
               newParts.push(
                 <span 
-                  key={`${keyPrefix}-${nameIndex}-${partIndex}-${i}-${divineName}`} 
+                  key={`${keyPrefix}-${nameIndex}-${partIndex}-${i}-${divineName}-${Math.random().toString(36).substr(2, 5)}`} 
                   className={colorClass} 
                   title={`Hebrew divine name: ${divineName}`}
                 >
