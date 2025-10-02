@@ -1359,7 +1359,11 @@ const MitzvotApp = () => {
                   ? 'bg-white text-gray-900 shadow' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-              onClick={() => setContentType('bible')}
+              onClick={() => {
+                console.log('Bible button clicked, changing contentType to bible');
+                setContentType('bible');
+                loadContent();  // Force reload content immediately
+              }}
             >
               Bible with Apocrypha
             </button>
