@@ -110,20 +110,49 @@ class CompleteExtractionSystem:
     def _extract_verse_with_chapter(self, verse_div, book_name: str) -> Optional[Dict]:
         """Enhanced verse extraction with better chapter detection"""
         try:
-            # Get verse text
-            verse_span = verse_div.find('span')
-            if not verse_span:
+            # METHOD 1: Try to get full text from the entire div
+            full_div_text = verse_div.get_text(strip=True)
+            
+            # METHOD 2: Try to find verse number and text separately
+            verse_spans = verse_div.find_all('span')
+            
+            # Debug logging
+            print(f"   DEBUG: verse_div classes: {verse_div.get('class', [])}")
+            print(f"   DEBUG: full_div_text: '{full_div_text[:100]}...'")
+            print(f"   DEBUG: found {len(verse_spans)} spans")
+            
+            # Try different extraction methods
+            verse_number = None
+            verse_content = None
+            
+            # Method 1: Extract from full div text
+            if full_div_text:
+                verse_match = re.match(r'^(\d+)(.+)', full_div_text)
+                if verse_match:
+                    verse_number = int(verse_match.group(1))
+                    verse_content = verse_match.group(2).strip()
+                    print(f"   DEBUG Method 1: verse {verse_number}, content: '{verse_content[:50]}...'")
+            
+            # Method 2: If that failed, try span-by-span
+            if not verse_content and verse_spans:
+                for i, span in enumerate(verse_spans):
+                    span_text = span.get_text(strip=True)
+                    print(f"   DEBUG span {i}: '{span_text[:50]}...' classes: {span.get('class', [])}")
+                    
+                    # Look for verse number
+                    if span_text.isdigit() and not verse_number:
+                        verse_number = int(span_text)
+                        print(f"   DEBUG: Found verse number {verse_number}")
+                    
+                    # Look for verse content (longer text)
+                    elif len(span_text) > 10 and not verse_content:
+                        verse_content = span_text
+                        print(f"   DEBUG: Found verse content: '{verse_content[:50]}...'")
+            
+            # Validation
+            if not verse_number or not verse_content or len(verse_content) < 5:
+                print(f"   DEBUG: FAILED - verse_number: {verse_number}, content length: {len(verse_content) if verse_content else 0}")
                 return None
-            
-            verse_text = verse_span.get_text(strip=True)
-            
-            # Enhanced verse number extraction
-            verse_match = re.match(r'^(\d+)(.+)', verse_text)
-            if not verse_match:
-                return None
-            
-            verse_number = int(verse_match.group(1))
-            verse_content = verse_match.group(2).strip()
             
             # Enhanced chapter detection
             chapter_number = self._detect_chapter_enhanced(verse_div, verse_number, verse_content)
