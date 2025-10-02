@@ -1501,6 +1501,48 @@ const MitzvotApp = () => {
                           ))}
                         </SelectContent>
                       </Select>
+
+                      {/* Quick Bible Navigator */}
+                      <div className="flex gap-2">
+                        <Select value={selectedBook} onValueChange={setSelectedBook}>
+                          <SelectTrigger className="w-32">
+                            <SelectValue placeholder="Book" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Books</SelectItem>
+                            {bibleStats.books?.map((book) => (
+                              <SelectItem key={book} value={book}>
+                                {book}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        <input 
+                          type="number" 
+                          placeholder="Ch" 
+                          className="w-16 px-2 py-1 border rounded text-sm"
+                          min="1"
+                          value={selectedChapter || ''}
+                          onChange={(e) => setSelectedChapter(e.target.value ? parseInt(e.target.value) : null)}
+                        />
+
+                        <input 
+                          type="number" 
+                          placeholder="Vs" 
+                          className="w-16 px-2 py-1 border rounded text-sm"
+                          min="1"
+                          value={selectedVerse || ''}
+                          onChange={(e) => setSelectedVerse(e.target.value ? parseInt(e.target.value) : null)}
+                        />
+
+                        <button 
+                          className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                          onClick={() => navigateToVerse()}
+                        >
+                          Go
+                        </button>
+                      </div>
                       
                       {/* Phase 3C: Advanced Bible Features */}
                       <div className="flex gap-2">
