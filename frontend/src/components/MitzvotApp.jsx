@@ -2024,11 +2024,11 @@ const MitzvotApp = () => {
                       // Filter books based on selected testament
                       let filteredBooks = bibleBooks || [];
                       
-                      if (selectedTestament && selectedTestament !== 'all') {
+                      if (advancedFilters.testament && advancedFilters.testament !== 'all') {
                         filteredBooks = filteredBooks.filter(book => {
-                          if (selectedTestament === 'old') return book.testament === 'old';
-                          if (selectedTestament === 'new') return book.testament === 'new';  
-                          if (selectedTestament === 'apocrypha') return book.testament === 'apocrypha';
+                          if (advancedFilters.testament === 'old') return book.testament === 'old';
+                          if (advancedFilters.testament === 'new') return book.testament === 'new';  
+                          if (advancedFilters.testament === 'apocrypha') return book.testament === 'apocrypha';
                           return true;
                         });
                       }
@@ -2052,21 +2052,21 @@ const MitzvotApp = () => {
                     
                     {(() => {
                       let filteredBooks = bibleBooks || [];
-                      if (selectedTestament && selectedTestament !== 'all') {
+                      if (advancedFilters.testament && advancedFilters.testament !== 'all') {
                         filteredBooks = filteredBooks.filter(book => {
-                          if (selectedTestament === 'old') return book.testament === 'old';
-                          if (selectedTestament === 'new') return book.testament === 'new';
-                          if (selectedTestament === 'apocrypha') return book.testament === 'apocrypha';
+                          if (advancedFilters.testament === 'old') return book.testament === 'old';
+                          if (advancedFilters.testament === 'new') return book.testament === 'new';
+                          if (advancedFilters.testament === 'apocrypha') return book.testament === 'apocrypha';
                           return true;
                         });
                       }
                       
                       return filteredBooks.length > 0 && (
                         <p className="text-xs text-gray-500 w-full text-center mt-2">
-                          Showing {filteredBooks.length} books ({selectedTestament === 'all' ? 'All Testaments' : 
-                            selectedTestament === 'old' ? 'Old Testament' : 
-                            selectedTestament === 'new' ? 'New Testament' : 
-                            selectedTestament === 'apocrypha' ? 'Apocrypha' : 'All'})
+                          Showing {filteredBooks.length} books ({advancedFilters.testament === 'all' ? 'All Testaments' : 
+                            advancedFilters.testament === 'old' ? 'Old Testament' : 
+                            advancedFilters.testament === 'new' ? 'New Testament' : 
+                            advancedFilters.testament === 'apocrypha' ? 'Apocrypha' : 'All'})
                         </p>
                       );
                     })()}
