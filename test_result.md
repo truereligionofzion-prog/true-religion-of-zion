@@ -467,9 +467,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Yah Scriptures Bible API Functionality - BACKEND VERIFIED ✅ WORKING CORRECTLY"
-    - "New Testament Data Quality - All 26 NT books accessible with proper biblical content"
-    - "Divine Name Standardization - YHWH/Elohim replacements working correctly"
+    - "Complete KJV Bible Data Replacement - PARSER CREATED ✅ NEEDS BACKEND API TESTING"
+    - "KJV 1611 Version API Functionality - Test with new complete dataset"
+    - "Bible Data Integrity Verification - Compare verse counts and content quality"
   stuck_tasks: 
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
     - "Bible Verse Text Display - FRONTEND ISSUE - renderBibleText() function not displaying API data correctly"
