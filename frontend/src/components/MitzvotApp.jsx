@@ -1639,7 +1639,10 @@ const MitzvotApp = () => {
                         <label className="block text-sm font-medium mb-1">Testament</label>
                         <Select 
                           value={advancedFilters.testament} 
-                          onValueChange={(value) => setAdvancedFilters({...advancedFilters, testament: value})}
+                          onValueChange={(value) => {
+                            console.log('Testament changed to:', value);
+                            setAdvancedFilters({...advancedFilters, testament: value});
+                          }}
                         >
                           <SelectTrigger>
                             <SelectValue />
