@@ -414,112 +414,204 @@ class APITester:
             self.log_test("Quality Cross-Reference Validation", False, f"Error: {str(e)}")
             return False
 
-    def test_kjv1611_performance_and_search(self):
-        """TEST: KJV 1611 Performance with larger dataset and search functionality"""
+    def test_bible_data_quality_verification(self):
+        """REVIEW REQUEST TEST 4: Bible Data Quality Verification - Sample verse content and structure integrity"""
         try:
-            print("\n🔍 KJV 1611 ENHANCED PERFORMANCE AND SEARCH TESTING...")
+            print("\n🔍 BIBLE DATA QUALITY VERIFICATION - SAMPLE VERSES AND STRUCTURE...")
             
-            import time
-            
-            # Test 1: API response time with larger dataset
-            start_time = time.time()
-            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=100")
-            response_time = time.time() - start_time
-            
-            if response.status_code == 200:
-                if response_time < 5.0:  # Should respond within 5 seconds
-                    self.log_test("KJV 1611 Enhanced - API Response Time", True, f"Response time: {response_time:.2f}s (good performance)")
-                else:
-                    self.log_test("KJV 1611 Enhanced - API Response Time", False, f"Response time: {response_time:.2f}s (too slow)")
-            else:
-                self.log_test("KJV 1611 Enhanced - API Response Time", False, f"Status: {response.status_code}")
-            
-            # Test 2: Search functionality across enhanced dataset
-            search_terms = ["God", "Lord", "Jesus", "Israel", "covenant"]
-            search_tests_passed = 0
-            
-            for term in search_terms:
-                try:
-                    start_time = time.time()
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&search={term}&limit=50")
-                    search_time = time.time() - start_time
-                    
-                    if response.status_code == 200:
-                        data = response.json()
-                        total = data.get('total', 0)
-                        verses = data.get('verses', [])
-                        
-                        if total > 0 and verses:
-                            self.log_test(f"KJV 1611 Enhanced - Search '{term}'", True, f"Found {total} results in {search_time:.2f}s")
-                            search_tests_passed += 1
-                            
-                            # Verify search results contain the term
-                            term_found_in_results = 0
-                            for verse in verses[:5]:  # Check first 5 results
-                                verse_text = verse.get('text', '').lower()
-                                if term.lower() in verse_text:
-                                    term_found_in_results += 1
-                            
-                            if term_found_in_results > 0:
-                                self.log_test(f"KJV 1611 Enhanced - Search '{term}' Accuracy", True, f"Term found in {term_found_in_results}/5 results")
-                            else:
-                                self.log_test(f"KJV 1611 Enhanced - Search '{term}' Accuracy", False, "Term not found in search results")
-                        else:
-                            self.log_test(f"KJV 1611 Enhanced - Search '{term}'", False, f"No results found for '{term}'")
-                    else:
-                        self.log_test(f"KJV 1611 Enhanced - Search '{term}'", False, f"Status: {response.status_code}")
-                except Exception as e:
-                    self.log_test(f"KJV 1611 Enhanced - Search '{term}'", False, f"Error: {str(e)}")
-            
-            # Test 3: Pagination performance with large dataset
+            # Test 1: Genesis 1:1 for both versions
+            # Test Yah Scriptures Genesis 1:1
             try:
-                start_time = time.time()
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&page=50&limit=20")
-                pagination_time = time.time() - start_time
-                
+                response = self.session.get(f"{self.base_url}/bible/verse/Genesis/1/1?version=yah_scriptures")
                 if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    current_page = data.get('page', 0)
-                    total_pages = data.get('totalPages', 0)
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
                     
-                    if verses and current_page == 50:
-                        self.log_test("KJV 1611 Enhanced - Deep Pagination", True, f"Page 50 loaded in {pagination_time:.2f}s, Total pages: {total_pages}")
-                    else:
-                        self.log_test("KJV 1611 Enhanced - Deep Pagination", False, f"Pagination issue: page {current_page}, verses: {len(verses)}")
-                else:
-                    self.log_test("KJV 1611 Enhanced - Deep Pagination", False, f"Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("KJV 1611 Enhanced - Deep Pagination", False, f"Error: {str(e)}")
-            
-            # Test 4: Database indexes efficiency (test multiple book filters)
-            book_filter_tests = ['Genesis', 'Matthew', 'Psalms']
-            book_filter_passed = 0
-            
-            for book in book_filter_tests:
-                try:
-                    start_time = time.time()
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book}&limit=100")
-                    filter_time = time.time() - start_time
-                    
-                    if response.status_code == 200:
-                        data = response.json()
-                        total = data.get('total', 0)
+                    if verse_text and len(verse_text) > 20:
+                        preview = verse_text[:100] + "..." if len(verse_text) > 100 else verse_text
+                        self.log_test("Genesis 1:1 - Yah Scriptures Content", True, f"Complete text ({len(verse_text)} chars): '{preview}'")
                         
-                        if total > 0 and filter_time < 3.0:  # Should be fast with proper indexing
-                            self.log_test(f"KJV 1611 Enhanced - Book Filter '{book}'", True, f"Found {total} verses in {filter_time:.2f}s")
-                            book_filter_passed += 1
+                        # Check structure integrity
+                        book = verse_data.get('book')
+                        chapter = verse_data.get('chapter')
+                        verse_num = verse_data.get('verse')
+                        testament = verse_data.get('testament')
+                        
+                        if book == 'Genesis' and chapter == 1 and verse_num == 1 and testament:
+                            self.log_test("Genesis 1:1 - Yah Structure", True, f"Proper structure: {book} {chapter}:{verse_num} ({testament})")
                         else:
-                            self.log_test(f"KJV 1611 Enhanced - Book Filter '{book}'", False, f"Slow response: {filter_time:.2f}s or no results")
+                            self.log_test("Genesis 1:1 - Yah Structure", False, f"Structure issue: {book} {chapter}:{verse_num} ({testament})")
                     else:
-                        self.log_test(f"KJV 1611 Enhanced - Book Filter '{book}'", False, f"Status: {response.status_code}")
-                except Exception as e:
-                    self.log_test(f"KJV 1611 Enhanced - Book Filter '{book}'", False, f"Error: {str(e)}")
+                        self.log_test("Genesis 1:1 - Yah Scriptures Content", False, f"Empty or truncated text: '{verse_text}'")
+                else:
+                    self.log_test("Genesis 1:1 - Yah Scriptures Content", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Genesis 1:1 - Yah Scriptures", False, f"Error: {str(e)}")
             
-            return search_tests_passed >= 3 and book_filter_passed >= 2 and response_time < 5.0
+            # Test KJV 1611 Genesis 1:1
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Genesis/1/1?version=kjv1611_divine")
+                if response.status_code == 200:
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
+                    
+                    if verse_text and len(verse_text) > 20:
+                        preview = verse_text[:100] + "..." if len(verse_text) > 100 else verse_text
+                        self.log_test("Genesis 1:1 - KJV 1611 Content", True, f"Complete text ({len(verse_text)} chars): '{preview}'")
+                        
+                        # Check structure integrity
+                        book = verse_data.get('book')
+                        chapter = verse_data.get('chapter')
+                        verse_num = verse_data.get('verse')
+                        testament = verse_data.get('testament')
+                        
+                        if book == 'Genesis' and chapter == 1 and verse_num == 1 and testament:
+                            self.log_test("Genesis 1:1 - KJV Structure", True, f"Proper structure: {book} {chapter}:{verse_num} ({testament})")
+                        else:
+                            self.log_test("Genesis 1:1 - KJV Structure", False, f"Structure issue: {book} {chapter}:{verse_num} ({testament})")
+                    else:
+                        self.log_test("Genesis 1:1 - KJV 1611 Content", False, f"Empty or truncated text: '{verse_text}'")
+                else:
+                    self.log_test("Genesis 1:1 - KJV 1611 Content", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Genesis 1:1 - KJV 1611", False, f"Error: {str(e)}")
+            
+            # Test 2: Matthew 1:1 for both versions
+            # Test Yah Scriptures Matthew 1:1
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Matthew/1/1?version=yah_scriptures")
+                if response.status_code == 200:
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
+                    
+                    if verse_text and len(verse_text) > 15:
+                        preview = verse_text[:100] + "..." if len(verse_text) > 100 else verse_text
+                        self.log_test("Matthew 1:1 - Yah Scriptures Content", True, f"Complete text ({len(verse_text)} chars): '{preview}'")
+                        
+                        # Check for genealogy content
+                        if 'genealogy' in verse_text.lower() or 'generation' in verse_text.lower() or 'jesus' in verse_text.lower():
+                            self.log_test("Matthew 1:1 - Yah Content Accuracy", True, "Contains expected genealogy/Jesus content")
+                        else:
+                            self.log_test("Matthew 1:1 - Yah Content Accuracy", False, "Missing expected genealogy content")
+                    else:
+                        self.log_test("Matthew 1:1 - Yah Scriptures Content", False, f"Empty or truncated text: '{verse_text}'")
+                else:
+                    self.log_test("Matthew 1:1 - Yah Scriptures Content", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Matthew 1:1 - Yah Scriptures", False, f"Error: {str(e)}")
+            
+            # Test KJV 1611 Matthew 1:1
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Matthew/1/1?version=kjv1611_divine")
+                if response.status_code == 200:
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
+                    
+                    if verse_text and len(verse_text) > 15:
+                        preview = verse_text[:100] + "..." if len(verse_text) > 100 else verse_text
+                        self.log_test("Matthew 1:1 - KJV 1611 Content", True, f"Complete text ({len(verse_text)} chars): '{preview}'")
+                        
+                        # Check for genealogy content
+                        if 'generation' in verse_text.lower() or 'jesus' in verse_text.lower() or 'christ' in verse_text.lower():
+                            self.log_test("Matthew 1:1 - KJV Content Accuracy", True, "Contains expected genealogy/Jesus content")
+                        else:
+                            self.log_test("Matthew 1:1 - KJV Content Accuracy", False, "Missing expected genealogy content")
+                    else:
+                        self.log_test("Matthew 1:1 - KJV 1611 Content", False, f"Empty or truncated text: '{verse_text}'")
+                else:
+                    self.log_test("Matthew 1:1 - KJV 1611 Content", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Matthew 1:1 - KJV 1611", False, f"Error: {str(e)}")
+            
+            # Test 3: Psalms 1:1 for both versions
+            # Test Yah Scriptures Psalms 1:1
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Psalms/1/1?version=yah_scriptures")
+                if response.status_code == 200:
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
+                    
+                    if verse_text and len(verse_text) > 15:
+                        preview = verse_text[:100] + "..." if len(verse_text) > 100 else verse_text
+                        self.log_test("Psalms 1:1 - Yah Scriptures Content", True, f"Complete text ({len(verse_text)} chars): '{preview}'")
+                        
+                        # Check for blessed/righteous content
+                        if 'blessed' in verse_text.lower() or 'righteous' in verse_text.lower() or 'wicked' in verse_text.lower():
+                            self.log_test("Psalms 1:1 - Yah Content Accuracy", True, "Contains expected blessed/righteous content")
+                        else:
+                            self.log_test("Psalms 1:1 - Yah Content Accuracy", False, "Missing expected blessed content")
+                    else:
+                        self.log_test("Psalms 1:1 - Yah Scriptures Content", False, f"Empty or truncated text: '{verse_text}'")
+                else:
+                    self.log_test("Psalms 1:1 - Yah Scriptures Content", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Psalms 1:1 - Yah Scriptures", False, f"Error: {str(e)}")
+            
+            # Test KJV 1611 Psalms 1:1
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Psalms/1/1?version=kjv1611_divine")
+                if response.status_code == 200:
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
+                    
+                    if verse_text and len(verse_text) > 15:
+                        preview = verse_text[:100] + "..." if len(verse_text) > 100 else verse_text
+                        self.log_test("Psalms 1:1 - KJV 1611 Content", True, f"Complete text ({len(verse_text)} chars): '{preview}'")
+                        
+                        # Check for blessed content
+                        if 'blessed' in verse_text.lower() or 'man' in verse_text.lower() or 'wicked' in verse_text.lower():
+                            self.log_test("Psalms 1:1 - KJV Content Accuracy", True, "Contains expected blessed/man content")
+                        else:
+                            self.log_test("Psalms 1:1 - KJV Content Accuracy", False, "Missing expected blessed content")
+                    else:
+                        self.log_test("Psalms 1:1 - KJV 1611 Content", False, f"Empty or truncated text: '{verse_text}'")
+                else:
+                    self.log_test("Psalms 1:1 - KJV 1611 Content", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Psalms 1:1 - KJV 1611", False, f"Error: {str(e)}")
+            
+            # Test 4: Check proper book/chapter/verse structure integrity across both versions
+            structure_tests = [
+                ("Genesis", 1, 2, "yah_scriptures"),
+                ("Genesis", 1, 2, "kjv1611_divine"),
+                ("Matthew", 1, 2, "yah_scriptures"),
+                ("Matthew", 1, 2, "kjv1611_divine"),
+                ("Psalms", 1, 2, "yah_scriptures"),
+                ("Psalms", 1, 2, "kjv1611_divine")
+            ]
+            
+            structure_passed = 0
+            for book, chapter, verse_num, version in structure_tests:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verse/{book}/{chapter}/{verse_num}?version={version}")
+                    if response.status_code == 200:
+                        verse_data = response.json()
+                        
+                        # Check all required fields are present and correct
+                        if (verse_data.get('book') == book and 
+                            verse_data.get('chapter') == chapter and 
+                            verse_data.get('verse') == verse_num and
+                            verse_data.get('text') and
+                            verse_data.get('testament')):
+                            structure_passed += 1
+                            self.log_test(f"Structure - {book} {chapter}:{verse_num} ({version})", True, "All fields present and correct")
+                        else:
+                            self.log_test(f"Structure - {book} {chapter}:{verse_num} ({version})", False, "Missing or incorrect fields")
+                    else:
+                        self.log_test(f"Structure - {book} {chapter}:{verse_num} ({version})", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Structure - {book} {chapter}:{verse_num} ({version})", False, f"Error: {str(e)}")
+            
+            # Overall structure integrity assessment
+            if structure_passed >= 5:  # At least 5/6 structure tests should pass
+                self.log_test("Overall Structure Integrity", True, f"{structure_passed}/6 structure tests passed")
+            else:
+                self.log_test("Overall Structure Integrity", False, f"Only {structure_passed}/6 structure tests passed")
+            
+            return structure_passed >= 5
             
         except Exception as e:
-            self.log_test("KJV 1611 Performance and Search", False, f"Error: {str(e)}")
+            self.log_test("Bible Data Quality Verification", False, f"Error: {str(e)}")
             return False
 
     def test_kjv1611_api_response_structure(self):
