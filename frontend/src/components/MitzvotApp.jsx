@@ -1574,9 +1574,9 @@ const MitzvotApp = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">All Books</SelectItem>
-                            {bibleStats.books?.map((book) => (
-                              <SelectItem key={book} value={book}>
-                                {book}
+                            {bibleBooks?.map((book) => (
+                              <SelectItem key={book.name} value={book.name}>
+                                {book.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
