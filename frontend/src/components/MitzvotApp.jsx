@@ -1722,7 +1722,73 @@ const MitzvotApp = () => {
               </TabsList>
 
               <TabsContent value="cards" className="mt-6">
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {contentType === 'bible' ? (
+                  // Organized Bible display with chapter groupings
+                  <div className="space-y-8">
+                    {Object.entries(
+                      (bibleVerses || []).reduce((chapters, verse) => {
+                        const chapterKey = `${verse.book} ${verse.chapter}`;
+                        if (!chapters[chapterKey]) {
+                          chapters[chapterKey] = [];
+                        }
+                        chapters[chapterKey].push(verse);
+                        return chapters;
+                      }, {})
+                    ).map(([chapterKey, verses]) => (
+                      <div key={chapterKey} className="space-y-4">
+                        {/* Chapter Header */}
+                        <div className="border-b-2 border-blue-200 pb-2">
+                          <h3 className="text-2xl font-bold text-blue-800 flex items-center gap-2">
+                            📖 {chapterKey}
+                            <Badge variant="secondary" className="text-sm">
+                              {verses.length} verse{verses.length !== 1 ? 's' : ''}
+                            </Badge>
+                          </h3>
+                        </div>
+                        
+                        {/* Verses in this chapter */}
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                          {verses.map((verse, index) => (
+                            <Card key={`chapter-${verse.book}-${verse.chapter}-${verse.verse}-${index}`} className="hover:shadow-lg transition-shadow">
+                              <CardHeader>
+                                <div className="flex items-start justify-between">
+                                  <CardTitle className="text-lg leading-tight">
+                                    <span className="text-green-600 font-bold">v{verse.verse}</span>
+                                  </CardTitle>
+                                  <Badge variant="outline" className="text-xs">
+                                    {selectedBibleVersion === 'yah_scriptures' ? 'Yah' : 'KJV'}
+                                  </Badge>
+                                </div>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="space-y-4">
+                                  <div>
+                                    <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded border-l-4 border-green-200 leading-relaxed">
+                                      {renderBibleText(verse?.text || '', verse?.id)}
+                                    </p>
+                                  </div>
+                                  
+                                  <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+                                    <Badge variant="secondary" className="capitalize text-xs">
+                                      {verse.testament} Testament
+                                    </Badge>
+                                    {verse.has_precept && (
+                                      <Badge variant="outline" className="text-green-700 border-green-300 text-xs">
+                                        Has Precepts
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  // Original mitzvot/precepts display
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {contentType === 'mitzvot' ? (
                     (mitzvot || []).map((mitzvah) => (
                       <Card key={mitzvah.id} className="hover:shadow-lg transition-shadow">
