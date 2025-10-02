@@ -1752,7 +1752,7 @@ const MitzvotApp = () => {
                       );
                     })
                   ) : (
-                    (bibleVerses || []).map((verse) => (
+                    (bibleVerses || []).map((verse, index) => (
                       <Card key={verse.id} className="hover:shadow-lg transition-shadow">
                         <CardHeader>
                           <div className="flex items-start justify-between">
@@ -1765,7 +1765,7 @@ const MitzvotApp = () => {
                           <div className="space-y-4">
                             <div>
                               <p className="text-sm text-gray-600 italic bg-gray-50 p-3 rounded border-l-4 border-green-200">
-                                "{renderHighlightedText(verse?.text || '', `card-${verse?.id || index}`)}"
+                                {renderHighlightedText(verse?.text || '', `card-${verse?.id || index}`)}
                               </p>
                             </div>
                             
