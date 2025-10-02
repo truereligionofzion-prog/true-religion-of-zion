@@ -2069,62 +2069,35 @@ const MitzvotApp = () => {
                   
                   {/* Book Navigation - Filtered by Testament */}
                   <div className="flex flex-wrap gap-2 mb-6 justify-center max-h-96 overflow-y-auto border border-gray-200 p-4 rounded">
-                    {(() => {
-                      // Filter books based on selected testament
-                      let filteredBooks = bibleBooks || [];
-                      
-                      console.log('=== TESTAMENT FILTERING DEBUG ===');
-                      console.log('Current testament filter:', advancedFilters.testament);
-                      console.log('Total books available:', filteredBooks.length);
-                      console.log('Sample book structure:', filteredBooks[0]);
-                      
-                      if (advancedFilters.testament && advancedFilters.testament !== 'all') {
-                        const originalCount = filteredBooks.length;
-                        console.log('Filtering for testament:', advancedFilters.testament);
-                        
-                        filteredBooks = filteredBooks.filter(book => {
-                          console.log(`Checking book: ${book.name} with testament: ${book.testament}`);
-                          if (advancedFilters.testament === 'old') return book.testament === 'old';
-                          if (advancedFilters.testament === 'new') return book.testament === 'new';  
-                          if (advancedFilters.testament === 'apocrypha') return book.testament === 'apocrypha';
-                          return true;
-                        });
-                        console.log(`Filtered from ${originalCount} to ${filteredBooks.length} books for testament: ${advancedFilters.testament}`);
-                        console.log('Filtered book names:', filteredBooks.map(b => b.name));
-                      } else {
-                        console.log('No filtering applied, showing all testaments');
-                      }
-                      
-                      return filteredBooks.map((book) => (
-                        <Button
-                          key={book.name}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedBook(book.name);
-                            
-                            // Navigate to specific verse if chapter and verse are selected
-                            if (selectedChapter && selectedVerse) {
-                              const elementId = `${book.name.toLowerCase().replace(/\s+/g, '_')}_${selectedChapter}_${selectedVerse}`;
-                              setTimeout(() => {
-                                const element = document.getElementById(elementId);
-                                if (element) {
-                                  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                  element.classList.add('bg-yellow-200');
-                                  setTimeout(() => element.classList.remove('bg-yellow-200'), 3000);
-                                }
-                              }, 1000);
-                            }
-                            
-                            loadContent(); // Reload content for selected book
-                          }}
-                          className={selectedBook === book.name ? 'bg-blue-100' : ''}
-                        >
-                          <BookOpen className="w-4 h-4 mr-2" />
-                          {book.name}
-                        </Button>
-                      ));
-                    })()}
+                    {filteredBooks.map((book) => (
+                      <Button
+                        key={book.name}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedBook(book.name);
+                          
+                          // Navigate to specific verse if chapter and verse are selected
+                          if (selectedChapter && selectedVerse) {
+                            const elementId = `${book.name.toLowerCase().replace(/\s+/g, '_')}_${selectedChapter}_${selectedVerse}`;
+                            setTimeout(() => {
+                              const element = document.getElementById(elementId);
+                              if (element) {
+                                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                element.classList.add('bg-yellow-200');
+                                setTimeout(() => element.classList.remove('bg-yellow-200'), 3000);
+                              }
+                            }, 1000);
+                          }
+                          
+                          loadContent(); // Reload content for selected book
+                        }}
+                        className={selectedBook === book.name ? 'bg-blue-100' : ''}
+                      >
+                        <BookOpen className="w-4 h-4 mr-2" />
+                        {book.name}
+                      </Button>
+                    ))}
                     
                     {(() => {
                       let filteredBooks = bibleBooks || [];
