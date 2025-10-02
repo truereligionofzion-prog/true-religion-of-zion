@@ -146,14 +146,31 @@ class APITester:
                 self.log_test("KJV 1611 - Stats Endpoint", False, f"Status: {response.status_code}")
                 return False
             
-            # Test 3: Bible books with yah_scriptures version - verify all 80 books present
-            response = self.session.get(f"{self.base_url}/bible/books?version=yah_scriptures")
+            # Test 3: Bible books with kjv1611_divine version - verify 6 sample books present
+            response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
             if response.status_code == 200:
                 data = response.json()
                 books = data.get('books', [])
                 
-                if len(books) == 80:
-                    self.log_test("Yah Scriptures - Books Count", True, f"Found all 80 books")
+                if len(books) == 6:
+                    self.log_test("KJV 1611 - Books Count", True, f"Found all 6 sample books")
+                    
+                    # Check for expected sample books
+                    expected_books = ['Genesis', 'Exodus', 'Matthew', 'Mark', 'Tobit', 'Psalms']
+                    book_names = [book.get('name', '') for book in books]
+                    
+                    found_books = []
+                    missing_books = []
+                    for expected in expected_books:
+                        if expected in book_names:
+                            found_books.append(expected)
+                        else:
+                            missing_books.append(expected)
+                    
+                    if len(found_books) == 6:
+                        self.log_test("KJV 1611 - Expected Books", True, f"All expected books found: {found_books}")
+                    else:
+                        self.log_test("KJV 1611 - Expected Books", False, f"Found: {found_books}, Missing: {missing_books}")
                     
                     # Check testament distribution
                     testaments = {}
@@ -161,11 +178,11 @@ class APITester:
                         testament = book.get('testament', 'unknown')
                         testaments[testament] = testaments.get(testament, 0) + 1
                     
-                    self.log_test("Yah Scriptures - Testament Distribution", True, f"Books by testament: {testaments}")
+                    self.log_test("KJV 1611 - Testament Distribution", True, f"Books by testament: {testaments}")
                 else:
-                    self.log_test("Yah Scriptures - Books Count", False, f"Found {len(books)} books (expected 80)")
+                    self.log_test("KJV 1611 - Books Count", False, f"Found {len(books)} books (expected 6 sample books)")
             else:
-                self.log_test("Yah Scriptures - Books Endpoint", False, f"Status: {response.status_code}")
+                self.log_test("KJV 1611 - Books Endpoint", False, f"Status: {response.status_code}")
                 return False
             
             # Test 4: Testament filtering with yah_scriptures version
