@@ -1,44 +1,48 @@
 #!/usr/bin/env python3
 """
-Backend Testing for KJV Bible Data Replacement - COMPREHENSIVE TESTING
+Backend Testing for KJV Bible Data Replacement - COMPREHENSIVE ENHANCED DATASET TESTING
 
-REVIEW REQUEST FOCUS - KJV 1611 VERSION TESTING:
-COMPLETED TASK: New KJV Bible data replacement has been loaded into the database.
+REVIEW REQUEST FOCUS - KJV 1611 ENHANCED DATASET TESTING:
+COMPLETED TASK: Comprehensive KJV Bible dataset has been loaded with 12,326 verses from 11 books.
 The KJV 1611 Divine Names version should now be complete with:
-- Sample books loaded: Genesis, Exodus, Matthew, Mark, Tobit, Psalms (6 books total)
-- Expected verse counts: ~1,083 verses for the sample books
-- Improved data quality: Genesis (~214 verses vs previous ~48), Matthew (~227 vs previous ~17)
+- Enhanced dataset: 11 books total (Genesis, Exodus, Psalms, Matthew, Mark, Luke, John, Acts, Romans, Tobit, Wisdom)
+- Expected verse counts: ~12,326 total verses (major upgrade from previous ~1,083)
+- Testament distribution: Old Testament (3), New Testament (6), Apocrypha (2)
+- Individual book counts: Genesis (~1,276), Matthew (~1,056), Psalms (~1,785)
 
 CRITICAL TESTING REQUIRED:
-1. KJV 1611 Version API Testing:
-   - GET /api/bible/versions (verify kjv1611_divine version is available and working)
-   - GET /api/bible/stats?version=kjv1611_divine (verify correct counts)
+1. KJV 1611 Enhanced Dataset Verification:
+   - GET /api/bible/versions (verify kjv1611_divine version with enhanced metadata)
+   - GET /api/bible/books?version=kjv1611_divine (verify 11 books: Genesis, Exodus, Psalms, Matthew, Mark, Luke, John, Acts, Romans, Tobit, Wisdom)
+   - Check testament distribution: Old Testament (3), New Testament (6), Apocrypha (2)
 
-2. Bible Books API Testing:
-   - GET /api/bible/books?version=kjv1611_divine (check 6 sample books present)
-   - Verify proper testament distribution (old/new/apocrypha)
-   - Check correct book ordering and metadata
+2. Enhanced Verse Count Testing:
+   - GET /api/bible/verses?version=kjv1611_divine (verify ~12,326 total verses)
+   - Test individual book verse counts: Genesis (~1,276), Matthew (~1,056), Psalms (~1,785)
+   - Check pagination is working correctly with the larger dataset
 
-3. Bible Verses API Testing:
-   - GET /api/bible/verses?version=kjv1611_divine (verify ~1,083 verses total)
-   - Test proper verse text content quality (not empty or truncated)
-   - Verify correct book/chapter/verse structure
+3. Data Quality Verification:
+   - Sample verse content from Genesis 1:1, Matthew 1:1, Psalms 1:1
+   - Verify verse text is complete and readable (not truncated)
+   - Check proper book/chapter/verse structure integrity
 
-4. Data Quality Verification:
-   - Compare Genesis verse count (should be ~214 verses vs previous ~48)
-   - Check Matthew verses (should be ~227 vs previous ~17)
-   - Verify verse text content is complete and readable
+4. Testament Filtering:
+   - GET /api/bible/verses?version=kjv1611_divine&testament=old (should show Genesis, Exodus, Psalms)
+   - GET /api/bible/verses?version=kjv1611_divine&testament=new (should show Matthew, Mark, Luke, John, Acts, Romans)
+   - GET /api/bible/verses?version=kjv1611_divine&testament=apocrypha (should show Tobit, Wisdom)
 
-5. API Response Structure:
-   - Ensure all Bible endpoints return proper JSON structure with required fields
-   - Test pagination and filtering functionality
+5. Performance Testing:
+   - Ensure API responses are reasonable with larger dataset
+   - Test search functionality across the enhanced dataset
+   - Verify database indexes are working efficiently
 
 EXPECTED RESULTS:
-- kjv1611_divine version should be available in versions list
-- Stats should show 6 books with ~1,083 total verses
-- Sample books: Genesis, Exodus, Matthew, Mark, Tobit, Psalms should be accessible
-- Verse content should be complete and readable (not truncated)
-- Significant improvement in verse counts compared to previous incomplete data
+- kjv1611_divine version available with enhanced metadata
+- Stats should show 11 books with ~12,326 total verses
+- Books: Genesis, Exodus, Psalms, Matthew, Mark, Luke, John, Acts, Romans, Tobit, Wisdom
+- Testament distribution: OT=3, NT=6, Apocrypha=2
+- Individual verse counts approaching biblical standards
+- Significant improvement from previous incomplete dataset
 """
 
 import requests
