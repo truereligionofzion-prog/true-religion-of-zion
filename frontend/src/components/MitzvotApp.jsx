@@ -2039,11 +2039,8 @@ const MitzvotApp = () => {
                 <div className="max-w-4xl mx-auto">
                   
                   {/* Book Navigation - Filtered by Testament */}
-                  <div 
-                    key={advancedFilters.testament} 
-                    className="flex flex-wrap gap-2 mb-6 justify-center max-h-96 overflow-y-auto border border-gray-200 p-4 rounded"
-                  >
-                    {(() => {
+                  <div className="flex flex-wrap gap-2 mb-6 justify-center max-h-96 overflow-y-auto border border-gray-200 p-4 rounded">
+                    {React.useMemo(() => {
                       // Filter books based on selected testament
                       let filteredBooks = bibleBooks || [];
                       
