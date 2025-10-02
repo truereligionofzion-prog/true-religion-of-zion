@@ -3018,26 +3018,22 @@ class APITester:
         return passed >= total * 0.8  # 80% success rate required
 
 def main():
-    """Run comprehensive Bible API functionality testing as per review request"""
-    print("🚀 BIBLE API FUNCTIONALITY VERIFICATION - CRITICAL BIBLE VERSE TEXT RENDERING ISSUE")
+    """Run comprehensive Yah Scriptures Bible API testing as per review request"""
+    print("🚀 YAH SCRIPTURES BIBLE API COMPREHENSIVE TESTING")
     print("=" * 90)
     print("REVIEW REQUEST FOCUS:")
-    print("- Test GET /api/bible/verses (should return verses with full text content)")
-    print("- Test GET /api/bible/stats (should return correct Bible statistics)")
-    print("- Verify verse objects contain 'text' field with actual biblical content")
-    print("- Check different testaments (old testament, new testament, apocrypha)")
-    print("- Test with specific verses like Tobit 1:1, Ezra 1:1")
-    print("- Verify API returns proper JSON structure with verses array")
-    print("- Check pagination works correctly (page, totalPages)")
-    print("- Verify stats endpoint returns: totalBooks, totalVerses, apocryphaBooks")
+    print("- Test Yah Scriptures version with 10,015 verses (2,678 OT + 5,328 NT + 2,009 Apocrypha)")
+    print("- Verify all 80 books are accessible")
+    print("- Test New Testament data quality (26 books, 5,328 verses)")
+    print("- Verify divine name standardization (YHWH instead of {vWHY})")
+    print("- Test testament filtering and book navigation")
+    print("- Verify sample verses: Matthew 1:1, John 1:1, Romans 1:1, Revelation 1:1")
     print("=" * 90)
     
     tester = APITester(BACKEND_URL)
     
-    # Test basic connectivity first
-    if not tester.test_api_root():
-        print("❌ Cannot connect to API. Exiting.")
-        return
+    # Run all Yah Scriptures tests
+    success = tester.run_all_tests()
     
     # Run comprehensive Bible API tests
     test_functions = [
