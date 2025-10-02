@@ -389,8 +389,8 @@ async def get_bible_verses(
 ):
     """Get Bible verses with filtering and pagination"""
     try:
-        # Build query
-        query = {}
+        # Build query with version filter
+        query = {"version": version}
         
         if book:
             query["book"] = book
