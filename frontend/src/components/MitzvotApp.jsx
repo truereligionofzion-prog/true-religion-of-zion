@@ -2096,10 +2096,17 @@ const MitzvotApp = () => {
                     
                     {filteredBooks.length > 0 && (
                       <p className="text-xs text-gray-500 w-full text-center mt-2 bg-gray-100 p-2 rounded">
-                        Showing {filteredBooks.length} books ({advancedFilters.testament === 'all' ? 'All Testaments' : 
-                          advancedFilters.testament === 'old' ? 'Old Testament Only' : 
-                          advancedFilters.testament === 'new' ? 'New Testament Only' : 
-                          advancedFilters.testament === 'apocrypha' ? 'Apocrypha Only' : 'All'})
+                        Showing {filteredBooks.length} books ({(() => {
+                          const testamentFilter = (contentType === 'bible' && selectedCategory !== 'all') 
+                            ? selectedCategory 
+                            : advancedFilters.testament;
+                          
+                          if (testamentFilter === 'all' || !testamentFilter) return 'All Testaments';
+                          if (testamentFilter === 'old') return 'Old Testament Only';
+                          if (testamentFilter === 'new') return 'New Testament Only';
+                          if (testamentFilter === 'apocrypha') return 'Apocrypha Only';
+                          return 'All';
+                        })()})
                       </p>
                     )}
                   </div>
