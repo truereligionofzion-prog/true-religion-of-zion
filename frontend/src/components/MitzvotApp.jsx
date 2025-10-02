@@ -2096,26 +2096,28 @@ const MitzvotApp = () => {
                 {/* Book-style Bible Reading Interface */}
                 <div className="max-w-4xl mx-auto">
                   
-                  {/* Book Navigation */}
-                  <div className="flex flex-wrap gap-2 mb-6 justify-center">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedBook('Genesis')}
-                      className={selectedBook === 'Genesis' ? 'bg-blue-100' : ''}
-                    >
-                      <BookOpen className="w-4 h-4 mr-2" />
-                      Genesis
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedBook('Tobit')}
-                      className={selectedBook === 'Tobit' ? 'bg-blue-100' : ''}
-                    >
-                      <BookOpen className="w-4 h-4 mr-2" />
-                      Tobit
-                    </Button>
+                  {/* Book Navigation - Dynamic from Available Books */}
+                  <div className="flex flex-wrap gap-2 mb-6 justify-center max-h-32 overflow-y-auto">
+                    {(bibleStats.books || []).slice(0, 20).map((bookName) => (
+                      <Button
+                        key={bookName}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedBook(bookName);
+                          loadContent(); // Reload content for selected book
+                        }}
+                        className={selectedBook === bookName ? 'bg-blue-100' : ''}
+                      >
+                        <BookOpen className="w-4 h-4 mr-2" />
+                        {bookName}
+                      </Button>
+                    ))}
+                    {(bibleStats.books || []).length > 20 && (
+                      <p className="text-xs text-gray-500 w-full text-center mt-2">
+                        Showing first 20 books. Use the dropdown above for complete list.
+                      </p>
+                    )}
                   </div>
 
                   {/* Reading Content - Grouped by Book and Chapter */}
