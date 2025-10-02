@@ -20,6 +20,11 @@ const MitzvotApp = () => {
   
   // State management
   const [contentType, setContentType] = useState('mitzvot'); // 'mitzvot', 'precepts', or 'bible'
+  
+  // Debug contentType changes
+  useEffect(() => {
+    console.log('ContentType changed to:', contentType);
+  }, [contentType]);
   const [mitzvot, setMitzvot] = useState([]);
   const [precepts, setPrecepts] = useState([]);
   const [bibleVerses, setBibleVerses] = useState([]);
