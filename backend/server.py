@@ -340,12 +340,13 @@ async def get_precepts_stats():
 
 @api_router.get("/bible/books")
 async def get_bible_books(
+    version: Optional[str] = Query("kjv1611_divine", description="Bible version: kjv1611_divine, yah_scriptures"),
     testament: Optional[str] = Query(None, description="Filter by testament: old, new, apocrypha")
 ):
     """Get all Bible books with metadata"""
     try:
-        # Build query
-        query = {}
+        # Build query with version filter
+        query = {"version": version}
         if testament and testament != "all":
             query["testament"] = testament
         
