@@ -129,6 +129,40 @@ const MitzvotApp = () => {
     }
   };
 
+  const navigateToVerse = async () => {
+    try {
+      setLoading(true);
+      
+      // Build params for specific navigation
+      const params = {
+        version: selectedBibleVersion,
+        book: selectedBook !== 'all' ? selectedBook : undefined,
+        chapter: selectedChapter || undefined,
+        verse: selectedVerse || undefined,
+        limit: 50
+      };
+
+      // Remove undefined values
+      Object.keys(params).forEach(key => 
+        params[key] === undefined && delete params[key]
+      );
+
+      const response = await apiService.getBibleVerses(params);
+      setBibleVerses(response.verses);
+      setCurrentPage(1); // Reset to first page
+      setTotalPages(response.totalPages || 1);
+
+      // Clear the navigation inputs after successful search
+      setSelectedChapter(null);
+      setSelectedVerse(null);
+      
+    } catch (error) {
+      console.error('Error navigating to verse:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const loadInitialData = async () => {
     try {
       setLoading(true);
