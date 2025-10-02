@@ -2084,11 +2084,11 @@ const MitzvotApp = () => {
                       }
                       
                       return filteredBooks.length > 0 && (
-                        <p className="text-xs text-gray-500 w-full text-center mt-2">
+                        <p className="text-xs text-gray-500 w-full text-center mt-2 bg-gray-100 p-2 rounded">
                           Showing {filteredBooks.length} books ({advancedFilters.testament === 'all' ? 'All Testaments' : 
-                            advancedFilters.testament === 'old' ? 'Old Testament' : 
-                            advancedFilters.testament === 'new' ? 'New Testament' : 
-                            advancedFilters.testament === 'apocrypha' ? 'Apocrypha' : 'All'})
+                            advancedFilters.testament === 'old' ? 'Old Testament Only' : 
+                            advancedFilters.testament === 'new' ? 'New Testament Only' : 
+                            advancedFilters.testament === 'apocrypha' ? 'Apocrypha Only' : 'All'})
                         </p>
                       );
                     })()}
