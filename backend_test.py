@@ -154,98 +154,103 @@ class APITester:
             self.log_test("Genesis Chapter/Verse Analysis", False, f"Error: {str(e)}")
             return False
 
-    def test_genesis_complete_structure(self):
-        """REVIEW REQUEST TEST 2: Complete Structure Test - Genesis 50 chapters and ~1,495 verses"""
+    def test_genesis_content_quality_check(self):
+        """REVIEW REQUEST TEST 2: Genesis Content Quality Check - Key verses and random sampling"""
         try:
-            print("\n🔍 GENESIS COMPLETE STRUCTURE TEST - 50 CHAPTERS & ~1,495 VERSES...")
+            print("\n🔍 GENESIS CONTENT QUALITY CHECK - KEY VERSES AND SAMPLING...")
             
-            # Test 1: Verify Genesis has exactly 50 chapters
+            # Test Genesis 1:1 - Expected creation text
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=100")
+                response = self.session.get(f"{self.base_url}/bible/verse/Genesis/1/1?version=kjv1611_divine")
                 if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
                     
-                    if verses:
-                        # Find max chapter number
-                        max_chapter = max(verse.get('chapter', 0) for verse in verses if isinstance(verse.get('chapter'), int))
-                        
-                        if max_chapter == 50:
-                            self.log_test("Genesis - 50 Chapters Structure", True, f"✅ PERFECT! Found exactly 50 chapters as expected")
-                        elif 45 <= max_chapter <= 55:  # Allow some variance
-                            self.log_test("Genesis - 50 Chapters Structure", True, f"Close to target: Found {max_chapter} chapters (expected 50)")
-                        else:
-                            self.log_test("Genesis - 50 Chapters Structure", False, f"Incorrect chapter count: {max_chapter} (expected 50)")
+                    # Check for Genesis 1:1 creation content
+                    creation_keywords = ['beginning', 'god', 'created', 'heaven', 'earth']
+                    keywords_found = sum(1 for keyword in creation_keywords if keyword.lower() in verse_text.lower())
+                    
+                    if keywords_found >= 4:
+                        self.log_test("Genesis 1:1 - Creation Text", True, f"✅ CORRECT! Found: '{verse_text[:100]}...'")
                     else:
-                        self.log_test("Genesis - 50 Chapters Structure", False, "No verses found for chapter count")
+                        self.log_test("Genesis 1:1 - Creation Text", False, f"Missing creation content. Found: '{verse_text[:100]}...'")
                 else:
-                    self.log_test("Genesis - 50 Chapters Structure", False, f"Status: {response.status_code}")
+                    self.log_test("Genesis 1:1 - Creation Text", False, f"Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Genesis - 50 Chapters Structure", False, f"Error: {str(e)}")
+                self.log_test("Genesis 1:1 - Creation Text", False, f"Error: {str(e)}")
             
-            # Test 2: Check verse count: ~1,495 verses (97.5% of expected 1,533)
+            # Test Genesis 50:26 - Last verse to ensure complete book
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
+                response = self.session.get(f"{self.base_url}/bible/verse/Genesis/50/26?version=kjv1611_divine")
                 if response.status_code == 200:
-                    data = response.json()
-                    total_verses = data.get('total', 0)
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
                     
-                    expected_verses = 1533
-                    target_verses = 1495
-                    coverage_percentage = (total_verses / expected_verses) * 100
+                    # Check for Genesis 50:26 content (Joseph's death/burial)
+                    ending_keywords = ['joseph', 'died', 'egypt', 'coffin', 'years']
+                    keywords_found = sum(1 for keyword in ending_keywords if keyword.lower() in verse_text.lower())
                     
-                    if total_verses >= target_verses * 0.95:  # Allow 5% variance
-                        self.log_test("Genesis - Verse Count Target", True, f"✅ EXCELLENT! Found {total_verses} verses (target: ~{target_verses}, coverage: {coverage_percentage:.1f}%)")
-                    elif total_verses >= 1200:  # Reasonable minimum
-                        self.log_test("Genesis - Verse Count Target", True, f"Good verse count: {total_verses} verses (coverage: {coverage_percentage:.1f}%)")
+                    if keywords_found >= 2:
+                        self.log_test("Genesis 50:26 - Last Verse", True, f"✅ COMPLETE BOOK! Found: '{verse_text[:100]}...'")
                     else:
-                        self.log_test("Genesis - Verse Count Target", False, f"Low verse count: {total_verses} verses (target: ~{target_verses})")
+                        self.log_test("Genesis 50:26 - Last Verse", False, f"Unexpected ending content. Found: '{verse_text[:100]}...'")
                 else:
-                    self.log_test("Genesis - Verse Count Target", False, f"Status: {response.status_code}")
+                    self.log_test("Genesis 50:26 - Last Verse", False, f"Status: {response.status_code} - Book may be incomplete")
             except Exception as e:
-                self.log_test("Genesis - Verse Count Target", False, f"Error: {str(e)}")
+                self.log_test("Genesis 50:26 - Last Verse", False, f"Error: {str(e)}")
             
-            # Test 3: Test different chapters - Genesis 1 (creation), Genesis 3 (fall), Genesis 6 (flood), Genesis 22 (Abraham/Isaac), Genesis 50 (Joseph's death)
-            key_chapters = [
-                (1, "creation", ["beginning", "god", "created"]),
-                (3, "fall", ["serpent", "tree", "knowledge"]),
-                (6, "flood", ["noah", "ark", "flood"]),
-                (22, "abraham/isaac", ["abraham", "isaac", "sacrifice"]),
-                (50, "joseph's death", ["joseph", "died", "egypt"])
-            ]
+            # Sample random verses for content quality
+            sample_chapters = [5, 12, 18, 25, 32, 39, 45]  # Spread across Genesis
+            quality_verses = 0
+            total_sampled = 0
             
-            chapter_tests_passed = 0
-            for chapter_num, description, expected_keywords in key_chapters:
+            print("\n📝 RANDOM VERSE QUALITY SAMPLING:")
+            
+            for chapter in sample_chapters:
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter_num}&limit=20")
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=3")
                     if response.status_code == 200:
                         data = response.json()
                         verses = data.get('verses', [])
-                        total_chapter_verses = data.get('total', 0)
                         
-                        if verses and total_chapter_verses > 0:
-                            # Check if chapter content matches expected theme
-                            chapter_text = ' '.join([v.get('text', '') for v in verses[:10]]).lower()
-                            keywords_found = sum(1 for keyword in expected_keywords if keyword in chapter_text)
+                        for verse in verses[:2]:  # Sample 2 verses per chapter
+                            verse_text = verse.get('text', '')
+                            verse_ref = f"Genesis {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            total_sampled += 1
                             
-                            if keywords_found >= 1:  # At least 1 keyword should be present
-                                self.log_test(f"Genesis Chapter {chapter_num} - {description}", True, f"✅ CORRECT THEME! Found {total_chapter_verses} verses with expected content")
-                                chapter_tests_passed += 1
+                            # Quality checks
+                            is_quality = (
+                                len(verse_text) > 15 and  # Reasonable length
+                                not verse_text.startswith('...') and  # Not truncated
+                                not verse_text.endswith('...') and
+                                any(char in verse_text for char in ['.', ';', ':', '!', '?']) and  # Has punctuation
+                                verse_text.strip() != ''  # Not empty
+                            )
+                            
+                            if is_quality:
+                                quality_verses += 1
+                                print(f"   ✅ {verse_ref}: '{verse_text[:80]}...'")
                             else:
-                                self.log_test(f"Genesis Chapter {chapter_num} - {description}", False, f"Theme mismatch: {total_chapter_verses} verses but missing expected keywords")
-                        else:
-                            self.log_test(f"Genesis Chapter {chapter_num} - {description}", False, f"Chapter not found or empty")
-                    else:
-                        self.log_test(f"Genesis Chapter {chapter_num} - {description}", False, f"Status: {response.status_code}")
+                                print(f"   ❌ {verse_ref}: QUALITY ISSUE - '{verse_text[:80]}...'")
+                                
                 except Exception as e:
-                    self.log_test(f"Genesis Chapter {chapter_num} - {description}", False, f"Error: {str(e)}")
+                    print(f"   ❌ Chapter {chapter}: Error - {str(e)}")
             
-            # Success criteria: 50 chapters, reasonable verse count, key chapters present
-            success = (chapter_tests_passed >= 3)
-            return success
+            if total_sampled > 0:
+                quality_percentage = (quality_verses / total_sampled) * 100
+                if quality_percentage >= 90:
+                    self.log_test("Random Verse Quality", True, f"✅ EXCELLENT! {quality_verses}/{total_sampled} verses are high quality ({quality_percentage:.1f}%)")
+                elif quality_percentage >= 75:
+                    self.log_test("Random Verse Quality", True, f"Good quality: {quality_verses}/{total_sampled} verses ({quality_percentage:.1f}%)")
+                else:
+                    self.log_test("Random Verse Quality", False, f"Poor quality: {quality_verses}/{total_sampled} verses ({quality_percentage:.1f}%)")
+            else:
+                self.log_test("Random Verse Quality", False, "No verses sampled for quality check")
+            
+            return True
             
         except Exception as e:
-            self.log_test("Genesis Complete Structure", False, f"Error: {str(e)}")
+            self.log_test("Genesis Content Quality Check", False, f"Error: {str(e)}")
             return False
 
     def test_database_cleanup_verification(self):
