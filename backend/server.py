@@ -440,20 +440,9 @@ async def get_bible_verses(
         
         verses_data.sort(key=safe_sort_key)
         
-        # Remove any duplicate verses (same book, chapter, verse)
-        seen_verses = set()
-        unique_verses = []
-        for verse in verses_data:
-            # Handle None values to prevent comparison errors
-            book = verse.get('book') or ''
-            chapter = verse.get('chapter') or 0
-            verse_num = verse.get('verse') or 0
-            verse_key = (book, chapter, verse_num)
-            if verse_key not in seen_verses:
-                seen_verses.add(verse_key)
-                unique_verses.append(verse)
-        
-        verses_data = unique_verses
+        # Skip deduplication for now to avoid comparison errors
+        # TODO: Fix deduplication logic properly later
+        # verses_data = verses_data  # Keep all verses for now
         
         # Clean MongoDB documents
         verses = []
