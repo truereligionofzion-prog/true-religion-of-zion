@@ -327,10 +327,10 @@ class APITester:
             self.log_test("No Placeholder Content Check", False, f"Error: {str(e)}")
             return False
 
-    def test_genesis_preservation_verification(self):
-        """REVIEW REQUEST TEST 3: Genesis Preservation Verification - Verify Genesis still has exactly 1,533 verses"""
+    def test_previous_books_preservation(self):
+        """REVIEW REQUEST TEST 3: Previous Books Preservation - Verify Genesis and Exodus are preserved"""
         try:
-            print("\n🔍 GENESIS PRESERVATION CHECK - VERIFYING GENESIS WASN'T AFFECTED BY EXODUS COMPLETION...")
+            print("\n🔍 PREVIOUS BOOKS PRESERVATION CHECK - VERIFYING GENESIS AND EXODUS WEREN'T AFFECTED BY LEVITICUS...")
             
             # Verify Genesis still has exactly 1,533 verses
             try:
@@ -348,6 +348,23 @@ class APITester:
                     self.log_test("Genesis Exact Verse Count Preserved", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
                 self.log_test("Genesis Exact Verse Count Preserved", False, f"Error: {str(e)}")
+            
+            # Verify Exodus still has exactly 1,063 verses
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    total_verses = data.get('total', 0)
+                    expected_verses = 1063  # Exodus should have exactly 1,063 verses
+                    
+                    if total_verses == expected_verses:
+                        self.log_test("Exodus Exact Verse Count Preserved", True, f"✅ PERFECT! Exodus still has exactly {total_verses} verses (preserved)")
+                    else:
+                        self.log_test("Exodus Exact Verse Count Preserved", False, f"❌ CHANGED! Exodus now has {total_verses} verses, expected {expected_verses}")
+                else:
+                    self.log_test("Exodus Exact Verse Count Preserved", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Exodus Exact Verse Count Preserved", False, f"Error: {str(e)}")
             
             # Confirm Genesis 1:1 and 50:26 are still intact
             key_genesis_verses = [
@@ -380,6 +397,38 @@ class APITester:
                 self.log_test("Genesis Key Verses Intact", True, f"✅ PRESERVED! All {genesis_key_verses_intact}/2 key Genesis verses are intact")
             else:
                 self.log_test("Genesis Key Verses Intact", False, f"❌ CORRUPTED! Only {genesis_key_verses_intact}/2 key Genesis verses are intact")
+            
+            # Confirm Exodus key verses are still intact
+            key_exodus_verses = [
+                {'chapter': 1, 'verse': 1, 'description': 'Israel in Egypt', 'expected_content': 'children of Israel'},
+                {'chapter': 20, 'verse': 1, 'description': 'Ten Commandments', 'expected_content': 'God spake'}
+            ]
+            
+            print("\n📖 EXODUS KEY VERSES INTEGRITY CHECK:")
+            exodus_key_verses_intact = 0
+            
+            for key_verse in key_exodus_verses:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verse/Exodus/{key_verse['chapter']}/{key_verse['verse']}")
+                    if response.status_code == 200:
+                        verse_data = response.json()
+                        verse_text = verse_data.get('text', '')
+                        
+                        if key_verse['expected_content'].lower() in verse_text.lower():
+                            exodus_key_verses_intact += 1
+                            print(f"   ✅ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): INTACT - '{verse_text[:60]}...'")
+                        else:
+                            print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): CHANGED - '{verse_text[:60]}...'")
+                    else:
+                        print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): API ERROR - Status {response.status_code}")
+                        
+                except Exception as e:
+                    print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): ERROR - {str(e)}")
+            
+            if exodus_key_verses_intact == len(key_exodus_verses):
+                self.log_test("Exodus Key Verses Intact", True, f"✅ PRESERVED! All {exodus_key_verses_intact}/2 key Exodus verses are intact")
+            else:
+                self.log_test("Exodus Key Verses Intact", False, f"❌ CORRUPTED! Only {exodus_key_verses_intact}/2 key Exodus verses are intact")
             
             # Ensure no cross-contamination between Genesis and Exodus
             try:
