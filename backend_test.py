@@ -1,43 +1,42 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Final Comprehensive Bible Dataset - 80-BOOK TARGET ACHIEVEMENT TESTING
+Backend Testing for Corrected Bible Parsing Results - KJV 1611 DIVINE NAMES CONTENT INTEGRITY TESTING
 
-REVIEW REQUEST FOCUS - FINAL COMPREHENSIVE BIBLE DATASET RESULTS AFTER COMPLETE 80-BOOK LOADING:
-Test the final comprehensive Bible dataset results after the complete 80-book loading process:
+REVIEW REQUEST FOCUS - CORRECTED BIBLE PARSING RESULTS VERIFICATION:
+Test the corrected Bible parsing results to verify content integrity:
 
-1. **Complete Dataset Verification**:
-   - Test GET /api/bible/versions to verify both yah_scriptures and kjv1611_divine versions
-   - Verify GET /api/bible/books for each version to check actual book counts
-   - Yah Scriptures should show 80/80 books (COMPLETE!)
-   - KJV 1611 should show the actual number loaded
+1. **KJV Data Quality Verification**:
+   - Test GET /api/bible/books?version=kjv1611_divine to verify 5 books loaded correctly
+   - Check specific books: Genesis, Exodus, Psalms, Matthew, Mark
+   - Verify verse counts approach web-verified standards:
+     - Genesis: ~1494 verses (vs expected 1533) = 97.4% coverage
+     - Exodus: ~1455 verses (vs expected 1213) = 119.9% coverage  
+     - Psalms: ~2953 verses (vs expected 2461) = 120.0% coverage
+     - Matthew: ~1049 verses (vs expected 1071) = 97.9% coverage
+     - Mark: ~813 verses (vs expected 678) = 119.9% coverage
 
-2. **Massive Verse Count Verification**:
-   - Test GET /api/bible/verses for both versions to verify the substantial improvements:
-   - Yah Scriptures: Expected ~46,384 verses (reported from loader)
-   - KJV 1611: Check actual verse count achieved
-   - Total combined verses should be substantial
+2. **Critical Content Integrity Test**: 
+   - Sample Genesis 1:1 - should contain "In the beginning God created"
+   - Sample Matthew 1:1 - should contain "book of the generation of Jesus Christ"
+   - Verify NO cross-contamination between books (no "Thessalonians" in Genesis)
+   - Check chapter structure makes sense for each book
 
-3. **Testament Distribution Verification**:
-   - Check testament filtering for comprehensive coverage:
-   - Old Testament (39 books expected)
-   - New Testament (27 books expected)  
-   - Apocrypha (14 books expected)
-   - Verify both versions have proper distribution
+3. **Testament Distribution**:
+   - Old Testament books: Genesis, Exodus, Psalms (3 books)
+   - New Testament books: Matthew, Mark (2 books)
+   - Total: 5 books with ~7,764 verses
 
-4. **Sample Book Quality Check**:
-   - Test specific high-value books from different testaments:
-   - Genesis, Psalms (Old Testament)
-   - Matthew, Romans (New Testament)
-   - Tobit, Wisdom, 1 Maccabees (Apocrypha)
-   - Verify verse counts approach web-verified standards
+4. **Data Quality Assessment**:
+   - Verify all verses have proper text content
+   - Check chapter/verse numbering is sequential and logical
+   - Confirm book names and testament assignments are correct
 
-5. **Database Performance with Large Dataset**:
-   - Test API performance with potentially 46,000+ verses for Yah Scriptures
-   - Verify pagination handles the massive dataset efficiently
-   - Check search functionality across the complete Bible
-   - Test advanced filtering and statistics
+5. **API Performance**:
+   - Test search functionality across 7,764 verses
+   - Verify pagination works correctly
+   - Check filtering by testament
 
-This tests the final achievement toward the 80-book target. The logs show Yah Scriptures achieved 100% coverage (80/80 books) with 46,384 verses, which is a major breakthrough.
+This tests the corrected parsing approach to ensure we're finally getting clean, accurate biblical content without cross-contamination. Focus on verifying the content integrity improvements and realistic verse counts approaching web-verified standards.
 """
 
 import requests
