@@ -442,7 +442,7 @@ test_plan:
     - "React Key Conflicts - Preventing ALL Bible text rendering"
   stuck_tasks: 
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
-    - "Bible Table/Card View Display - React key conflicts preventing text display in specific views"
+    - "Bible Verse Text Display - CRITICAL FAILURE - ALL view modes broken, React key conflicts preventing text rendering"
   test_all: false
   test_priority: "high_first"
 
