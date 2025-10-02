@@ -1818,10 +1818,10 @@ const MitzvotApp = () => {
                       ))
                     )}
                   </div>
-                ) : (
-                  // Original mitzvot/precepts display
+                ) : contentType === 'mitzvot' ? (
+                  // Mitzvot display
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {contentType === 'mitzvot' ? (
+                  {(
                     (mitzvot || []).map((mitzvah) => (
                       <Card key={mitzvah.id} className="hover:shadow-lg transition-shadow">
                         <CardHeader>
