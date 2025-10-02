@@ -89,10 +89,10 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_kjv1611_bible_api_comprehensive(self):
-        """COMPREHENSIVE TEST: KJV 1611 Divine Names Bible API functionality"""
+    def test_kjv1611_enhanced_dataset_verification(self):
+        """COMPREHENSIVE TEST: KJV 1611 Enhanced Dataset with 12,326 verses from 11 books"""
         try:
-            print("\n🔍 COMPREHENSIVE KJV 1611 DIVINE NAMES BIBLE API TESTING...")
+            print("\n🔍 COMPREHENSIVE KJV 1611 ENHANCED DATASET VERIFICATION...")
             
             # Test 1: Bible versions endpoint - verify kjv1611_divine is available
             response = self.session.get(f"{self.base_url}/bible/versions")
@@ -102,21 +102,21 @@ class APITester:
                 kjv1611_found = any(v.get('id') == 'kjv1611_divine' for v in versions)
                 
                 if kjv1611_found:
-                    self.log_test("KJV 1611 - Version Available", True, "kjv1611_divine version found in versions list")
+                    self.log_test("KJV 1611 Enhanced - Version Available", True, "kjv1611_divine version found in versions list")
                     
                     # Get version details
                     kjv_version = next((v for v in versions if v.get('id') == 'kjv1611_divine'), {})
                     version_name = kjv_version.get('name', 'Unknown')
                     version_desc = kjv_version.get('description', 'No description')
-                    self.log_test("KJV 1611 - Version Details", True, f"Name: {version_name}, Description: {version_desc}")
+                    self.log_test("KJV 1611 Enhanced - Version Metadata", True, f"Name: {version_name}, Description: {version_desc}")
                 else:
-                    self.log_test("KJV 1611 - Version Available", False, "kjv1611_divine version not found")
+                    self.log_test("KJV 1611 Enhanced - Version Available", False, "kjv1611_divine version not found")
                     return False
             else:
-                self.log_test("KJV 1611 - Version Available", False, f"Status: {response.status_code}")
+                self.log_test("KJV 1611 Enhanced - Version Available", False, f"Status: {response.status_code}")
                 return False
             
-            # Test 2: Bible stats with kjv1611_divine version - verify expected counts
+            # Test 2: Bible stats with kjv1611_divine version - verify enhanced counts
             response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
             if response.status_code == 200:
                 data = response.json()
@@ -129,38 +129,52 @@ class APITester:
                 new_testament_verses = data.get('newTestamentVerses', 0)
                 apocrypha_verses = data.get('apocryphaVerses', 0)
                 
-                # Verify expected counts from review request (6 sample books, ~1,083 verses)
-                if total_books == 6:
-                    self.log_test("KJV 1611 - Total Books", True, f"Found exactly 6 sample books as expected")
+                # Verify expected counts from review request (11 books, ~12,326 verses)
+                if total_books == 11:
+                    self.log_test("KJV 1611 Enhanced - Total Books", True, f"Found exactly 11 books as expected")
                 else:
-                    self.log_test("KJV 1611 - Total Books", False, f"Found {total_books} books (expected 6 sample books)")
+                    self.log_test("KJV 1611 Enhanced - Total Books", False, f"Found {total_books} books (expected 11)")
                 
-                if 1000 <= total_verses <= 1200:  # Allow range around 1,083
-                    self.log_test("KJV 1611 - Total Verses", True, f"Found {total_verses} verses (expected ~1,083)")
+                if 12000 <= total_verses <= 13000:  # Allow range around 12,326
+                    self.log_test("KJV 1611 Enhanced - Total Verses", True, f"Found {total_verses} verses (expected ~12,326)")
                 else:
-                    self.log_test("KJV 1611 - Total Verses", False, f"Found {total_verses} verses (expected ~1,083)")
+                    self.log_test("KJV 1611 Enhanced - Total Verses", False, f"Found {total_verses} verses (expected ~12,326)")
                 
-                # Log testament distribution
-                self.log_test("KJV 1611 - Testament Distribution", True, 
-                            f"Books: OT={old_testament_books}, NT={new_testament_books}, Apocrypha={apocrypha_books}")
-                self.log_test("KJV 1611 - Verse Distribution", True, 
+                # Verify testament distribution: OT=3, NT=6, Apocrypha=2
+                if old_testament_books == 3:
+                    self.log_test("KJV 1611 Enhanced - Old Testament Books", True, f"Found {old_testament_books} OT books (expected 3)")
+                else:
+                    self.log_test("KJV 1611 Enhanced - Old Testament Books", False, f"Found {old_testament_books} OT books (expected 3)")
+                
+                if new_testament_books == 6:
+                    self.log_test("KJV 1611 Enhanced - New Testament Books", True, f"Found {new_testament_books} NT books (expected 6)")
+                else:
+                    self.log_test("KJV 1611 Enhanced - New Testament Books", False, f"Found {new_testament_books} NT books (expected 6)")
+                
+                if apocrypha_books == 2:
+                    self.log_test("KJV 1611 Enhanced - Apocrypha Books", True, f"Found {apocrypha_books} Apocrypha books (expected 2)")
+                else:
+                    self.log_test("KJV 1611 Enhanced - Apocrypha Books", False, f"Found {apocrypha_books} Apocrypha books (expected 2)")
+                
+                # Log verse distribution
+                self.log_test("KJV 1611 Enhanced - Verse Distribution", True, 
                             f"Verses: OT={old_testament_verses}, NT={new_testament_verses}, Apocrypha={apocrypha_verses}")
                 
             else:
-                self.log_test("KJV 1611 - Stats Endpoint", False, f"Status: {response.status_code}")
+                self.log_test("KJV 1611 Enhanced - Stats Endpoint", False, f"Status: {response.status_code}")
                 return False
             
-            # Test 3: Bible books with kjv1611_divine version - verify 6 sample books present
+            # Test 3: Bible books with kjv1611_divine version - verify 11 books present
             response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
             if response.status_code == 200:
                 data = response.json()
                 books = data.get('books', [])
                 
-                if len(books) == 6:
-                    self.log_test("KJV 1611 - Books Count", True, f"Found all 6 sample books")
+                if len(books) == 11:
+                    self.log_test("KJV 1611 Enhanced - Books Count", True, f"Found all 11 books")
                     
-                    # Check for expected sample books
-                    expected_books = ['Genesis', 'Exodus', 'Matthew', 'Mark', 'Tobit', 'Psalms']
+                    # Check for expected enhanced books
+                    expected_books = ['Genesis', 'Exodus', 'Psalms', 'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans', 'Tobit', 'Wisdom']
                     book_names = [book.get('name', '') for book in books]
                     
                     found_books = []
@@ -171,10 +185,10 @@ class APITester:
                         else:
                             missing_books.append(expected)
                     
-                    if len(found_books) == 6:
-                        self.log_test("KJV 1611 - Expected Books", True, f"All expected books found: {found_books}")
+                    if len(found_books) == 11:
+                        self.log_test("KJV 1611 Enhanced - Expected Books", True, f"All expected books found: {found_books}")
                     else:
-                        self.log_test("KJV 1611 - Expected Books", False, f"Found: {found_books}, Missing: {missing_books}")
+                        self.log_test("KJV 1611 Enhanced - Expected Books", False, f"Found: {found_books}, Missing: {missing_books}")
                     
                     # Check testament distribution
                     testaments = {}
@@ -182,24 +196,31 @@ class APITester:
                         testament = book.get('testament', 'unknown')
                         testaments[testament] = testaments.get(testament, 0) + 1
                     
-                    self.log_test("KJV 1611 - Testament Distribution", True, f"Books by testament: {testaments}")
+                    self.log_test("KJV 1611 Enhanced - Testament Distribution", True, f"Books by testament: {testaments}")
                 else:
-                    self.log_test("KJV 1611 - Books Count", False, f"Found {len(books)} books (expected 6 sample books)")
+                    self.log_test("KJV 1611 Enhanced - Books Count", False, f"Found {len(books)} books (expected 11)")
             else:
-                self.log_test("KJV 1611 - Books Endpoint", False, f"Status: {response.status_code}")
+                self.log_test("KJV 1611 Enhanced - Books Endpoint", False, f"Status: {response.status_code}")
                 return False
             
-            # Test 4: Verse retrieval with kjv1611_divine version
+            # Test 4: Enhanced verse retrieval with kjv1611_divine version
             response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=50")
             if response.status_code == 200:
                 data = response.json()
                 total = data.get('total', 0)
                 verses = data.get('verses', [])
+                total_pages = data.get('totalPages', 0)
                 
-                if 1000 <= total <= 1200:  # Expected ~1,083 verses
-                    self.log_test("KJV 1611 - Verses Retrieval", True, f"Found {total} verses (expected ~1,083)")
+                if 12000 <= total <= 13000:  # Expected ~12,326 verses
+                    self.log_test("KJV 1611 Enhanced - Verses Retrieval", True, f"Found {total} verses (expected ~12,326)")
                 else:
-                    self.log_test("KJV 1611 - Verses Retrieval", False, f"Found {total} verses (expected ~1,083)")
+                    self.log_test("KJV 1611 Enhanced - Verses Retrieval", False, f"Found {total} verses (expected ~12,326)")
+                
+                # Test pagination with larger dataset
+                if total_pages > 100:  # Should have many pages with 12,326 verses
+                    self.log_test("KJV 1611 Enhanced - Pagination", True, f"Found {total_pages} pages (good for large dataset)")
+                else:
+                    self.log_test("KJV 1611 Enhanced - Pagination", False, f"Only {total_pages} pages (expected 100+)")
                 
                 # Test verse content quality
                 if verses:
@@ -210,19 +231,19 @@ class APITester:
                             content_quality_passed += 1
                     
                     if content_quality_passed >= 8:  # At least 8/10 should have good content
-                        self.log_test("KJV 1611 - Verse Content Quality", True, f"{content_quality_passed}/10 verses have good content")
+                        self.log_test("KJV 1611 Enhanced - Verse Content Quality", True, f"{content_quality_passed}/10 verses have good content")
                     else:
-                        self.log_test("KJV 1611 - Verse Content Quality", False, f"Only {content_quality_passed}/10 verses have good content")
+                        self.log_test("KJV 1611 Enhanced - Verse Content Quality", False, f"Only {content_quality_passed}/10 verses have good content")
                 else:
-                    self.log_test("KJV 1611 - Verse Content Quality", False, "No verses returned")
+                    self.log_test("KJV 1611 Enhanced - Verse Content Quality", False, "No verses returned")
             else:
-                self.log_test("KJV 1611 - Verses Retrieval", False, f"Status: {response.status_code}")
+                self.log_test("KJV 1611 Enhanced - Verses Retrieval", False, f"Status: {response.status_code}")
                 return False
             
-            return total >= 1000 and len(verses) > 0
+            return total >= 12000 and len(verses) > 0 and total_books == 11
             
         except Exception as e:
-            self.log_test("KJV 1611 Bible API Comprehensive Test", False, f"Error: {str(e)}")
+            self.log_test("KJV 1611 Enhanced Dataset Verification", False, f"Error: {str(e)}")
             return False
 
     def test_kjv1611_data_quality_verification(self):
