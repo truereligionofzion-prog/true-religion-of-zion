@@ -76,11 +76,21 @@ const MitzvotApp = () => {
 
   // Phase 3C: Divine name rendering - COMPLETELY REBUILT to fix React key conflicts
   const renderBibleText = (text, verseId) => {
+    // Debug logging to identify the issue
+    console.log('renderBibleText called with:', {
+      text: text,
+      textType: typeof text,
+      textLength: text ? text.length : 'no text',
+      verseId: verseId
+    });
+    
     // Return plain text for proper display
     if (!text || typeof text !== 'string') {
+      console.log('renderBibleText returning empty string - invalid text:', text);
       return '';  // Return empty string instead of placeholder text
     }
     
+    console.log('renderBibleText returning text:', text.substring(0, 50) + '...');
     return text;
   };
 
