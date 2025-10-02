@@ -430,16 +430,18 @@ class APITester:
             else:
                 self.log_test("Exodus Key Verses Intact", False, f"❌ CORRUPTED! Only {exodus_key_verses_intact}/2 key Exodus verses are intact")
             
-            # Ensure no cross-contamination between Genesis and Exodus
+            # Ensure no cross-contamination between all three books
             try:
-                # Check Genesis verses don't contain Exodus content
+                print("\n🔍 CROSS-CONTAMINATION CHECK BETWEEN ALL THREE BOOKS:")
+                
+                # Check Genesis verses don't contain Exodus or Leviticus content
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=10")
                 if response.status_code == 200:
                     data = response.json()
                     genesis_verses = data.get('verses', [])
                     
-                    exodus_contamination = 0
-                    exodus_keywords = ['moses', 'pharaoh', 'egypt', 'israelites', 'commandments', 'tabernacle', 'aaron']
+                    contamination_count = 0
+                    other_books_keywords = ['moses', 'aaron', 'tabernacle', 'offerings', 'sacrifices', 'levites', 'priests']
                     
                     for verse in genesis_verses:
                         verse_text = verse.get('text', '').lower()
@@ -447,69 +449,103 @@ class APITester:
                         
                         # Check book field is correct
                         if book != 'Genesis':
-                            exodus_contamination += 1
+                            contamination_count += 1
                             print(f"   ❌ BOOK CONTAMINATION: Verse labeled as '{book}' in Genesis query")
                             continue
                         
-                        # Check for Exodus-specific content in Genesis verses
-                        for keyword in exodus_keywords:
+                        # Check for other books' content in Genesis verses
+                        for keyword in other_books_keywords:
                             if keyword in verse_text:
-                                # Some keywords like 'egypt' might legitimately appear in Genesis
-                                if keyword in ['moses', 'pharaoh', 'commandments', 'tabernacle', 'aaron']:
-                                    exodus_contamination += 1
-                                    print(f"   ❌ CONTENT CONTAMINATION: Genesis verse contains '{keyword}': '{verse_text[:50]}...'")
-                                    break
+                                contamination_count += 1
+                                print(f"   ❌ CONTENT CONTAMINATION: Genesis verse contains '{keyword}': '{verse_text[:50]}...'")
+                                break
                     
-                    if exodus_contamination == 0:
-                        self.log_test("No Cross-Contamination Genesis", True, f"✅ PURE! No Exodus contamination found in {len(genesis_verses)} Genesis verses")
+                    if contamination_count == 0:
+                        self.log_test("No Cross-Contamination Genesis", True, f"✅ PURE! No Exodus/Leviticus contamination found in {len(genesis_verses)} Genesis verses")
                     else:
-                        self.log_test("No Cross-Contamination Genesis", False, f"❌ CONTAMINATED! Found {exodus_contamination} instances of Exodus contamination in Genesis")
-                        
-                    # Check Exodus verses don't contain Genesis-specific content
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=10")
-                    if response.status_code == 200:
-                        data = response.json()
-                        exodus_verses = data.get('verses', [])
-                        
-                        genesis_contamination = 0
-                        genesis_keywords = ['adam', 'eve', 'noah', 'abraham', 'isaac', 'jacob', 'joseph']
-                        
-                        for verse in exodus_verses:
-                            verse_text = verse.get('text', '').lower()
-                            book = verse.get('book', '')
-                            
-                            # Check book field is correct
-                            if book != 'Exodus':
-                                genesis_contamination += 1
-                                print(f"   ❌ BOOK CONTAMINATION: Verse labeled as '{book}' in Exodus query")
-                                continue
-                            
-                            # Check for Genesis-specific content in Exodus verses (some overlap is expected)
-                            for keyword in genesis_keywords:
-                                if keyword in verse_text:
-                                    # Some names like 'abraham', 'isaac', 'jacob' might legitimately appear in Exodus
-                                    if keyword in ['adam', 'eve', 'noah']:
-                                        genesis_contamination += 1
-                                        print(f"   ❌ CONTENT CONTAMINATION: Exodus verse contains '{keyword}': '{verse_text[:50]}...'")
-                                        break
-                        
-                        if genesis_contamination == 0:
-                            self.log_test("No Cross-Contamination Exodus", True, f"✅ PURE! No Genesis contamination found in {len(exodus_verses)} Exodus verses")
-                        else:
-                            self.log_test("No Cross-Contamination Exodus", False, f"❌ CONTAMINATED! Found {genesis_contamination} instances of Genesis contamination in Exodus")
-                    else:
-                        self.log_test("No Cross-Contamination Exodus", False, f"API Error getting Exodus verses - Status: {response.status_code}")
+                        self.log_test("No Cross-Contamination Genesis", False, f"❌ CONTAMINATED! Found {contamination_count} instances of contamination in Genesis")
                 else:
                     self.log_test("No Cross-Contamination Genesis", False, f"API Error getting Genesis verses - Status: {response.status_code}")
-                    self.log_test("No Cross-Contamination Exodus", False, f"Cannot test Exodus contamination without Genesis data")
+                
+                # Check Exodus verses don't contain Genesis or Leviticus content
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=10")
+                if response.status_code == 200:
+                    data = response.json()
+                    exodus_verses = data.get('verses', [])
+                    
+                    contamination_count = 0
+                    other_books_keywords = ['adam', 'eve', 'noah', 'offerings', 'sacrifices', 'holiness', 'unclean']
+                    
+                    for verse in exodus_verses:
+                        verse_text = verse.get('text', '').lower()
+                        book = verse.get('book', '')
+                        
+                        # Check book field is correct
+                        if book != 'Exodus':
+                            contamination_count += 1
+                            print(f"   ❌ BOOK CONTAMINATION: Verse labeled as '{book}' in Exodus query")
+                            continue
+                        
+                        # Check for other books' content (some overlap expected)
+                        for keyword in other_books_keywords:
+                            if keyword in verse_text:
+                                # Only flag clear contamination
+                                if keyword in ['adam', 'eve', 'noah']:
+                                    contamination_count += 1
+                                    print(f"   ❌ CONTENT CONTAMINATION: Exodus verse contains '{keyword}': '{verse_text[:50]}...'")
+                                    break
+                    
+                    if contamination_count == 0:
+                        self.log_test("No Cross-Contamination Exodus", True, f"✅ PURE! No Genesis/Leviticus contamination found in {len(exodus_verses)} Exodus verses")
+                    else:
+                        self.log_test("No Cross-Contamination Exodus", False, f"❌ CONTAMINATED! Found {contamination_count} instances of contamination in Exodus")
+                else:
+                    self.log_test("No Cross-Contamination Exodus", False, f"API Error getting Exodus verses - Status: {response.status_code}")
+                
+                # Check Leviticus verses don't contain Genesis or Exodus content
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=10")
+                if response.status_code == 200:
+                    data = response.json()
+                    leviticus_verses = data.get('verses', [])
+                    
+                    contamination_count = 0
+                    other_books_keywords = ['adam', 'eve', 'noah', 'abraham', 'isaac', 'jacob', 'pharaoh', 'egypt']
+                    
+                    for verse in leviticus_verses:
+                        verse_text = verse.get('text', '').lower()
+                        book = verse.get('book', '')
+                        
+                        # Check book field is correct
+                        if book != 'Leviticus':
+                            contamination_count += 1
+                            print(f"   ❌ BOOK CONTAMINATION: Verse labeled as '{book}' in Leviticus query")
+                            continue
+                        
+                        # Check for other books' content
+                        for keyword in other_books_keywords:
+                            if keyword in verse_text:
+                                # Only flag clear contamination
+                                if keyword in ['adam', 'eve', 'noah', 'pharaoh']:
+                                    contamination_count += 1
+                                    print(f"   ❌ CONTENT CONTAMINATION: Leviticus verse contains '{keyword}': '{verse_text[:50]}...'")
+                                    break
+                    
+                    if contamination_count == 0:
+                        self.log_test("No Cross-Contamination Leviticus", True, f"✅ PURE! No Genesis/Exodus contamination found in {len(leviticus_verses)} Leviticus verses")
+                    else:
+                        self.log_test("No Cross-Contamination Leviticus", False, f"❌ CONTAMINATED! Found {contamination_count} instances of contamination in Leviticus")
+                else:
+                    self.log_test("No Cross-Contamination Leviticus", False, f"API Error getting Leviticus verses - Status: {response.status_code}")
+                    
             except Exception as e:
                 self.log_test("No Cross-Contamination Genesis", False, f"Error: {str(e)}")
                 self.log_test("No Cross-Contamination Exodus", False, f"Error: {str(e)}")
+                self.log_test("No Cross-Contamination Leviticus", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Genesis Preservation Check", False, f"Error: {str(e)}")
+            self.log_test("Previous Books Preservation Check", False, f"Error: {str(e)}")
             return False
 
     def test_content_quality_sampling(self):
