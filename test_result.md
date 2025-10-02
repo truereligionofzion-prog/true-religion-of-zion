@@ -429,11 +429,11 @@ metadata:
 test_plan:
   current_focus:
     - "Phase 3C: Advanced Bible Features - CRITICAL ISSUE CONFIRMED ❌"
-    - "Bible Verse Text Display - renderHighlightedText() function broken"
-    - "React JSX Rendering Issues - dangerouslySetInnerHTML not working properly"
+    - "Bible Verse Text Display - React key conflicts in renderHighlightedText() function"
+    - "React JSX Rendering Issues - Duplicate keys causing text rendering failure"
   stuck_tasks: 
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
-    - "Bible Verse Text Display - Frontend rendering broken despite working API - URGENT FIX NEEDED"
+    - "Bible Verse Text Display - React key conflicts preventing text display - URGENT FIX NEEDED"
   test_all: false
   test_priority: "high_first"
 
