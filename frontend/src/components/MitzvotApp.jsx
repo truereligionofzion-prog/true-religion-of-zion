@@ -30,7 +30,7 @@ const MitzvotApp = () => {
   const [preceptsStats, setPreceptsStats] = useState({});
   const [bibleStats, setBibleStats] = useState({});
   const [mitzvahOfTheDay, setMitzvahOfTheDay] = useState(null);
-  const [selectedBibleVersion, setSelectedBibleVersion] = useState('yah_scriptures'); // Default to Yah Scriptures for testing
+  const [selectedBibleVersion, setSelectedBibleVersion] = useState('kjv1611_divine'); // Default to extracted version
   const [availableVersions, setAvailableVersions] = useState([]);
   const [selectedChapter, setSelectedChapter] = useState(null);
   const [selectedVerse, setSelectedVerse] = useState(null);
