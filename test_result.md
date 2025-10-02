@@ -485,7 +485,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Complete KJV Bible Data Replacement - ✅ COMPREHENSIVE TESTING COMPLETED - 12,326 verses from 11 books verified"
+    - "Complete KJV Bible Data Replacement - ✅ COMPREHENSIVE TESTING COMPLETED - Content integrity verified with corrected parsing"
     - "Bible Frontend Integration Testing - ✅ COMPLETED - All view modes working with KJV dataset"
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
   stuck_tasks: 
