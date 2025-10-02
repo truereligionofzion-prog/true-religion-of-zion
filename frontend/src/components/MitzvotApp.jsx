@@ -76,21 +76,27 @@ const MitzvotApp = () => {
     console.log('Total books available:', books.length);
     console.log('Sample book structure:', books[0]);
     
-    if (advancedFilters.testament && advancedFilters.testament !== 'all') {
+    // FORCE OLD TESTAMENT FOR TESTING
+    const testamentFilter = advancedFilters.testament;
+    console.log('Testament filter value:', testamentFilter, typeof testamentFilter);
+    
+    if (testamentFilter && testamentFilter !== 'all') {
       const originalCount = books.length;
-      console.log('Filtering for testament:', advancedFilters.testament);
+      console.log('APPLYING FILTERING for testament:', testamentFilter);
       
       books = books.filter(book => {
-        console.log(`Checking book: ${book.name} with testament: ${book.testament}`);
-        if (advancedFilters.testament === 'old') return book.testament === 'old';
-        if (advancedFilters.testament === 'new') return book.testament === 'new';  
-        if (advancedFilters.testament === 'apocrypha') return book.testament === 'apocrypha';
+        const bookTestament = book?.testament;
+        console.log(`Checking book: ${book?.name} with testament: "${bookTestament}"`);
+        
+        if (testamentFilter === 'old') return bookTestament === 'old';
+        if (testamentFilter === 'new') return bookTestament === 'new';  
+        if (testamentFilter === 'apocrypha') return bookTestament === 'apocrypha';
         return true;
       });
-      console.log(`Filtered from ${originalCount} to ${books.length} books for testament: ${advancedFilters.testament}`);
-      console.log('Filtered book names:', books.map(b => b.name));
+      console.log(`FILTERED from ${originalCount} to ${books.length} books for testament: ${testamentFilter}`);
+      console.log('Filtered book names:', books.map(b => b?.name));
     } else {
-      console.log('No filtering applied, showing all testaments');
+      console.log('No filtering applied - showing all testaments, filter value was:', testamentFilter);
     }
     
     return books;
