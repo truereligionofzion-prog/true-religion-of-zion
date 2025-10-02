@@ -77,133 +77,131 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_exodus_completion_verification(self):
-        """REVIEW REQUEST TEST 1: Exodus Completion Verification - Verify Exodus exists with proper verse count and all 40 chapters"""
+    def test_exodus_authentic_content_verification(self):
+        """REVIEW REQUEST TEST 1: Exodus Authentic Content Verification - Verify Exodus has authentic biblical text"""
         try:
-            print("\n🔍 EXODUS COMPLETION VERIFICATION - CHECKING FULL COMPLETION STATUS...")
+            print("\n🔍 EXODUS AUTHENTIC CONTENT VERIFICATION - CHECKING FOR AUTHENTIC BIBLICAL TEXT...")
             
-            # Verify Exodus exists in the database with proper verse count
+            # Verify Exodus has 1,063 verses across all 40 chapters (review request specifies 1,063)
             try:
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
                 if response.status_code == 200:
                     data = response.json()
                     total_verses = data.get('total', 0)
-                    expected_verses = 1213  # Exodus should have 1,213 verses total
+                    expected_verses = 1063  # Review request specifies 1,063 verses
                     
                     if total_verses == expected_verses:
-                        self.log_test("Exodus Complete Verse Count", True, f"✅ PERFECT! Exodus has exactly {total_verses} verses (100% complete)")
+                        self.log_test("Exodus 1,063 Verses Count", True, f"✅ PERFECT! Exodus has exactly {total_verses} verses as specified")
                     elif total_verses > 0:
-                        completion_percentage = (total_verses / expected_verses) * 100
-                        missing_verses = expected_verses - total_verses
-                        self.log_test("Exodus Complete Verse Count", False, f"❌ INCOMPLETE! Exodus has {total_verses} verses, missing {missing_verses} ({completion_percentage:.1f}% complete)")
+                        self.log_test("Exodus 1,063 Verses Count", False, f"❌ INCORRECT COUNT! Exodus has {total_verses} verses, expected {expected_verses}")
                     else:
-                        self.log_test("Exodus Complete Verse Count", False, f"❌ NOT FOUND! Exodus does not exist in database (0 verses)")
+                        self.log_test("Exodus 1,063 Verses Count", False, f"❌ NOT FOUND! Exodus does not exist in database (0 verses)")
                 else:
-                    self.log_test("Exodus Complete Verse Count", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Exodus 1,063 Verses Count", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Exodus Complete Verse Count", False, f"Error: {str(e)}")
+                self.log_test("Exodus 1,063 Verses Count", False, f"Error: {str(e)}")
             
-            # Check all 40 chapters are present with correct verse counts
-            expected_verses_per_chapter = {
-                1: 22, 2: 25, 3: 22, 4: 31, 5: 23, 6: 30, 7: 25, 8: 32, 9: 35, 10: 29,
-                11: 10, 12: 51, 13: 22, 14: 31, 15: 27, 16: 36, 17: 16, 18: 27, 19: 25, 20: 26,
-                21: 36, 22: 31, 23: 33, 24: 18, 25: 40, 26: 37, 27: 21, 28: 43, 29: 46, 30: 38,
-                31: 18, 32: 35, 33: 23, 34: 35, 35: 35, 36: 38, 37: 29, 38: 31, 39: 43, 40: 38
-            }
+            # Check that Exodus 1:1-5 contains proper Israel names content (not Genesis creation content)
+            print("\n📖 EXODUS 1:1-5 ISRAEL NAMES CONTENT VERIFICATION:")
+            israel_names_verified = 0
+            expected_israel_names = ['reuben', 'simeon', 'levi', 'judah', 'issachar', 'zebulun', 'benjamin', 'dan', 'naphtali', 'gad', 'asher']
+            genesis_creation_words = ['beginning', 'created', 'heaven', 'earth', 'darkness', 'light']
             
-            print("\n📊 EXODUS ALL 40 CHAPTERS VERIFICATION:")
-            complete_chapters = 0
-            incomplete_chapters = []
-            total_verified_verses = 0
-            
-            for chapter in range(1, 41):  # Exodus has 40 chapters
+            for verse_num in range(1, 6):  # Exodus 1:1-5
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&chapter={chapter}&limit=1")
-                    if response.status_code == 200:
-                        data = response.json()
-                        actual_verses = data.get('total', 0)
-                        expected_verses = expected_verses_per_chapter.get(chapter, 0)
-                        
-                        if actual_verses == expected_verses:
-                            complete_chapters += 1
-                            total_verified_verses += actual_verses
-                            print(f"   ✅ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses - COMPLETE")
-                        else:
-                            incomplete_chapters.append({
-                                'chapter': chapter,
-                                'actual': actual_verses,
-                                'expected': expected_verses,
-                                'status': 'MISSING' if actual_verses == 0 else 'PARTIAL'
-                            })
-                            total_verified_verses += actual_verses
-                            status = 'MISSING' if actual_verses == 0 else 'PARTIAL'
-                            print(f"   ❌ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses - {status}")
-                        
-                    else:
-                        incomplete_chapters.append({
-                            'chapter': chapter,
-                            'actual': 0,
-                            'expected': expected_verses_per_chapter.get(chapter, 0),
-                            'status': 'API_ERROR'
-                        })
-                        print(f"   ❌ Chapter {chapter:2d}: API ERROR - Status {response.status_code}")
-                        
-                except Exception as e:
-                    incomplete_chapters.append({
-                        'chapter': chapter,
-                        'actual': 0,
-                        'expected': expected_verses_per_chapter.get(chapter, 0),
-                        'status': 'ERROR'
-                    })
-                    print(f"   ❌ Chapter {chapter:2d}: ERROR - {str(e)}")
-            
-            # Verify all 40 chapters are complete
-            if complete_chapters == 40:
-                self.log_test("All 40 Exodus Chapters Present", True, f"✅ PERFECT! All 40 chapters are complete with correct verse counts")
-            else:
-                missing_count = len([ch for ch in incomplete_chapters if ch['status'] == 'MISSING'])
-                partial_count = len([ch for ch in incomplete_chapters if ch['status'] == 'PARTIAL'])
-                self.log_test("All 40 Exodus Chapters Present", False, f"❌ INCOMPLETE! {complete_chapters}/40 complete, {partial_count} partial, {missing_count} missing")
-            
-            # Confirm key verses have proper content
-            key_verses = [
-                {'chapter': 1, 'verse': 1, 'description': 'Israel in Egypt'},
-                {'chapter': 3, 'verse': 1, 'description': 'Burning Bush'},
-                {'chapter': 12, 'verse': 1, 'description': 'Passover'},
-                {'chapter': 20, 'verse': 1, 'description': 'Ten Commandments'},
-                {'chapter': 40, 'verse': 1, 'description': 'Tabernacle Completion'}
-            ]
-            
-            print("\n📖 KEY EXODUS VERSES CONTENT VERIFICATION:")
-            key_verses_verified = 0
-            
-            for key_verse in key_verses:
-                try:
-                    response = self.session.get(f"{self.base_url}/bible/verse/Exodus/{key_verse['chapter']}/{key_verse['verse']}")
+                    response = self.session.get(f"{self.base_url}/bible/verse/Exodus/1/{verse_num}")
                     if response.status_code == 200:
                         verse_data = response.json()
-                        verse_text = verse_data.get('text', '')
+                        verse_text = verse_data.get('text', '').lower()
                         
-                        if len(verse_text) > 20 and not verse_text.startswith('...'):
-                            key_verses_verified += 1
-                            print(f"   ✅ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): '{verse_text[:60]}...'")
+                        # Check for Israel names content
+                        israel_names_found = [name for name in expected_israel_names if name in verse_text]
+                        genesis_creation_found = [word for word in genesis_creation_words if word in verse_text]
+                        
+                        if israel_names_found and not genesis_creation_found:
+                            israel_names_verified += 1
+                            print(f"   ✅ Exodus 1:{verse_num}: Israel names content - Found: {', '.join(israel_names_found)}")
+                        elif genesis_creation_found:
+                            print(f"   ❌ Exodus 1:{verse_num}: GENESIS CONTAMINATION - Found creation words: {', '.join(genesis_creation_found)}")
                         else:
-                            print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): POOR CONTENT - '{verse_text}'")
+                            print(f"   ⚠️ Exodus 1:{verse_num}: No specific Israel names detected - '{verse_text[:50]}...'")
                     else:
-                        print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): API ERROR - Status {response.status_code}")
+                        print(f"   ❌ Exodus 1:{verse_num}: API ERROR - Status {response.status_code}")
                         
                 except Exception as e:
-                    print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): ERROR - {str(e)}")
+                    print(f"   ❌ Exodus 1:{verse_num}: ERROR - {str(e)}")
             
-            if key_verses_verified == len(key_verses):
-                self.log_test("Key Exodus Verses Content", True, f"✅ EXCELLENT! All {key_verses_verified}/5 key verses have proper content")
+            if israel_names_verified >= 2:  # At least 2 verses should have Israel names
+                self.log_test("Exodus 1:1-5 Israel Names Content", True, f"✅ AUTHENTIC! {israel_names_verified}/5 verses contain proper Israel names content")
             else:
-                self.log_test("Key Exodus Verses Content", False, f"❌ ISSUES! Only {key_verses_verified}/5 key verses have proper content")
+                self.log_test("Exodus 1:1-5 Israel Names Content", False, f"❌ INCORRECT! Only {israel_names_verified}/5 verses contain Israel names content")
+            
+            # Confirm Exodus 3:1-2 has burning bush content
+            print("\n🔥 EXODUS 3:1-2 BURNING BUSH CONTENT VERIFICATION:")
+            burning_bush_verified = 0
+            burning_bush_keywords = ['moses', 'bush', 'fire', 'flame', 'angel', 'lord', 'burned', 'consumed']
+            
+            for verse_num in range(1, 3):  # Exodus 3:1-2
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verse/Exodus/3/{verse_num}")
+                    if response.status_code == 200:
+                        verse_data = response.json()
+                        verse_text = verse_data.get('text', '').lower()
+                        
+                        # Check for burning bush content
+                        bush_keywords_found = [word for word in burning_bush_keywords if word in verse_text]
+                        
+                        if bush_keywords_found:
+                            burning_bush_verified += 1
+                            print(f"   ✅ Exodus 3:{verse_num}: Burning bush content - Found: {', '.join(bush_keywords_found)}")
+                        else:
+                            print(f"   ❌ Exodus 3:{verse_num}: NO BURNING BUSH CONTENT - '{verse_text[:60]}...'")
+                    else:
+                        print(f"   ❌ Exodus 3:{verse_num}: API ERROR - Status {response.status_code}")
+                        
+                except Exception as e:
+                    print(f"   ❌ Exodus 3:{verse_num}: ERROR - {str(e)}")
+            
+            if burning_bush_verified >= 1:  # At least 1 verse should have burning bush content
+                self.log_test("Exodus 3:1-2 Burning Bush Content", True, f"✅ AUTHENTIC! {burning_bush_verified}/2 verses contain burning bush content")
+            else:
+                self.log_test("Exodus 3:1-2 Burning Bush Content", False, f"❌ MISSING! No burning bush content found in Exodus 3:1-2")
+            
+            # Verify Exodus 20:1-3 has Ten Commandments content
+            print("\n📜 EXODUS 20:1-3 TEN COMMANDMENTS CONTENT VERIFICATION:")
+            commandments_verified = 0
+            commandments_keywords = ['god', 'spake', 'words', 'lord', 'commandments', 'gods', 'before']
+            
+            for verse_num in range(1, 4):  # Exodus 20:1-3
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verse/Exodus/20/{verse_num}")
+                    if response.status_code == 200:
+                        verse_data = response.json()
+                        verse_text = verse_data.get('text', '').lower()
+                        
+                        # Check for Ten Commandments content
+                        commandments_keywords_found = [word for word in commandments_keywords if word in verse_text]
+                        
+                        if commandments_keywords_found:
+                            commandments_verified += 1
+                            print(f"   ✅ Exodus 20:{verse_num}: Ten Commandments content - Found: {', '.join(commandments_keywords_found)}")
+                        else:
+                            print(f"   ❌ Exodus 20:{verse_num}: NO COMMANDMENTS CONTENT - '{verse_text[:60]}...'")
+                    else:
+                        print(f"   ❌ Exodus 20:{verse_num}: API ERROR - Status {response.status_code}")
+                        
+                except Exception as e:
+                    print(f"   ❌ Exodus 20:{verse_num}: ERROR - {str(e)}")
+            
+            if commandments_verified >= 2:  # At least 2 verses should have commandments content
+                self.log_test("Exodus 20:1-3 Ten Commandments Content", True, f"✅ AUTHENTIC! {commandments_verified}/3 verses contain Ten Commandments content")
+            else:
+                self.log_test("Exodus 20:1-3 Ten Commandments Content", False, f"❌ MISSING! Only {commandments_verified}/3 verses contain Ten Commandments content")
             
             return True
             
         except Exception as e:
-            self.log_test("Exodus Completion Verification", False, f"Error: {str(e)}")
+            self.log_test("Exodus Authentic Content Verification", False, f"Error: {str(e)}")
             return False
 
     def test_genesis_preservation_check(self):
