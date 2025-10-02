@@ -193,6 +193,11 @@ class ApiService {
     return this.request('/bible/versions');
   }
 
+  // Get Bible books
+  async getBibleBooks(version = 'kjv1611_divine') {
+    return this.request(`/bible/books?version=${encodeURIComponent(version)}`);
+  }
+
   // ===== PHASE 3C: ADVANCED BIBLE SEARCH METHODS =====
   
   // Advanced Bible search with multiple filters
