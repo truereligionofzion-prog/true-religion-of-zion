@@ -2099,26 +2099,14 @@ const MitzvotApp = () => {
                       </Button>
                     ))}
                     
-                    {(() => {
-                      let filteredBooks = bibleBooks || [];
-                      if (advancedFilters.testament && advancedFilters.testament !== 'all') {
-                        filteredBooks = filteredBooks.filter(book => {
-                          if (advancedFilters.testament === 'old') return book.testament === 'old';
-                          if (advancedFilters.testament === 'new') return book.testament === 'new';
-                          if (advancedFilters.testament === 'apocrypha') return book.testament === 'apocrypha';
-                          return true;
-                        });
-                      }
-                      
-                      return filteredBooks.length > 0 && (
-                        <p className="text-xs text-gray-500 w-full text-center mt-2 bg-gray-100 p-2 rounded">
-                          Showing {filteredBooks.length} books ({advancedFilters.testament === 'all' ? 'All Testaments' : 
-                            advancedFilters.testament === 'old' ? 'Old Testament Only' : 
-                            advancedFilters.testament === 'new' ? 'New Testament Only' : 
-                            advancedFilters.testament === 'apocrypha' ? 'Apocrypha Only' : 'All'})
-                        </p>
-                      );
-                    })()}
+                    {filteredBooks.length > 0 && (
+                      <p className="text-xs text-gray-500 w-full text-center mt-2 bg-gray-100 p-2 rounded">
+                        Showing {filteredBooks.length} books ({advancedFilters.testament === 'all' ? 'All Testaments' : 
+                          advancedFilters.testament === 'old' ? 'Old Testament Only' : 
+                          advancedFilters.testament === 'new' ? 'New Testament Only' : 
+                          advancedFilters.testament === 'apocrypha' ? 'Apocrypha Only' : 'All'})
+                      </p>
+                    )}
                   </div>
 
                   {/* Reading Content - Grouped by Book and Chapter */}
