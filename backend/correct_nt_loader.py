@@ -68,7 +68,7 @@ class CorrectNTLoader:
                         # Look ahead to see if this is the right Matthew
                         for i in range(line_num, min(line_num + 10, len(lines))):
                             ahead_line = lines[i].strip()
-                            if ahead_line.startswith('1 ') and 'genealogy' in ahead_line:
+                            if ahead_line.startswith('1 ') and ('genealogy' in ahead_line or 'Mashiaḥ' in ahead_line):
                                 print(f"   📖 Found NT starting at line {line_num}")
                                 return line_num
                         
