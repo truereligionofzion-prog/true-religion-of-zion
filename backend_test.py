@@ -246,90 +246,121 @@ class APITester:
             self.log_test("KJV 1611 Enhanced Dataset Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_kjv1611_data_quality_verification(self):
-        """TEST: KJV 1611 data quality improvements - Genesis and Matthew verse counts"""
+    def test_kjv1611_enhanced_verse_counts(self):
+        """TEST: KJV 1611 Enhanced individual book verse counts - Genesis (~1,276), Matthew (~1,056), Psalms (~1,785)"""
         try:
-            print("\n🔍 KJV 1611 DATA QUALITY VERIFICATION...")
+            print("\n🔍 KJV 1611 ENHANCED INDIVIDUAL BOOK VERSE COUNTS...")
             
+            # Test Genesis verse count (should be ~1,276 vs previous ~214)
             genesis_total = 0
-            matthew_total = 0
-            
-            # Test Genesis verse count improvement (should be ~214 vs previous ~48)
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1000")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=2000")
                 if response.status_code == 200:
                     data = response.json()
                     genesis_total = data.get('total', 0)
                     genesis_verses = data.get('verses', [])
                     
-                    if genesis_total >= 200:  # Should be around 214
-                        self.log_test("KJV 1611 - Genesis Verse Count", True, f"Found {genesis_total} Genesis verses (expected ~214, major improvement)")
+                    if 1200 <= genesis_total <= 1350:  # Should be around 1,276
+                        self.log_test("KJV 1611 Enhanced - Genesis Verse Count", True, f"Found {genesis_total} Genesis verses (expected ~1,276, major upgrade)")
                     else:
-                        self.log_test("KJV 1611 - Genesis Verse Count", False, f"Found only {genesis_total} Genesis verses (expected ~214)")
+                        self.log_test("KJV 1611 Enhanced - Genesis Verse Count", False, f"Found {genesis_total} Genesis verses (expected ~1,276)")
                     
-                    # Test Genesis content quality
+                    # Test Genesis 1:1 content quality
                     if genesis_verses:
                         first_verse = genesis_verses[0]
                         verse_text = first_verse.get('text', '')
                         if verse_text and len(verse_text) > 10:
                             preview = verse_text[:80] + "..." if len(verse_text) > 80 else verse_text
-                            self.log_test("KJV 1611 - Genesis Content", True, f"Genesis 1:1: '{preview}'")
+                            self.log_test("KJV 1611 Enhanced - Genesis 1:1 Content", True, f"Genesis 1:1: '{preview}'")
                         else:
-                            self.log_test("KJV 1611 - Genesis Content", False, f"Genesis content issue: '{verse_text[:50]}...'")
+                            self.log_test("KJV 1611 Enhanced - Genesis 1:1 Content", False, f"Genesis content issue: '{verse_text[:50]}...'")
                 else:
-                    self.log_test("KJV 1611 - Genesis Verse Count", False, f"Status: {response.status_code}")
+                    self.log_test("KJV 1611 Enhanced - Genesis Verse Count", False, f"Status: {response.status_code}")
             except Exception as e:
-                self.log_test("KJV 1611 - Genesis Verse Count", False, f"Error: {str(e)}")
+                self.log_test("KJV 1611 Enhanced - Genesis Verse Count", False, f"Error: {str(e)}")
             
-            # Test Matthew verse count improvement (should be ~227 vs previous ~17)
+            # Test Matthew verse count (should be ~1,056 vs previous ~227)
+            matthew_total = 0
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Matthew&limit=1000")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Matthew&limit=1500")
                 if response.status_code == 200:
                     data = response.json()
                     matthew_total = data.get('total', 0)
                     matthew_verses = data.get('verses', [])
                     
-                    if matthew_total >= 220:  # Should be around 227
-                        self.log_test("KJV 1611 - Matthew Verse Count", True, f"Found {matthew_total} Matthew verses (expected ~227, major improvement)")
+                    if 1000 <= matthew_total <= 1150:  # Should be around 1,056
+                        self.log_test("KJV 1611 Enhanced - Matthew Verse Count", True, f"Found {matthew_total} Matthew verses (expected ~1,056, major upgrade)")
                     else:
-                        self.log_test("KJV 1611 - Matthew Verse Count", False, f"Found only {matthew_total} Matthew verses (expected ~227)")
+                        self.log_test("KJV 1611 Enhanced - Matthew Verse Count", False, f"Found {matthew_total} Matthew verses (expected ~1,056)")
                     
-                    # Test Matthew content quality
+                    # Test Matthew 1:1 content quality
                     if matthew_verses:
                         first_verse = matthew_verses[0]
                         verse_text = first_verse.get('text', '')
                         if verse_text and len(verse_text) > 10:
                             preview = verse_text[:80] + "..." if len(verse_text) > 80 else verse_text
-                            self.log_test("KJV 1611 - Matthew Content", True, f"Matthew 1:1: '{preview}'")
+                            self.log_test("KJV 1611 Enhanced - Matthew 1:1 Content", True, f"Matthew 1:1: '{preview}'")
                         else:
-                            self.log_test("KJV 1611 - Matthew Content", False, f"Matthew content issue: '{verse_text[:50]}...'")
+                            self.log_test("KJV 1611 Enhanced - Matthew 1:1 Content", False, f"Matthew content issue: '{verse_text[:50]}...'")
                 else:
-                    self.log_test("KJV 1611 - Matthew Verse Count", False, f"Status: {response.status_code}")
+                    self.log_test("KJV 1611 Enhanced - Matthew Verse Count", False, f"Status: {response.status_code}")
             except Exception as e:
-                self.log_test("KJV 1611 - Matthew Verse Count", False, f"Error: {str(e)}")
+                self.log_test("KJV 1611 Enhanced - Matthew Verse Count", False, f"Error: {str(e)}")
             
-            # Test other sample books
-            sample_books = [
-                ("Exodus", 180, 200),  # Expected range
-                ("Mark", 240, 260),    # Expected range
-                ("Tobit", 90, 120),    # Expected range
-                ("Psalms", 100, 120)   # Expected range (sample)
+            # Test Psalms verse count (should be ~1,785 vs previous ~104)
+            psalms_total = 0
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Psalms&limit=2000")
+                if response.status_code == 200:
+                    data = response.json()
+                    psalms_total = data.get('total', 0)
+                    psalms_verses = data.get('verses', [])
+                    
+                    if 1700 <= psalms_total <= 1900:  # Should be around 1,785
+                        self.log_test("KJV 1611 Enhanced - Psalms Verse Count", True, f"Found {psalms_total} Psalms verses (expected ~1,785, major upgrade)")
+                    else:
+                        self.log_test("KJV 1611 Enhanced - Psalms Verse Count", False, f"Found {psalms_total} Psalms verses (expected ~1,785)")
+                    
+                    # Test Psalms 1:1 content quality
+                    if psalms_verses:
+                        first_verse = psalms_verses[0]
+                        verse_text = first_verse.get('text', '')
+                        if verse_text and len(verse_text) > 10:
+                            preview = verse_text[:80] + "..." if len(verse_text) > 80 else verse_text
+                            self.log_test("KJV 1611 Enhanced - Psalms 1:1 Content", True, f"Psalms 1:1: '{preview}'")
+                        else:
+                            self.log_test("KJV 1611 Enhanced - Psalms 1:1 Content", False, f"Psalms content issue: '{verse_text[:50]}...'")
+                else:
+                    self.log_test("KJV 1611 Enhanced - Psalms Verse Count", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("KJV 1611 Enhanced - Psalms Verse Count", False, f"Error: {str(e)}")
+            
+            # Test other enhanced books with realistic biblical verse counts
+            enhanced_books = [
+                ("Exodus", 1200, 1300),    # Expected range for full Exodus
+                ("Mark", 650, 750),        # Expected range for full Mark
+                ("Luke", 1100, 1200),      # Expected range for full Luke
+                ("John", 850, 950),        # Expected range for full John
+                ("Acts", 1000, 1100),      # Expected range for full Acts
+                ("Romans", 400, 500),      # Expected range for full Romans
+                ("Tobit", 300, 400),       # Expected range for full Tobit
+                ("Wisdom", 400, 500)       # Expected range for full Wisdom
             ]
             
-            sample_books_passed = 0
-            for book_name, min_verses, max_verses in sample_books:
+            enhanced_books_passed = 0
+            for book_name, min_verses, max_verses in enhanced_books:
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=1000")
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=1500")
                     if response.status_code == 200:
                         data = response.json()
                         book_total = data.get('total', 0)
                         book_verses = data.get('verses', [])
                         
                         if min_verses <= book_total <= max_verses:
-                            self.log_test(f"KJV 1611 - {book_name} Count", True, f"Found {book_total} verses (expected {min_verses}-{max_verses})")
-                            sample_books_passed += 1
+                            self.log_test(f"KJV 1611 Enhanced - {book_name} Count", True, f"Found {book_total} verses (expected {min_verses}-{max_verses})")
+                            enhanced_books_passed += 1
                         else:
-                            self.log_test(f"KJV 1611 - {book_name} Count", False, f"Found {book_total} verses (expected {min_verses}-{max_verses})")
+                            self.log_test(f"KJV 1611 Enhanced - {book_name} Count", False, f"Found {book_total} verses (expected {min_verses}-{max_verses})")
                         
                         # Test content quality
                         if book_verses:
@@ -337,18 +368,18 @@ class APITester:
                             verse_text = first_verse.get('text', '')
                             if verse_text and len(verse_text) > 10:
                                 preview = verse_text[:60] + "..." if len(verse_text) > 60 else verse_text
-                                self.log_test(f"KJV 1611 - {book_name} Content", True, f"First verse: '{preview}'")
+                                self.log_test(f"KJV 1611 Enhanced - {book_name} Content", True, f"First verse: '{preview}'")
                             else:
-                                self.log_test(f"KJV 1611 - {book_name} Content", False, "Empty or too short content")
+                                self.log_test(f"KJV 1611 Enhanced - {book_name} Content", False, "Empty or too short content")
                     else:
-                        self.log_test(f"KJV 1611 - {book_name} Count", False, f"Status: {response.status_code}")
+                        self.log_test(f"KJV 1611 Enhanced - {book_name} Count", False, f"Status: {response.status_code}")
                 except Exception as e:
-                    self.log_test(f"KJV 1611 - {book_name}", False, f"Error: {str(e)}")
+                    self.log_test(f"KJV 1611 Enhanced - {book_name}", False, f"Error: {str(e)}")
             
-            return genesis_total >= 200 and matthew_total >= 220 and sample_books_passed >= 2
+            return genesis_total >= 1200 and matthew_total >= 1000 and psalms_total >= 1700 and enhanced_books_passed >= 5
             
         except Exception as e:
-            self.log_test("KJV 1611 Data Quality Verification", False, f"Error: {str(e)}")
+            self.log_test("KJV 1611 Enhanced Verse Counts", False, f"Error: {str(e)}")
             return False
 
     def test_kjv1611_api_response_structure(self):
