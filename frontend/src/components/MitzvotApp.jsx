@@ -2047,18 +2047,26 @@ const MitzvotApp = () => {
                       // Filter books based on selected testament
                       let filteredBooks = bibleBooks || [];
                       
+                      console.log('=== TESTAMENT FILTERING DEBUG ===');
                       console.log('Current testament filter:', advancedFilters.testament);
                       console.log('Total books available:', filteredBooks.length);
+                      console.log('Sample book structure:', filteredBooks[0]);
                       
                       if (advancedFilters.testament && advancedFilters.testament !== 'all') {
                         const originalCount = filteredBooks.length;
+                        console.log('Filtering for testament:', advancedFilters.testament);
+                        
                         filteredBooks = filteredBooks.filter(book => {
+                          console.log(`Checking book: ${book.name} with testament: ${book.testament}`);
                           if (advancedFilters.testament === 'old') return book.testament === 'old';
                           if (advancedFilters.testament === 'new') return book.testament === 'new';  
                           if (advancedFilters.testament === 'apocrypha') return book.testament === 'apocrypha';
                           return true;
                         });
                         console.log(`Filtered from ${originalCount} to ${filteredBooks.length} books for testament: ${advancedFilters.testament}`);
+                        console.log('Filtered book names:', filteredBooks.map(b => b.name));
+                      } else {
+                        console.log('No filtering applied, showing all testaments');
                       }
                       
                       return filteredBooks.map((book) => (
