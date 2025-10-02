@@ -359,115 +359,153 @@ class APITester:
             self.log_test("Database Structure Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_genesis_reading_quality(self):
-        """REVIEW REQUEST TEST 4: Reading Quality Test - Sample verses for readability"""
+    def test_specific_missing_verses_investigation(self):
+        """REVIEW REQUEST TEST 4: Specific Missing Verses Investigation - Calculate and locate missing verses"""
         try:
-            print("\n🔍 GENESIS READING QUALITY TEST - VERSE READABILITY & COMPLETENESS...")
+            print("\n🔍 SPECIFIC MISSING VERSES INVESTIGATION - CALCULATING MISSING 38 VERSES...")
             
-            # Test 1: Sample random verses from different chapters
-            sample_chapters = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-            readable_verses = 0
-            total_sampled = 0
+            # Get current total verse count
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    current_verses = data.get('total', 0)
+                    expected_verses = 1533
+                    missing_verses = expected_verses - current_verses
+                    
+                    self.log_test("Missing Verses Calculation", True, f"Current: {current_verses}, Expected: {expected_verses}, Missing: {missing_verses}")
+                else:
+                    self.log_test("Missing Verses Calculation", False, f"Status: {response.status_code}")
+                    return False
+            except Exception as e:
+                self.log_test("Missing Verses Calculation", False, f"Error: {str(e)}")
+                return False
             
-            for chapter in sample_chapters:
+            # Detailed analysis of missing verses by chapter
+            expected_verses_per_chapter = {
+                1: 31, 2: 25, 3: 24, 4: 26, 5: 32, 6: 22, 7: 24, 8: 22, 9: 29, 10: 32,
+                11: 32, 12: 20, 13: 18, 14: 24, 15: 21, 16: 16, 17: 27, 18: 33, 19: 38, 20: 18,
+                21: 34, 22: 24, 23: 20, 24: 67, 25: 34, 26: 35, 27: 46, 28: 22, 29: 35, 30: 43,
+                31: 55, 32: 32, 33: 20, 34: 31, 35: 29, 36: 43, 37: 36, 38: 30, 39: 23, 40: 23,
+                41: 57, 42: 38, 43: 34, 44: 34, 45: 28, 46: 34, 47: 31, 48: 22, 49: 33, 50: 26
+            }
+            
+            print("\n🔍 DETAILED MISSING VERSES ANALYSIS:")
+            
+            truncated_chapters = []
+            scattered_missing = []
+            total_calculated_missing = 0
+            
+            for chapter in range(1, 51):
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=5")
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=100")
                     if response.status_code == 200:
                         data = response.json()
                         verses = data.get('verses', [])
+                        actual_count = data.get('total', 0)
+                        expected_count = expected_verses_per_chapter.get(chapter, 0)
+                        missing_count = expected_count - actual_count
                         
-                        for verse in verses[:3]:  # Check first 3 verses of each chapter
-                            verse_text = verse.get('text', '')
-                            total_sampled += 1
+                        if missing_count > 0:
+                            total_calculated_missing += missing_count
                             
-                            # Check if verse is readable (complete sentences, reasonable length)
-                            if (len(verse_text) > 20 and 
-                                any(char in verse_text for char in ['.', ';', ':', '!', '?']) and
-                                not verse_text.startswith('...') and
-                                not verse_text.endswith('...')):
-                                readable_verses += 1
-                    else:
-                        self.log_test(f"Chapter {chapter} Sampling", False, f"Status: {response.status_code}")
+                            # Check if chapter is truncated (missing verses at the end)
+                            if verses:
+                                verse_numbers = [v.get('verse', 0) for v in verses if isinstance(v.get('verse'), int)]
+                                verse_numbers.sort()
+                                max_verse = max(verse_numbers) if verse_numbers else 0
+                                
+                                if max_verse < expected_count:
+                                    truncated_chapters.append({
+                                        'chapter': chapter,
+                                        'actual': actual_count,
+                                        'expected': expected_count,
+                                        'missing': missing_count,
+                                        'max_verse': max_verse,
+                                        'type': 'truncated'
+                                    })
+                                    print(f"   ❌ Chapter {chapter:2d}: TRUNCATED - has verses 1-{max_verse}, missing {expected_count - max_verse} at end")
+                                else:
+                                    # Check for gaps in verse numbering
+                                    expected_verses = set(range(1, expected_count + 1))
+                                    actual_verses = set(verse_numbers)
+                                    missing_verse_numbers = expected_verses - actual_verses
+                                    
+                                    if missing_verse_numbers:
+                                        scattered_missing.append({
+                                            'chapter': chapter,
+                                            'actual': actual_count,
+                                            'expected': expected_count,
+                                            'missing': missing_count,
+                                            'missing_verses': sorted(list(missing_verse_numbers)),
+                                            'type': 'scattered'
+                                        })
+                                        missing_list = ', '.join(map(str, sorted(list(missing_verse_numbers))[:10]))
+                                        if len(missing_verse_numbers) > 10:
+                                            missing_list += '...'
+                                        print(f"   ❌ Chapter {chapter:2d}: SCATTERED - missing verses: {missing_list}")
+                            else:
+                                truncated_chapters.append({
+                                    'chapter': chapter,
+                                    'actual': 0,
+                                    'expected': expected_count,
+                                    'missing': expected_count,
+                                    'max_verse': 0,
+                                    'type': 'empty'
+                                })
+                                print(f"   ❌ Chapter {chapter:2d}: EMPTY - missing all {expected_count} verses")
+                        else:
+                            print(f"   ✅ Chapter {chapter:2d}: COMPLETE - {actual_count}/{expected_count} verses")
+                            
                 except Exception as e:
-                    self.log_test(f"Chapter {chapter} Sampling", False, f"Error: {str(e)}")
+                    print(f"   ❌ Chapter {chapter:2d}: ERROR - {str(e)}")
             
-            if total_sampled > 0:
-                readability_percentage = (readable_verses / total_sampled) * 100
-                if readability_percentage >= 90:
-                    self.log_test("Verse Readability Quality", True, f"✅ EXCELLENT! {readable_verses}/{total_sampled} verses are readable ({readability_percentage:.1f}%)")
-                elif readability_percentage >= 75:
-                    self.log_test("Verse Readability Quality", True, f"Good readability: {readable_verses}/{total_sampled} verses ({readability_percentage:.1f}%)")
-                else:
-                    self.log_test("Verse Readability Quality", False, f"Poor readability: {readable_verses}/{total_sampled} verses ({readability_percentage:.1f}%)")
+            # Summary of missing verse patterns
+            self.log_test("Total Missing Verses Verification", True, f"Calculated missing: {total_calculated_missing} verses")
+            
+            if truncated_chapters:
+                truncated_count = len(truncated_chapters)
+                truncated_missing = sum(ch['missing'] for ch in truncated_chapters)
+                self.log_test("Truncated Chapters", False, f"❌ {truncated_count} chapters are truncated (missing {truncated_missing} verses)")
+                
+                # Show worst truncated chapters
+                truncated_chapters.sort(key=lambda x: x['missing'], reverse=True)
+                worst_truncated = truncated_chapters[:3]
+                for ch in worst_truncated:
+                    self.log_test(f"Truncated Chapter {ch['chapter']}", False, f"Missing {ch['missing']} verses (has 1-{ch['max_verse']}, needs 1-{ch['expected']})")
             else:
-                self.log_test("Verse Readability Quality", False, "No verses sampled for readability check")
+                self.log_test("Truncated Chapters", True, "✅ No chapters are truncated")
             
-            # Test 2: Verify verse text is complete sentences (not fragments)
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter=1&limit=10")
-                if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    
-                    complete_sentences = 0
-                    for verse in verses:
-                        verse_text = verse.get('text', '')
-                        
-                        # Check for complete sentence indicators
-                        if (verse_text and 
-                            len(verse_text) > 15 and
-                            (verse_text.endswith('.') or verse_text.endswith(';') or verse_text.endswith(':')) and
-                            not '...' in verse_text):
-                            complete_sentences += 1
-                    
-                    if len(verses) > 0:
-                        completeness_percentage = (complete_sentences / len(verses)) * 100
-                        if completeness_percentage >= 80:
-                            self.log_test("Complete Sentences Check", True, f"✅ COMPLETE! {complete_sentences}/{len(verses)} verses are complete sentences ({completeness_percentage:.1f}%)")
-                        else:
-                            self.log_test("Complete Sentences Check", False, f"Incomplete sentences: {complete_sentences}/{len(verses)} verses ({completeness_percentage:.1f}%)")
-                    else:
-                        self.log_test("Complete Sentences Check", False, "No verses found for completeness check")
-                else:
-                    self.log_test("Complete Sentences Check", False, f"Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Complete Sentences Check", False, f"Error: {str(e)}")
+            if scattered_missing:
+                scattered_count = len(scattered_missing)
+                scattered_missing_total = sum(ch['missing'] for ch in scattered_missing)
+                self.log_test("Scattered Missing Verses", False, f"❌ {scattered_count} chapters have scattered missing verses ({scattered_missing_total} total)")
+                
+                # Show chapters with most scattered missing
+                scattered_missing.sort(key=lambda x: x['missing'], reverse=True)
+                worst_scattered = scattered_missing[:3]
+                for ch in worst_scattered:
+                    missing_list = ', '.join(map(str, ch['missing_verses'][:5]))
+                    if len(ch['missing_verses']) > 5:
+                        missing_list += '...'
+                    self.log_test(f"Scattered Chapter {ch['chapter']}", False, f"Missing {ch['missing']} verses: {missing_list}")
+            else:
+                self.log_test("Scattered Missing Verses", True, "✅ No scattered missing verses")
             
-            # Test 3: Check that chapters have reasonable verse counts (20-35 verses per chapter typically)
-            reasonable_chapters = 0
-            chapters_tested = 0
+            # Pattern analysis
+            if truncated_chapters and not scattered_missing:
+                self.log_test("Missing Verse Pattern", True, "Pattern: Chapters are truncated (missing verses at end)")
+            elif scattered_missing and not truncated_chapters:
+                self.log_test("Missing Verse Pattern", True, "Pattern: Verses are scattered missing throughout chapters")
+            elif truncated_chapters and scattered_missing:
+                self.log_test("Missing Verse Pattern", True, "Pattern: Mixed - both truncated chapters and scattered missing verses")
+            else:
+                self.log_test("Missing Verse Pattern", True, "Pattern: No missing verses detected")
             
-            for chapter in [1, 10, 20, 30, 40, 50]:  # Sample key chapters
-                try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=1")
-                    if response.status_code == 200:
-                        data = response.json()
-                        chapter_verse_count = data.get('total', 0)
-                        chapters_tested += 1
-                        
-                        if 15 <= chapter_verse_count <= 50:  # Reasonable range for Genesis chapters
-                            reasonable_chapters += 1
-                            self.log_test(f"Chapter {chapter} - Verse Count", True, f"✅ REASONABLE! {chapter_verse_count} verses")
-                        else:
-                            self.log_test(f"Chapter {chapter} - Verse Count", False, f"Unusual count: {chapter_verse_count} verses")
-                    else:
-                        self.log_test(f"Chapter {chapter} - Verse Count", False, f"Status: {response.status_code}")
-                except Exception as e:
-                    self.log_test(f"Chapter {chapter} - Verse Count", False, f"Error: {str(e)}")
-            
-            if chapters_tested > 0:
-                reasonable_percentage = (reasonable_chapters / chapters_tested) * 100
-                if reasonable_percentage >= 80:
-                    self.log_test("Chapter Verse Count Reasonableness", True, f"✅ REASONABLE! {reasonable_chapters}/{chapters_tested} chapters have reasonable verse counts ({reasonable_percentage:.1f}%)")
-                else:
-                    self.log_test("Chapter Verse Count Reasonableness", False, f"Unreasonable counts: {reasonable_chapters}/{chapters_tested} chapters ({reasonable_percentage:.1f}%)")
-            
-            # Success criteria: Good readability, complete sentences, reasonable chapter sizes
-            success = (readability_percentage >= 75 if total_sampled > 0 else False)
-            return success
+            return True
             
         except Exception as e:
-            self.log_test("Genesis Reading Quality", False, f"Error: {str(e)}")
+            self.log_test("Specific Missing Verses Investigation", False, f"Error: {str(e)}")
             return False
 
     def test_genesis_api_performance(self):
