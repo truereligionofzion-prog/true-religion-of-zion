@@ -72,92 +72,115 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_genesis_completion_verification(self):
-        """REVIEW REQUEST TEST 1: Genesis Completion Verification - Verify exactly 1,533 verses (100%)"""
+    def test_exodus_current_state_analysis(self):
+        """REVIEW REQUEST TEST 1: Exodus Current State Analysis - Check if Exodus exists and get current counts"""
         try:
-            print("\n🔍 GENESIS COMPLETION VERIFICATION - VERIFYING 100% COMPLETION (1,533 VERSES)...")
+            print("\n🔍 EXODUS CURRENT STATE ANALYSIS - CHECKING EXISTENCE AND CURRENT COUNTS...")
             
-            # Get overall Genesis statistics
+            # Check if Exodus exists in the database at all
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
                 if response.status_code == 200:
                     data = response.json()
                     total_verses = data.get('total', 0)
-                    expected_verses = 1533
+                    expected_verses = 1213  # Exodus should have 1,213 verses total
                     
-                    if total_verses == expected_verses:
-                        self.log_test("Genesis Total Verse Count - 100% COMPLETE", True, f"✅ PERFECT! Found exactly {total_verses} verses (100% complete)")
-                    else:
-                        missing_verses = expected_verses - total_verses
+                    if total_verses > 0:
                         completion_percentage = (total_verses / expected_verses) * 100
-                        self.log_test("Genesis Total Verse Count - 100% COMPLETE", False, f"❌ INCOMPLETE! Found {total_verses} verses, missing {missing_verses} ({completion_percentage:.1f}% complete)")
+                        self.log_test("Exodus Exists in Database", True, f"✅ FOUND! Exodus exists with {total_verses} verses ({completion_percentage:.1f}% of expected {expected_verses})")
+                        
+                        # If Exodus exists, get current chapter and verse count
+                        if total_verses == expected_verses:
+                            self.log_test("Exodus Completion Status", True, f"✅ COMPLETE! Exodus has all {total_verses} verses (100% complete)")
+                        else:
+                            missing_verses = expected_verses - total_verses
+                            self.log_test("Exodus Completion Status", False, f"⚠️ INCOMPLETE! Exodus has {total_verses} verses, missing {missing_verses} ({completion_percentage:.1f}% complete)")
+                    else:
+                        self.log_test("Exodus Exists in Database", False, f"❌ NOT FOUND! Exodus does not exist in database (0 verses)")
+                        self.log_test("Exodus Completion Status", False, f"❌ MISSING! Exodus completely absent from database")
                 else:
-                    self.log_test("Genesis Total Verse Count - 100% COMPLETE", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Exodus Exists in Database", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Exodus Completion Status", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Genesis Total Verse Count - 100% COMPLETE", False, f"Error: {str(e)}")
+                self.log_test("Exodus Exists in Database", False, f"Error: {str(e)}")
+                self.log_test("Exodus Completion Status", False, f"Error: {str(e)}")
             
-            # Verify all 50 chapters are complete with proper verse counts
+            # Identify which chapters/verses are present vs missing
             expected_verses_per_chapter = {
-                1: 31, 2: 25, 3: 24, 4: 26, 5: 32, 6: 22, 7: 24, 8: 22, 9: 29, 10: 32,
-                11: 32, 12: 20, 13: 18, 14: 24, 15: 21, 16: 16, 17: 27, 18: 33, 19: 38, 20: 18,
-                21: 34, 22: 24, 23: 20, 24: 67, 25: 34, 26: 35, 27: 46, 28: 22, 29: 35, 30: 43,
-                31: 55, 32: 32, 33: 20, 34: 31, 35: 29, 36: 43, 37: 36, 38: 30, 39: 23, 40: 23,
-                41: 57, 42: 38, 43: 34, 44: 34, 45: 28, 46: 34, 47: 31, 48: 22, 49: 33, 50: 26
+                1: 22, 2: 25, 3: 22, 4: 31, 5: 23, 6: 30, 7: 25, 8: 32, 9: 35, 10: 29,
+                11: 10, 12: 51, 13: 22, 14: 31, 15: 27, 16: 36, 17: 16, 18: 27, 19: 25, 20: 26,
+                21: 36, 22: 31, 23: 33, 24: 18, 25: 40, 26: 37, 27: 21, 28: 43, 29: 46, 30: 38,
+                31: 18, 32: 35, 33: 23, 34: 35, 35: 35, 36: 38, 37: 29, 38: 31, 39: 43, 40: 38
             }
             
-            print("\n📊 ALL 50 CHAPTERS COMPLETION VERIFICATION:")
-            complete_chapters = 0
-            incomplete_chapters = []
+            print("\n📊 EXODUS CHAPTER-BY-CHAPTER ANALYSIS (40 chapters expected):")
+            present_chapters = 0
+            missing_chapters = []
+            partial_chapters = []
+            complete_chapters = []
+            total_present_verses = 0
             
-            for chapter in range(1, 51):  # Genesis has 50 chapters
+            for chapter in range(1, 41):  # Exodus has 40 chapters
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=1")
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&chapter={chapter}&limit=1")
                     if response.status_code == 200:
                         data = response.json()
                         actual_verses = data.get('total', 0)
                         expected_verses = expected_verses_per_chapter.get(chapter, 0)
                         
                         if actual_verses == expected_verses:
-                            complete_chapters += 1
+                            present_chapters += 1
+                            complete_chapters.append(chapter)
+                            total_present_verses += actual_verses
                             print(f"   ✅ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses - COMPLETE")
-                        else:
-                            incomplete_chapters.append({
+                        elif actual_verses > 0:
+                            present_chapters += 1
+                            partial_chapters.append({
                                 'chapter': chapter,
                                 'actual': actual_verses,
                                 'expected': expected_verses,
                                 'missing': expected_verses - actual_verses
                             })
-                            print(f"   ❌ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses - MISSING {expected_verses - actual_verses}")
+                            total_present_verses += actual_verses
+                            print(f"   ⚠️ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses - PARTIAL (missing {expected_verses - actual_verses})")
+                        else:
+                            missing_chapters.append({
+                                'chapter': chapter,
+                                'expected': expected_verses
+                            })
+                            print(f"   ❌ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses - MISSING")
                         
                     else:
-                        incomplete_chapters.append({
+                        missing_chapters.append({
                             'chapter': chapter,
-                            'actual': 0,
-                            'expected': expected_verses_per_chapter.get(chapter, 0),
-                            'missing': expected_verses_per_chapter.get(chapter, 0)
+                            'expected': expected_verses_per_chapter.get(chapter, 0)
                         })
                         print(f"   ❌ Chapter {chapter:2d}: API ERROR - Status {response.status_code}")
                         
                 except Exception as e:
-                    incomplete_chapters.append({
+                    missing_chapters.append({
                         'chapter': chapter,
-                        'actual': 0,
-                        'expected': expected_verses_per_chapter.get(chapter, 0),
-                        'missing': expected_verses_per_chapter.get(chapter, 0)
+                        'expected': expected_verses_per_chapter.get(chapter, 0)
                     })
                     print(f"   ❌ Chapter {chapter:2d}: ERROR - {str(e)}")
             
-            # Summary of all 50 chapters
-            if complete_chapters == 50:
-                self.log_test("All 50 Chapters Complete", True, f"✅ PERFECT! All 50 chapters are complete with proper verse counts")
+            # Summary of chapter analysis
+            total_missing_verses = sum(ch['expected'] for ch in missing_chapters) + sum(ch['missing'] for ch in partial_chapters)
+            
+            self.log_test("Exodus Chapter Presence Analysis", True, f"Present: {present_chapters}/40 chapters, Complete: {len(complete_chapters)}, Partial: {len(partial_chapters)}, Missing: {len(missing_chapters)}")
+            self.log_test("Exodus Verse Count Analysis", True, f"Present: {total_present_verses} verses, Missing: {total_missing_verses} verses, Total Expected: 1213")
+            
+            if len(complete_chapters) == 40:
+                self.log_test("All Exodus Chapters Complete", True, f"✅ PERFECT! All 40 chapters are complete")
+            elif len(complete_chapters) > 0:
+                self.log_test("All Exodus Chapters Complete", False, f"⚠️ PARTIAL! {len(complete_chapters)}/40 chapters complete, {len(partial_chapters)} partial, {len(missing_chapters)} missing")
             else:
-                total_missing = sum(ch['missing'] for ch in incomplete_chapters)
-                self.log_test("All 50 Chapters Complete", False, f"❌ INCOMPLETE! {complete_chapters}/50 chapters complete, {len(incomplete_chapters)} chapters missing {total_missing} total verses")
+                self.log_test("All Exodus Chapters Complete", False, f"❌ NONE! No complete chapters found")
             
             return True
             
         except Exception as e:
-            self.log_test("Genesis Completion Verification", False, f"Error: {str(e)}")
+            self.log_test("Exodus Current State Analysis", False, f"Error: {str(e)}")
             return False
 
     def test_data_quality_check(self):
