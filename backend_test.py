@@ -207,119 +207,140 @@ class APITester:
             self.log_test("Exodus Completion Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_database_structure_check(self):
-        """REVIEW REQUEST TEST 2: Database Structure Check - Verify Bible versions and database structure"""
+    def test_genesis_preservation_check(self):
+        """REVIEW REQUEST TEST 2: Genesis Preservation Check - Verify Genesis still has exactly 1,533 verses and is intact"""
         try:
-            print("\n🔍 DATABASE STRUCTURE CHECK - VERIFYING BIBLE VERSIONS AND STRUCTURE...")
+            print("\n🔍 GENESIS PRESERVATION CHECK - VERIFYING GENESIS WASN'T AFFECTED BY EXODUS COMPLETION...")
             
-            # Verify what Bible versions are available
+            # Verify Genesis still has exactly 1,533 verses
             try:
-                response = self.session.get(f"{self.base_url}/bible/versions")
-                if response.status_code == 200:
-                    data = response.json()
-                    versions = data.get('versions', [])
-                    version_count = len(versions)
-                    
-                    if version_count > 0:
-                        version_names = [v.get('name', 'Unknown') for v in versions]
-                        version_ids = [v.get('id', 'Unknown') for v in versions]
-                        self.log_test("Bible Versions Available", True, f"✅ FOUND! {version_count} versions available: {', '.join(version_names)}")
-                        
-                        # Check if KJV 1611 Divine version exists
-                        kjv_divine_found = any(v.get('id') == 'kjv1611_divine' for v in versions)
-                        if kjv_divine_found:
-                            self.log_test("KJV 1611 Divine Version Available", True, f"✅ CONFIRMED! KJV 1611 Divine Names version is available")
-                        else:
-                            self.log_test("KJV 1611 Divine Version Available", False, f"❌ MISSING! KJV 1611 Divine Names version not found. Available: {', '.join(version_ids)}")
-                    else:
-                        self.log_test("Bible Versions Available", False, f"❌ NONE! No Bible versions found in database")
-                        self.log_test("KJV 1611 Divine Version Available", False, f"❌ MISSING! No versions available")
-                else:
-                    self.log_test("Bible Versions Available", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("KJV 1611 Divine Version Available", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Bible Versions Available", False, f"Error: {str(e)}")
-                self.log_test("KJV 1611 Divine Version Available", False, f"Error: {str(e)}")
-            
-            # Check if Exodus exists in KJV 1611 Divine version specifically
-            try:
-                response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
-                if response.status_code == 200:
-                    data = response.json()
-                    books = data.get('books', [])
-                    book_names = [book.get('name', 'Unknown') for book in books]
-                    
-                    if 'Exodus' in book_names:
-                        exodus_book = next((book for book in books if book.get('name') == 'Exodus'), None)
-                        if exodus_book:
-                            testament = exodus_book.get('testament', 'unknown')
-                            order = exodus_book.get('order', 'unknown')
-                            self.log_test("Exodus in KJV 1611 Divine", True, f"✅ FOUND! Exodus exists in KJV 1611 Divine (Testament: {testament}, Order: {order})")
-                        else:
-                            self.log_test("Exodus in KJV 1611 Divine", True, f"✅ FOUND! Exodus exists in KJV 1611 Divine")
-                    else:
-                        self.log_test("Exodus in KJV 1611 Divine", False, f"❌ MISSING! Exodus not found in KJV 1611 Divine. Available books: {', '.join(book_names)}")
-                        
-                    # Show all available books for context
-                    self.log_test("KJV 1611 Divine Books Available", True, f"Books in KJV 1611 Divine: {len(books)} total - {', '.join(book_names)}")
-                else:
-                    self.log_test("Exodus in KJV 1611 Divine", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("KJV 1611 Divine Books Available", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Exodus in KJV 1611 Divine", False, f"Error: {str(e)}")
-                self.log_test("KJV 1611 Divine Books Available", False, f"Error: {str(e)}")
-            
-            # Confirm the database structure matches Genesis format
-            try:
-                # Get a sample verse from Genesis to understand the structure
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
                 if response.status_code == 200:
                     data = response.json()
-                    verses = data.get('verses', [])
+                    total_verses = data.get('total', 0)
+                    expected_verses = 1533  # Genesis should have exactly 1,533 verses
                     
-                    if verses:
-                        genesis_verse = verses[0]
-                        genesis_fields = set(genesis_verse.keys())
-                        
-                        # Now get a sample verse from Exodus (if it exists)
-                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
-                        if response.status_code == 200:
-                            data = response.json()
-                            verses = data.get('verses', [])
-                            
-                            if verses:
-                                exodus_verse = verses[0]
-                                exodus_fields = set(exodus_verse.keys())
-                                
-                                # Compare structures
-                                if genesis_fields == exodus_fields:
-                                    common_fields = list(genesis_fields)
-                                    self.log_test("Database Structure Consistency", True, f"✅ CONSISTENT! Genesis and Exodus have identical structure: {', '.join(common_fields)}")
-                                else:
-                                    missing_in_exodus = genesis_fields - exodus_fields
-                                    extra_in_exodus = exodus_fields - genesis_fields
-                                    self.log_test("Database Structure Consistency", False, f"❌ INCONSISTENT! Missing in Exodus: {missing_in_exodus}, Extra in Exodus: {extra_in_exodus}")
-                            else:
-                                self.log_test("Database Structure Consistency", False, f"❌ NO DATA! Exodus has no verses to compare structure")
-                        else:
-                            self.log_test("Database Structure Consistency", False, f"❌ NO EXODUS! Cannot compare structure - Exodus not accessible")
-                            
-                        # Show Genesis structure as reference
-                        self.log_test("Genesis Structure Reference", True, f"Genesis verse structure: {', '.join(genesis_fields)}")
+                    if total_verses == expected_verses:
+                        self.log_test("Genesis Exact Verse Count Preserved", True, f"✅ PERFECT! Genesis still has exactly {total_verses} verses (preserved)")
                     else:
-                        self.log_test("Database Structure Consistency", False, f"❌ NO DATA! Genesis has no verses to analyze structure")
-                        self.log_test("Genesis Structure Reference", False, f"❌ NO DATA! Genesis has no verses")
+                        self.log_test("Genesis Exact Verse Count Preserved", False, f"❌ CHANGED! Genesis now has {total_verses} verses, expected {expected_verses}")
                 else:
-                    self.log_test("Database Structure Consistency", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Genesis Structure Reference", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Genesis Exact Verse Count Preserved", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Database Structure Consistency", False, f"Error: {str(e)}")
-                self.log_test("Genesis Structure Reference", False, f"Error: {str(e)}")
+                self.log_test("Genesis Exact Verse Count Preserved", False, f"Error: {str(e)}")
+            
+            # Confirm Genesis 1:1 and 50:26 are still intact
+            key_genesis_verses = [
+                {'chapter': 1, 'verse': 1, 'description': 'Creation Beginning', 'expected_content': 'In the beginning God created'},
+                {'chapter': 50, 'verse': 26, 'description': 'Genesis Ending', 'expected_content': 'So Joseph died'}
+            ]
+            
+            print("\n📖 GENESIS KEY VERSES INTEGRITY CHECK:")
+            genesis_key_verses_intact = 0
+            
+            for key_verse in key_genesis_verses:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verse/Genesis/{key_verse['chapter']}/{key_verse['verse']}")
+                    if response.status_code == 200:
+                        verse_data = response.json()
+                        verse_text = verse_data.get('text', '')
+                        
+                        if key_verse['expected_content'].lower() in verse_text.lower():
+                            genesis_key_verses_intact += 1
+                            print(f"   ✅ Genesis {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): INTACT - '{verse_text[:60]}...'")
+                        else:
+                            print(f"   ❌ Genesis {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): CHANGED - '{verse_text[:60]}...'")
+                    else:
+                        print(f"   ❌ Genesis {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): API ERROR - Status {response.status_code}")
+                        
+                except Exception as e:
+                    print(f"   ❌ Genesis {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): ERROR - {str(e)}")
+            
+            if genesis_key_verses_intact == len(key_genesis_verses):
+                self.log_test("Genesis Key Verses Intact", True, f"✅ PRESERVED! All {genesis_key_verses_intact}/2 key Genesis verses are intact")
+            else:
+                self.log_test("Genesis Key Verses Intact", False, f"❌ CORRUPTED! Only {genesis_key_verses_intact}/2 key Genesis verses are intact")
+            
+            # Ensure no cross-contamination between Genesis and Exodus
+            try:
+                # Check Genesis verses don't contain Exodus content
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=10")
+                if response.status_code == 200:
+                    data = response.json()
+                    genesis_verses = data.get('verses', [])
+                    
+                    exodus_contamination = 0
+                    exodus_keywords = ['moses', 'pharaoh', 'egypt', 'israelites', 'commandments', 'tabernacle', 'aaron']
+                    
+                    for verse in genesis_verses:
+                        verse_text = verse.get('text', '').lower()
+                        book = verse.get('book', '')
+                        
+                        # Check book field is correct
+                        if book != 'Genesis':
+                            exodus_contamination += 1
+                            print(f"   ❌ BOOK CONTAMINATION: Verse labeled as '{book}' in Genesis query")
+                            continue
+                        
+                        # Check for Exodus-specific content in Genesis verses
+                        for keyword in exodus_keywords:
+                            if keyword in verse_text:
+                                # Some keywords like 'egypt' might legitimately appear in Genesis
+                                if keyword in ['moses', 'pharaoh', 'commandments', 'tabernacle', 'aaron']:
+                                    exodus_contamination += 1
+                                    print(f"   ❌ CONTENT CONTAMINATION: Genesis verse contains '{keyword}': '{verse_text[:50]}...'")
+                                    break
+                    
+                    if exodus_contamination == 0:
+                        self.log_test("No Cross-Contamination Genesis", True, f"✅ PURE! No Exodus contamination found in {len(genesis_verses)} Genesis verses")
+                    else:
+                        self.log_test("No Cross-Contamination Genesis", False, f"❌ CONTAMINATED! Found {exodus_contamination} instances of Exodus contamination in Genesis")
+                        
+                    # Check Exodus verses don't contain Genesis-specific content
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=10")
+                    if response.status_code == 200:
+                        data = response.json()
+                        exodus_verses = data.get('verses', [])
+                        
+                        genesis_contamination = 0
+                        genesis_keywords = ['adam', 'eve', 'noah', 'abraham', 'isaac', 'jacob', 'joseph']
+                        
+                        for verse in exodus_verses:
+                            verse_text = verse.get('text', '').lower()
+                            book = verse.get('book', '')
+                            
+                            # Check book field is correct
+                            if book != 'Exodus':
+                                genesis_contamination += 1
+                                print(f"   ❌ BOOK CONTAMINATION: Verse labeled as '{book}' in Exodus query")
+                                continue
+                            
+                            # Check for Genesis-specific content in Exodus verses (some overlap is expected)
+                            for keyword in genesis_keywords:
+                                if keyword in verse_text:
+                                    # Some names like 'abraham', 'isaac', 'jacob' might legitimately appear in Exodus
+                                    if keyword in ['adam', 'eve', 'noah']:
+                                        genesis_contamination += 1
+                                        print(f"   ❌ CONTENT CONTAMINATION: Exodus verse contains '{keyword}': '{verse_text[:50]}...'")
+                                        break
+                        
+                        if genesis_contamination == 0:
+                            self.log_test("No Cross-Contamination Exodus", True, f"✅ PURE! No Genesis contamination found in {len(exodus_verses)} Exodus verses")
+                        else:
+                            self.log_test("No Cross-Contamination Exodus", False, f"❌ CONTAMINATED! Found {genesis_contamination} instances of Genesis contamination in Exodus")
+                    else:
+                        self.log_test("No Cross-Contamination Exodus", False, f"API Error getting Exodus verses - Status: {response.status_code}")
+                else:
+                    self.log_test("No Cross-Contamination Genesis", False, f"API Error getting Genesis verses - Status: {response.status_code}")
+                    self.log_test("No Cross-Contamination Exodus", False, f"Cannot test Exodus contamination without Genesis data")
+            except Exception as e:
+                self.log_test("No Cross-Contamination Genesis", False, f"Error: {str(e)}")
+                self.log_test("No Cross-Contamination Exodus", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Database Structure Check", False, f"Error: {str(e)}")
+            self.log_test("Genesis Preservation Check", False, f"Error: {str(e)}")
             return False
 
     def test_exodus_content_quality_check(self):
