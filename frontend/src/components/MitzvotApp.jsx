@@ -176,6 +176,23 @@ const MitzvotApp = () => {
       setCurrentPage(1); // Reset to first page
       setTotalPages(response.totalPages || 1);
 
+      // Scroll to the specific verse after content loads
+      if (selectedBook && selectedChapter && selectedVerse) {
+        setTimeout(() => {
+          const elementId = `${selectedBook.toLowerCase().replace(/\s+/g, '_')}_${selectedChapter}_${selectedVerse}`;
+          const element = document.getElementById(elementId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.add('bg-yellow-200', 'border-2', 'border-yellow-400');
+            setTimeout(() => {
+              element.classList.remove('bg-yellow-200', 'border-2', 'border-yellow-400');
+            }, 5000);
+          } else {
+            console.log('Element not found with ID:', elementId);
+          }
+        }, 1000); // Wait for DOM to update
+      }
+
       // Clear the navigation inputs after successful search
       setSelectedChapter(null);
       setSelectedVerse(null);
