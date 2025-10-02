@@ -2018,28 +2018,58 @@ const MitzvotApp = () => {
                 {/* Book-style Bible Reading Interface */}
                 <div className="max-w-4xl mx-auto">
                   
-                  {/* Book Navigation - Dynamic from Available Books */}
-                  <div className="flex flex-wrap gap-2 mb-6 justify-center max-h-32 overflow-y-auto">
-                    {(bibleBooks || []).slice(0, 20).map((book) => (
-                      <Button
-                        key={book.name}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedBook(book.name);
-                          loadContent(); // Reload content for selected book
-                        }}
-                        className={selectedBook === book.name ? 'bg-blue-100' : ''}
-                      >
-                        <BookOpen className="w-4 h-4 mr-2" />
-                        {book.name}
-                      </Button>
-                    ))}
-                    {(bibleStats.books || []).length > 20 && (
-                      <p className="text-xs text-gray-500 w-full text-center mt-2">
-                        Showing first 20 books. Use the dropdown above for complete list.
-                      </p>
-                    )}
+                  {/* Book Navigation - Filtered by Testament */}
+                  <div className="flex flex-wrap gap-2 mb-6 justify-center max-h-64 overflow-y-auto">
+                    {(() => {
+                      // Filter books based on selected testament
+                      let filteredBooks = bibleBooks || [];
+                      
+                      if (selectedTestament && selectedTestament !== 'all') {
+                        filteredBooks = filteredBooks.filter(book => {
+                          if (selectedTestament === 'old') return book.testament === 'old';
+                          if (selectedTestament === 'new') return book.testament === 'new';  
+                          if (selectedTestament === 'apocrypha') return book.testament === 'apocrypha';
+                          return true;
+                        });
+                      }
+                      
+                      return filteredBooks.map((book) => (
+                        <Button
+                          key={book.name}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedBook(book.name);
+                            loadContent(); // Reload content for selected book
+                          }}
+                          className={selectedBook === book.name ? 'bg-blue-100' : ''}
+                        >
+                          <BookOpen className="w-4 h-4 mr-2" />
+                          {book.name}
+                        </Button>
+                      ));
+                    })()}
+                    
+                    {(() => {
+                      let filteredBooks = bibleBooks || [];
+                      if (selectedTestament && selectedTestament !== 'all') {
+                        filteredBooks = filteredBooks.filter(book => {
+                          if (selectedTestament === 'old') return book.testament === 'old';
+                          if (selectedTestament === 'new') return book.testament === 'new';
+                          if (selectedTestament === 'apocrypha') return book.testament === 'apocrypha';
+                          return true;
+                        });
+                      }
+                      
+                      return filteredBooks.length > 0 && (
+                        <p className="text-xs text-gray-500 w-full text-center mt-2">
+                          Showing {filteredBooks.length} books ({selectedTestament === 'all' ? 'All Testaments' : 
+                            selectedTestament === 'old' ? 'Old Testament' : 
+                            selectedTestament === 'new' ? 'New Testament' : 
+                            selectedTestament === 'apocrypha' ? 'Apocrypha' : 'All'})
+                        </p>
+                      );
+                    })()}
                   </div>
 
                   {/* Reading Content - Grouped by Book and Chapter */}
