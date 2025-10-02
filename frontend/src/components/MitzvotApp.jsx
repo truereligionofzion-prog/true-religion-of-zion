@@ -1241,8 +1241,9 @@ const MitzvotApp = () => {
 
         {/* Content Type Switcher */}
         <div className="flex justify-center mb-6">
-          <div className="bg-gray-100 p-1 rounded-lg grid grid-cols-3 w-auto">
+          <div className="bg-gray-100 p-1 rounded-lg flex w-auto">
             <button
+              type="button"
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 contentType === 'mitzvot' 
                   ? 'bg-white text-gray-900 shadow' 
@@ -1256,6 +1257,7 @@ const MitzvotApp = () => {
               613 Mitzvot
             </button>
             <button
+              type="button"
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 contentType === 'precepts' 
                   ? 'bg-white text-gray-900 shadow' 
@@ -1269,6 +1271,7 @@ const MitzvotApp = () => {
               Biblical Precepts
             </button>
             <button
+              type="button"
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 contentType === 'bible' 
                   ? 'bg-white text-gray-900 shadow' 
