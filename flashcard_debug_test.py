@@ -6,7 +6,7 @@ Debug test for flashcard generation issue
 import requests
 import json
 
-BACKEND_URL = "https://biblestudysuite.preview.emergentagent.com/api"
+BACKEND_URL = "https://scripturesearch.preview.emergentagent.com/api"
 
 def test_flashcard_debug():
     session = requests.Session()
