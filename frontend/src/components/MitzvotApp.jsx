@@ -75,7 +75,10 @@ const MitzvotApp = () => {
 
   // Phase 3C: Divine name highlighting function
   const highlightDivineNames = (text) => {
-    if (!divineNameHighlight || !text || typeof text !== 'string') return text;
+    // If highlighting is disabled, return plain text
+    if (!divineNameHighlight || !text || typeof text !== 'string') {
+      return text;
+    }
     
     const divineNames = [
       { name: 'YHWH', color: 'text-red-600 font-semibold', title: 'The Tetragrammaton - Divine Name of God' },
@@ -92,7 +95,19 @@ const MitzvotApp = () => {
       );
     });
     
-    return <span dangerouslySetInnerHTML={{ __html: highlightedText }} />;
+    // Return HTML string for dangerouslySetInnerHTML, not JSX element
+    return highlightedText;
+  };
+
+  // Helper function to render highlighted text
+  const renderHighlightedText = (text) => {
+    const highlightedHtml = highlightDivineNames(text);
+    if (highlightedHtml === text) {
+      // No highlighting applied, return plain text
+      return text;
+    }
+    // Return JSX element with highlighted HTML
+    return <span dangerouslySetInnerHTML={{ __html: highlightedHtml }} />;
   };
 
   // Status types removed - no longer using origin-based filtering
