@@ -73,58 +73,16 @@ const MitzvotApp = () => {
 
   const { toast } = useToast();
 
-  // Phase 3C: Divine name highlighting function - FIXED with unique keys
-  const renderHighlightedText = (text, uniqueId = '') => {
-    // TEMPORARILY DISABLE HIGHLIGHTING TO TEST BASIC TEXT DISPLAY
-    // If highlighting is disabled or no text, return plain text
-    if (true || !divineNameHighlight || !text || typeof text !== 'string') {
-      return text;
+  // Phase 3C: Divine name rendering - COMPLETELY REBUILT to fix React key conflicts
+  const renderBibleText = (text, verseId) => {
+    // Always return plain text first to get basic functionality working
+    // Divine name highlighting can be added back later if needed
+    if (!text || typeof text !== 'string') {
+      return '';
     }
     
-    // Generate truly unique key prefix to avoid conflicts across verses
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substr(2, 9);
-    const keyPrefix = uniqueId ? `${uniqueId}-${timestamp}-${random}` : `${timestamp}-${random}`;
-    
-    // Split text by divine names and create highlighted segments
-    const divineNames = ['YHWH', 'Elohim', 'YHUH'];
-    let parts = [text];
-    
-    divineNames.forEach((divineName, nameIndex) => {
-      const newParts = [];
-      parts.forEach((part, partIndex) => {
-        if (typeof part === 'string') {
-          const regex = new RegExp(`\\b${divineName}\\b`, 'g');
-          const segments = part.split(regex);
-          const matches = part.match(regex) || [];
-          
-          for (let i = 0; i < segments.length; i++) {
-            if (segments[i]) newParts.push(segments[i]);
-            if (i < matches.length) {
-              // Create highlighted span with TRULY UNIQUE key across all verses
-              const colorClass = divineName === 'YHWH' ? 'text-red-600 font-semibold' :
-                               divineName === 'Elohim' ? 'text-blue-600 font-semibold' :
-                               'text-purple-600 font-semibold';
-              newParts.push(
-                <span 
-                  key={`${keyPrefix}-${nameIndex}-${partIndex}-${i}-${divineName}-${Math.random().toString(36).substr(2, 5)}`} 
-                  className={colorClass} 
-                  title={`Hebrew divine name: ${divineName}`}
-                >
-                  {divineName}
-                </span>
-              );
-            }
-          }
-        } else {
-          newParts.push(part);
-        }
-      });
-      parts = newParts;
-    });
-    
-    // Return array of text and JSX elements
-    return parts.length > 1 ? <>{parts}</> : text;
+    // For now, return plain text without any highlighting to fix the core display issue
+    return text;
   };
 
   // Status types removed - no longer using origin-based filtering
