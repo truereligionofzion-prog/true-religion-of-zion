@@ -1921,7 +1921,7 @@ const MitzvotApp = () => {
                           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center border-b pb-4">
                             {chapter.book} {chapter.chapter}
                             <span className="text-sm font-normal text-gray-600 ml-2">
-                              ({chapter.testament.charAt(0).toUpperCase() + chapter.testament.slice(1)} Testament)
+                              ({chapter.testament ? (chapter.testament.charAt(0).toUpperCase() + chapter.testament.slice(1)) : 'Unknown'} Testament)
                             </span>
                           </h2>
                           
