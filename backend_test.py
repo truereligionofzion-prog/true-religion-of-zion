@@ -549,26 +549,26 @@ class APITester:
             return False
 
     def test_content_quality_sampling(self):
-        """REVIEW REQUEST TEST 4: Content Quality Sampling - Sample 10 random Exodus verses for authentic biblical content"""
+        """REVIEW REQUEST TEST 4: Content Quality Sampling - Sample 10 random Leviticus verses for authentic biblical content"""
         try:
-            print("\n🔍 CONTENT QUALITY SAMPLING - SAMPLING 10 RANDOM EXODUS VERSES FOR AUTHENTIC BIBLICAL CONTENT...")
+            print("\n🔍 CONTENT QUALITY SAMPLING - SAMPLING 10 RANDOM LEVITICUS VERSES FOR AUTHENTIC BIBLICAL CONTENT...")
             
-            # Sample 10 random Exodus verses to verify authentic biblical content
+            # Sample 10 random Leviticus verses to verify authentic biblical content
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=10")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=10")
                 if response.status_code == 200:
                     data = response.json()
                     verses = data.get('verses', [])
                     
                     if verses:
-                        print("\n📝 10 RANDOM EXODUS VERSES QUALITY SAMPLING:")
+                        print("\n📝 10 RANDOM LEVITICUS VERSES QUALITY SAMPLING:")
                         authentic_verses = 0
                         substantial_verses = 0
                         proper_language_verses = 0
                         
                         for i, verse in enumerate(verses[:10], 1):  # Sample exactly 10 verses
                             verse_text = verse.get('text', '')
-                            verse_ref = f"Exodus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            verse_ref = f"Leviticus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
                             
                             # Check for authentic biblical content
                             is_authentic = (
