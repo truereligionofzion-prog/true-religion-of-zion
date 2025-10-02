@@ -253,12 +253,12 @@ class APITester:
             self.log_test("Genesis Content Quality Check", False, f"Error: {str(e)}")
             return False
 
-    def test_database_cleanup_verification(self):
-        """REVIEW REQUEST TEST 3: Database Cleanup Verification - ONLY Genesis exists"""
+    def test_database_structure_verification(self):
+        """REVIEW REQUEST TEST 3: Database Structure Verification - Genesis only and chapter completeness"""
         try:
-            print("\n🔍 DATABASE CLEANUP VERIFICATION - ONLY GENESIS SHOULD EXIST...")
+            print("\n🔍 DATABASE STRUCTURE VERIFICATION - GENESIS ONLY AND COMPLETENESS...")
             
-            # Test 1: Confirm ONLY 1 book (Genesis) exists
+            # Confirm we only have Genesis data (no cross-contamination)
             try:
                 response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
                 if response.status_code == 200:
@@ -269,68 +269,94 @@ class APITester:
                     if book_count == 1:
                         book_name = books[0].get('name', 'Unknown') if books else 'Unknown'
                         if book_name == 'Genesis':
-                            self.log_test("Database Cleanup - Single Book", True, f"✅ PERFECT CLEANUP! Only Genesis exists ({book_count} book total)")
+                            self.log_test("Database Purity - Genesis Only", True, f"✅ PURE! Only Genesis exists ({book_count} book)")
                         else:
-                            self.log_test("Database Cleanup - Single Book", False, f"Wrong book: Found '{book_name}' instead of Genesis")
+                            self.log_test("Database Purity - Genesis Only", False, f"Wrong book: Found '{book_name}' instead of Genesis")
                     else:
                         book_names = [book.get('name', 'Unknown') for book in books]
-                        self.log_test("Database Cleanup - Single Book", False, f"Multiple books found: {book_count} books ({', '.join(book_names[:5])})")
-                else:
-                    self.log_test("Database Cleanup - Single Book", False, f"Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Database Cleanup - Single Book", False, f"Error: {str(e)}")
-            
-            # Test 2: Verify statistics show: 1 Total Book, ~1,495 Total Verses
-            try:
-                response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
-                if response.status_code == 200:
-                    data = response.json()
-                    total_books = data.get('totalBooks', 0)
-                    total_verses = data.get('totalVerses', 0)
-                    
-                    if total_books == 1:
-                        self.log_test("Statistics - Total Books", True, f"✅ CORRECT! Statistics show {total_books} total book")
-                    else:
-                        self.log_test("Statistics - Total Books", False, f"Statistics show {total_books} total books (expected 1)")
-                    
-                    if 1200 <= total_verses <= 1600:  # Reasonable range around 1,495
-                        self.log_test("Statistics - Total Verses", True, f"✅ EXCELLENT! Statistics show {total_verses} total verses (target: ~1,495)")
-                    else:
-                        self.log_test("Statistics - Total Verses", False, f"Statistics show {total_verses} total verses (target: ~1,495)")
-                else:
-                    self.log_test("Statistics Verification", False, f"Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Statistics Verification", False, f"Error: {str(e)}")
-            
-            # Test 3: Verify no other Bible versions or books contaminate results
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=50")
-                if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    
-                    if verses:
-                        # Check that all verses are from Genesis
-                        genesis_verses = sum(1 for verse in verses if verse.get('book') == 'Genesis')
-                        contamination_percentage = ((len(verses) - genesis_verses) / len(verses)) * 100
-                        
-                        if genesis_verses == len(verses):
-                            self.log_test("Database Purity - Genesis Only", True, f"✅ PURE DATABASE! All {len(verses)} verses are from Genesis")
-                        elif contamination_percentage < 5:  # Allow minimal contamination
-                            self.log_test("Database Purity - Genesis Only", True, f"Mostly pure: {genesis_verses}/{len(verses)} verses from Genesis")
-                        else:
-                            self.log_test("Database Purity - Genesis Only", False, f"Database contamination: Only {genesis_verses}/{len(verses)} verses from Genesis")
-                    else:
-                        self.log_test("Database Purity - Genesis Only", False, "No verses found for purity check")
+                        self.log_test("Database Purity - Genesis Only", False, f"Cross-contamination: {book_count} books ({', '.join(book_names[:5])})")
                 else:
                     self.log_test("Database Purity - Genesis Only", False, f"Status: {response.status_code}")
             except Exception as e:
                 self.log_test("Database Purity - Genesis Only", False, f"Error: {str(e)}")
             
+            # Check verse count per chapter to identify incomplete chapters
+            print("\n📊 VERSE COUNT PER CHAPTER ANALYSIS:")
+            
+            expected_verses_per_chapter = {
+                1: 31, 2: 25, 3: 24, 4: 26, 5: 32, 6: 22, 7: 24, 8: 22, 9: 29, 10: 32,
+                11: 32, 12: 20, 13: 18, 14: 24, 15: 21, 16: 16, 17: 27, 18: 33, 19: 38, 20: 18,
+                21: 34, 22: 24, 23: 20, 24: 67, 25: 34, 26: 35, 27: 46, 28: 22, 29: 35, 30: 43,
+                31: 55, 32: 32, 33: 20, 34: 31, 35: 29, 36: 43, 37: 36, 38: 30, 39: 23, 40: 23,
+                41: 57, 42: 38, 43: 34, 44: 34, 45: 28, 46: 34, 47: 31, 48: 22, 49: 33, 50: 26
+            }
+            
+            incomplete_chapters = []
+            complete_chapters = []
+            total_missing = 0
+            
+            for chapter in range(1, 51):
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=1")
+                    if response.status_code == 200:
+                        data = response.json()
+                        actual_verses = data.get('total', 0)
+                        expected_verses = expected_verses_per_chapter.get(chapter, 0)
+                        missing = expected_verses - actual_verses
+                        
+                        if missing > 0:
+                            incomplete_chapters.append({
+                                'chapter': chapter,
+                                'actual': actual_verses,
+                                'expected': expected_verses,
+                                'missing': missing
+                            })
+                            total_missing += missing
+                            print(f"   ❌ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses (missing {missing})")
+                        else:
+                            complete_chapters.append(chapter)
+                            if actual_verses == expected_verses:
+                                print(f"   ✅ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses (complete)")
+                            else:
+                                print(f"   ⚠️ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses (extra verses)")
+                    else:
+                        incomplete_chapters.append({
+                            'chapter': chapter,
+                            'actual': 0,
+                            'expected': expected_verses_per_chapter.get(chapter, 0),
+                            'missing': expected_verses_per_chapter.get(chapter, 0)
+                        })
+                        total_missing += expected_verses_per_chapter.get(chapter, 0)
+                        print(f"   ❌ Chapter {chapter:2d}: ERROR - Status {response.status_code}")
+                        
+                except Exception as e:
+                    incomplete_chapters.append({
+                        'chapter': chapter,
+                        'actual': 0,
+                        'expected': expected_verses_per_chapter.get(chapter, 0),
+                        'missing': expected_verses_per_chapter.get(chapter, 0)
+                    })
+                    total_missing += expected_verses_per_chapter.get(chapter, 0)
+                    print(f"   ❌ Chapter {chapter:2d}: ERROR - {str(e)}")
+            
+            # Summary
+            self.log_test("Complete Chapters", True, f"✅ {len(complete_chapters)}/50 chapters are complete")
+            
+            if incomplete_chapters:
+                self.log_test("Incomplete Chapters", False, f"❌ {len(incomplete_chapters)}/50 chapters are incomplete (missing {total_missing} total verses)")
+                
+                # Show top 5 chapters with most missing verses
+                incomplete_chapters.sort(key=lambda x: x['missing'], reverse=True)
+                top_incomplete = incomplete_chapters[:5]
+                missing_summary = ", ".join([f"Ch{ch['chapter']}(-{ch['missing']})" for ch in top_incomplete])
+                self.log_test("Most Incomplete Chapters", False, f"Top missing: {missing_summary}")
+            else:
+                self.log_test("Incomplete Chapters", True, "✅ All chapters are complete")
+            
             return True
             
         except Exception as e:
-            self.log_test("Database Cleanup Verification", False, f"Error: {str(e)}")
+            self.log_test("Database Structure Verification", False, f"Error: {str(e)}")
             return False
 
     def test_genesis_reading_quality(self):
