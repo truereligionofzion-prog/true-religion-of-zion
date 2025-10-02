@@ -1494,19 +1494,7 @@ const MitzvotApp = () => {
                         </SelectContent>
                       </Select>
 
-                      <Select value={selectedBook} onValueChange={setSelectedBook}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="All Books" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Books</SelectItem>
-                          {filters.books && filters.books.map((book) => (
-                            <SelectItem key={book} value={book}>
-                              {book}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      {/* Removed problematic "All Books" dropdown that showed wrong order */}
                     </>
                   ) : contentType === 'precepts' ? (
                     <>
@@ -1536,19 +1524,7 @@ const MitzvotApp = () => {
                         </SelectContent>
                       </Select>
 
-                      <Select value={selectedBook} onValueChange={setSelectedBook}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="All Books" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Books</SelectItem>
-                          {filters.books && filters.books.map((book) => (
-                            <SelectItem key={book} value={book}>
-                              {book}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      {/* Removed problematic "All Books" dropdown that showed wrong order */}
 
                       {/* Bible Version Selector */}
                       <Select value={selectedBibleVersion} onValueChange={setSelectedBibleVersion}>
