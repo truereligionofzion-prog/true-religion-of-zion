@@ -394,11 +394,11 @@ const MitzvotApp = () => {
 
   // Auto-load content when content type changes
   useEffect(() => {
-    if (contentType === 'mitzvot') {
+    if (contentType === 'mitzvot' && mitzvot.length === 0) {
       loadMitzvot();
-    } else if (contentType === 'precepts') {
+    } else if (contentType === 'precepts' && precepts.length === 0) {
       loadPrecepts();
-    } else if (contentType === 'bible') {
+    } else if (contentType === 'bible' && bibleVerses.length === 0) {
       loadBibleVerses();
     }
   }, [contentType]);
