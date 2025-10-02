@@ -2786,12 +2786,19 @@ class APITester:
         return passed >= total * 0.8  # 80% success rate required
 
 def main():
-    """Run focused Bible verses API testing to diagnose the 500 error"""
-    print("🚀 Starting Bible Verses API Error Diagnosis")
-    print("=" * 80)
-    print("Focus: Diagnosing 500 error in /api/bible/verses endpoint")
-    print("Error: '<' not supported between instances of 'str' and 'NoneType'")
-    print("=" * 80)
+    """Run comprehensive Bible API functionality testing as per review request"""
+    print("🚀 BIBLE API FUNCTIONALITY VERIFICATION - CRITICAL BIBLE VERSE TEXT RENDERING ISSUE")
+    print("=" * 90)
+    print("REVIEW REQUEST FOCUS:")
+    print("- Test GET /api/bible/verses (should return verses with full text content)")
+    print("- Test GET /api/bible/stats (should return correct Bible statistics)")
+    print("- Verify verse objects contain 'text' field with actual biblical content")
+    print("- Check different testaments (old testament, new testament, apocrypha)")
+    print("- Test with specific verses like Tobit 1:1, Ezra 1:1")
+    print("- Verify API returns proper JSON structure with verses array")
+    print("- Check pagination works correctly (page, totalPages)")
+    print("- Verify stats endpoint returns: totalBooks, totalVerses, apocryphaBooks")
+    print("=" * 90)
     
     tester = APITester(BACKEND_URL)
     
