@@ -621,8 +621,8 @@ class APITester:
             self.log_test("Exodus Content Quality", False, f"Error: {str(e)}")
             return False
 
-    def test_database_statistics(self):
-        """REVIEW REQUEST TEST 4: Database Statistics - Total Bible verse count, both books verification, testament classification"""
+    def test_complete_database_status(self):
+        """REVIEW REQUEST TEST 5: Complete Database Status - Total verse count, both books verification, testament classification"""
         try:
             print("\n🔍 DATABASE STATISTICS - TOTAL BIBLE VERSE COUNT AND BOOK VERIFICATION...")
             
