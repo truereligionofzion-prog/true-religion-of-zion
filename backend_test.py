@@ -3488,9 +3488,9 @@ class APITester:
         self.test_bible_books_endpoint()
         
         # Summary
-        print("\n" + "=" * 70)
-        print("📋 KJV 1611 BIBLE API TEST SUMMARY")
-        print("=" * 70)
+        print("\n" + "=" * 80)
+        print("📋 KJV 1611 ENHANCED DATASET TEST SUMMARY")
+        print("=" * 80)
         
         passed = sum(1 for result in self.test_results if result['passed'])
         total = len(self.test_results)
