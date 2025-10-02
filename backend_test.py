@@ -1,26 +1,50 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Bible API Functionality - CRITICAL BIBLE VERSE TEXT RENDERING ISSUE DEBUGGING
+Backend Testing for Yah Scriptures Bible API Functionality - COMPREHENSIVE TESTING
 
-REVIEW REQUEST FOCUS:
-- Test GET /api/bible/verses (should return verses with full text content)
-- Test GET /api/bible/stats (should return correct Bible statistics)
-- Verify verse objects contain 'text' field with actual biblical content
-- Check different testaments (old testament, new testament, apocrypha)
-- Verify data structure: {id, book, chapter, verse, text, testament, has_precept}
-- Verify 'text' field contains full biblical verse content (not empty/null)
-- Test with specific verses like Tobit 1:1, Ezra 1:1
-- Verify API returns proper JSON structure with verses array
-- Check pagination works correctly (page, totalPages)
-- Confirm filters structure is correct
-- Verify stats endpoint returns: totalBooks, totalVerses, apocryphaBooks
-- Numbers should be reasonable (44+ books, 15000+ verses)
+REVIEW REQUEST FOCUS - YAH SCRIPTURES VERSION TESTING:
+COMPLETED TASK: Just finished extracting the complete New Testament from yah_scriptures.pdf. 
+The Yah Scriptures version is now complete with:
+- Old Testament: 2,678 verses (39 books) 
+- New Testament: 5,328 verses (26 books) - NEWLY COMPLETED
+- Apocrypha: 2,009 verses (15 books)
+- TOTAL: 10,015 verses (80 books)
+
+CRITICAL TESTING REQUIRED:
+1. Bible API Endpoints with Yah Scriptures version:
+   - GET /api/bible/stats?version=yah_scriptures (verify all counts are correct)
+   - GET /api/bible/books?version=yah_scriptures (check all 80 books present)
+   - GET /api/bible/verses?version=yah_scriptures (verify verse retrieval works)
+   - GET /api/bible/versions (confirm yah_scriptures is available)
+
+2. New Testament Data Quality:
+   - Test specific NT books: Matthew, Mark, Luke, John, Acts, Romans, 1 Corinthians, Revelation
+   - Verify chapter/verse structure is correct
+   - Check that verse text contains actual biblical content (not empty or corrupted)
+   - Verify divine name standardization applied (should contain "YHWH" not "{vWHY}")
+
+3. Testament Filtering:
+   - Test filtering by testament=new (should return 5,328 NT verses)
+   - Test filtering by testament=old (should return 2,678 OT verses)
+   - Test filtering by testament=apocrypha (should return 2,009 verses)
+
+4. Book Navigation:
+   - Test that all 26 NT books are accessible
+   - Check proper ordering (Matthew=40, Mark=41, etc.)
+   - Verify chapter counts match expected (Matthew=28, Mark=16, Luke=24, John=21)
+
+5. Sample Verse Verification:
+   - Matthew 1:1 (genealogy of Jesus)
+   - John 1:1 (In the beginning was the Word)
+   - Romans 1:1 (Paul's introduction)
+   - Revelation 1:1 (The revelation of Jesus Christ)
 
 EXPECTED RESULTS:
-- All Bible API endpoints should return 200 OK
-- Verse text should contain actual biblical content (e.g., "The book of the words of Tobit...")
-- Stats should show correct numbers matching database content
-- No 500 errors or empty response data
+- All Bible API endpoints should return 200 OK with yah_scriptures version
+- Stats should show: 80 books, 10,015 verses (2,678 OT + 5,328 NT + 2,009 Apocrypha)
+- New Testament books should be accessible and contain proper biblical content
+- Divine name standardization should be applied (YHWH instead of {vWHY})
+- Testament filtering should work correctly with proper verse counts
 """
 
 import requests
