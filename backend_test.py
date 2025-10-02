@@ -1040,11 +1040,11 @@ class APITester:
             self.log_test("Key Chapter Verification", False, f"Error: {str(e)}")
             return False
 
-    def run_exodus_authentic_content_verification_tests(self):
-        """Run Exodus authentic content verification tests as per review request"""
+    def run_leviticus_authentic_content_verification_tests(self):
+        """Run Leviticus authentic content verification tests as per review request"""
         print("=" * 80)
-        print("🎉 EXODUS AUTHENTIC BIBLICAL TEXT VERIFICATION")
-        print("Verifying that Exodus now contains authentic biblical text without placeholder brackets")
+        print("🎉 LEVITICUS AUTHENTIC BIBLICAL TEXT VERIFICATION")
+        print("Verifying that Leviticus now contains authentic biblical text following the Genesis/Exodus success pattern")
         print("=" * 80)
         
         # Test basic connectivity first
@@ -1055,14 +1055,14 @@ class APITester:
         # Run the 5 main review request tests
         test_results = []
         
-        # Test 1: Exodus Authentic Content Verification
-        test_results.append(self.test_exodus_authentic_content_verification())
+        # Test 1: Leviticus Authentic Content Verification
+        test_results.append(self.test_leviticus_authentic_content_verification())
         
-        # Test 2: No Placeholder Brackets Check
-        test_results.append(self.test_no_placeholder_brackets_check())
+        # Test 2: No Placeholder Content Check
+        test_results.append(self.test_no_placeholder_content_check())
         
-        # Test 3: Genesis Preservation Verification
-        test_results.append(self.test_genesis_preservation_verification())
+        # Test 3: Previous Books Preservation
+        test_results.append(self.test_previous_books_preservation())
         
         # Test 4: Content Quality Sampling
         test_results.append(self.test_content_quality_sampling())
