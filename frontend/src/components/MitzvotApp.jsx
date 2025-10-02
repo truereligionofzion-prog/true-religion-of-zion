@@ -1485,6 +1485,22 @@ const MitzvotApp = () => {
                           ))}
                         </SelectContent>
                       </Select>
+
+                      {/* Bible Version Selector */}
+                      <Select value={selectedBibleVersion} onValueChange={setSelectedBibleVersion}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Version" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="yah_scriptures">Yah Scriptures</SelectItem>
+                          <SelectItem value="kjv1611_divine">KJV 1611 (Divine Names)</SelectItem>
+                          {availableVersions.map((version) => (
+                            <SelectItem key={version.id} value={version.id}>
+                              {version.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       
                       {/* Phase 3C: Advanced Bible Features */}
                       <div className="flex gap-2">
