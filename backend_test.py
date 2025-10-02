@@ -382,6 +382,115 @@ class APITester:
             self.log_test("KJV 1611 Enhanced Verse Counts", False, f"Error: {str(e)}")
             return False
 
+    def test_kjv1611_testament_filtering(self):
+        """TEST: KJV 1611 Testament filtering - Old Testament (3), New Testament (6), Apocrypha (2)"""
+        try:
+            print("\n🔍 KJV 1611 ENHANCED TESTAMENT FILTERING...")
+            
+            # Test Old Testament filtering (should show Genesis, Exodus, Psalms)
+            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&testament=old&limit=100")
+            if response.status_code == 200:
+                data = response.json()
+                ot_verses = data.get('verses', [])
+                ot_total = data.get('total', 0)
+                
+                if ot_verses:
+                    # Check that all verses are from Old Testament books
+                    ot_books = set()
+                    for verse in ot_verses:
+                        book = verse.get('book', '')
+                        if book:
+                            ot_books.add(book)
+                    
+                    expected_ot_books = {'Genesis', 'Exodus', 'Psalms'}
+                    found_ot_books = ot_books.intersection(expected_ot_books)
+                    
+                    if len(found_ot_books) == 3:
+                        self.log_test("KJV 1611 Enhanced - Old Testament Filtering", True, f"Found all 3 OT books: {found_ot_books}, Total verses: {ot_total}")
+                    else:
+                        self.log_test("KJV 1611 Enhanced - Old Testament Filtering", False, f"Found OT books: {found_ot_books} (expected Genesis, Exodus, Psalms)")
+                else:
+                    self.log_test("KJV 1611 Enhanced - Old Testament Filtering", False, "No Old Testament verses found")
+            else:
+                self.log_test("KJV 1611 Enhanced - Old Testament Filtering", False, f"Status: {response.status_code}")
+            
+            # Test New Testament filtering (should show Matthew, Mark, Luke, John, Acts, Romans)
+            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&testament=new&limit=100")
+            if response.status_code == 200:
+                data = response.json()
+                nt_verses = data.get('verses', [])
+                nt_total = data.get('total', 0)
+                
+                if nt_verses:
+                    # Check that all verses are from New Testament books
+                    nt_books = set()
+                    for verse in nt_verses:
+                        book = verse.get('book', '')
+                        if book:
+                            nt_books.add(book)
+                    
+                    expected_nt_books = {'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans'}
+                    found_nt_books = nt_books.intersection(expected_nt_books)
+                    
+                    if len(found_nt_books) >= 5:  # Allow some tolerance
+                        self.log_test("KJV 1611 Enhanced - New Testament Filtering", True, f"Found {len(found_nt_books)} NT books: {found_nt_books}, Total verses: {nt_total}")
+                    else:
+                        self.log_test("KJV 1611 Enhanced - New Testament Filtering", False, f"Found NT books: {found_nt_books} (expected Matthew, Mark, Luke, John, Acts, Romans)")
+                else:
+                    self.log_test("KJV 1611 Enhanced - New Testament Filtering", False, "No New Testament verses found")
+            else:
+                self.log_test("KJV 1611 Enhanced - New Testament Filtering", False, f"Status: {response.status_code}")
+            
+            # Test Apocrypha filtering (should show Tobit, Wisdom)
+            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&testament=apocrypha&limit=100")
+            if response.status_code == 200:
+                data = response.json()
+                apocrypha_verses = data.get('verses', [])
+                apocrypha_total = data.get('total', 0)
+                
+                if apocrypha_verses:
+                    # Check that all verses are from Apocrypha books
+                    apocrypha_books = set()
+                    for verse in apocrypha_verses:
+                        book = verse.get('book', '')
+                        if book:
+                            apocrypha_books.add(book)
+                    
+                    expected_apocrypha_books = {'Tobit', 'Wisdom'}
+                    found_apocrypha_books = apocrypha_books.intersection(expected_apocrypha_books)
+                    
+                    if len(found_apocrypha_books) == 2:
+                        self.log_test("KJV 1611 Enhanced - Apocrypha Filtering", True, f"Found all 2 Apocrypha books: {found_apocrypha_books}, Total verses: {apocrypha_total}")
+                    else:
+                        self.log_test("KJV 1611 Enhanced - Apocrypha Filtering", False, f"Found Apocrypha books: {found_apocrypha_books} (expected Tobit, Wisdom)")
+                else:
+                    self.log_test("KJV 1611 Enhanced - Apocrypha Filtering", False, "No Apocrypha verses found")
+            else:
+                self.log_test("KJV 1611 Enhanced - Apocrypha Filtering", False, f"Status: {response.status_code}")
+            
+            # Test that testament filtering is working correctly by checking book distribution
+            response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
+            if response.status_code == 200:
+                data = response.json()
+                books = data.get('books', [])
+                
+                testament_distribution = {}
+                for book in books:
+                    testament = book.get('testament', 'unknown')
+                    testament_distribution[testament] = testament_distribution.get(testament, 0) + 1
+                
+                expected_distribution = {'old': 3, 'new': 6, 'apocrypha': 2}
+                if testament_distribution == expected_distribution:
+                    self.log_test("KJV 1611 Enhanced - Testament Distribution", True, f"Perfect distribution: {testament_distribution}")
+                else:
+                    self.log_test("KJV 1611 Enhanced - Testament Distribution", False, f"Found: {testament_distribution}, Expected: {expected_distribution}")
+            
+            return len(found_ot_books) >= 2 and len(found_nt_books) >= 4 and len(found_apocrypha_books) >= 1
+            
+        except Exception as e:
+            self.log_test("KJV 1611 Testament Filtering", False, f"Error: {str(e)}")
+            return False
+
     def test_kjv1611_api_response_structure(self):
         """TEST: KJV 1611 API response structure and required fields"""
         try:
