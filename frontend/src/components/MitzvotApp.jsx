@@ -1823,7 +1823,7 @@ const MitzvotApp = () => {
                             ))
                           ) : (
                             (bibleVerses || []).map((verse, index) => (
-                              <tr key={verse.id} className="border-b hover:bg-gray-50">
+                              <tr key={`table-${verse.book}-${verse.chapter}-${verse.verse}-${index}`} className="border-b hover:bg-gray-50">
                                 <td className="p-4 font-medium text-green-700">
                                   {verse.book} {verse.chapter}:{verse.verse}
                                 </td>
