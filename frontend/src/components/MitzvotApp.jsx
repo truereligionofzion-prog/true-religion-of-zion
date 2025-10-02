@@ -2095,7 +2095,7 @@ const MitzvotApp = () => {
                           {book.name}
                         </Button>
                       ));
-                    })()}
+                    }, [bibleBooks, advancedFilters.testament, selectedBook, selectedChapter, selectedVerse])}
                     
                     {(() => {
                       let filteredBooks = bibleBooks || [];
