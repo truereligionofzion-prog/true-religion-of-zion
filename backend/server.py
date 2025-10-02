@@ -378,6 +378,7 @@ async def get_bible_books(
 
 @api_router.get("/bible/verses")
 async def get_bible_verses(
+    version: Optional[str] = Query("kjv1611_divine", description="Bible version: kjv1611_divine, yah_scriptures"),
     book: Optional[str] = Query(None, description="Filter by book name"),
     chapter: Optional[int] = Query(None, description="Filter by chapter number"),
     testament: Optional[str] = Query(None, description="Filter by testament: old, new, apocrypha"),
