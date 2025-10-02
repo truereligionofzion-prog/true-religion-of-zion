@@ -791,7 +791,7 @@ class APITester:
             except Exception as e:
                 self.log_test("All Three Books in KJV 1611 Divine", False, f"Error: {str(e)}")
             
-            # Confirm proper testament classification
+            # Confirm proper testament and order classification
             try:
                 # Check Genesis testament classification
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
@@ -811,16 +811,32 @@ class APITester:
                     if verses:
                         exodus_testament = verses[0].get('testament', 'unknown')
                 
-                print(f"\n📜 TESTAMENT CLASSIFICATION VERIFICATION:")
+                # Check Leviticus testament classification
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=1")
+                leviticus_testament = None
+                if response.status_code == 200:
+                    data = response.json()
+                    verses = data.get('verses', [])
+                    if verses:
+                        leviticus_testament = verses[0].get('testament', 'unknown')
+                
+                print(f"\n📜 TESTAMENT AND ORDER CLASSIFICATION VERIFICATION:")
                 print(f"   📖 Genesis Testament: {genesis_testament}")
                 print(f"   📖 Exodus Testament: {exodus_testament}")
+                print(f"   📖 Leviticus Testament: {leviticus_testament}")
                 
-                if genesis_testament == 'old' and exodus_testament == 'old':
-                    self.log_test("Proper Testament Classification", True, f"✅ CORRECT! Both Genesis and Exodus classified as Old Testament")
-                elif genesis_testament == 'old' or exodus_testament == 'old':
-                    self.log_test("Proper Testament Classification", False, f"❌ PARTIAL! Genesis: {genesis_testament}, Exodus: {exodus_testament} (both should be 'old')")
+                if genesis_testament == 'old' and exodus_testament == 'old' and leviticus_testament == 'old':
+                    self.log_test("Proper Testament Classification", True, f"✅ CORRECT! All three books (Genesis, Exodus, Leviticus) classified as Old Testament")
                 else:
-                    self.log_test("Proper Testament Classification", False, f"❌ INCORRECT! Genesis: {genesis_testament}, Exodus: {exodus_testament} (both should be 'old')")
+                    incorrect_books = []
+                    if genesis_testament != 'old':
+                        incorrect_books.append(f"Genesis: {genesis_testament}")
+                    if exodus_testament != 'old':
+                        incorrect_books.append(f"Exodus: {exodus_testament}")
+                    if leviticus_testament != 'old':
+                        incorrect_books.append(f"Leviticus: {leviticus_testament}")
+                    
+                    self.log_test("Proper Testament Classification", False, f"❌ INCORRECT! {', '.join(incorrect_books)} (all should be 'old')")
                     
             except Exception as e:
                 self.log_test("Proper Testament Classification", False, f"Error: {str(e)}")
@@ -858,10 +874,27 @@ class APITester:
                         self.log_test("Exodus Exactly 1,063 Verses", False, f"❌ INCORRECT! Exodus has {exodus_verses} verses, expected 1,063 (difference: {abs(exodus_verses - 1063)})")
                 else:
                     self.log_test("Exodus Exactly 1,063 Verses", False, f"API Error - Status: {response.status_code}")
+                
+                # Leviticus verse count (should be exactly 788 per review request)
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    leviticus_verses = data.get('total', 0)
+                    print(f"   📖 Leviticus: {leviticus_verses} verses (expected: 788)")
+                    
+                    if leviticus_verses == 788:
+                        self.log_test("Leviticus Exactly 788 Verses", True, f"✅ PERFECT! Leviticus has exactly 788 verses as specified")
+                    elif abs(leviticus_verses - 788) <= 20:  # Within 20 verses is close
+                        self.log_test("Leviticus Exactly 788 Verses", True, f"✅ CLOSE! Leviticus has {leviticus_verses} verses (expected 788, difference: {abs(leviticus_verses - 788)})")
+                    else:
+                        self.log_test("Leviticus Exactly 788 Verses", False, f"❌ INCORRECT! Leviticus has {leviticus_verses} verses, expected 788 (difference: {abs(leviticus_verses - 788)})")
+                else:
+                    self.log_test("Leviticus Exactly 788 Verses", False, f"API Error - Status: {response.status_code}")
                     
             except Exception as e:
                 self.log_test("Genesis Exactly 1,533 Verses", False, f"Error: {str(e)}")
                 self.log_test("Exodus Exactly 1,063 Verses", False, f"Error: {str(e)}")
+                self.log_test("Leviticus Exactly 788 Verses", False, f"Error: {str(e)}")
             
             return True
             
