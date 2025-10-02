@@ -727,7 +727,9 @@ const MitzvotApp = () => {
     
     const answers = ['Old Testament', 'New Testament', 'Mixed Testament'];
     
-    const correctAnswer = correctPrecept.testament.charAt(0).toUpperCase() + correctPrecept.testament.slice(1) + ' Testament';
+    const correctAnswer = correctPrecept.testament ? 
+      (correctPrecept.testament.charAt(0).toUpperCase() + correctPrecept.testament.slice(1) + ' Testament') : 
+      'Unknown Testament';
     
     return {
       question: `Which testament classification best describes the precept "${correctPrecept.title}"?`,
