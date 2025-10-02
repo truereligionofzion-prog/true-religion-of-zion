@@ -422,11 +422,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phase 3C: Advanced Bible Features - TESTING COMPLETED ✅"
-    - "Bible Books Count Issue - Shows 2 instead of 44 books"
-    - "Bible API Stability - Some 500 errors on /api/bible/verses endpoint"
+    - "Phase 3C: Advanced Bible Features - CRITICAL ISSUE FOUND ❌"
+    - "Bible Verse Text Display - Showing '...' instead of actual verse content"
+    - "highlightDivineNames Function - May be causing React rendering issues"
   stuck_tasks: 
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
+    - "Bible Verse Text Display - Frontend rendering broken despite working API"
   test_all: false
   test_priority: "high_first"
 
