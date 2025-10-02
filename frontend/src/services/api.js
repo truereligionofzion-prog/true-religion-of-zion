@@ -184,8 +184,13 @@ class ApiService {
   }
 
   // Get Bible statistics
-  async getBibleStats() {
-    return this.request('/bible/stats');
+  async getBibleStats(version = 'kjv1611_divine') {
+    return this.request(`/bible/stats?version=${encodeURIComponent(version)}`);
+  }
+
+  // Get available Bible versions
+  async getBibleVersions() {
+    return this.request('/bible/versions');
   }
 
   // ===== PHASE 3C: ADVANCED BIBLE SEARCH METHODS =====
