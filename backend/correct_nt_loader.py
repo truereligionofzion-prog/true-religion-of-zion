@@ -56,21 +56,20 @@ class CorrectNTLoader:
         
         try:
             with open(self.text_file, 'r', encoding='utf-8') as file:
-                for line_num, line in enumerate(file, 1):
+                lines = file.readlines()
+                
+                for i, line in enumerate(lines):
                     line = line.strip()
                     
                     # Look for MATTHEW (the start of NT)
                     if line == 'MATTHEW':
                         # Check next few lines to confirm this is the NT section
-                        file.seek(0)  # Reset file pointer
-                        lines = file.readlines()
-                        
                         # Look ahead to see if this is the right Matthew
-                        for i in range(line_num, min(line_num + 10, len(lines))):
-                            ahead_line = lines[i].strip()
+                        for j in range(i + 1, min(i + 10, len(lines))):
+                            ahead_line = lines[j].strip()
                             if ahead_line.startswith('1 ') and ('genealogy' in ahead_line or 'Mashiaḥ' in ahead_line):
-                                print(f"   📖 Found NT starting at line {line_num}")
-                                return line_num
+                                print(f"   📖 Found NT starting at line {i + 1}")
+                                return i + 1
                         
         except Exception as e:
             print(f"❌ Error finding NT start: {e}")
