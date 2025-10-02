@@ -1246,9 +1246,9 @@ const MitzvotApp = () => {
             setContentType(value);
           }} className="w-auto">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="mitzvot">613 Mitzvot</TabsTrigger>
-              <TabsTrigger value="precepts">Biblical Precepts</TabsTrigger>
-              <TabsTrigger value="bible">Bible with Apocrypha</TabsTrigger>
+              <TabsTrigger value="mitzvot" onClick={() => console.log('Mitzvot tab clicked')}>613 Mitzvot</TabsTrigger>
+              <TabsTrigger value="precepts" onClick={() => console.log('Precepts tab clicked')}>Biblical Precepts</TabsTrigger>
+              <TabsTrigger value="bible" onClick={() => console.log('Bible tab clicked')}>Bible with Apocrypha</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
