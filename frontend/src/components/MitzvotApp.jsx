@@ -392,6 +392,17 @@ const MitzvotApp = () => {
     }
   }, []);
 
+  // Auto-load content when content type changes
+  useEffect(() => {
+    if (contentType === 'mitzvot') {
+      loadMitzvot();
+    } else if (contentType === 'precepts') {
+      loadPrecepts();
+    } else if (contentType === 'bible') {
+      loadBibleVerses();
+    }
+  }, [contentType]);
+
   const getCategoryName = (categorySlug) => {
     const category = categories.find(c => c.slug === categorySlug);
     return category ? category.name : categorySlug;
