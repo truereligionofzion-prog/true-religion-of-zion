@@ -1,48 +1,36 @@
 #!/usr/bin/env python3
 """
-Backend Testing for KJV Bible Data Replacement - COMPREHENSIVE ENHANCED DATASET TESTING
+Backend Testing for Comprehensive Bible Datasets - YAH SCRIPTURES & KJV 1611 ENHANCED TESTING
 
-REVIEW REQUEST FOCUS - KJV 1611 ENHANCED DATASET TESTING:
-COMPLETED TASK: Comprehensive KJV Bible dataset has been loaded with 12,326 verses from 11 books.
-The KJV 1611 Divine Names version should now be complete with:
-- Enhanced dataset: 11 books total (Genesis, Exodus, Psalms, Matthew, Mark, Luke, John, Acts, Romans, Tobit, Wisdom)
-- Expected verse counts: ~12,326 total verses (major upgrade from previous ~1,083)
-- Testament distribution: Old Testament (3), New Testament (6), Apocrypha (2)
-- Individual book counts: Genesis (~1,276), Matthew (~1,056), Psalms (~1,785)
+REVIEW REQUEST FOCUS - COMPREHENSIVE BIBLE DATASETS TESTING:
+Test the newly loaded comprehensive Bible datasets with focused validation on:
 
-CRITICAL TESTING REQUIRED:
-1. KJV 1611 Enhanced Dataset Verification:
-   - GET /api/bible/versions (verify kjv1611_divine version with enhanced metadata)
-   - GET /api/bible/books?version=kjv1611_divine (verify 11 books: Genesis, Exodus, Psalms, Matthew, Mark, Luke, John, Acts, Romans, Tobit, Wisdom)
-   - Check testament distribution: Old Testament (3), New Testament (6), Apocrypha (2)
+1. **Yah Scriptures Enhanced Dataset Verification**:
+   - Test GET /api/bible/versions to confirm yah_scriptures version is available
+   - Verify GET /api/bible/books?version=yah_scriptures shows 10 books (Genesis, Exodus, Psalms, Matthew, Mark, Luke, John, Acts, Romans, Revelation)
+   - Check testament distribution: Old Testament, New Testament coverage
 
-2. Enhanced Verse Count Testing:
-   - GET /api/bible/verses?version=kjv1611_divine (verify ~12,326 total verses)
-   - Test individual book verse counts: Genesis (~1,276), Matthew (~1,056), Psalms (~1,785)
-   - Check pagination is working correctly with the larger dataset
+2. **Enhanced Verse Count Verification**:
+   - Test GET /api/bible/verses?version=yah_scriptures shows ~12,994 total verses
+   - Sample specific books: Genesis (~1,394 verses), Matthew (~1,558 verses), Psalms (~1,402 verses)
+   - Verify these are massive improvements from the previous incomplete data
 
-3. Data Quality Verification:
-   - Sample verse content from Genesis 1:1, Matthew 1:1, Psalms 1:1
-   - Verify verse text is complete and readable (not truncated)
+3. **KJV 1611 Dataset Testing**:
+   - Test GET /api/bible/books?version=kjv1611_divine for available books
+   - Verify Genesis (~931 verses), Matthew (~1,021 verses), Psalms (~1,305 verses)
+   - Check if KJV data is accessible through API
+
+4. **Data Quality Verification**:
+   - Sample verse content from Genesis 1:1, Matthew 1:1 for both versions
+   - Verify verse text is complete, readable, and not truncated
    - Check proper book/chapter/verse structure integrity
 
-4. Testament Filtering:
-   - GET /api/bible/verses?version=kjv1611_divine&testament=old (should show Genesis, Exodus, Psalms)
-   - GET /api/bible/verses?version=kjv1611_divine&testament=new (should show Matthew, Mark, Luke, John, Acts, Romans)
-   - GET /api/bible/verses?version=kjv1611_divine&testament=apocrypha (should show Tobit, Wisdom)
+5. **API Performance Testing**:
+   - Test pagination with larger datasets (~12,994+ verses total)
+   - Verify testament filtering works correctly
+   - Check search functionality across enhanced datasets
 
-5. Performance Testing:
-   - Ensure API responses are reasonable with larger dataset
-   - Test search functionality across the enhanced dataset
-   - Verify database indexes are working efficiently
-
-EXPECTED RESULTS:
-- kjv1611_divine version available with enhanced metadata
-- Stats should show 11 books with ~12,326 total verses
-- Books: Genesis, Exodus, Psalms, Matthew, Mark, Luke, John, Acts, Romans, Tobit, Wisdom
-- Testament distribution: OT=3, NT=6, Apocrypha=2
-- Individual verse counts approaching biblical standards
-- Significant improvement from previous incomplete dataset
+This tests the major breakthrough from incomplete fragmented data to comprehensive biblical datasets with realistic verse counts approaching biblical standards.
 """
 
 import requests
