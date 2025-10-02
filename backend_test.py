@@ -721,16 +721,16 @@ class APITester:
 
 def main():
     """Main test execution"""
-    print("🚀 Starting Genesis KJV 1611 Final Implementation Testing...")
+    print("🚀 Starting Genesis Data Analysis Testing...")
     
     tester = APITester(BACKEND_URL)
-    success = tester.run_genesis_kjv_1611_tests()
+    success = tester.run_genesis_data_analysis_tests()
     
     if success:
-        print("\n🎉 Genesis KJV 1611 testing completed successfully!")
+        print("\n🎉 Genesis data analysis completed successfully!")
         sys.exit(0)
     else:
-        print("\n❌ Genesis KJV 1611 testing completed with issues.")
+        print("\n❌ Genesis data analysis completed with issues.")
         sys.exit(1)
 
 if __name__ == "__main__":
