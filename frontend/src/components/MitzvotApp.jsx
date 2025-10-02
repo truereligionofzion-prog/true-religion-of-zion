@@ -1241,7 +1241,10 @@ const MitzvotApp = () => {
 
         {/* Content Type Switcher */}
         <div className="flex justify-center mb-6">
-          <Tabs value={contentType} onValueChange={setContentType} className="w-auto">
+          <Tabs value={contentType} onValueChange={(value) => {
+            console.log('Tab change requested from', contentType, 'to', value);
+            setContentType(value);
+          }} className="w-auto">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="mitzvot">613 Mitzvot</TabsTrigger>
               <TabsTrigger value="precepts">Biblical Precepts</TabsTrigger>
