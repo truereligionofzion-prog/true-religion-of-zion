@@ -2044,19 +2044,19 @@ const MitzvotApp = () => {
                   
                   {/* Book Navigation - Dynamic from Available Books */}
                   <div className="flex flex-wrap gap-2 mb-6 justify-center max-h-32 overflow-y-auto">
-                    {(bibleStats.books || []).slice(0, 20).map((bookName) => (
+                    {(bibleBooks || []).slice(0, 20).map((book) => (
                       <Button
-                        key={bookName}
+                        key={book.name}
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          setSelectedBook(bookName);
+                          setSelectedBook(book.name);
                           loadContent(); // Reload content for selected book
                         }}
-                        className={selectedBook === bookName ? 'bg-blue-100' : ''}
+                        className={selectedBook === book.name ? 'bg-blue-100' : ''}
                       >
                         <BookOpen className="w-4 h-4 mr-2" />
-                        {bookName}
+                        {book.name}
                       </Button>
                     ))}
                     {(bibleStats.books || []).length > 20 && (
