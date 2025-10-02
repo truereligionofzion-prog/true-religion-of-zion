@@ -473,9 +473,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Complete KJV Bible Data Replacement - PARSER CREATED ✅ NEEDS BACKEND API TESTING"
-    - "KJV 1611 Version API Functionality - Test with new complete dataset"
-    - "Bible Data Integrity Verification - Compare verse counts and content quality"
+    - "Complete KJV Bible Data Replacement - COMPREHENSIVE DATASET LOADED ✅ NEEDS BACKEND TESTING"
+    - "KJV 1611 Enhanced Dataset API Testing - Verify 12,326 verses from 11 books"
+    - "Bible Frontend Integration Testing - Test UI with enhanced KJV dataset"
   stuck_tasks: 
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
     - "Bible Verse Text Display - FRONTEND ISSUE - renderBibleText() function not displaying API data correctly"
