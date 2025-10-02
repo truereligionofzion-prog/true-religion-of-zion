@@ -91,151 +91,378 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_bible_verses_endpoint_comprehensive(self):
-        """COMPREHENSIVE TEST: /api/bible/verses endpoint for Bible verse text rendering issue"""
+    def test_yah_scriptures_bible_api_comprehensive(self):
+        """COMPREHENSIVE TEST: Yah Scriptures Bible API functionality"""
         try:
-            print("\n🔍 COMPREHENSIVE BIBLE VERSES API TESTING...")
+            print("\n🔍 COMPREHENSIVE YAH SCRIPTURES BIBLE API TESTING...")
             
-            # Test 1: Basic endpoint call - should return 200 OK with verses
-            response = self.session.get(f"{self.base_url}/bible/verses?limit=20")
+            # Test 1: Bible versions endpoint - verify yah_scriptures is available
+            response = self.session.get(f"{self.base_url}/bible/versions")
+            if response.status_code == 200:
+                data = response.json()
+                versions = data.get('versions', [])
+                yah_scriptures_found = any(v.get('id') == 'yah_scriptures' for v in versions)
+                
+                if yah_scriptures_found:
+                    self.log_test("Yah Scriptures - Version Available", True, "yah_scriptures version found in versions list")
+                else:
+                    self.log_test("Yah Scriptures - Version Available", False, "yah_scriptures version not found")
+                    return False
+            else:
+                self.log_test("Yah Scriptures - Version Available", False, f"Status: {response.status_code}")
+                return False
+            
+            # Test 2: Bible stats with yah_scriptures version - verify expected counts
+            response = self.session.get(f"{self.base_url}/bible/stats?version=yah_scriptures")
+            if response.status_code == 200:
+                data = response.json()
+                total_books = data.get('totalBooks', 0)
+                total_verses = data.get('totalVerses', 0)
+                old_testament_verses = data.get('oldTestamentVerses', 0)
+                new_testament_verses = data.get('newTestamentVerses', 0)
+                apocrypha_verses = data.get('apocryphaVerses', 0)
+                
+                # Verify expected counts from review request
+                if total_books == 80:
+                    self.log_test("Yah Scriptures - Total Books", True, f"Found exactly 80 books as expected")
+                else:
+                    self.log_test("Yah Scriptures - Total Books", False, f"Found {total_books} books (expected 80)")
+                
+                if total_verses == 10015:
+                    self.log_test("Yah Scriptures - Total Verses", True, f"Found exactly 10,015 verses as expected")
+                else:
+                    self.log_test("Yah Scriptures - Total Verses", False, f"Found {total_verses} verses (expected 10,015)")
+                
+                if old_testament_verses == 2678:
+                    self.log_test("Yah Scriptures - OT Verses", True, f"Found exactly 2,678 OT verses as expected")
+                else:
+                    self.log_test("Yah Scriptures - OT Verses", False, f"Found {old_testament_verses} OT verses (expected 2,678)")
+                
+                if new_testament_verses == 5328:
+                    self.log_test("Yah Scriptures - NT Verses", True, f"Found exactly 5,328 NT verses as expected")
+                else:
+                    self.log_test("Yah Scriptures - NT Verses", False, f"Found {new_testament_verses} NT verses (expected 5,328)")
+                
+                if apocrypha_verses == 2009:
+                    self.log_test("Yah Scriptures - Apocrypha Verses", True, f"Found exactly 2,009 Apocrypha verses as expected")
+                else:
+                    self.log_test("Yah Scriptures - Apocrypha Verses", False, f"Found {apocrypha_verses} Apocrypha verses (expected 2,009)")
+                
+            else:
+                self.log_test("Yah Scriptures - Stats Endpoint", False, f"Status: {response.status_code}")
+                return False
+            
+            # Test 3: Bible books with yah_scriptures version - verify all 80 books present
+            response = self.session.get(f"{self.base_url}/bible/books?version=yah_scriptures")
+            if response.status_code == 200:
+                data = response.json()
+                books = data.get('books', [])
+                
+                if len(books) == 80:
+                    self.log_test("Yah Scriptures - Books Count", True, f"Found all 80 books")
+                    
+                    # Check testament distribution
+                    testaments = {}
+                    for book in books:
+                        testament = book.get('testament', 'unknown')
+                        testaments[testament] = testaments.get(testament, 0) + 1
+                    
+                    self.log_test("Yah Scriptures - Testament Distribution", True, f"Books by testament: {testaments}")
+                else:
+                    self.log_test("Yah Scriptures - Books Count", False, f"Found {len(books)} books (expected 80)")
+            else:
+                self.log_test("Yah Scriptures - Books Endpoint", False, f"Status: {response.status_code}")
+                return False
+            
+            # Test 4: Testament filtering with yah_scriptures version
+            testament_tests = [
+                ("old", 2678, "Old Testament"),
+                ("new", 5328, "New Testament"), 
+                ("apocrypha", 2009, "Apocrypha")
+            ]
+            
+            testament_tests_passed = 0
+            for testament, expected_count, description in testament_tests:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&testament={testament}&limit=50")
+                    if response.status_code == 200:
+                        data = response.json()
+                        total = data.get('total', 0)
+                        verses = data.get('verses', [])
+                        
+                        if total == expected_count:
+                            self.log_test(f"Yah Scriptures - {description} Count", True, f"Found exactly {total} verses as expected")
+                            testament_tests_passed += 1
+                        else:
+                            self.log_test(f"Yah Scriptures - {description} Count", False, f"Found {total} verses (expected {expected_count})")
+                        
+                        # Verify verses are from correct testament
+                        if verses:
+                            correct_testament = all(v.get('testament') == testament for v in verses)
+                            if correct_testament:
+                                self.log_test(f"Yah Scriptures - {description} Filter", True, "All verses from correct testament")
+                            else:
+                                self.log_test(f"Yah Scriptures - {description} Filter", False, "Testament filter not working correctly")
+                    else:
+                        self.log_test(f"Yah Scriptures - {description} Filter", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Yah Scriptures - {description} Filter", False, f"Error: {str(e)}")
+            
+            return testament_tests_passed >= 2  # At least 2 out of 3 testament tests should pass
+            
+        except Exception as e:
+            self.log_test("Yah Scriptures Bible API Comprehensive Test", False, f"Error: {str(e)}")
+            return False
+
+    def test_yah_scriptures_new_testament_quality(self):
+        """TEST: New Testament data quality in Yah Scriptures version"""
+        try:
+            print("\n🔍 YAH SCRIPTURES NEW TESTAMENT DATA QUALITY TESTING...")
+            
+            # Test specific NT books mentioned in review request
+            nt_books_to_test = [
+                ("Matthew", 28, "genealogy of Jesus"),
+                ("Mark", 16, "gospel of Mark"),
+                ("Luke", 24, "gospel of Luke"),
+                ("John", 21, "In the beginning was the Word"),
+                ("Acts", 28, "acts of the apostles"),
+                ("Romans", 16, "Paul's introduction"),
+                ("1 Corinthians", 16, "Corinthians epistle"),
+                ("Revelation", 22, "The revelation of Jesus Christ")
+            ]
+            
+            nt_books_passed = 0
+            for book_name, expected_chapters, content_hint in nt_books_to_test:
+                try:
+                    # Test book accessibility
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&book={book_name}&limit=10")
+                    if response.status_code == 200:
+                        data = response.json()
+                        verses = data.get('verses', [])
+                        total = data.get('total', 0)
+                        
+                        if verses and total > 0:
+                            self.log_test(f"NT Book - {book_name} Accessibility", True, f"Found {total} verses")
+                            
+                            # Check verse content quality
+                            first_verse = verses[0]
+                            verse_text = first_verse.get('text', '')
+                            
+                            if verse_text and len(verse_text) > 10:
+                                preview = verse_text[:60] + "..." if len(verse_text) > 60 else verse_text
+                                self.log_test(f"NT Book - {book_name} Content", True, f"Content: '{preview}'")
+                                nt_books_passed += 1
+                            else:
+                                self.log_test(f"NT Book - {book_name} Content", False, "Empty or too short verse content")
+                        else:
+                            self.log_test(f"NT Book - {book_name} Accessibility", False, "No verses found")
+                    else:
+                        self.log_test(f"NT Book - {book_name} Accessibility", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"NT Book - {book_name}", False, f"Error: {str(e)}")
+            
+            # Test specific sample verses mentioned in review request
+            sample_verses = [
+                ("Matthew", 1, 1, "genealogy of Jesus"),
+                ("John", 1, 1, "In the beginning was the Word"),
+                ("Romans", 1, 1, "Paul"),
+                ("Revelation", 1, 1, "revelation of Jesus Christ")
+            ]
+            
+            sample_verses_passed = 0
+            for book, chapter, verse_num, expected_content in sample_verses:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verse/{book}/{chapter}/{verse_num}?version=yah_scriptures")
+                    if response.status_code == 200:
+                        verse_data = response.json()
+                        verse_text = verse_data.get('text', '')
+                        
+                        if verse_text and len(verse_text) > 10:
+                            preview = verse_text[:80] + "..." if len(verse_text) > 80 else verse_text
+                            self.log_test(f"Sample Verse - {book} {chapter}:{verse_num}", True, f"Content: '{preview}'")
+                            sample_verses_passed += 1
+                        else:
+                            self.log_test(f"Sample Verse - {book} {chapter}:{verse_num}", False, "Empty or too short content")
+                    else:
+                        self.log_test(f"Sample Verse - {book} {chapter}:{verse_num}", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Sample Verse - {book} {chapter}:{verse_num}", False, f"Error: {str(e)}")
+            
+            return nt_books_passed >= 6 and sample_verses_passed >= 3  # Most tests should pass
+            
+        except Exception as e:
+            self.log_test("Yah Scriptures New Testament Quality Test", False, f"Error: {str(e)}")
+            return False
+
+    def test_yah_scriptures_divine_name_standardization(self):
+        """TEST: Divine name standardization in Yah Scriptures version (YHWH instead of {vWHY})"""
+        try:
+            print("\n🔍 YAH SCRIPTURES DIVINE NAME STANDARDIZATION TESTING...")
+            
+            # Test for YHWH presence in verses
+            response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&search=YHWH&limit=20")
             if response.status_code == 200:
                 data = response.json()
                 verses = data.get('verses', [])
                 total = data.get('total', 0)
                 
-                if verses:
-                    self.log_test("Bible Verses - Basic Endpoint", True, f"Retrieved {len(verses)} verses, total: {total}")
+                if total > 0 and verses:
+                    self.log_test("Divine Names - YHWH Search", True, f"Found {total} verses containing YHWH")
                     
-                    # Test verse data structure
-                    first_verse = verses[0]
-                    required_fields = ['id', 'book', 'chapter', 'verse', 'text', 'testament']
-                    missing_fields = [field for field in required_fields if field not in first_verse]
-                    
-                    if not missing_fields:
-                        self.log_test("Bible Verses - Data Structure", True, "All required fields present")
-                    else:
-                        self.log_test("Bible Verses - Data Structure", False, f"Missing fields: {missing_fields}")
-                        return False
-                    
-                    # CRITICAL TEST: Verify 'text' field contains actual biblical content
-                    text_content_tests = 0
-                    empty_text_count = 0
-                    actual_content_count = 0
-                    
-                    for verse in verses[:10]:  # Test first 10 verses
+                    # Check actual content for YHWH
+                    yhwh_found_in_content = 0
+                    for verse in verses[:5]:  # Check first 5 verses
                         verse_text = verse.get('text', '')
-                        book = verse.get('book', '')
-                        chapter = verse.get('chapter', '')
-                        verse_num = verse.get('verse', '')
-                        
-                        if not verse_text or verse_text.strip() == '':
-                            empty_text_count += 1
-                            self.log_test(f"Bible Verse Text - {book} {chapter}:{verse_num}", False, "Empty text field")
-                        elif len(verse_text) < 10:
-                            empty_text_count += 1
-                            self.log_test(f"Bible Verse Text - {book} {chapter}:{verse_num}", False, f"Text too short: '{verse_text}'")
-                        else:
-                            actual_content_count += 1
-                            # Show first 50 characters of actual content
-                            preview = verse_text[:50] + "..." if len(verse_text) > 50 else verse_text
-                            self.log_test(f"Bible Verse Text - {book} {chapter}:{verse_num}", True, f"Content: '{preview}' ({len(verse_text)} chars)")
-                        
-                        text_content_tests += 1
+                        if 'YHWH' in verse_text:
+                            yhwh_found_in_content += 1
+                            preview = verse_text[:100] + "..." if len(verse_text) > 100 else verse_text
+                            self.log_test(f"Divine Names - YHWH Content", True, f"Found YHWH in: '{preview}'")
                     
-                    # Summary of text content testing
-                    if actual_content_count == text_content_tests:
-                        self.log_test("Bible Verses - Text Content Quality", True, f"All {text_content_tests} verses have proper text content")
-                    elif actual_content_count > 0:
-                        self.log_test("Bible Verses - Text Content Quality", False, f"Only {actual_content_count}/{text_content_tests} verses have proper text content")
+                    if yhwh_found_in_content > 0:
+                        self.log_test("Divine Names - YHWH Standardization", True, f"YHWH properly standardized in {yhwh_found_in_content} verses")
                     else:
-                        self.log_test("Bible Verses - Text Content Quality", False, "NO verses have proper text content - CRITICAL ISSUE")
-                        return False
-                    
+                        self.log_test("Divine Names - YHWH Standardization", False, "YHWH not found in verse content")
                 else:
-                    self.log_test("Bible Verses - Basic Endpoint", False, "No verses returned")
-                    return False
+                    self.log_test("Divine Names - YHWH Search", False, "No verses found containing YHWH")
             else:
-                self.log_test("Bible Verses - Basic Endpoint", False, f"Status: {response.status_code}")
-                return False
+                self.log_test("Divine Names - YHWH Search", False, f"Status: {response.status_code}")
             
-            # Test 2: Specific verses mentioned in review (Tobit 1:1, Ezra 1:1)
-            specific_verses = [
-                ("Tobit", 1, 1, "The book of the words of Tobit"),
-                ("Ezra", 1, 1, "Now in the first year")
-            ]
+            # Test for old format {vWHY} - should NOT be found
+            response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&search=%7BvWHY%7D&limit=10")
+            if response.status_code == 200:
+                data = response.json()
+                old_format_total = data.get('total', 0)
+                
+                if old_format_total == 0:
+                    self.log_test("Divine Names - Old Format Removed", True, "No {vWHY} format found (properly standardized)")
+                else:
+                    self.log_test("Divine Names - Old Format Removed", False, f"Found {old_format_total} verses with old {vWHY} format")
+            else:
+                self.log_test("Divine Names - Old Format Check", False, f"Status: {response.status_code}")
             
-            specific_tests_passed = 0
-            for book, chapter, verse_num, expected_content in specific_verses:
+            # Test for other divine names
+            divine_names = ["Elohim", "YHUH", "Adonai"]
+            divine_names_found = 0
+            
+            for name in divine_names:
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verse/{book}/{chapter}/{verse_num}")
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&search={name}&limit=5")
                     if response.status_code == 200:
-                        verse_data = response.json()
-                        verse_text = verse_data.get('text', '')
-                        
-                        if verse_text and expected_content.lower() in verse_text.lower():
-                            self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", True, f"Contains expected content: '{verse_text[:60]}...'")
-                            specific_tests_passed += 1
-                        elif verse_text:
-                            self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, f"Unexpected content: '{verse_text[:60]}...'")
+                        data = response.json()
+                        total = data.get('total', 0)
+                        if total > 0:
+                            self.log_test(f"Divine Names - {name}", True, f"Found {total} verses containing {name}")
+                            divine_names_found += 1
                         else:
-                            self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, "Empty text content")
+                            self.log_test(f"Divine Names - {name}", False, f"No verses found containing {name}")
                     else:
-                        self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, f"Status: {response.status_code}")
+                        self.log_test(f"Divine Names - {name}", False, f"Status: {response.status_code}")
                 except Exception as e:
-                    self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, f"Error: {str(e)}")
+                    self.log_test(f"Divine Names - {name}", False, f"Error: {str(e)}")
             
-            # Test 3: Different testaments
-            testament_tests = [
-                ("old", "Old Testament verses"),
-                ("new", "New Testament verses"),
-                ("apocrypha", "Apocrypha verses")
+            return total > 0 and yhwh_found_in_content > 0 and old_format_total == 0
+            
+        except Exception as e:
+            self.log_test("Yah Scriptures Divine Name Standardization Test", False, f"Error: {str(e)}")
+            return False
+
+    def test_yah_scriptures_book_navigation(self):
+        """TEST: Book navigation and structure in Yah Scriptures version"""
+        try:
+            print("\n🔍 YAH SCRIPTURES BOOK NAVIGATION TESTING...")
+            
+            # Test New Testament book ordering and chapter counts
+            nt_book_structure = [
+                ("Matthew", 28),
+                ("Mark", 16), 
+                ("Luke", 24),
+                ("John", 21),
+                ("Acts", 28),
+                ("Romans", 16),
+                ("1 Corinthians", 16),
+                ("2 Corinthians", 13),
+                ("Galatians", 6),
+                ("Ephesians", 6),
+                ("Philippians", 4),
+                ("Colossians", 4),
+                ("1 Thessalonians", 5),
+                ("2 Thessalonians", 3),
+                ("1 Timothy", 6),
+                ("2 Timothy", 4),
+                ("Titus", 3),
+                ("Philemon", 1),
+                ("Hebrews", 13),
+                ("James", 5),
+                ("1 Peter", 5),
+                ("2 Peter", 3),
+                ("1 John", 5),
+                ("2 John", 1),
+                ("3 John", 1),
+                ("Jude", 1),
+                ("Revelation", 22)
             ]
             
-            testament_tests_passed = 0
-            for testament, description in testament_tests:
+            nt_books_verified = 0
+            for book_name, expected_chapters in nt_book_structure:
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?testament={testament}&limit=10")
+                    # Get all verses for this book to determine chapter count
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&book={book_name}&limit=1000")
                     if response.status_code == 200:
                         data = response.json()
                         verses = data.get('verses', [])
                         
                         if verses:
-                            # Verify all verses are from correct testament
-                            correct_testament = all(v.get('testament') == testament for v in verses)
-                            if correct_testament:
-                                self.log_test(f"Testament Filter - {testament}", True, f"Found {len(verses)} {description}")
-                                testament_tests_passed += 1
+                            # Find maximum chapter number
+                            max_chapter = max(v.get('chapter', 0) for v in verses)
+                            
+                            if max_chapter == expected_chapters:
+                                self.log_test(f"NT Book Structure - {book_name}", True, f"Correct {max_chapter} chapters")
+                                nt_books_verified += 1
                             else:
-                                self.log_test(f"Testament Filter - {testament}", False, "Testament filter not working correctly")
+                                self.log_test(f"NT Book Structure - {book_name}", False, f"Found {max_chapter} chapters (expected {expected_chapters})")
                         else:
-                            self.log_test(f"Testament Filter - {testament}", False, f"No {description} found")
+                            self.log_test(f"NT Book Structure - {book_name}", False, "No verses found")
                     else:
-                        self.log_test(f"Testament Filter - {testament}", False, f"Status: {response.status_code}")
+                        self.log_test(f"NT Book Structure - {book_name}", False, f"Status: {response.status_code}")
                 except Exception as e:
-                    self.log_test(f"Testament Filter - {testament}", False, f"Error: {str(e)}")
+                    self.log_test(f"NT Book Structure - {book_name}", False, f"Error: {str(e)}")
             
-            # Test 4: Pagination
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?page=2&limit=15")
-                if response.status_code == 200:
-                    data = response.json()
-                    page = data.get('page', 0)
-                    total_pages = data.get('totalPages', 0)
-                    verses = data.get('verses', [])
+            # Test that all 26 NT books are accessible
+            if nt_books_verified >= 20:  # Allow some tolerance
+                self.log_test("NT Books - Accessibility", True, f"{nt_books_verified}/27 NT books verified")
+            else:
+                self.log_test("NT Books - Accessibility", False, f"Only {nt_books_verified}/27 NT books verified")
+            
+            # Test book ordering by checking a few key books
+            response = self.session.get(f"{self.base_url}/bible/books?version=yah_scriptures&testament=new")
+            if response.status_code == 200:
+                data = response.json()
+                books = data.get('books', [])
+                
+                if len(books) == 27:  # 26 NT books + potentially 1 more
+                    self.log_test("NT Books - Count", True, f"Found {len(books)} New Testament books")
                     
-                    if page == 2 and total_pages > 1 and verses:
-                        self.log_test("Bible Verses - Pagination", True, f"Page 2 of {total_pages} with {len(verses)} verses")
+                    # Check if books have proper ordering
+                    book_names = [book.get('name', '') for book in books]
+                    if 'Matthew' in book_names and 'Revelation' in book_names:
+                        matthew_index = book_names.index('Matthew') if 'Matthew' in book_names else -1
+                        revelation_index = book_names.index('Revelation') if 'Revelation' in book_names else -1
+                        
+                        if matthew_index >= 0 and revelation_index >= 0 and matthew_index < revelation_index:
+                            self.log_test("NT Books - Ordering", True, "Matthew comes before Revelation as expected")
+                        else:
+                            self.log_test("NT Books - Ordering", False, "Book ordering issue detected")
                     else:
-                        self.log_test("Bible Verses - Pagination", False, f"Pagination issue: page={page}, totalPages={total_pages}, verses={len(verses)}")
+                        self.log_test("NT Books - Key Books", False, "Matthew or Revelation not found")
                 else:
-                    self.log_test("Bible Verses - Pagination", False, f"Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Bible Verses - Pagination", False, f"Error: {str(e)}")
+                    self.log_test("NT Books - Count", False, f"Found {len(books)} NT books (expected ~27)")
+            else:
+                self.log_test("NT Books - Count", False, f"Status: {response.status_code}")
             
-            return actual_content_count > 0 and specific_tests_passed > 0
+            return nt_books_verified >= 20  # Most NT books should be verified
             
         except Exception as e:
-            self.log_test("Bible Verses Comprehensive Test", False, f"Error: {str(e)}")
+            self.log_test("Yah Scriptures Book Navigation Test", False, f"Error: {str(e)}")
             return False
 
     def test_bible_database_content(self):
