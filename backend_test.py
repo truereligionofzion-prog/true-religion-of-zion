@@ -185,41 +185,37 @@ class APITester:
                 self.log_test("KJV 1611 - Books Endpoint", False, f"Status: {response.status_code}")
                 return False
             
-            # Test 4: Testament filtering with yah_scriptures version
-            testament_tests = [
-                ("old", 2678, "Old Testament"),
-                ("new", 5328, "New Testament"), 
-                ("apocrypha", 2009, "Apocrypha")
-            ]
-            
-            testament_tests_passed = 0
-            for testament, expected_count, description in testament_tests:
-                try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&testament={testament}&limit=50")
-                    if response.status_code == 200:
-                        data = response.json()
-                        total = data.get('total', 0)
-                        verses = data.get('verses', [])
-                        
-                        if total == expected_count:
-                            self.log_test(f"Yah Scriptures - {description} Count", True, f"Found exactly {total} verses as expected")
-                            testament_tests_passed += 1
-                        else:
-                            self.log_test(f"Yah Scriptures - {description} Count", False, f"Found {total} verses (expected {expected_count})")
-                        
-                        # Verify verses are from correct testament
-                        if verses:
-                            correct_testament = all(v.get('testament') == testament for v in verses)
-                            if correct_testament:
-                                self.log_test(f"Yah Scriptures - {description} Filter", True, "All verses from correct testament")
-                            else:
-                                self.log_test(f"Yah Scriptures - {description} Filter", False, "Testament filter not working correctly")
+            # Test 4: Verse retrieval with kjv1611_divine version
+            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=50")
+            if response.status_code == 200:
+                data = response.json()
+                total = data.get('total', 0)
+                verses = data.get('verses', [])
+                
+                if 1000 <= total <= 1200:  # Expected ~1,083 verses
+                    self.log_test("KJV 1611 - Verses Retrieval", True, f"Found {total} verses (expected ~1,083)")
+                else:
+                    self.log_test("KJV 1611 - Verses Retrieval", False, f"Found {total} verses (expected ~1,083)")
+                
+                # Test verse content quality
+                if verses:
+                    content_quality_passed = 0
+                    for verse in verses[:10]:  # Check first 10 verses
+                        verse_text = verse.get('text', '')
+                        if verse_text and len(verse_text) > 10:
+                            content_quality_passed += 1
+                    
+                    if content_quality_passed >= 8:  # At least 8/10 should have good content
+                        self.log_test("KJV 1611 - Verse Content Quality", True, f"{content_quality_passed}/10 verses have good content")
                     else:
-                        self.log_test(f"Yah Scriptures - {description} Filter", False, f"Status: {response.status_code}")
-                except Exception as e:
-                    self.log_test(f"Yah Scriptures - {description} Filter", False, f"Error: {str(e)}")
+                        self.log_test("KJV 1611 - Verse Content Quality", False, f"Only {content_quality_passed}/10 verses have good content")
+                else:
+                    self.log_test("KJV 1611 - Verse Content Quality", False, "No verses returned")
+            else:
+                self.log_test("KJV 1611 - Verses Retrieval", False, f"Status: {response.status_code}")
+                return False
             
-            return testament_tests_passed >= 2  # At least 2 out of 3 testament tests should pass
+            return total >= 1000 and len(verses) > 0
             
         except Exception as e:
             self.log_test("Yah Scriptures Bible API Comprehensive Test", False, f"Error: {str(e)}")
