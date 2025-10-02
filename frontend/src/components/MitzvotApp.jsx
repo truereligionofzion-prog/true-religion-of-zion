@@ -75,8 +75,9 @@ const MitzvotApp = () => {
 
   // Phase 3C: Divine name highlighting function - FIXED with unique keys
   const renderHighlightedText = (text, uniqueId = '') => {
+    // TEMPORARILY DISABLE HIGHLIGHTING TO TEST BASIC TEXT DISPLAY
     // If highlighting is disabled or no text, return plain text
-    if (!divineNameHighlight || !text || typeof text !== 'string') {
+    if (true || !divineNameHighlight || !text || typeof text !== 'string') {
       return text;
     }
     
