@@ -1551,7 +1551,8 @@ const MitzvotApp = () => {
                           <SelectValue placeholder="Select Version" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="kjv1611">KJV 1611</SelectItem>
+                          <SelectItem value="yah_scriptures">Yah Scriptures</SelectItem>
+                          <SelectItem value="kjv1611_divine">KJV 1611</SelectItem>
                           {availableVersions.map((version) => (
                             <SelectItem key={version.id} value={version.id}>
                               {version.name}
