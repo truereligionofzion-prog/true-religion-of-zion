@@ -44,7 +44,7 @@ class YahScripturesLoader:
     
     def standardize_divine_names(self, text: str) -> tuple[str, int]:
         """
-        Standardize divine names in text
+        Standardize divine names in text and remove artifacts
         Returns: (standardized_text, replacement_count)
         """
         if not text:
@@ -52,6 +52,14 @@ class YahScripturesLoader:
             
         original_text = text
         replacement_count = 0
+        
+        # Remove BERĔSHITH artifacts (page references)
+        import re
+        bereshith_pattern = re.compile(r'\s*BERĔSHITH\s+\d+\s*', re.IGNORECASE)
+        text = bereshith_pattern.sub('', text)
+        
+        # Clean up any double spaces
+        text = re.sub(r'\s+', ' ', text.strip())
         
         # Apply divine name replacements
         for old_name, new_name in self.divine_name_replacements.items():
