@@ -3229,21 +3229,21 @@ class APITester:
         return passed >= total * 0.8  # 80% success rate required
 
 def main():
-    """Run comprehensive Yah Scriptures Bible API testing as per review request"""
-    print("🚀 YAH SCRIPTURES BIBLE API COMPREHENSIVE TESTING")
+    """Run comprehensive KJV 1611 Bible API testing as per review request"""
+    print("🚀 KJV 1611 DIVINE NAMES BIBLE API COMPREHENSIVE TESTING")
     print("=" * 90)
     print("REVIEW REQUEST FOCUS:")
-    print("- Test Yah Scriptures version with 10,015 verses (2,678 OT + 5,328 NT + 2,009 Apocrypha)")
-    print("- Verify all 80 books are accessible")
-    print("- Test New Testament data quality (26 books, 5,328 verses)")
-    print("- Verify divine name standardization (YHWH instead of {vWHY})")
-    print("- Test testament filtering and book navigation")
-    print("- Verify sample verses: Matthew 1:1, John 1:1, Romans 1:1, Revelation 1:1")
+    print("- Test KJV 1611 Divine Names version with ~1,083 verses from 6 sample books")
+    print("- Verify 6 sample books: Genesis, Exodus, Matthew, Mark, Tobit, Psalms")
+    print("- Test data quality improvements: Genesis (~214 vs ~48), Matthew (~227 vs ~17)")
+    print("- Verify proper testament distribution (old/new/apocrypha)")
+    print("- Test API response structure and required fields")
+    print("- Ensure verse content is complete and readable (not truncated)")
     print("=" * 90)
     
     tester = APITester(BACKEND_URL)
     
-    # Run all Yah Scriptures tests
+    # Run all KJV 1611 tests
     success = tester.run_all_tests()
     
     # Print final summary
