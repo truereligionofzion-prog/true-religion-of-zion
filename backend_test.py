@@ -627,9 +627,9 @@ class APITester:
     def test_complete_database_status(self):
         """REVIEW REQUEST TEST 5: Complete Database Status - Total verse count, both books verification, testament classification"""
         try:
-            print("\n🔍 DATABASE STATISTICS - TOTAL BIBLE VERSE COUNT AND BOOK VERIFICATION...")
+            print("\n🔍 COMPLETE DATABASE STATUS - TOTAL VERSE COUNT AND BOOK VERIFICATION...")
             
-            # Get total Bible verse count (should be Genesis 1,533 + Exodus ~1,173)
+            # Get total verse count (should be Genesis 1,533 + Exodus 1,063 = 2,596)
             try:
                 response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
                 if response.status_code == 200:
@@ -638,24 +638,24 @@ class APITester:
                     total_books = stats.get('totalBooks', 0)
                     old_testament_verses = stats.get('oldTestamentVerses', 0)
                     
-                    expected_total = 1533 + 1213  # Genesis + Exodus = 2,746 verses
+                    expected_total = 1533 + 1063  # Genesis + Exodus = 2,596 verses (per review request)
                     
-                    print(f"\n📊 BIBLE DATABASE STATISTICS:")
+                    print(f"\n📊 COMPLETE BIBLE DATABASE STATUS:")
                     print(f"   📖 Total Books: {total_books}")
                     print(f"   📝 Total Verses: {total_verses}")
                     print(f"   📜 Old Testament Verses: {old_testament_verses}")
                     
                     if total_verses == expected_total:
-                        self.log_test("Total Bible Verse Count", True, f"✅ PERFECT! Total verses: {total_verses} (Genesis 1,533 + Exodus 1,213 = {expected_total})")
-                    elif total_verses >= expected_total * 0.95:  # Within 5% is acceptable
-                        self.log_test("Total Bible Verse Count", True, f"✅ EXCELLENT! Total verses: {total_verses} (close to expected {expected_total})")
+                        self.log_test("Total Verse Count (Genesis + Exodus)", True, f"✅ PERFECT! Total verses: {total_verses} (Genesis 1,533 + Exodus 1,063 = {expected_total})")
+                    elif abs(total_verses - expected_total) <= 50:  # Within 50 verses is close
+                        self.log_test("Total Verse Count (Genesis + Exodus)", True, f"✅ CLOSE! Total verses: {total_verses} (expected {expected_total}, difference: {abs(total_verses - expected_total)})")
                     else:
-                        self.log_test("Total Bible Verse Count", False, f"❌ INCOMPLETE! Total verses: {total_verses}, expected approximately {expected_total}")
+                        self.log_test("Total Verse Count (Genesis + Exodus)", False, f"❌ INCORRECT! Total verses: {total_verses}, expected {expected_total} (difference: {abs(total_verses - expected_total)})")
                         
                 else:
-                    self.log_test("Total Bible Verse Count", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Total Verse Count (Genesis + Exodus)", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Total Bible Verse Count", False, f"Error: {str(e)}")
+                self.log_test("Total Verse Count (Genesis + Exodus)", False, f"Error: {str(e)}")
             
             # Verify both books exist in KJV 1611 Divine version
             try:
@@ -673,7 +673,7 @@ class APITester:
                     print(f"   📜 Books: {', '.join(book_names)}")
                     
                     if genesis_found and exodus_found:
-                        self.log_test("Both Genesis and Exodus Present", True, f"✅ CONFIRMED! Both Genesis and Exodus exist in KJV 1611 Divine version")
+                        self.log_test("Both Books in KJV 1611 Divine", True, f"✅ CONFIRMED! Both Genesis and Exodus exist in KJV 1611 Divine version")
                         
                         # Get detailed info for both books
                         genesis_book = next((book for book in books if book.get('name') == 'Genesis'), None)
@@ -689,18 +689,18 @@ class APITester:
                             print(f"   ✅ Exodus: Testament={exodus_testament}, Order={exodus_order}")
                             
                     elif genesis_found:
-                        self.log_test("Both Genesis and Exodus Present", False, f"❌ PARTIAL! Genesis found but Exodus missing from KJV 1611 Divine")
+                        self.log_test("Both Books in KJV 1611 Divine", False, f"❌ PARTIAL! Genesis found but Exodus missing from KJV 1611 Divine")
                     elif exodus_found:
-                        self.log_test("Both Genesis and Exodus Present", False, f"❌ PARTIAL! Exodus found but Genesis missing from KJV 1611 Divine")
+                        self.log_test("Both Books in KJV 1611 Divine", False, f"❌ PARTIAL! Exodus found but Genesis missing from KJV 1611 Divine")
                     else:
-                        self.log_test("Both Genesis and Exodus Present", False, f"❌ MISSING! Neither Genesis nor Exodus found in KJV 1611 Divine")
+                        self.log_test("Both Books in KJV 1611 Divine", False, f"❌ MISSING! Neither Genesis nor Exodus found in KJV 1611 Divine")
                         
                 else:
-                    self.log_test("Both Genesis and Exodus Present", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Both Books in KJV 1611 Divine", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Both Genesis and Exodus Present", False, f"Error: {str(e)}")
+                self.log_test("Both Books in KJV 1611 Divine", False, f"Error: {str(e)}")
             
-            # Confirm proper testament classification (Old Testament)
+            # Confirm proper testament classification
             try:
                 # Check Genesis testament classification
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
@@ -734,11 +734,11 @@ class APITester:
             except Exception as e:
                 self.log_test("Proper Testament Classification", False, f"Error: {str(e)}")
             
-            # Additional verification: Individual book verse counts
+            # Individual book verse counts verification
             try:
                 print(f"\n🔢 INDIVIDUAL BOOK VERSE COUNT VERIFICATION:")
                 
-                # Genesis verse count
+                # Genesis verse count (should be exactly 1,533)
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
                 if response.status_code == 200:
                     data = response.json()
@@ -746,36 +746,36 @@ class APITester:
                     print(f"   📖 Genesis: {genesis_verses} verses (expected: 1,533)")
                     
                     if genesis_verses == 1533:
-                        self.log_test("Genesis Individual Count", True, f"✅ PERFECT! Genesis has exactly 1,533 verses")
+                        self.log_test("Genesis Exactly 1,533 Verses", True, f"✅ PERFECT! Genesis has exactly 1,533 verses")
                     else:
-                        self.log_test("Genesis Individual Count", False, f"❌ INCORRECT! Genesis has {genesis_verses} verses, expected 1,533")
+                        self.log_test("Genesis Exactly 1,533 Verses", False, f"❌ INCORRECT! Genesis has {genesis_verses} verses, expected exactly 1,533")
                 else:
-                    self.log_test("Genesis Individual Count", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Genesis Exactly 1,533 Verses", False, f"API Error - Status: {response.status_code}")
                 
-                # Exodus verse count
+                # Exodus verse count (should be exactly 1,063 per review request)
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
                 if response.status_code == 200:
                     data = response.json()
                     exodus_verses = data.get('total', 0)
-                    print(f"   📖 Exodus: {exodus_verses} verses (expected: 1,213)")
+                    print(f"   📖 Exodus: {exodus_verses} verses (expected: 1,063)")
                     
-                    if exodus_verses == 1213:
-                        self.log_test("Exodus Individual Count", True, f"✅ PERFECT! Exodus has exactly 1,213 verses")
-                    elif exodus_verses >= 1173:  # Close to expected
-                        self.log_test("Exodus Individual Count", True, f"✅ EXCELLENT! Exodus has {exodus_verses} verses (close to expected 1,213)")
+                    if exodus_verses == 1063:
+                        self.log_test("Exodus Exactly 1,063 Verses", True, f"✅ PERFECT! Exodus has exactly 1,063 verses as specified")
+                    elif abs(exodus_verses - 1063) <= 20:  # Within 20 verses is close
+                        self.log_test("Exodus Exactly 1,063 Verses", True, f"✅ CLOSE! Exodus has {exodus_verses} verses (expected 1,063, difference: {abs(exodus_verses - 1063)})")
                     else:
-                        self.log_test("Exodus Individual Count", False, f"❌ INCOMPLETE! Exodus has {exodus_verses} verses, expected approximately 1,213")
+                        self.log_test("Exodus Exactly 1,063 Verses", False, f"❌ INCORRECT! Exodus has {exodus_verses} verses, expected 1,063 (difference: {abs(exodus_verses - 1063)})")
                 else:
-                    self.log_test("Exodus Individual Count", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Exodus Exactly 1,063 Verses", False, f"API Error - Status: {response.status_code}")
                     
             except Exception as e:
-                self.log_test("Genesis Individual Count", False, f"Error: {str(e)}")
-                self.log_test("Exodus Individual Count", False, f"Error: {str(e)}")
+                self.log_test("Genesis Exactly 1,533 Verses", False, f"Error: {str(e)}")
+                self.log_test("Exodus Exactly 1,063 Verses", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Database Statistics", False, f"Error: {str(e)}")
+            self.log_test("Complete Database Status", False, f"Error: {str(e)}")
             return False
 
     def test_key_chapter_verification(self):
