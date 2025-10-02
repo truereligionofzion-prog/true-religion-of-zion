@@ -1241,16 +1241,47 @@ const MitzvotApp = () => {
 
         {/* Content Type Switcher */}
         <div className="flex justify-center mb-6">
-          <Tabs value={contentType} onValueChange={(value) => {
-            console.log('Tab change requested from', contentType, 'to', value);
-            setContentType(value);
-          }} className="w-auto">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="mitzvot" onClick={() => console.log('Mitzvot tab clicked')}>613 Mitzvot</TabsTrigger>
-              <TabsTrigger value="precepts" onClick={() => console.log('Precepts tab clicked')}>Biblical Precepts</TabsTrigger>
-              <TabsTrigger value="bible" onClick={() => console.log('Bible tab clicked')}>Bible with Apocrypha</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="bg-gray-100 p-1 rounded-lg grid grid-cols-3 w-auto">
+            <button
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                contentType === 'mitzvot' 
+                  ? 'bg-white text-gray-900 shadow' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+              onClick={() => {
+                console.log('Mitzvot button clicked');
+                setContentType('mitzvot');
+              }}
+            >
+              613 Mitzvot
+            </button>
+            <button
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                contentType === 'precepts' 
+                  ? 'bg-white text-gray-900 shadow' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+              onClick={() => {
+                console.log('Precepts button clicked');
+                setContentType('precepts');
+              }}
+            >
+              Biblical Precepts
+            </button>
+            <button
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                contentType === 'bible' 
+                  ? 'bg-white text-gray-900 shadow' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+              onClick={() => {
+                console.log('Bible button clicked');
+                setContentType('bible');
+              }}
+            >
+              Bible with Apocrypha
+            </button>
+          </div>
         </div>
 
         {/* Main Navigation Tabs */}
