@@ -1263,10 +1263,7 @@ const MitzvotApp = () => {
                   ? 'bg-white text-gray-900 shadow' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-              onClick={() => {
-                console.log('Bible button clicked');
-                setContentType('bible');
-              }}
+              onClick={() => setContentType('bible')}
             >
               Bible with Apocrypha
             </button>
