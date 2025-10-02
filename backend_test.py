@@ -637,9 +637,9 @@ class APITester:
                             self.log_test("Proper Biblical Language", False, f"❌ POOR! Only {proper_language_verses}/10 verses have proper biblical language")
                         
                     else:
-                        self.log_test("Authentic Biblical Content", False, f"❌ NO DATA! No Exodus verses found for quality sampling")
-                        self.log_test("Substantial Verse Content", False, f"❌ NO DATA! No Exodus verses found for content check")
-                        self.log_test("Proper Biblical Language", False, f"❌ NO DATA! No Exodus verses found for language check")
+                        self.log_test("Authentic Biblical Content", False, f"❌ NO DATA! No Leviticus verses found for quality sampling")
+                        self.log_test("Substantial Verse Content", False, f"❌ NO DATA! No Leviticus verses found for content check")
+                        self.log_test("Proper Biblical Language", False, f"❌ NO DATA! No Leviticus verses found for language check")
                 else:
                     self.log_test("Authentic Biblical Content", False, f"API Error - Status: {response.status_code}")
                     self.log_test("Substantial Verse Content", False, f"API Error - Status: {response.status_code}")
