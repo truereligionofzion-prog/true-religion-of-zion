@@ -67,22 +67,27 @@ const MitzvotApp = () => {
   const [showCrossReferences, setShowCrossReferences] = useState(false);
   const [divineNameHighlight, setDivineNameHighlight] = useState(true);
   
-  // Filtered books based on testament selection
+  // Filtered books based on testament selection (main dropdown OR advanced filter)
   const filteredBooks = React.useMemo(() => {
     let books = bibleBooks || [];
     
+    // Use main testament dropdown (selectedCategory) OR advanced filter
+    const testamentFilter = (contentType === 'bible' && selectedCategory !== 'all') 
+      ? selectedCategory 
+      : advancedFilters.testament;
+    
     // Filter books based on testament selection
-    if (advancedFilters.testament && advancedFilters.testament !== 'all') {
+    if (testamentFilter && testamentFilter !== 'all') {
       books = books.filter(book => {
-        if (advancedFilters.testament === 'old') return book?.testament === 'old';
-        if (advancedFilters.testament === 'new') return book?.testament === 'new';  
-        if (advancedFilters.testament === 'apocrypha') return book?.testament === 'apocrypha';
+        if (testamentFilter === 'old') return book?.testament === 'old';
+        if (testamentFilter === 'new') return book?.testament === 'new';  
+        if (testamentFilter === 'apocrypha') return book?.testament === 'apocrypha';
         return true;
       });
     }
     
     return books;
-  }, [bibleBooks, advancedFilters.testament]);
+  }, [bibleBooks, selectedCategory, advancedFilters.testament, contentType]);
   
   // Authentication UI state
   const [showAuthModal, setShowAuthModal] = useState(false);
