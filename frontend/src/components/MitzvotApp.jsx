@@ -1920,9 +1920,9 @@ const MitzvotApp = () => {
                           </CardContent>
                         </Card>
                       );
-                    })}
-                  </div>
-                )}
+                    })
+                  )}
+                </div>
               </TabsContent>
 
               <TabsContent value="table" className="mt-6">
