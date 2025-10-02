@@ -159,12 +159,12 @@ class APITester:
             self.log_test("Genesis Completion Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_genesis_content_quality_check(self):
-        """REVIEW REQUEST TEST 2: Genesis Content Quality Check - Key verses and random sampling"""
+    def test_data_quality_check(self):
+        """REVIEW REQUEST TEST 2: Data Quality Check - Key verses, sampling, and cross-contamination"""
         try:
-            print("\n🔍 GENESIS CONTENT QUALITY CHECK - KEY VERSES AND SAMPLING...")
+            print("\n🔍 DATA QUALITY CHECK - KEY VERSES, SAMPLING, AND PURITY...")
             
-            # Test Genesis 1:1 - Expected creation text
+            # Confirm Genesis 1:1 still has correct creation text
             try:
                 response = self.session.get(f"{self.base_url}/bible/verse/Genesis/1/1?version=kjv1611_divine")
                 if response.status_code == 200:
@@ -176,15 +176,15 @@ class APITester:
                     keywords_found = sum(1 for keyword in creation_keywords if keyword.lower() in verse_text.lower())
                     
                     if keywords_found >= 4:
-                        self.log_test("Genesis 1:1 - Creation Text", True, f"✅ CORRECT! Found: '{verse_text[:100]}...'")
+                        self.log_test("Genesis 1:1 - Creation Text Preserved", True, f"✅ CORRECT! Found: '{verse_text}'")
                     else:
-                        self.log_test("Genesis 1:1 - Creation Text", False, f"Missing creation content. Found: '{verse_text[:100]}...'")
+                        self.log_test("Genesis 1:1 - Creation Text Preserved", False, f"❌ CORRUPTED! Found: '{verse_text}'")
                 else:
-                    self.log_test("Genesis 1:1 - Creation Text", False, f"Status: {response.status_code}")
+                    self.log_test("Genesis 1:1 - Creation Text Preserved", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Genesis 1:1 - Creation Text", False, f"Error: {str(e)}")
+                self.log_test("Genesis 1:1 - Creation Text Preserved", False, f"Error: {str(e)}")
             
-            # Test Genesis 50:26 - Last verse to ensure complete book
+            # Confirm Genesis 50:26 has proper ending text
             try:
                 response = self.session.get(f"{self.base_url}/bible/verse/Genesis/50/26?version=kjv1611_divine")
                 if response.status_code == 200:
@@ -196,66 +196,90 @@ class APITester:
                     keywords_found = sum(1 for keyword in ending_keywords if keyword.lower() in verse_text.lower())
                     
                     if keywords_found >= 2:
-                        self.log_test("Genesis 50:26 - Last Verse", True, f"✅ COMPLETE BOOK! Found: '{verse_text[:100]}...'")
+                        self.log_test("Genesis 50:26 - Proper Ending Text", True, f"✅ CORRECT! Found: '{verse_text}'")
                     else:
-                        self.log_test("Genesis 50:26 - Last Verse", False, f"Unexpected ending content. Found: '{verse_text[:100]}...'")
+                        self.log_test("Genesis 50:26 - Proper Ending Text", False, f"❌ INCORRECT! Found: '{verse_text}'")
                 else:
-                    self.log_test("Genesis 50:26 - Last Verse", False, f"Status: {response.status_code} - Book may be incomplete")
+                    self.log_test("Genesis 50:26 - Proper Ending Text", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Genesis 50:26 - Last Verse", False, f"Error: {str(e)}")
+                self.log_test("Genesis 50:26 - Proper Ending Text", False, f"Error: {str(e)}")
             
-            # Sample random verses for content quality
-            sample_chapters = [5, 12, 18, 25, 32, 39, 45]  # Spread across Genesis
+            # Verify no cross-contamination occurred (database still has only Genesis)
+            try:
+                response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
+                if response.status_code == 200:
+                    data = response.json()
+                    books = data.get('books', [])
+                    book_count = len(books)
+                    
+                    if book_count == 1:
+                        book_name = books[0].get('name', 'Unknown') if books else 'Unknown'
+                        if book_name == 'Genesis':
+                            self.log_test("No Cross-Contamination - Pure Genesis Dataset", True, f"✅ PURE! Only Genesis exists ({book_count} book)")
+                        else:
+                            self.log_test("No Cross-Contamination - Pure Genesis Dataset", False, f"❌ WRONG BOOK! Found '{book_name}' instead of Genesis")
+                    else:
+                        book_names = [book.get('name', 'Unknown') for book in books]
+                        self.log_test("No Cross-Contamination - Pure Genesis Dataset", False, f"❌ CONTAMINATED! {book_count} books found: {', '.join(book_names)}")
+                else:
+                    self.log_test("No Cross-Contamination - Pure Genesis Dataset", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("No Cross-Contamination - Pure Genesis Dataset", False, f"Error: {str(e)}")
+            
+            # Sample newly added verses to ensure they have proper text
+            print("\n📝 NEWLY ADDED VERSES QUALITY SAMPLING:")
+            
+            # Sample verses from different chapters to check quality
+            sample_chapters = [1, 10, 20, 30, 40, 50]  # Spread across Genesis
             quality_verses = 0
             total_sampled = 0
             
-            print("\n📝 RANDOM VERSE QUALITY SAMPLING:")
-            
             for chapter in sample_chapters:
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=3")
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=5")
                     if response.status_code == 200:
                         data = response.json()
                         verses = data.get('verses', [])
                         
-                        for verse in verses[:2]:  # Sample 2 verses per chapter
+                        for verse in verses[:3]:  # Sample 3 verses per chapter
                             verse_text = verse.get('text', '')
                             verse_ref = f"Genesis {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
                             total_sampled += 1
                             
-                            # Quality checks
+                            # Quality checks for newly added verses
                             is_quality = (
-                                len(verse_text) > 15 and  # Reasonable length
+                                len(verse_text) > 10 and  # Reasonable length
                                 not verse_text.startswith('...') and  # Not truncated
                                 not verse_text.endswith('...') and
-                                any(char in verse_text for char in ['.', ';', ':', '!', '?']) and  # Has punctuation
-                                verse_text.strip() != ''  # Not empty
+                                verse_text.strip() != '' and  # Not empty
+                                not verse_text.lower().startswith('error') and  # No error messages
+                                not verse_text.lower().startswith('missing')  # No missing indicators
                             )
                             
                             if is_quality:
                                 quality_verses += 1
-                                print(f"   ✅ {verse_ref}: '{verse_text[:80]}...'")
+                                print(f"   ✅ {verse_ref}: '{verse_text[:60]}...'")
                             else:
-                                print(f"   ❌ {verse_ref}: QUALITY ISSUE - '{verse_text[:80]}...'")
+                                print(f"   ❌ {verse_ref}: QUALITY ISSUE - '{verse_text[:60]}...'")
                                 
                 except Exception as e:
                     print(f"   ❌ Chapter {chapter}: Error - {str(e)}")
             
             if total_sampled > 0:
                 quality_percentage = (quality_verses / total_sampled) * 100
-                if quality_percentage >= 90:
-                    self.log_test("Random Verse Quality", True, f"✅ EXCELLENT! {quality_verses}/{total_sampled} verses are high quality ({quality_percentage:.1f}%)")
-                elif quality_percentage >= 75:
-                    self.log_test("Random Verse Quality", True, f"Good quality: {quality_verses}/{total_sampled} verses ({quality_percentage:.1f}%)")
+                if quality_percentage >= 95:
+                    self.log_test("Newly Added Verses Quality", True, f"✅ EXCELLENT! {quality_verses}/{total_sampled} verses are high quality ({quality_percentage:.1f}%)")
+                elif quality_percentage >= 85:
+                    self.log_test("Newly Added Verses Quality", True, f"✅ GOOD! {quality_verses}/{total_sampled} verses are good quality ({quality_percentage:.1f}%)")
                 else:
-                    self.log_test("Random Verse Quality", False, f"Poor quality: {quality_verses}/{total_sampled} verses ({quality_percentage:.1f}%)")
+                    self.log_test("Newly Added Verses Quality", False, f"❌ POOR! {quality_verses}/{total_sampled} verses have quality issues ({quality_percentage:.1f}%)")
             else:
-                self.log_test("Random Verse Quality", False, "No verses sampled for quality check")
+                self.log_test("Newly Added Verses Quality", False, "No verses sampled for quality check")
             
             return True
             
         except Exception as e:
-            self.log_test("Genesis Content Quality Check", False, f"Error: {str(e)}")
+            self.log_test("Data Quality Check", False, f"Error: {str(e)}")
             return False
 
     def test_database_structure_verification(self):
