@@ -431,9 +431,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phase 3C: Advanced Bible Features - CRITICAL ISSUE CONFIRMED ❌"
-    - "Bible Verse Text Display - React key conflicts in renderHighlightedText() function"
-    - "React JSX Rendering Issues - Duplicate keys causing text rendering failure"
+    - "Phase 3C: Advanced Bible Features - CRITICAL ISSUE PERSISTS ❌"
+    - "Bible Verse Text Display - React key conflicts preventing text rendering"
+    - "React Component Structure Issues - Deeper problems beyond renderHighlightedText function"
   stuck_tasks: 
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
     - "Bible Verse Text Display - React key conflicts preventing text display - URGENT FIX NEEDED"
