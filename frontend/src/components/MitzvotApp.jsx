@@ -1848,7 +1848,7 @@ const MitzvotApp = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    )}
+                    ))}
                   </div>
                 ) : contentType === 'precepts' ? (
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
