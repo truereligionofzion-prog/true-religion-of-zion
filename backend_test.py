@@ -344,6 +344,85 @@ class APITester:
             self.log_test("Bible Database Content Check", False, f"Error: {str(e)}")
             return False
 
+    def test_bible_stats_verification(self):
+        """COMPREHENSIVE TEST: /api/bible/stats endpoint verification"""
+        try:
+            print("\n🔍 COMPREHENSIVE BIBLE STATS VERIFICATION...")
+            
+            response = self.session.get(f"{self.base_url}/bible/stats")
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Required fields as per review request
+                required_fields = ['totalBooks', 'totalVerses', 'apocryphaBooks']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("Bible Stats - Required Fields", True, "All required fields present")
+                else:
+                    self.log_test("Bible Stats - Required Fields", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                # Extract values
+                total_books = data.get('totalBooks', 0)
+                total_verses = data.get('totalVerses', 0)
+                apocrypha_books = data.get('apocryphaBooks', 0)
+                old_testament_books = data.get('oldTestamentBooks', 0)
+                new_testament_books = data.get('newTestamentBooks', 0)
+                old_testament_verses = data.get('oldTestamentVerses', 0)
+                new_testament_verses = data.get('newTestamentVerses', 0)
+                apocrypha_verses = data.get('apocryphaVerses', 0)
+                
+                # Verify reasonable numbers as per review request
+                if total_books >= 44:
+                    self.log_test("Bible Stats - Total Books", True, f"{total_books} books (expected 44+)")
+                else:
+                    self.log_test("Bible Stats - Total Books", False, f"Only {total_books} books (expected 44+)")
+                
+                if total_verses >= 15000:
+                    self.log_test("Bible Stats - Total Verses", True, f"{total_verses} verses (expected 15000+)")
+                else:
+                    self.log_test("Bible Stats - Total Verses", False, f"Only {total_verses} verses (expected 15000+)")
+                
+                if apocrypha_books >= 1:
+                    self.log_test("Bible Stats - Apocrypha Books", True, f"{apocrypha_books} apocrypha books")
+                else:
+                    self.log_test("Bible Stats - Apocrypha Books", False, f"Only {apocrypha_books} apocrypha books")
+                
+                # Verify testament breakdown if available
+                if old_testament_books > 0 and new_testament_books > 0:
+                    testament_total = old_testament_books + new_testament_books + apocrypha_books
+                    if testament_total == total_books:
+                        self.log_test("Bible Stats - Testament Breakdown", True, f"OT: {old_testament_books}, NT: {new_testament_books}, Apocrypha: {apocrypha_books}")
+                    else:
+                        self.log_test("Bible Stats - Testament Breakdown", False, f"Testament totals don't match: {testament_total} vs {total_books}")
+                
+                if old_testament_verses > 0 and new_testament_verses > 0:
+                    verse_total = old_testament_verses + new_testament_verses + apocrypha_verses
+                    if abs(verse_total - total_verses) <= 1:  # Allow for rounding
+                        self.log_test("Bible Stats - Verse Breakdown", True, f"OT: {old_testament_verses}, NT: {new_testament_verses}, Apocrypha: {apocrypha_verses}")
+                    else:
+                        self.log_test("Bible Stats - Verse Breakdown", False, f"Verse totals don't match: {verse_total} vs {total_verses}")
+                
+                # Additional stats if available
+                verses_with_precepts = data.get('versesWithPrecepts', 0)
+                if verses_with_precepts > 0:
+                    self.log_test("Bible Stats - Precept Connections", True, f"{verses_with_precepts} verses with precept connections")
+                
+                total_chapters = data.get('totalChapters', 0)
+                if total_chapters > 0:
+                    self.log_test("Bible Stats - Total Chapters", True, f"{total_chapters} chapters")
+                
+                return total_books >= 44 and total_verses >= 15000 and apocrypha_books >= 1
+                
+            else:
+                self.log_test("Bible Stats Verification", False, f"Status: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Bible Stats Verification", False, f"Error: {str(e)}")
+            return False
+
     def test_related_bible_endpoints(self):
         """Test related Bible endpoints to see if they work"""
         try:
