@@ -73,41 +73,48 @@ const MitzvotApp = () => {
 
   const { toast } = useToast();
 
-  // Phase 3C: Divine name highlighting function
-  const highlightDivineNames = (text) => {
-    // If highlighting is disabled, return plain text
+  // Phase 3C: Divine name highlighting function - SIMPLIFIED VERSION
+  const renderHighlightedText = (text) => {
+    // If highlighting is disabled or no text, return plain text
     if (!divineNameHighlight || !text || typeof text !== 'string') {
       return text;
     }
     
-    const divineNames = [
-      { name: 'YHWH', color: 'text-red-600 font-semibold', title: 'The Tetragrammaton - Divine Name of God' },
-      { name: 'Elohim', color: 'text-blue-600 font-semibold', title: 'Hebrew: God/Gods (plural of majesty)' },
-      { name: 'YHUH', color: 'text-purple-600 font-semibold', title: 'Adonai - Reverence substitute for YHWH' }
-    ];
+    // Split text by divine names and create highlighted segments
+    const divineNames = ['YHWH', 'Elohim', 'YHUH'];
+    let parts = [text];
     
-    let highlightedText = text;
-    
-    divineNames.forEach(divine => {
-      const regex = new RegExp(`\\b${divine.name}\\b`, 'g');
-      highlightedText = highlightedText.replace(regex, 
-        `<span class="${divine.color}" title="${divine.title}">${divine.name}</span>`
-      );
+    divineNames.forEach(divineName => {
+      const newParts = [];
+      parts.forEach(part => {
+        if (typeof part === 'string') {
+          const regex = new RegExp(`\\b${divineName}\\b`, 'g');
+          const segments = part.split(regex);
+          const matches = part.match(regex) || [];
+          
+          for (let i = 0; i < segments.length; i++) {
+            if (segments[i]) newParts.push(segments[i]);
+            if (i < matches.length) {
+              // Create highlighted span for divine name
+              const colorClass = divineName === 'YHWH' ? 'text-red-600 font-semibold' :
+                               divineName === 'Elohim' ? 'text-blue-600 font-semibold' :
+                               'text-purple-600 font-semibold';
+              newParts.push(
+                <span key={`${divineName}-${i}`} className={colorClass} title={`Hebrew divine name: ${divineName}`}>
+                  {divineName}
+                </span>
+              );
+            }
+          }
+        } else {
+          newParts.push(part);
+        }
+      });
+      parts = newParts;
     });
     
-    // Return HTML string for dangerouslySetInnerHTML, not JSX element
-    return highlightedText;
-  };
-
-  // Helper function to render highlighted text
-  const renderHighlightedText = (text) => {
-    const highlightedHtml = highlightDivineNames(text);
-    if (highlightedHtml === text) {
-      // No highlighting applied, return plain text
-      return text;
-    }
-    // Return JSX element with highlighted HTML
-    return <span dangerouslySetInnerHTML={{ __html: highlightedHtml }} />;
+    // Return array of text and JSX elements
+    return parts.length > 1 ? <>{parts}</> : text;
   };
 
   // Status types removed - no longer using origin-based filtering
