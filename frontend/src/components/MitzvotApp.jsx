@@ -1299,7 +1299,6 @@ const MitzvotApp = () => {
           {/* Explore Tab Content */}
           <TabsContent value="explore">
             {/* Stats */}
-            {console.log('Rendering stats with contentType:', contentType)}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               {contentType === 'mitzvot' ? (
                 <>
