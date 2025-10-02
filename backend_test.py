@@ -504,6 +504,86 @@ class APITester:
             self.log_test("Related Bible Endpoints", False, f"Error: {str(e)}")
             return False
 
+    def test_bible_books_endpoint(self):
+        """COMPREHENSIVE TEST: /api/bible/books endpoint"""
+        try:
+            print("\n🔍 COMPREHENSIVE BIBLE BOOKS TESTING...")
+            
+            # Test basic books endpoint
+            response = self.session.get(f"{self.base_url}/bible/books")
+            if response.status_code == 200:
+                data = response.json()
+                books = data.get('books', [])
+                total = data.get('total', 0)
+                filters = data.get('filters', {})
+                
+                if books:
+                    self.log_test("Bible Books - Basic Endpoint", True, f"Retrieved {len(books)} books, total: {total}")
+                    
+                    # Test book data structure
+                    first_book = books[0]
+                    required_fields = ['name', 'testament']
+                    missing_fields = [field for field in required_fields if field not in first_book]
+                    
+                    if not missing_fields:
+                        self.log_test("Bible Books - Data Structure", True, "All required fields present")
+                    else:
+                        self.log_test("Bible Books - Data Structure", False, f"Missing fields: {missing_fields}")
+                    
+                    # Test testament distribution
+                    testaments = {}
+                    for book in books:
+                        testament = book.get('testament', 'unknown')
+                        testaments[testament] = testaments.get(testament, 0) + 1
+                    
+                    self.log_test("Bible Books - Testament Distribution", True, f"Testaments: {testaments}")
+                    
+                    # Test filters
+                    available_testaments = filters.get('testaments', [])
+                    if available_testaments:
+                        self.log_test("Bible Books - Filter Options", True, f"Available testaments: {available_testaments}")
+                    else:
+                        self.log_test("Bible Books - Filter Options", False, "No testament filter options")
+                    
+                else:
+                    self.log_test("Bible Books - Basic Endpoint", False, "No books returned")
+                    return False
+            else:
+                self.log_test("Bible Books - Basic Endpoint", False, f"Status: {response.status_code}")
+                return False
+            
+            # Test testament filtering
+            testament_filters = ['old', 'new', 'apocrypha']
+            testament_tests_passed = 0
+            
+            for testament in testament_filters:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/books?testament={testament}")
+                    if response.status_code == 200:
+                        data = response.json()
+                        books = data.get('books', [])
+                        
+                        if books:
+                            # Verify all books are from correct testament
+                            correct_testament = all(b.get('testament') == testament for b in books)
+                            if correct_testament:
+                                self.log_test(f"Bible Books - {testament.title()} Testament", True, f"Found {len(books)} {testament} testament books")
+                                testament_tests_passed += 1
+                            else:
+                                self.log_test(f"Bible Books - {testament.title()} Testament", False, "Testament filter not working correctly")
+                        else:
+                            self.log_test(f"Bible Books - {testament.title()} Testament", False, f"No {testament} testament books found")
+                    else:
+                        self.log_test(f"Bible Books - {testament.title()} Testament", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Bible Books - {testament.title()} Testament", False, f"Error: {str(e)}")
+            
+            return len(books) > 0 and testament_tests_passed > 0
+            
+        except Exception as e:
+            self.log_test("Bible Books Endpoint", False, f"Error: {str(e)}")
+            return False
+
     def test_new_biblical_structure_verification(self):
         """Test that the new biblical structure is working correctly"""
         try:
