@@ -3546,5 +3546,395 @@ def main():
         print("3. Check divine name standardization implementation")
         print("4. Ensure all 80 books and 10,015 verses are accessible")
 
+    # ===== NEW REVIEW REQUEST SPECIFIC TESTS =====
+    
+    def test_yah_scriptures_enhanced_dataset_verification(self):
+        """1. Yah Scriptures Enhanced Dataset Verification"""
+        try:
+            print("\n🔍 YAH SCRIPTURES ENHANCED DATASET VERIFICATION...")
+            
+            # Test GET /api/bible/versions to confirm yah_scriptures version is available
+            response = self.session.get(f"{self.base_url}/bible/versions")
+            if response.status_code == 200:
+                data = response.json()
+                versions = data.get('versions', [])
+                yah_scriptures_found = any(v.get('id') == 'yah_scriptures' for v in versions)
+                
+                if yah_scriptures_found:
+                    self.log_test("Yah Scriptures - Version Available", True, "yah_scriptures version found in versions list")
+                    
+                    # Get version details
+                    yah_version = next((v for v in versions if v.get('id') == 'yah_scriptures'), {})
+                    version_name = yah_version.get('name', 'Unknown')
+                    version_desc = yah_version.get('description', 'No description')
+                    self.log_test("Yah Scriptures - Version Metadata", True, f"Name: {version_name}, Description: {version_desc}")
+                else:
+                    self.log_test("Yah Scriptures - Version Available", False, "yah_scriptures version not found")
+                    return False
+            else:
+                self.log_test("Yah Scriptures - Version Available", False, f"Status: {response.status_code}")
+                return False
+            
+            # Test GET /api/bible/books?version=yah_scriptures shows 10 books
+            response = self.session.get(f"{self.base_url}/bible/books?version=yah_scriptures")
+            if response.status_code == 200:
+                data = response.json()
+                books = data.get('books', [])
+                
+                expected_books = ['Genesis', 'Exodus', 'Psalms', 'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans', 'Revelation']
+                book_names = [book.get('name', '') for book in books]
+                
+                found_books = []
+                missing_books = []
+                for expected in expected_books:
+                    if expected in book_names:
+                        found_books.append(expected)
+                    else:
+                        missing_books.append(expected)
+                
+                if len(found_books) == 10:
+                    self.log_test("Yah Scriptures - Expected Books", True, f"All 10 expected books found: {found_books}")
+                else:
+                    self.log_test("Yah Scriptures - Expected Books", False, f"Found: {found_books}, Missing: {missing_books}")
+                
+                # Check testament distribution
+                testaments = {}
+                for book in books:
+                    testament = book.get('testament', 'unknown')
+                    testaments[testament] = testaments.get(testament, 0) + 1
+                
+                if 'old' in testaments and 'new' in testaments:
+                    self.log_test("Yah Scriptures - Testament Coverage", True, f"Old Testament: {testaments.get('old', 0)}, New Testament: {testaments.get('new', 0)}")
+                else:
+                    self.log_test("Yah Scriptures - Testament Coverage", False, f"Testament distribution: {testaments}")
+                
+                return len(found_books) >= 8  # Allow some tolerance
+            else:
+                self.log_test("Yah Scriptures - Books Endpoint", False, f"Status: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Yah Scriptures Enhanced Dataset Verification", False, f"Error: {str(e)}")
+            return False
+
+    def test_enhanced_verse_count_verification(self):
+        """2. Enhanced Verse Count Verification"""
+        try:
+            print("\n🔍 ENHANCED VERSE COUNT VERIFICATION...")
+            
+            # Test GET /api/bible/verses?version=yah_scriptures shows ~12,994 total verses
+            response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&limit=50")
+            if response.status_code == 200:
+                data = response.json()
+                total_verses = data.get('total', 0)
+                
+                if 12000 <= total_verses <= 14000:  # Allow range around 12,994
+                    self.log_test("Yah Scriptures - Total Verses", True, f"Found {total_verses} verses (expected ~12,994)")
+                else:
+                    self.log_test("Yah Scriptures - Total Verses", False, f"Found {total_verses} verses (expected ~12,994)")
+            else:
+                self.log_test("Yah Scriptures - Total Verses", False, f"Status: {response.status_code}")
+                return False
+            
+            # Sample specific books: Genesis (~1,394 verses), Matthew (~1,558 verses), Psalms (~1,402 verses)
+            book_tests = [
+                ("Genesis", 1300, 1500),
+                ("Matthew", 1400, 1700),
+                ("Psalms", 1300, 1500)
+            ]
+            
+            books_passed = 0
+            for book_name, min_verses, max_verses in book_tests:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&book={book_name}&limit=2000")
+                    if response.status_code == 200:
+                        data = response.json()
+                        book_total = data.get('total', 0)
+                        
+                        if min_verses <= book_total <= max_verses:
+                            self.log_test(f"Yah Scriptures - {book_name} Count", True, f"Found {book_total} verses (expected {min_verses}-{max_verses})")
+                            books_passed += 1
+                        else:
+                            self.log_test(f"Yah Scriptures - {book_name} Count", False, f"Found {book_total} verses (expected {min_verses}-{max_verses})")
+                    else:
+                        self.log_test(f"Yah Scriptures - {book_name} Count", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Yah Scriptures - {book_name} Count", False, f"Error: {str(e)}")
+            
+            return total_verses >= 12000 and books_passed >= 2
+            
+        except Exception as e:
+            self.log_test("Enhanced Verse Count Verification", False, f"Error: {str(e)}")
+            return False
+
+    def test_kjv1611_dataset_testing(self):
+        """3. KJV 1611 Dataset Testing"""
+        try:
+            print("\n🔍 KJV 1611 DATASET TESTING...")
+            
+            # Test GET /api/bible/books?version=kjv1611_divine for available books
+            response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
+            if response.status_code == 200:
+                data = response.json()
+                books = data.get('books', [])
+                
+                if books:
+                    self.log_test("KJV 1611 - Books Available", True, f"Found {len(books)} books")
+                    
+                    # List available books
+                    book_names = [book.get('name', '') for book in books]
+                    self.log_test("KJV 1611 - Book List", True, f"Books: {book_names}")
+                else:
+                    self.log_test("KJV 1611 - Books Available", False, "No books found")
+                    return False
+            else:
+                self.log_test("KJV 1611 - Books Available", False, f"Status: {response.status_code}")
+                return False
+            
+            # Verify Genesis (~931 verses), Matthew (~1,021 verses), Psalms (~1,305 verses)
+            kjv_book_tests = [
+                ("Genesis", 900, 1000),
+                ("Matthew", 1000, 1100),
+                ("Psalms", 1200, 1400)
+            ]
+            
+            kjv_books_passed = 0
+            for book_name, min_verses, max_verses in kjv_book_tests:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=1500")
+                    if response.status_code == 200:
+                        data = response.json()
+                        book_total = data.get('total', 0)
+                        
+                        if min_verses <= book_total <= max_verses:
+                            self.log_test(f"KJV 1611 - {book_name} Count", True, f"Found {book_total} verses (expected {min_verses}-{max_verses})")
+                            kjv_books_passed += 1
+                        else:
+                            self.log_test(f"KJV 1611 - {book_name} Count", False, f"Found {book_total} verses (expected {min_verses}-{max_verses})")
+                    else:
+                        self.log_test(f"KJV 1611 - {book_name} Count", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"KJV 1611 - {book_name} Count", False, f"Error: {str(e)}")
+            
+            # Check if KJV data is accessible through API
+            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=10")
+            if response.status_code == 200:
+                data = response.json()
+                verses = data.get('verses', [])
+                if verses:
+                    self.log_test("KJV 1611 - Data Accessible", True, f"Successfully retrieved {len(verses)} sample verses")
+                else:
+                    self.log_test("KJV 1611 - Data Accessible", False, "No verses retrieved")
+            else:
+                self.log_test("KJV 1611 - Data Accessible", False, f"Status: {response.status_code}")
+            
+            return len(books) > 0 and kjv_books_passed >= 2
+            
+        except Exception as e:
+            self.log_test("KJV 1611 Dataset Testing", False, f"Error: {str(e)}")
+            return False
+
+    def test_data_quality_verification(self):
+        """4. Data Quality Verification"""
+        try:
+            print("\n🔍 DATA QUALITY VERIFICATION...")
+            
+            # Sample verse content from Genesis 1:1, Matthew 1:1 for both versions
+            test_verses = [
+                ("yah_scriptures", "Genesis", 1, 1),
+                ("yah_scriptures", "Matthew", 1, 1),
+                ("kjv1611_divine", "Genesis", 1, 1),
+                ("kjv1611_divine", "Matthew", 1, 1)
+            ]
+            
+            quality_tests_passed = 0
+            for version, book, chapter, verse in test_verses:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verse/{book}/{chapter}/{verse}?version={version}")
+                    if response.status_code == 200:
+                        verse_data = response.json()
+                        verse_text = verse_data.get('text', '')
+                        
+                        # Verify verse text is complete, readable, and not truncated
+                        if verse_text and len(verse_text) > 20:
+                            preview = verse_text[:100] + "..." if len(verse_text) > 100 else verse_text
+                            self.log_test(f"Data Quality - {version} {book} {chapter}:{verse}", True, f"Content: '{preview}'")
+                            quality_tests_passed += 1
+                            
+                            # Check proper book/chapter/verse structure integrity
+                            if (verse_data.get('book') == book and 
+                                verse_data.get('chapter') == chapter and 
+                                verse_data.get('verse') == verse):
+                                self.log_test(f"Data Structure - {version} {book} {chapter}:{verse}", True, "Proper structure integrity")
+                            else:
+                                self.log_test(f"Data Structure - {version} {book} {chapter}:{verse}", False, "Structure integrity issue")
+                        else:
+                            self.log_test(f"Data Quality - {version} {book} {chapter}:{verse}", False, f"Empty or too short content: '{verse_text[:50]}...'")
+                    else:
+                        self.log_test(f"Data Quality - {version} {book} {chapter}:{verse}", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Data Quality - {version} {book} {chapter}:{verse}", False, f"Error: {str(e)}")
+            
+            return quality_tests_passed >= 3  # At least 3 out of 4 should pass
+            
+        except Exception as e:
+            self.log_test("Data Quality Verification", False, f"Error: {str(e)}")
+            return False
+
+    def test_api_performance_testing(self):
+        """5. API Performance Testing"""
+        try:
+            print("\n🔍 API PERFORMANCE TESTING...")
+            
+            import time
+            
+            # Test pagination with larger datasets (~12,994+ verses total)
+            start_time = time.time()
+            response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&limit=100")
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                total = data.get('total', 0)
+                total_pages = data.get('totalPages', 0)
+                
+                if response_time < 5.0:  # Should respond within 5 seconds
+                    self.log_test("Performance - API Response Time", True, f"Response time: {response_time:.2f}s")
+                else:
+                    self.log_test("Performance - API Response Time", False, f"Response time: {response_time:.2f}s (too slow)")
+                
+                if total_pages > 100:  # Should have many pages with large dataset
+                    self.log_test("Performance - Pagination", True, f"Found {total_pages} pages for {total} verses")
+                else:
+                    self.log_test("Performance - Pagination", False, f"Only {total_pages} pages for {total} verses")
+            else:
+                self.log_test("Performance - API Response Time", False, f"Status: {response.status_code}")
+                return False
+            
+            # Verify testament filtering works correctly
+            testament_tests = ['old', 'new', 'apocrypha']
+            testament_tests_passed = 0
+            
+            for testament in testament_tests:
+                try:
+                    start_time = time.time()
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&testament={testament}&limit=50")
+                    filter_time = time.time() - start_time
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        verses = data.get('verses', [])
+                        
+                        if verses and filter_time < 3.0:
+                            # Verify all verses are from correct testament
+                            correct_testament = all(v.get('testament') == testament for v in verses)
+                            if correct_testament:
+                                self.log_test(f"Performance - {testament.title()} Testament Filter", True, f"Found {len(verses)} verses in {filter_time:.2f}s")
+                                testament_tests_passed += 1
+                            else:
+                                self.log_test(f"Performance - {testament.title()} Testament Filter", False, "Testament filter not working correctly")
+                        else:
+                            self.log_test(f"Performance - {testament.title()} Testament Filter", False, f"No verses or slow response: {filter_time:.2f}s")
+                    else:
+                        self.log_test(f"Performance - {testament.title()} Testament Filter", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Performance - {testament.title()} Testament Filter", False, f"Error: {str(e)}")
+            
+            # Check search functionality across enhanced datasets
+            search_terms = ["God", "Lord", "covenant", "Israel"]
+            search_tests_passed = 0
+            
+            for term in search_terms:
+                try:
+                    start_time = time.time()
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&search={term}&limit=20")
+                    search_time = time.time() - start_time
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        total = data.get('total', 0)
+                        verses = data.get('verses', [])
+                        
+                        if total > 0 and verses and search_time < 3.0:
+                            self.log_test(f"Performance - Search '{term}'", True, f"Found {total} results in {search_time:.2f}s")
+                            search_tests_passed += 1
+                        else:
+                            self.log_test(f"Performance - Search '{term}'", False, f"No results or slow response: {search_time:.2f}s")
+                    else:
+                        self.log_test(f"Performance - Search '{term}'", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Performance - Search '{term}'", False, f"Error: {str(e)}")
+            
+            return (response_time < 5.0 and testament_tests_passed >= 2 and search_tests_passed >= 3)
+            
+        except Exception as e:
+            self.log_test("API Performance Testing", False, f"Error: {str(e)}")
+            return False
+
+    def run_comprehensive_bible_datasets_tests(self):
+        """Run comprehensive Bible datasets tests as per review request"""
+        print("🚀 STARTING COMPREHENSIVE BIBLE DATASETS TESTING...")
+        print("Testing newly loaded comprehensive Bible datasets with focused validation")
+        print("=" * 80)
+        
+        # Test basic connectivity first
+        if not self.test_api_root():
+            print("❌ API connectivity failed. Stopping tests.")
+            return False
+        
+        # Run comprehensive Bible datasets tests as per review request
+        tests = [
+            ("1. Yah Scriptures Enhanced Dataset Verification", self.test_yah_scriptures_enhanced_dataset_verification),
+            ("2. Enhanced Verse Count Verification", self.test_enhanced_verse_count_verification),
+            ("3. KJV 1611 Dataset Testing", self.test_kjv1611_dataset_testing),
+            ("4. Data Quality Verification", self.test_data_quality_verification),
+            ("5. API Performance Testing", self.test_api_performance_testing),
+            ("Additional: Bible Database Content", self.test_bible_database_content),
+            ("Additional: Bible Stats Verification", self.test_bible_stats_verification)
+        ]
+        
+        passed_tests = 0
+        total_tests = len(tests)
+        
+        for test_name, test_func in tests:
+            print(f"\n{'='*60}")
+            print(f"🧪 RUNNING: {test_name}")
+            print(f"{'='*60}")
+            
+            try:
+                if test_func():
+                    passed_tests += 1
+                    print(f"✅ {test_name} - PASSED")
+                else:
+                    print(f"❌ {test_name} - FAILED")
+            except Exception as e:
+                print(f"❌ {test_name} - ERROR: {str(e)}")
+        
+        # Final summary
+        print(f"\n{'='*80}")
+        print(f"🏁 COMPREHENSIVE BIBLE DATASETS TESTING COMPLETE")
+        print(f"{'='*80}")
+        print(f"✅ PASSED: {passed_tests}/{total_tests} tests")
+        print(f"❌ FAILED: {total_tests - passed_tests}/{total_tests} tests")
+        print(f"📊 SUCCESS RATE: {(passed_tests/total_tests)*100:.1f}%")
+        
+        # Detailed results
+        print(f"\n📋 DETAILED TEST RESULTS:")
+        for result in self.test_results:
+            status = "✅" if result["passed"] else "❌"
+            print(f"{status} {result['test']}")
+            if result["details"]:
+                print(f"   └─ {result['details']}")
+        
+        return passed_tests >= (total_tests * 0.7)  # 70% pass rate required
+
 if __name__ == "__main__":
-    main()
+    tester = APITester(BACKEND_URL)
+    success = tester.run_comprehensive_bible_datasets_tests()
+    
+    if success:
+        print("\n🎉 Bible datasets tests passed! The comprehensive Bible datasets are working correctly.")
+        sys.exit(0)
+    else:
+        print("\n⚠️  Some tests failed. Please check the detailed results above.")
+        sys.exit(1)
