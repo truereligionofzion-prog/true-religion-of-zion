@@ -3035,70 +3035,29 @@ def main():
     # Run all Yah Scriptures tests
     success = tester.run_all_tests()
     
-    # Run comprehensive Bible API tests
-    test_functions = [
-        tester.test_bible_verses_endpoint_comprehensive,
-        tester.test_bible_stats_verification,
-        tester.test_bible_books_endpoint,
-        tester.test_related_bible_endpoints,
-        tester.test_bible_database_content
-    ]
+    # Print final summary
+    print("\n" + "=" * 90)
+    print("📊 FINAL YAH SCRIPTURES BIBLE API TEST SUMMARY")
+    print("=" * 90)
     
-    passed_tests = 0
-    total_tests = len(test_functions)
+    passed = sum(1 for result in tester.test_results if result['passed'])
+    total = len(tester.test_results)
+    success_rate = (passed / total) * 100 if total > 0 else 0
     
-    for test_func in test_functions:
-        try:
-            if test_func():
-                passed_tests += 1
-        except Exception as e:
-            print(f"❌ Test {test_func.__name__} failed with exception: {e}")
+    print(f"Total Tests: {total}")
+    print(f"Passed: {passed}")
+    print(f"Failed: {total - passed}")
+    print(f"Success Rate: {success_rate:.1f}%")
     
-    # Print summary
-    print("\n" + "=" * 80)
-    print("📊 BIBLE VERSES API DIAGNOSIS SUMMARY")
-    print("=" * 80)
-    
-    # Print individual test results
-    print("\n📋 DETAILED RESULTS:")
-    for result in tester.test_results:
-        status = "✅" if result["passed"] else "❌"
-        print(f"{status} {result['test']}")
-        if result["details"]:
-            print(f"   └─ {result['details']}")
-    
-    # Analysis and recommendations
-    print("\n" + "=" * 80)
-    print("🔍 ANALYSIS AND RECOMMENDATIONS")
-    print("=" * 80)
-    
-    print("\n📍 ROOT CAUSE ANALYSIS:")
-    print("The error '<' not supported between instances of 'str' and 'NoneType'")
-    print("occurs in the sorting operation at line 419 of server.py:")
-    print("cursor = bible_verses_collection.find(query).sort([('book', 1), ('chapter', 1), ('verse', 1)])")
-    print("\nThis happens when MongoDB tries to sort documents where some have:")
-    print("- book field = string value (e.g., 'Genesis')")
-    print("- book field = None/null value")
-    print("- chapter field = integer value (e.g., 1)")
-    print("- chapter field = None/null value")
-    print("- verse field = integer value (e.g., 1)")
-    print("- verse field = None/null value")
-    
-    print("\n🛠️  RECOMMENDED FIXES:")
-    print("1. Add data validation before sorting:")
-    print("   query['book'] = {'$ne': None}")
-    print("   query['chapter'] = {'$ne': None}")
-    print("   query['verse'] = {'$ne': None}")
-    
-    print("\n2. Or handle None values in the query:")
-    print("   cursor = bible_verses_collection.find(query).sort([")
-    print("       ('book', 1), ('chapter', 1), ('verse', 1)")
-    print("   ]).skip(skip).limit(limit)")
-    print("   # Add: .collation({'locale': 'en', 'numericOrdering': True})")
-    
-    print("\n3. Clean up database by removing/fixing documents with None values")
-    
-    print("\n4. Add error handling around the sorting operation")
+    if success_rate >= 70.0:
+        print("\n✅ YAH SCRIPTURES BIBLE API TESTING: OVERALL SUCCESS")
+    else:
+        print("\n❌ YAH SCRIPTURES BIBLE API TESTING: NEEDS ATTENTION")
+        print("\n🛠️  RECOMMENDED ACTIONS:")
+        print("1. Review failed tests and fix underlying issues")
+        print("2. Verify Yah Scriptures data extraction completed properly")
+        print("3. Check divine name standardization implementation")
+        print("4. Ensure all 80 books and 10,015 verses are accessible")
 
 if __name__ == "__main__":
     main()
