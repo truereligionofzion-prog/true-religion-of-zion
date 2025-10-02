@@ -201,21 +201,21 @@ class APITester:
             self.log_test("Leviticus Authentic Content Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_no_placeholder_brackets_check(self):
-        """REVIEW REQUEST TEST 2: No Placeholder Brackets Check - Verify NO placeholder brackets exist"""
+    def test_no_placeholder_content_check(self):
+        """REVIEW REQUEST TEST 2: No Placeholder Content Check - Verify NO placeholder content exists"""
         try:
-            print("\n🔍 NO PLACEHOLDER BRACKETS CHECK - VERIFYING NO PLACEHOLDER TEXT EXISTS...")
+            print("\n🔍 NO PLACEHOLDER CONTENT CHECK - VERIFYING NO PLACEHOLDER TEXT EXISTS...")
             
-            # Verify NO verses contain "see Exodus [chapter]:[verse]" placeholder text
+            # Verify NO verses contain "see Leviticus [chapter]:[verse]" placeholder text
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=50")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=50")
                 if response.status_code == 200:
                     data = response.json()
                     verses = data.get('verses', [])
                     
                     placeholder_patterns = [
-                        'see exodus [',
-                        'see exodus chapter',
+                        'see leviticus [',
+                        'see leviticus chapter',
                         '[chapter]',
                         '[verse]',
                         'complete kjv text',
