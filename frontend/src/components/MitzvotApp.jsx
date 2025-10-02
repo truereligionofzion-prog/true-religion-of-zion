@@ -1922,7 +1922,7 @@ const MitzvotApp = () => {
                             {chapter.verses.map((verse) => (
                               <p key={`${chapter.book}_${chapter.chapter}_${verse.verse}`} className="text-base">
                                 <span className="font-bold text-blue-600 mr-2">{verse.verse}</span>
-                                <span className="text-gray-800">{renderHighlightedText(verse?.text || '', `reading-${verse?.id || `${verse?.book}-${verse?.chapter}-${verse?.verse}`}`)}</span>
+                                <span className="text-gray-800">{renderBibleText(verse?.text || '', verse?.id)}</span>
                                 {verse.has_precept && (
                                   <span className="ml-2 inline-block">
                                     <Badge variant="outline" className="text-xs text-green-700 border-green-300">
