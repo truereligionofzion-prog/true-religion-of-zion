@@ -75,7 +75,7 @@ const MitzvotApp = () => {
 
   // Phase 3C: Divine name highlighting function
   const highlightDivineNames = (text) => {
-    if (!divineNameHighlight || !text) return text;
+    if (!divineNameHighlight || !text || typeof text !== 'string') return text;
     
     const divineNames = [
       { name: 'YHWH', color: 'text-red-600 font-semibold', title: 'The Tetragrammaton - Divine Name of God' },
