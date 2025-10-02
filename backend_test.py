@@ -401,150 +401,162 @@ class APITester:
     def test_api_response_validation(self):
         """REVIEW REQUEST TEST 4: API Response Validation - Complete data and pagination"""
         try:
-            print("\n🔍 SPECIFIC MISSING VERSES INVESTIGATION - CALCULATING MISSING 38 VERSES...")
+            print("\n🔍 API RESPONSE VALIDATION - COMPLETE DATA AND PAGINATION...")
             
-            # Get current total verse count
+            # Test that Genesis API endpoints return the complete data
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=50")
                 if response.status_code == 200:
                     data = response.json()
-                    current_verses = data.get('total', 0)
-                    expected_verses = 1533
-                    missing_verses = expected_verses - current_verses
+                    verses = data.get('verses', [])
+                    total = data.get('total', 0)
+                    total_pages = data.get('totalPages', 0)
                     
-                    self.log_test("Missing Verses Calculation", True, f"Current: {current_verses}, Expected: {expected_verses}, Missing: {missing_verses}")
-                else:
-                    self.log_test("Missing Verses Calculation", False, f"Status: {response.status_code}")
-                    return False
-            except Exception as e:
-                self.log_test("Missing Verses Calculation", False, f"Error: {str(e)}")
-                return False
-            
-            # Detailed analysis of missing verses by chapter
-            expected_verses_per_chapter = {
-                1: 31, 2: 25, 3: 24, 4: 26, 5: 32, 6: 22, 7: 24, 8: 22, 9: 29, 10: 32,
-                11: 32, 12: 20, 13: 18, 14: 24, 15: 21, 16: 16, 17: 27, 18: 33, 19: 38, 20: 18,
-                21: 34, 22: 24, 23: 20, 24: 67, 25: 34, 26: 35, 27: 46, 28: 22, 29: 35, 30: 43,
-                31: 55, 32: 32, 33: 20, 34: 31, 35: 29, 36: 43, 37: 36, 38: 30, 39: 23, 40: 23,
-                41: 57, 42: 38, 43: 34, 44: 34, 45: 28, 46: 34, 47: 31, 48: 22, 49: 33, 50: 26
-            }
-            
-            print("\n🔍 DETAILED MISSING VERSES ANALYSIS:")
-            
-            truncated_chapters = []
-            scattered_missing = []
-            total_calculated_missing = 0
-            
-            for chapter in range(1, 51):
-                try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=100")
-                    if response.status_code == 200:
-                        data = response.json()
-                        verses = data.get('verses', [])
-                        actual_count = data.get('total', 0)
-                        expected_count = expected_verses_per_chapter.get(chapter, 0)
-                        missing_count = expected_count - actual_count
+                    if total == 1533:
+                        self.log_test("Genesis API - Complete Data Response", True, f"✅ COMPLETE! API returns {total} total verses (100% Genesis)")
+                    else:
+                        self.log_test("Genesis API - Complete Data Response", False, f"❌ INCOMPLETE! API returns {total} verses, expected 1,533")
+                    
+                    if len(verses) == 50:
+                        self.log_test("Genesis API - Proper Response Limit", True, f"✅ CORRECT! API returns {len(verses)} verses per page as requested")
+                    else:
+                        self.log_test("Genesis API - Proper Response Limit", False, f"❌ INCORRECT! API returns {len(verses)} verses, expected 50")
                         
-                        if missing_count > 0:
-                            total_calculated_missing += missing_count
-                            
-                            # Check if chapter is truncated (missing verses at the end)
-                            if verses:
-                                verse_numbers = [v.get('verse', 0) for v in verses if isinstance(v.get('verse'), int)]
-                                verse_numbers.sort()
-                                max_verse = max(verse_numbers) if verse_numbers else 0
-                                
-                                if max_verse < expected_count:
-                                    truncated_chapters.append({
-                                        'chapter': chapter,
-                                        'actual': actual_count,
-                                        'expected': expected_count,
-                                        'missing': missing_count,
-                                        'max_verse': max_verse,
-                                        'type': 'truncated'
-                                    })
-                                    print(f"   ❌ Chapter {chapter:2d}: TRUNCATED - has verses 1-{max_verse}, missing {expected_count - max_verse} at end")
-                                else:
-                                    # Check for gaps in verse numbering
-                                    expected_verses = set(range(1, expected_count + 1))
-                                    actual_verses = set(verse_numbers)
-                                    missing_verse_numbers = expected_verses - actual_verses
-                                    
-                                    if missing_verse_numbers:
-                                        scattered_missing.append({
-                                            'chapter': chapter,
-                                            'actual': actual_count,
-                                            'expected': expected_count,
-                                            'missing': missing_count,
-                                            'missing_verses': sorted(list(missing_verse_numbers)),
-                                            'type': 'scattered'
-                                        })
-                                        missing_list = ', '.join(map(str, sorted(list(missing_verse_numbers))[:10]))
-                                        if len(missing_verse_numbers) > 10:
-                                            missing_list += '...'
-                                        print(f"   ❌ Chapter {chapter:2d}: SCATTERED - missing verses: {missing_list}")
-                            else:
-                                truncated_chapters.append({
-                                    'chapter': chapter,
-                                    'actual': 0,
-                                    'expected': expected_count,
-                                    'missing': expected_count,
-                                    'max_verse': 0,
-                                    'type': 'empty'
-                                })
-                                print(f"   ❌ Chapter {chapter:2d}: EMPTY - missing all {expected_count} verses")
+                    # Check that verses have proper structure
+                    if verses:
+                        first_verse = verses[0]
+                        required_fields = ['book', 'chapter', 'verse', 'text']
+                        missing_fields = [field for field in required_fields if field not in first_verse]
+                        
+                        if not missing_fields:
+                            self.log_test("Genesis API - Proper Verse Structure", True, f"✅ COMPLETE! Verses have all required fields: {required_fields}")
                         else:
-                            print(f"   ✅ Chapter {chapter:2d}: COMPLETE - {actual_count}/{expected_count} verses")
+                            self.log_test("Genesis API - Proper Verse Structure", False, f"❌ INCOMPLETE! Missing fields: {missing_fields}")
+                    else:
+                        self.log_test("Genesis API - Proper Verse Structure", False, f"❌ NO DATA! No verses returned")
+                        
+                else:
+                    self.log_test("Genesis API - Complete Data Response", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Genesis API - Proper Response Limit", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Genesis API - Proper Verse Structure", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Genesis API - Complete Data Response", False, f"Error: {str(e)}")
+                self.log_test("Genesis API - Proper Response Limit", False, f"Error: {str(e)}")
+                self.log_test("Genesis API - Proper Verse Structure", False, f"Error: {str(e)}")
+            
+            # Verify pagination works correctly with the full dataset
+            print("\n📄 PAGINATION TESTING WITH FULL GENESIS DATASET:")
+            
+            try:
+                # Test first page
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&page=1&limit=20")
+                if response.status_code == 200:
+                    data = response.json()
+                    page = data.get('page', 0)
+                    total_pages = data.get('totalPages', 0)
+                    verses = data.get('verses', [])
+                    
+                    if page == 1:
+                        self.log_test("Pagination - First Page", True, f"✅ CORRECT! First page returns page={page}")
+                    else:
+                        self.log_test("Pagination - First Page", False, f"❌ INCORRECT! First page returns page={page}, expected 1")
+                    
+                    expected_total_pages = (1533 + 19) // 20  # Ceiling division for 1533 verses with 20 per page
+                    if total_pages == expected_total_pages:
+                        self.log_test("Pagination - Total Pages Calculation", True, f"✅ CORRECT! Total pages = {total_pages} (for 1,533 verses with 20 per page)")
+                    else:
+                        self.log_test("Pagination - Total Pages Calculation", False, f"❌ INCORRECT! Total pages = {total_pages}, expected {expected_total_pages}")
+                        
+                    if len(verses) == 20:
+                        self.log_test("Pagination - Page Size", True, f"✅ CORRECT! Page contains {len(verses)} verses as requested")
+                    else:
+                        self.log_test("Pagination - Page Size", False, f"❌ INCORRECT! Page contains {len(verses)} verses, expected 20")
+                        
+                else:
+                    self.log_test("Pagination - First Page", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Pagination - Total Pages Calculation", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Pagination - Page Size", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Pagination - First Page", False, f"Error: {str(e)}")
+                self.log_test("Pagination - Total Pages Calculation", False, f"Error: {str(e)}")
+                self.log_test("Pagination - Page Size", False, f"Error: {str(e)}")
+            
+            # Test middle page
+            try:
+                middle_page = 40  # Middle of the dataset
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&page={middle_page}&limit=20")
+                if response.status_code == 200:
+                    data = response.json()
+                    verses = data.get('verses', [])
+                    page = data.get('page', 0)
+                    
+                    if page == middle_page:
+                        self.log_test("Pagination - Middle Page", True, f"✅ CORRECT! Middle page {middle_page} returns correct page number")
+                    else:
+                        self.log_test("Pagination - Middle Page", False, f"❌ INCORRECT! Middle page returns page={page}, expected {middle_page}")
+                        
+                    if verses:
+                        first_verse = verses[0]
+                        verse_book = first_verse.get('book', '')
+                        if verse_book == 'Genesis':
+                            self.log_test("Pagination - Middle Page Content", True, f"✅ CORRECT! Middle page contains Genesis verses")
+                        else:
+                            self.log_test("Pagination - Middle Page Content", False, f"❌ INCORRECT! Middle page contains {verse_book} verses, expected Genesis")
+                    else:
+                        self.log_test("Pagination - Middle Page Content", False, f"❌ EMPTY! Middle page contains no verses")
+                        
+                else:
+                    self.log_test("Pagination - Middle Page", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Pagination - Middle Page Content", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Pagination - Middle Page", False, f"Error: {str(e)}")
+                self.log_test("Pagination - Middle Page Content", False, f"Error: {str(e)}")
+            
+            # Test last page
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&page=1&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    total_pages = data.get('totalPages', 0)
+                    
+                    if total_pages > 0:
+                        # Test the actual last page
+                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&page={total_pages}&limit=20")
+                        if response.status_code == 200:
+                            data = response.json()
+                            verses = data.get('verses', [])
+                            page = data.get('page', 0)
                             
-                except Exception as e:
-                    print(f"   ❌ Chapter {chapter:2d}: ERROR - {str(e)}")
-            
-            # Summary of missing verse patterns
-            self.log_test("Total Missing Verses Verification", True, f"Calculated missing: {total_calculated_missing} verses")
-            
-            if truncated_chapters:
-                truncated_count = len(truncated_chapters)
-                truncated_missing = sum(ch['missing'] for ch in truncated_chapters)
-                self.log_test("Truncated Chapters", False, f"❌ {truncated_count} chapters are truncated (missing {truncated_missing} verses)")
-                
-                # Show worst truncated chapters
-                truncated_chapters.sort(key=lambda x: x['missing'], reverse=True)
-                worst_truncated = truncated_chapters[:3]
-                for ch in worst_truncated:
-                    self.log_test(f"Truncated Chapter {ch['chapter']}", False, f"Missing {ch['missing']} verses (has 1-{ch['max_verse']}, needs 1-{ch['expected']})")
-            else:
-                self.log_test("Truncated Chapters", True, "✅ No chapters are truncated")
-            
-            if scattered_missing:
-                scattered_count = len(scattered_missing)
-                scattered_missing_total = sum(ch['missing'] for ch in scattered_missing)
-                self.log_test("Scattered Missing Verses", False, f"❌ {scattered_count} chapters have scattered missing verses ({scattered_missing_total} total)")
-                
-                # Show chapters with most scattered missing
-                scattered_missing.sort(key=lambda x: x['missing'], reverse=True)
-                worst_scattered = scattered_missing[:3]
-                for ch in worst_scattered:
-                    missing_list = ', '.join(map(str, ch['missing_verses'][:5]))
-                    if len(ch['missing_verses']) > 5:
-                        missing_list += '...'
-                    self.log_test(f"Scattered Chapter {ch['chapter']}", False, f"Missing {ch['missing']} verses: {missing_list}")
-            else:
-                self.log_test("Scattered Missing Verses", True, "✅ No scattered missing verses")
-            
-            # Pattern analysis
-            if truncated_chapters and not scattered_missing:
-                self.log_test("Missing Verse Pattern", True, "Pattern: Chapters are truncated (missing verses at end)")
-            elif scattered_missing and not truncated_chapters:
-                self.log_test("Missing Verse Pattern", True, "Pattern: Verses are scattered missing throughout chapters")
-            elif truncated_chapters and scattered_missing:
-                self.log_test("Missing Verse Pattern", True, "Pattern: Mixed - both truncated chapters and scattered missing verses")
-            else:
-                self.log_test("Missing Verse Pattern", True, "Pattern: No missing verses detected")
+                            if page == total_pages:
+                                self.log_test("Pagination - Last Page", True, f"✅ CORRECT! Last page {total_pages} returns correct page number")
+                            else:
+                                self.log_test("Pagination - Last Page", False, f"❌ INCORRECT! Last page returns page={page}, expected {total_pages}")
+                                
+                            if verses:
+                                last_verse = verses[-1]
+                                if last_verse.get('book') == 'Genesis':
+                                    self.log_test("Pagination - Last Page Content", True, f"✅ CORRECT! Last page contains Genesis verses")
+                                else:
+                                    self.log_test("Pagination - Last Page Content", False, f"❌ INCORRECT! Last page contains non-Genesis verses")
+                            else:
+                                self.log_test("Pagination - Last Page Content", False, f"❌ EMPTY! Last page contains no verses")
+                        else:
+                            self.log_test("Pagination - Last Page", False, f"API Error - Status: {response.status_code}")
+                            self.log_test("Pagination - Last Page Content", False, f"API Error - Status: {response.status_code}")
+                    else:
+                        self.log_test("Pagination - Last Page", False, f"❌ NO PAGES! Total pages = {total_pages}")
+                        self.log_test("Pagination - Last Page Content", False, f"❌ NO PAGES! Total pages = {total_pages}")
+                else:
+                    self.log_test("Pagination - Last Page", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Pagination - Last Page Content", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Pagination - Last Page", False, f"Error: {str(e)}")
+                self.log_test("Pagination - Last Page Content", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Specific Missing Verses Investigation", False, f"Error: {str(e)}")
+            self.log_test("API Response Validation", False, f"Error: {str(e)}")
             return False
 
     def test_genesis_completion_recommendations(self):
