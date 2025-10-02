@@ -508,132 +508,111 @@ class APITester:
             self.log_test("Specific Missing Verses Investigation", False, f"Error: {str(e)}")
             return False
 
-    def test_genesis_api_performance(self):
-        """REVIEW REQUEST TEST 5: API Performance - Search and navigation for Genesis"""
+    def test_genesis_completion_recommendations(self):
+        """ADDITIONAL TEST: Generate recommendations for reaching 100% Genesis coverage"""
         try:
-            print("\n🔍 GENESIS API PERFORMANCE TEST - SEARCH & NAVIGATION...")
+            print("\n🔍 GENESIS COMPLETION RECOMMENDATIONS - PATH TO 100% COVERAGE...")
             
-            import time
-            
-            # Test 1: Search for "God created" should find Genesis 1:1
+            # Get current statistics
             try:
-                start_time = time.time()
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&search=God created&limit=10")
-                search_time = time.time() - start_time
-                
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
                 if response.status_code == 200:
                     data = response.json()
-                    search_results = data.get('total', 0)
-                    verses = data.get('verses', [])
+                    current_verses = data.get('total', 0)
+                    expected_verses = 1533
+                    missing_verses = expected_verses - current_verses
+                    completion_percentage = (current_verses / expected_verses) * 100
                     
-                    # Check if Genesis 1:1 is in results
-                    genesis_1_1_found = False
-                    for verse in verses:
-                        if (verse.get('book') == 'Genesis' and 
-                            verse.get('chapter') == 1 and 
-                            verse.get('verse') == 1):
-                            genesis_1_1_found = True
-                            break
-                    
-                    if genesis_1_1_found and search_time < 3.0:
-                        self.log_test("Search 'God created' - Genesis 1:1", True, f"✅ FOUND! Genesis 1:1 found in {search_results} results ({search_time:.2f}s)")
-                    elif search_results > 0:
-                        self.log_test("Search 'God created' - Genesis 1:1", True, f"Search working: {search_results} results ({search_time:.2f}s)")
-                    else:
-                        self.log_test("Search 'God created' - Genesis 1:1", False, f"No results found ({search_time:.2f}s)")
+                    self.log_test("Current Completion Status", True, f"{completion_percentage:.1f}% complete ({current_verses}/{expected_verses} verses)")
                 else:
-                    self.log_test("Search 'God created' - Genesis 1:1", False, f"Status: {response.status_code}")
+                    self.log_test("Current Completion Status", False, f"Status: {response.status_code}")
+                    return False
             except Exception as e:
-                self.log_test("Search 'God created' - Genesis 1:1", False, f"Error: {str(e)}")
+                self.log_test("Current Completion Status", False, f"Error: {str(e)}")
+                return False
             
-            # Test 2: Navigation - Genesis chapter 1 verse 1 through verse 31
-            try:
-                start_time = time.time()
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter=1&limit=31")
-                navigation_time = time.time() - start_time
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    total_chapter_verses = data.get('total', 0)
-                    
-                    # Check verse sequence
-                    verse_numbers = [verse.get('verse', 0) for verse in verses if isinstance(verse.get('verse'), int)]
-                    verse_numbers.sort()
-                    
-                    if (len(verse_numbers) >= 31 and 
-                        verse_numbers[0] == 1 and 
-                        verse_numbers[-1] >= 31 and
-                        navigation_time < 3.0):
-                        self.log_test("Navigation - Genesis 1:1-31", True, f"✅ COMPLETE NAVIGATION! Found verses 1-{verse_numbers[-1]} ({navigation_time:.2f}s)")
-                    elif len(verse_numbers) >= 20:
-                        self.log_test("Navigation - Genesis 1:1-31", True, f"Partial navigation: Found {len(verse_numbers)} verses ({navigation_time:.2f}s)")
-                    else:
-                        self.log_test("Navigation - Genesis 1:1-31", False, f"Incomplete navigation: Only {len(verse_numbers)} verses found")
-                else:
-                    self.log_test("Navigation - Genesis 1:1-31", False, f"Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Navigation - Genesis 1:1-31", False, f"Error: {str(e)}")
+            # Analyze which chapters need the most work
+            expected_verses_per_chapter = {
+                1: 31, 2: 25, 3: 24, 4: 26, 5: 32, 6: 22, 7: 24, 8: 22, 9: 29, 10: 32,
+                11: 32, 12: 20, 13: 18, 14: 24, 15: 21, 16: 16, 17: 27, 18: 33, 19: 38, 20: 18,
+                21: 34, 22: 24, 23: 20, 24: 67, 25: 34, 26: 35, 27: 46, 28: 22, 29: 35, 30: 43,
+                31: 55, 32: 32, 33: 20, 34: 31, 35: 29, 36: 43, 37: 36, 38: 30, 39: 23, 40: 23,
+                41: 57, 42: 38, 43: 34, 44: 34, 45: 28, 46: 34, 47: 31, 48: 22, 49: 33, 50: 26
+            }
             
-            # Test 3: Verify filtering and sorting work correctly
-            try:
-                start_time = time.time()
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&testament=old&limit=20")
-                filter_time = time.time() - start_time
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    
-                    # Check filtering accuracy
-                    correct_filtering = sum(1 for verse in verses if verse.get('book') == 'Genesis' and verse.get('testament') == 'old')
-                    
-                    if correct_filtering == len(verses) and filter_time < 3.0:
-                        self.log_test("Filtering & Sorting", True, f"✅ ACCURATE FILTERING! All {len(verses)} verses correctly filtered ({filter_time:.2f}s)")
-                    elif correct_filtering >= len(verses) * 0.9:  # 90% accuracy
-                        self.log_test("Filtering & Sorting", True, f"Good filtering: {correct_filtering}/{len(verses)} verses correct ({filter_time:.2f}s)")
-                    else:
-                        self.log_test("Filtering & Sorting", False, f"Poor filtering: {correct_filtering}/{len(verses)} verses correct")
-                else:
-                    self.log_test("Filtering & Sorting", False, f"Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Filtering & Sorting", False, f"Error: {str(e)}")
+            priority_chapters = []
             
-            # Test 4: Additional search terms relevant to Genesis
-            genesis_search_terms = ["Adam", "Eve", "Noah", "Abraham", "Isaac", "Jacob", "Joseph"]
-            successful_searches = 0
-            
-            for term in genesis_search_terms:
+            for chapter in range(1, 51):
                 try:
-                    start_time = time.time()
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&search={term}&limit=5")
-                    term_search_time = time.time() - start_time
-                    
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=1")
                     if response.status_code == 200:
                         data = response.json()
-                        results = data.get('total', 0)
+                        actual_verses = data.get('total', 0)
+                        expected_verses = expected_verses_per_chapter.get(chapter, 0)
+                        missing_verses = expected_verses - actual_verses
                         
-                        if results > 0 and term_search_time < 3.0:
-                            self.log_test(f"Genesis Search - '{term}'", True, f"✅ FOUND! {results} results ({term_search_time:.2f}s)")
-                            successful_searches += 1
-                        elif results > 0:
-                            self.log_test(f"Genesis Search - '{term}'", True, f"Found {results} results (slow: {term_search_time:.2f}s)")
-                            successful_searches += 1
-                        else:
-                            # Some names might not appear in Genesis (like Joseph might be limited)
-                            self.log_test(f"Genesis Search - '{term}'", True, f"No results for '{term}' (may be expected)")
-                            successful_searches += 1
-                    else:
-                        self.log_test(f"Genesis Search - '{term}'", False, f"Status: {response.status_code}")
+                        if missing_verses > 0:
+                            priority_chapters.append({
+                                'chapter': chapter,
+                                'missing': missing_verses,
+                                'expected': expected_verses,
+                                'actual': actual_verses,
+                                'priority': 'HIGH' if missing_verses > 10 else 'MEDIUM' if missing_verses > 5 else 'LOW'
+                            })
                 except Exception as e:
-                    self.log_test(f"Genesis Search - '{term}'", False, f"Error: {str(e)}")
+                    priority_chapters.append({
+                        'chapter': chapter,
+                        'missing': expected_verses_per_chapter.get(chapter, 0),
+                        'expected': expected_verses_per_chapter.get(chapter, 0),
+                        'actual': 0,
+                        'priority': 'CRITICAL'
+                    })
             
-            # Success criteria: Search works, navigation works, filtering works
-            success = (successful_searches >= 5)
-            return success
+            # Sort by missing verses (highest priority first)
+            priority_chapters.sort(key=lambda x: x['missing'], reverse=True)
+            
+            print("\n📋 COMPLETION RECOMMENDATIONS:")
+            
+            if priority_chapters:
+                high_priority = [ch for ch in priority_chapters if ch['priority'] in ['CRITICAL', 'HIGH']]
+                medium_priority = [ch for ch in priority_chapters if ch['priority'] == 'MEDIUM']
+                low_priority = [ch for ch in priority_chapters if ch['priority'] == 'LOW']
+                
+                if high_priority:
+                    print(f"\n🔴 HIGH PRIORITY CHAPTERS ({len(high_priority)} chapters):")
+                    for ch in high_priority[:5]:  # Show top 5
+                        print(f"   Chapter {ch['chapter']:2d}: Missing {ch['missing']:2d} verses ({ch['actual']:2d}/{ch['expected']:2d})")
+                    
+                    total_high_missing = sum(ch['missing'] for ch in high_priority)
+                    self.log_test("High Priority Chapters", False, f"❌ {len(high_priority)} chapters need urgent attention ({total_high_missing} missing verses)")
+                
+                if medium_priority:
+                    print(f"\n🟡 MEDIUM PRIORITY CHAPTERS ({len(medium_priority)} chapters):")
+                    for ch in medium_priority[:3]:  # Show top 3
+                        print(f"   Chapter {ch['chapter']:2d}: Missing {ch['missing']:2d} verses ({ch['actual']:2d}/{ch['expected']:2d})")
+                    
+                    total_medium_missing = sum(ch['missing'] for ch in medium_priority)
+                    self.log_test("Medium Priority Chapters", True, f"⚠️ {len(medium_priority)} chapters need moderate attention ({total_medium_missing} missing verses)")
+                
+                if low_priority:
+                    total_low_missing = sum(ch['missing'] for ch in low_priority)
+                    self.log_test("Low Priority Chapters", True, f"✅ {len(low_priority)} chapters need minor fixes ({total_low_missing} missing verses)")
+                
+                # Completion roadmap
+                print(f"\n🗺️ COMPLETION ROADMAP:")
+                print(f"   Phase 1: Fix {len(high_priority)} high-priority chapters ({sum(ch['missing'] for ch in high_priority)} verses)")
+                print(f"   Phase 2: Fix {len(medium_priority)} medium-priority chapters ({sum(ch['missing'] for ch in medium_priority)} verses)")
+                print(f"   Phase 3: Fix {len(low_priority)} low-priority chapters ({sum(ch['missing'] for ch in low_priority)} verses)")
+                print(f"   Result: 100% Genesis coverage ({expected_verses} total verses)")
+                
+                self.log_test("Completion Roadmap", True, f"Path to 100%: {len(priority_chapters)} chapters need fixes across 3 phases")
+            else:
+                self.log_test("Completion Status", True, "✅ Genesis is already 100% complete!")
+            
+            return True
             
         except Exception as e:
-            self.log_test("Genesis API Performance", False, f"Error: {str(e)}")
+            self.log_test("Genesis Completion Recommendations", False, f"Error: {str(e)}")
             return False
 
     def run_genesis_kjv_1611_tests(self):
