@@ -455,9 +455,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phase 3C: Advanced Bible Features - BACKEND API VERIFIED ✅ FRONTEND RENDERING BROKEN ❌"
-    - "Bible Verse Text Display - Backend API working correctly, frontend renderBibleText() function broken"
-    - "React Key Conflicts - Frontend rendering issue confirmed, NOT backend API issue"
+    - "Yah Scriptures Bible API Functionality - BACKEND VERIFIED ✅ WORKING CORRECTLY"
+    - "New Testament Data Quality - All 26 NT books accessible with proper biblical content"
+    - "Divine Name Standardization - YHWH/Elohim replacements working correctly"
   stuck_tasks: 
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
     - "Bible Verse Text Display - FRONTEND ISSUE - renderBibleText() function not displaying API data correctly"
