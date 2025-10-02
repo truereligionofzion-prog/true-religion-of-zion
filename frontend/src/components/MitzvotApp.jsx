@@ -2073,6 +2073,29 @@ const MitzvotApp = () => {
                 {/* Book-style Bible Reading Interface */}
                 <div className="max-w-4xl mx-auto">
                   
+                  {/* DEBUG: Manual Testament Filter Buttons */}
+                  <div className="mb-4 p-2 bg-yellow-100 border rounded">
+                    <p className="text-sm mb-2">DEBUG: Current filter: {advancedFilters.testament} | Books showing: {filteredBooks.length}</p>
+                    <button 
+                      onClick={() => setAdvancedFilters(prev => ({...prev, testament: 'old'}))}
+                      className="mr-2 px-3 py-1 bg-red-500 text-white rounded text-sm"
+                    >
+                      Force OLD Testament
+                    </button>
+                    <button 
+                      onClick={() => setAdvancedFilters(prev => ({...prev, testament: 'new'}))}
+                      className="mr-2 px-3 py-1 bg-blue-500 text-white rounded text-sm"
+                    >
+                      Force NEW Testament
+                    </button>
+                    <button 
+                      onClick={() => setAdvancedFilters(prev => ({...prev, testament: 'all'}))}
+                      className="px-3 py-1 bg-green-500 text-white rounded text-sm"
+                    >
+                      Show ALL
+                    </button>
+                  </div>
+                  
                   {/* Book Navigation - Filtered by Testament */}
                   <div className="flex flex-wrap gap-2 mb-6 justify-center max-h-96 overflow-y-auto border border-gray-200 p-4 rounded">
                     {filteredBooks.map((book) => (
