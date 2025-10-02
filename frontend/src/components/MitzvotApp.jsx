@@ -1822,7 +1822,6 @@ const MitzvotApp = () => {
                   // Mitzvot display
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {(mitzvot || []).map((mitzvah) => (
-                    (mitzvot || []).map((mitzvah) => (
                       <Card key={mitzvah.id} className="hover:shadow-lg transition-shadow">
                         <CardHeader>
                           <div className="flex items-start justify-between">
