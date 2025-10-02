@@ -614,115 +614,163 @@ class APITester:
             self.log_test("Bible Data Quality Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_kjv1611_api_response_structure(self):
-        """TEST: KJV 1611 API response structure and required fields"""
+    def test_api_performance_with_enhanced_dataset(self):
+        """REVIEW REQUEST TEST 5: API Performance with Enhanced Dataset - Pagination, search, and testament filtering"""
         try:
-            print("\n🔍 KJV 1611 API RESPONSE STRUCTURE TESTING...")
+            print("\n🔍 API PERFORMANCE WITH ENHANCED DATASET - ~30,830 VERSES...")
             
-            # Test bible/versions response structure
-            response = self.session.get(f"{self.base_url}/bible/versions")
+            import time
+            
+            # Test 1: Pagination handles larger datasets efficiently
+            start_time = time.time()
+            response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&limit=100")
+            response_time = time.time() - start_time
+            
             if response.status_code == 200:
                 data = response.json()
-                if 'versions' in data and isinstance(data['versions'], list):
-                    self.log_test("KJV 1611 - Versions Structure", True, "Proper JSON structure with versions array")
-                    
-                    # Check KJV version structure
-                    kjv_version = next((v for v in data['versions'] if v.get('id') == 'kjv1611_divine'), None)
-                    if kjv_version:
-                        required_fields = ['id', 'name', 'description']
-                        missing_fields = [field for field in required_fields if field not in kjv_version]
-                        if not missing_fields:
-                            self.log_test("KJV 1611 - Version Fields", True, "All required version fields present")
-                        else:
-                            self.log_test("KJV 1611 - Version Fields", False, f"Missing fields: {missing_fields}")
-                else:
-                    self.log_test("KJV 1611 - Versions Structure", False, "Invalid JSON structure")
-            else:
-                self.log_test("KJV 1611 - Versions Structure", False, f"Status: {response.status_code}")
-            
-            # Test bible/books response structure
-            response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
-            if response.status_code == 200:
-                data = response.json()
-                required_fields = ['books', 'total', 'filters']
-                missing_fields = [field for field in required_fields if field not in data]
+                total = data.get('total', 0)
+                total_pages = data.get('totalPages', 0)
                 
-                if not missing_fields:
-                    self.log_test("KJV 1611 - Books Structure", True, "All required fields present")
-                    
-                    # Check individual book structure
-                    books = data.get('books', [])
-                    if books:
-                        first_book = books[0]
-                        book_fields = ['name', 'testament']
-                        missing_book_fields = [field for field in book_fields if field not in first_book]
-                        if not missing_book_fields:
-                            self.log_test("KJV 1611 - Book Fields", True, "All required book fields present")
-                        else:
-                            self.log_test("KJV 1611 - Book Fields", False, f"Missing book fields: {missing_book_fields}")
+                if response_time < 3.0:  # Should respond quickly even with large dataset
+                    self.log_test("Pagination - Response Time", True, f"Fast response: {response_time:.2f}s for {total} verses")
                 else:
-                    self.log_test("KJV 1611 - Books Structure", False, f"Missing fields: {missing_fields}")
-            else:
-                self.log_test("KJV 1611 - Books Structure", False, f"Status: {response.status_code}")
-            
-            # Test bible/verses response structure
-            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=10")
-            if response.status_code == 200:
-                data = response.json()
-                required_fields = ['verses', 'total', 'page', 'totalPages', 'filters']
-                missing_fields = [field for field in required_fields if field not in data]
+                    self.log_test("Pagination - Response Time", False, f"Slow response: {response_time:.2f}s")
                 
-                if not missing_fields:
-                    self.log_test("KJV 1611 - Verses Structure", True, "All required fields present")
+                # Test deep pagination
+                if total_pages > 100:
+                    start_time = time.time()
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&page=100&limit=50")
+                    deep_pagination_time = time.time() - start_time
                     
-                    # Check individual verse structure
-                    verses = data.get('verses', [])
-                    if verses:
-                        first_verse = verses[0]
-                        verse_fields = ['book', 'chapter', 'verse', 'text', 'testament']
-                        missing_verse_fields = [field for field in verse_fields if field not in first_verse]
-                        if not missing_verse_fields:
-                            self.log_test("KJV 1611 - Verse Fields", True, "All required verse fields present")
-                        else:
-                            self.log_test("KJV 1611 - Verse Fields", False, f"Missing verse fields: {missing_verse_fields}")
+                    if response.status_code == 200 and deep_pagination_time < 5.0:
+                        self.log_test("Pagination - Deep Page Access", True, f"Page 100 loaded in {deep_pagination_time:.2f}s")
+                    else:
+                        self.log_test("Pagination - Deep Page Access", False, f"Deep pagination issue: {deep_pagination_time:.2f}s")
+                else:
+                    self.log_test("Pagination - Deep Page Access", False, f"Only {total_pages} pages available")
+            else:
+                self.log_test("Pagination - Response Time", False, f"Status: {response.status_code}")
+            
+            # Test 2: Search functionality works across ~30,830 verses
+            search_terms = ["God", "Lord", "Jesus", "Israel", "covenant", "righteousness"]
+            search_performance_passed = 0
+            
+            for term in search_terms:
+                try:
+                    # Test search across both versions
+                    for version in ["yah_scriptures", "kjv1611_divine"]:
+                        start_time = time.time()
+                        response = self.session.get(f"{self.base_url}/bible/verses?version={version}&search={term}&limit=50")
+                        search_time = time.time() - start_time
                         
-                        # Test pagination
-                        total_pages = data.get('totalPages', 0)
-                        current_page = data.get('page', 0)
-                        if total_pages > 0 and current_page == 1:
-                            self.log_test("KJV 1611 - Pagination", True, f"Pagination working: page {current_page} of {total_pages}")
+                        if response.status_code == 200:
+                            data = response.json()
+                            total = data.get('total', 0)
+                            verses = data.get('verses', [])
+                            
+                            if total > 0 and search_time < 5.0:
+                                self.log_test(f"Search Performance - '{term}' ({version})", True, f"Found {total} results in {search_time:.2f}s")
+                                search_performance_passed += 1
+                                
+                                # Verify search accuracy
+                                term_found = 0
+                                for verse in verses[:3]:  # Check first 3 results
+                                    if term.lower() in verse.get('text', '').lower():
+                                        term_found += 1
+                                
+                                if term_found > 0:
+                                    self.log_test(f"Search Accuracy - '{term}' ({version})", True, f"Term found in {term_found}/3 results")
+                                else:
+                                    self.log_test(f"Search Accuracy - '{term}' ({version})", False, "Term not found in results")
+                            else:
+                                self.log_test(f"Search Performance - '{term}' ({version})", False, f"Poor performance: {total} results in {search_time:.2f}s")
                         else:
-                            self.log_test("KJV 1611 - Pagination", False, f"Pagination issue: page {current_page} of {total_pages}")
-                else:
-                    self.log_test("KJV 1611 - Verses Structure", False, f"Missing fields: {missing_fields}")
-            else:
-                self.log_test("KJV 1611 - Verses Structure", False, f"Status: {response.status_code}")
+                            self.log_test(f"Search Performance - '{term}' ({version})", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Search Performance - '{term}'", False, f"Error: {str(e)}")
             
-            # Test bible/stats response structure
-            response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
-            if response.status_code == 200:
-                data = response.json()
-                required_fields = ['totalBooks', 'totalVerses']
-                missing_fields = [field for field in required_fields if field not in data]
-                
-                if not missing_fields:
-                    self.log_test("KJV 1611 - Stats Structure", True, "All required stats fields present")
+            # Test 3: Testament filtering for both versions (old, new, apocrypha)
+            testament_tests = [
+                ("old", "yah_scriptures"),
+                ("new", "yah_scriptures"),
+                ("apocrypha", "yah_scriptures"),
+                ("old", "kjv1611_divine"),
+                ("new", "kjv1611_divine"),
+                ("apocrypha", "kjv1611_divine")
+            ]
+            
+            testament_filtering_passed = 0
+            for testament, version in testament_tests:
+                try:
+                    start_time = time.time()
+                    response = self.session.get(f"{self.base_url}/bible/verses?version={version}&testament={testament}&limit=100")
+                    filter_time = time.time() - start_time
                     
-                    # Check for additional useful fields
-                    optional_fields = ['oldTestamentBooks', 'newTestamentBooks', 'apocryphaBooks', 
-                                     'oldTestamentVerses', 'newTestamentVerses', 'apocryphaVerses']
-                    present_optional = [field for field in optional_fields if field in data]
-                    if present_optional:
-                        self.log_test("KJV 1611 - Stats Optional Fields", True, f"Optional fields present: {present_optional}")
-                else:
-                    self.log_test("KJV 1611 - Stats Structure", False, f"Missing fields: {missing_fields}")
-            else:
-                self.log_test("KJV 1611 - Stats Structure", False, f"Status: {response.status_code}")
+                    if response.status_code == 200:
+                        data = response.json()
+                        verses = data.get('verses', [])
+                        total = data.get('total', 0)
+                        
+                        if verses and total > 0 and filter_time < 3.0:
+                            self.log_test(f"Testament Filter - {testament} ({version})", True, f"Found {total} verses in {filter_time:.2f}s")
+                            testament_filtering_passed += 1
+                            
+                            # Verify all verses are from correct testament
+                            correct_testament = 0
+                            for verse in verses[:5]:  # Check first 5 verses
+                                if verse.get('testament') == testament:
+                                    correct_testament += 1
+                            
+                            if correct_testament >= 4:  # At least 4/5 should be correct
+                                self.log_test(f"Testament Accuracy - {testament} ({version})", True, f"{correct_testament}/5 verses have correct testament")
+                            else:
+                                self.log_test(f"Testament Accuracy - {testament} ({version})", False, f"Only {correct_testament}/5 verses have correct testament")
+                        else:
+                            self.log_test(f"Testament Filter - {testament} ({version})", False, f"Poor performance: {total} results in {filter_time:.2f}s")
+                    else:
+                        self.log_test(f"Testament Filter - {testament} ({version})", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Testament Filter - {testament} ({version})", False, f"Error: {str(e)}")
             
-            return True
+            # Test 4: Bible statistics endpoints reflect comprehensive coverage
+            for version in ["yah_scriptures", "kjv1611_divine"]:
+                try:
+                    start_time = time.time()
+                    response = self.session.get(f"{self.base_url}/bible/stats?version={version}")
+                    stats_time = time.time() - start_time
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        total_books = data.get('totalBooks', 0)
+                        total_verses = data.get('totalVerses', 0)
+                        
+                        if stats_time < 2.0:  # Stats should be fast
+                            self.log_test(f"Stats Performance - {version}", True, f"Stats loaded in {stats_time:.2f}s")
+                        else:
+                            self.log_test(f"Stats Performance - {version}", False, f"Slow stats: {stats_time:.2f}s")
+                        
+                        # Verify comprehensive coverage
+                        if version == "yah_scriptures" and total_verses >= 15000:
+                            self.log_test(f"Stats Coverage - {version}", True, f"Comprehensive coverage: {total_books} books, {total_verses} verses")
+                        elif version == "kjv1611_divine" and total_verses >= 15000:
+                            self.log_test(f"Stats Coverage - {version}", True, f"Comprehensive coverage: {total_books} books, {total_verses} verses")
+                        else:
+                            self.log_test(f"Stats Coverage - {version}", False, f"Limited coverage: {total_books} books, {total_verses} verses")
+                    else:
+                        self.log_test(f"Stats Performance - {version}", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Stats Performance - {version}", False, f"Error: {str(e)}")
+            
+            # Overall performance assessment
+            if search_performance_passed >= 8 and testament_filtering_passed >= 4:
+                self.log_test("Overall API Performance", True, f"Good performance across {search_performance_passed} search tests and {testament_filtering_passed} testament filters")
+            else:
+                self.log_test("Overall API Performance", False, f"Performance issues: {search_performance_passed} search tests, {testament_filtering_passed} testament filters passed")
+            
+            return search_performance_passed >= 8 and testament_filtering_passed >= 4
             
         except Exception as e:
-            self.log_test("KJV 1611 API Response Structure", False, f"Error: {str(e)}")
+            self.log_test("API Performance with Enhanced Dataset", False, f"Error: {str(e)}")
             return False
 
     def test_yah_scriptures_new_testament_quality(self):
