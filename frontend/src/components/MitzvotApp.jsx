@@ -1241,10 +1241,7 @@ const MitzvotApp = () => {
                   ? 'bg-white text-gray-900 shadow' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-              onClick={() => {
-                console.log('Mitzvot button clicked');
-                setContentType('mitzvot');
-              }}
+              onClick={() => setContentType('mitzvot')}
             >
               613 Mitzvot
             </button>
