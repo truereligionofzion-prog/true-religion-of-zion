@@ -15,7 +15,7 @@ class CorrectNTLoader:
     def __init__(self):
         self.text_file = '/app/yah_scriptures_correct.txt'
         self.MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-        self.client = AsyncIOMotorClient(MONGO_URL)
+        self.client = AsyncIOMotorClient(self.MONGO_URL)
         self.db = self.client[os.environ.get('DB_NAME', 'test_database')]
         
         # NT book mappings
