@@ -224,13 +224,13 @@ class APITester:
                         'reference:'
                     ]
                     
-                    print("\n🚫 PLACEHOLDER BRACKETS DETECTION:")
+                    print("\n🚫 PLACEHOLDER CONTENT DETECTION:")
                     placeholder_violations = 0
                     legitimate_brackets = 0
                     
                     for verse in verses:
                         verse_text = verse.get('text', '').lower()
-                        verse_ref = f"Exodus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                        verse_ref = f"Leviticus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
                         
                         # Check for placeholder patterns
                         placeholders_found = [pattern for pattern in placeholder_patterns if pattern in verse_text]
@@ -247,9 +247,9 @@ class APITester:
                                 print(f"   ✅ {verse_ref}: Legitimate KJV brackets preserved - {', '.join(legitimate_bracket_matches)}")
                     
                     if placeholder_violations == 0:
-                        self.log_test("No Placeholder Brackets", True, f"✅ CLEAN! No placeholder brackets found in {len(verses)} Exodus verses")
+                        self.log_test("No Placeholder Content", True, f"✅ CLEAN! No placeholder content found in {len(verses)} Leviticus verses")
                     else:
-                        self.log_test("No Placeholder Brackets", False, f"❌ VIOLATIONS! Found {placeholder_violations} placeholder bracket violations")
+                        self.log_test("No Placeholder Content", False, f"❌ VIOLATIONS! Found {placeholder_violations} placeholder content violations")
                     
                     if legitimate_brackets > 0:
                         self.log_test("Legitimate KJV Brackets Preserved", True, f"✅ PRESERVED! Found {legitimate_brackets} verses with legitimate KJV brackets")
