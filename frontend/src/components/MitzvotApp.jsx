@@ -231,7 +231,7 @@ const MitzvotApp = () => {
         testament: selectedCategory,
         book: selectedBook,
         page: currentPage,
-        limit: 20
+        limit: 50  // Increased from 20 to show more verses initially
       };
 
       const response = await apiService.getBibleVerses(params);
