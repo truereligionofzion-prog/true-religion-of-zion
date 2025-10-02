@@ -147,11 +147,15 @@ const MitzvotApp = () => {
   };
 
   const loadContent = async () => {
+    console.log('loadContent called with contentType:', contentType);
     if (contentType === 'mitzvot') {
+      console.log('Loading mitzvot...');
       await loadMitzvot();
     } else if (contentType === 'precepts') {
+      console.log('Loading precepts...');
       await loadPrecepts();
     } else {
+      console.log('Loading Bible verses...');
       await loadBibleVerses();
     }
   };
