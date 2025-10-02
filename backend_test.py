@@ -707,11 +707,11 @@ class APITester:
             return False
 
     def test_complete_database_status(self):
-        """REVIEW REQUEST TEST 5: Complete Database Status - Total verse count, both books verification, testament classification"""
+        """REVIEW REQUEST TEST 5: Complete Database Status - Total verse count, all three books verification, testament classification"""
         try:
-            print("\n🔍 COMPLETE DATABASE STATUS - TOTAL VERSE COUNT AND BOOK VERIFICATION...")
+            print("\n🔍 COMPLETE DATABASE STATUS - TOTAL VERSE COUNT AND ALL THREE BOOKS VERIFICATION...")
             
-            # Get total verse count (should be Genesis 1,533 + Exodus 1,063 = 2,596)
+            # Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 = 3,384)
             try:
                 response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
                 if response.status_code == 200:
@@ -720,7 +720,7 @@ class APITester:
                     total_books = stats.get('totalBooks', 0)
                     old_testament_verses = stats.get('oldTestamentVerses', 0)
                     
-                    expected_total = 1533 + 1063  # Genesis + Exodus = 2,596 verses (per review request)
+                    expected_total = 1533 + 1063 + 788  # Genesis + Exodus + Leviticus = 3,384 verses (per review request)
                     
                     print(f"\n📊 COMPLETE BIBLE DATABASE STATUS:")
                     print(f"   📖 Total Books: {total_books}")
@@ -728,18 +728,18 @@ class APITester:
                     print(f"   📜 Old Testament Verses: {old_testament_verses}")
                     
                     if total_verses == expected_total:
-                        self.log_test("Total Verse Count (Genesis + Exodus)", True, f"✅ PERFECT! Total verses: {total_verses} (Genesis 1,533 + Exodus 1,063 = {expected_total})")
+                        self.log_test("Total Verse Count (Genesis + Exodus + Leviticus)", True, f"✅ PERFECT! Total verses: {total_verses} (Genesis 1,533 + Exodus 1,063 + Leviticus 788 = {expected_total})")
                     elif abs(total_verses - expected_total) <= 50:  # Within 50 verses is close
-                        self.log_test("Total Verse Count (Genesis + Exodus)", True, f"✅ CLOSE! Total verses: {total_verses} (expected {expected_total}, difference: {abs(total_verses - expected_total)})")
+                        self.log_test("Total Verse Count (Genesis + Exodus + Leviticus)", True, f"✅ CLOSE! Total verses: {total_verses} (expected {expected_total}, difference: {abs(total_verses - expected_total)})")
                     else:
-                        self.log_test("Total Verse Count (Genesis + Exodus)", False, f"❌ INCORRECT! Total verses: {total_verses}, expected {expected_total} (difference: {abs(total_verses - expected_total)})")
+                        self.log_test("Total Verse Count (Genesis + Exodus + Leviticus)", False, f"❌ INCORRECT! Total verses: {total_verses}, expected {expected_total} (difference: {abs(total_verses - expected_total)})")
                         
                 else:
-                    self.log_test("Total Verse Count (Genesis + Exodus)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Total Verse Count (Genesis + Exodus + Leviticus)", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Total Verse Count (Genesis + Exodus)", False, f"Error: {str(e)}")
+                self.log_test("Total Verse Count (Genesis + Exodus + Leviticus)", False, f"Error: {str(e)}")
             
-            # Verify both books exist in KJV 1611 Divine version
+            # Verify all three books exist in KJV 1611 Divine version
             try:
                 response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
                 if response.status_code == 200:
@@ -749,38 +749,47 @@ class APITester:
                     
                     genesis_found = 'Genesis' in book_names
                     exodus_found = 'Exodus' in book_names
+                    leviticus_found = 'Leviticus' in book_names
                     
                     print(f"\n📚 KJV 1611 DIVINE VERSION BOOKS:")
                     print(f"   📖 Total Books Available: {len(books)}")
                     print(f"   📜 Books: {', '.join(book_names)}")
                     
-                    if genesis_found and exodus_found:
-                        self.log_test("Both Books in KJV 1611 Divine", True, f"✅ CONFIRMED! Both Genesis and Exodus exist in KJV 1611 Divine version")
+                    if genesis_found and exodus_found and leviticus_found:
+                        self.log_test("All Three Books in KJV 1611 Divine", True, f"✅ CONFIRMED! Genesis, Exodus, and Leviticus all exist in KJV 1611 Divine version")
                         
-                        # Get detailed info for both books
+                        # Get detailed info for all three books
                         genesis_book = next((book for book in books if book.get('name') == 'Genesis'), None)
                         exodus_book = next((book for book in books if book.get('name') == 'Exodus'), None)
+                        leviticus_book = next((book for book in books if book.get('name') == 'Leviticus'), None)
                         
-                        if genesis_book and exodus_book:
+                        if genesis_book and exodus_book and leviticus_book:
                             genesis_testament = genesis_book.get('testament', 'unknown')
                             exodus_testament = exodus_book.get('testament', 'unknown')
+                            leviticus_testament = leviticus_book.get('testament', 'unknown')
                             genesis_order = genesis_book.get('order', 'unknown')
                             exodus_order = exodus_book.get('order', 'unknown')
+                            leviticus_order = leviticus_book.get('order', 'unknown')
                             
                             print(f"   ✅ Genesis: Testament={genesis_testament}, Order={genesis_order}")
                             print(f"   ✅ Exodus: Testament={exodus_testament}, Order={exodus_order}")
+                            print(f"   ✅ Leviticus: Testament={leviticus_testament}, Order={leviticus_order}")
                             
-                    elif genesis_found:
-                        self.log_test("Both Books in KJV 1611 Divine", False, f"❌ PARTIAL! Genesis found but Exodus missing from KJV 1611 Divine")
-                    elif exodus_found:
-                        self.log_test("Both Books in KJV 1611 Divine", False, f"❌ PARTIAL! Exodus found but Genesis missing from KJV 1611 Divine")
                     else:
-                        self.log_test("Both Books in KJV 1611 Divine", False, f"❌ MISSING! Neither Genesis nor Exodus found in KJV 1611 Divine")
+                        missing_books = []
+                        if not genesis_found:
+                            missing_books.append('Genesis')
+                        if not exodus_found:
+                            missing_books.append('Exodus')
+                        if not leviticus_found:
+                            missing_books.append('Leviticus')
+                        
+                        self.log_test("All Three Books in KJV 1611 Divine", False, f"❌ MISSING! Books not found: {', '.join(missing_books)}")
                         
                 else:
-                    self.log_test("Both Books in KJV 1611 Divine", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("All Three Books in KJV 1611 Divine", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Both Books in KJV 1611 Divine", False, f"Error: {str(e)}")
+                self.log_test("All Three Books in KJV 1611 Divine", False, f"Error: {str(e)}")
             
             # Confirm proper testament classification
             try:
