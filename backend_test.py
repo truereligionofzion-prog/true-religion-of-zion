@@ -651,7 +651,7 @@ class APITester:
             
             # Additional check for biblical structure and themes
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=15")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=15")
                 if response.status_code == 200:
                     data = response.json()
                     verses = data.get('verses', [])
@@ -660,22 +660,22 @@ class APITester:
                         print("\n📖 BIBLICAL STRUCTURE AND THEMES VERIFICATION:")
                         biblical_structure_count = 0
                         
-                        # Check for proper biblical content themes in Exodus
-                        exodus_themes = {
-                            'moses': 0, 'pharaoh': 0, 'egypt': 0, 'israelites': 0, 'israel': 0,
-                            'lord': 0, 'god': 0, 'commandments': 0, 'tabernacle': 0, 'aaron': 0,
-                            'people': 0, 'children': 0, 'land': 0, 'house': 0, 'said': 0
+                        # Check for proper biblical content themes in Leviticus
+                        leviticus_themes = {
+                            'lord': 0, 'moses': 0, 'aaron': 0, 'priests': 0, 'offering': 0,
+                            'sacrifice': 0, 'holy': 0, 'holiness': 0, 'clean': 0, 'unclean': 0,
+                            'congregation': 0, 'children': 0, 'israel': 0, 'tabernacle': 0, 'god': 0
                         }
                         
                         for verse in verses:
                             verse_text = verse.get('text', '').lower()
-                            verse_ref = f"Exodus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            verse_ref = f"Leviticus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
                             
                             # Count biblical themes
                             themes_found = []
-                            for theme in exodus_themes:
+                            for theme in leviticus_themes:
                                 if theme in verse_text:
-                                    exodus_themes[theme] += 1
+                                    leviticus_themes[theme] += 1
                                     themes_found.append(theme)
                             
                             if themes_found:
@@ -685,20 +685,20 @@ class APITester:
                                 print(f"   ⚠️ {verse_ref}: No specific themes detected")
                         
                         # Summary of biblical themes
-                        total_theme_occurrences = sum(exodus_themes.values())
-                        themes_with_content = len([theme for theme, count in exodus_themes.items() if count > 0])
+                        total_theme_occurrences = sum(leviticus_themes.values())
+                        themes_with_content = len([theme for theme, count in leviticus_themes.items() if count > 0])
                         
                         if biblical_structure_count >= len(verses) * 0.6:  # At least 60% should have biblical themes
-                            self.log_test("Biblical Structure and Themes", True, f"✅ AUTHENTIC! {biblical_structure_count}/{len(verses)} verses contain biblical themes ({themes_with_content} different themes)")
+                            self.log_test("Leviticus Biblical Themes", True, f"✅ AUTHENTIC! {biblical_structure_count}/{len(verses)} verses contain Leviticus themes ({themes_with_content} different themes)")
                         else:
-                            self.log_test("Biblical Structure and Themes", False, f"❌ QUESTIONABLE! Only {biblical_structure_count}/{len(verses)} verses contain biblical themes")
+                            self.log_test("Leviticus Biblical Themes", False, f"❌ QUESTIONABLE! Only {biblical_structure_count}/{len(verses)} verses contain Leviticus themes")
                         
                     else:
-                        self.log_test("Biblical Structure and Themes", False, f"❌ NO DATA! No Exodus verses found for structure check")
+                        self.log_test("Leviticus Biblical Themes", False, f"❌ NO DATA! No Leviticus verses found for structure check")
                 else:
-                    self.log_test("Biblical Structure and Themes", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Leviticus Biblical Themes", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Biblical Structure and Themes", False, f"Error: {str(e)}")
+                self.log_test("Leviticus Biblical Themes", False, f"Error: {str(e)}")
             
             return True
             
