@@ -404,7 +404,7 @@ frontend:
     implemented: true
     working: false
     file: "/app/frontend/src/components/MitzvotApp.jsx"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -414,6 +414,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL BIBLE VERSE DISPLAY ISSUE CONFIRMED: User report is ACCURATE - Bible verses are NOT displaying properly despite recent fixes. ✅ WORKING CORRECTLY: Bible tab loads, shows correct statistics (15,283 verses, 2 books), all view modes present (Reading View, Card View, Table View), advanced search panel functional, API returning full verse data (verified: 'The book of the words of Tobit, son of Tobiel...'). ❌ CORE PROBLEM: Actual Bible verse text is displaying as '...' instead of full verse content in ALL view modes. The highlightDivineNames() function returns React element with dangerouslySetInnerHTML which may be causing rendering issues. Backend API works perfectly - frontend text rendering is broken. User experience: clicking Bible tab shows only verse references (Ezra 1:1, Tobit 1:1) but NO actual Bible text content. This is exactly what user reported - Bible verses still not displaying properly."
+      - working: false
+        agent: "testing"
+        comment: "❌ URGENT VERIFICATION FAILED: Bible verse text display issue is NOT FIXED after highlightDivineNames function correction. COMPREHENSIVE TESTING RESULTS: ✅ BACKEND API PERFECT: All API calls successful (200 status), returning complete verse data ('The book of the words of Tobit, son of Tobiel, the son of Ananiel...' - 152 characters), 4 successful API responses captured (/api/bible/verses, /api/bible/stats). ❌ FRONTEND RENDERING BROKEN: All view modes show '...' instead of actual Bible text - Card View: displays '...' in verse text areas, Table View: shows '...' in text columns, Reading View: shows only verse numbers (1, 2, 3) without text content. ❌ ROOT CAUSE: renderHighlightedText() function (lines 103-111) not working properly with dangerouslySetInnerHTML, React console errors (duplicate keys 'tobit_1_4', HTML structure violations), JSX rendering issues preventing text display. USER REPORT 100% ACCURATE - Bible verses still showing placeholders instead of actual biblical content. CRITICAL FIX NEEDED: renderHighlightedText function must be completely rewritten to handle text rendering without breaking React components."
 
 metadata:
   created_by: "main_agent"
