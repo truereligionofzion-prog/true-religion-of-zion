@@ -466,8 +466,8 @@ class APITester:
             self.log_test("Genesis Preservation Check", False, f"Error: {str(e)}")
             return False
 
-    def test_exodus_content_quality(self):
-        """REVIEW REQUEST TEST 3: Exodus Content Quality - Sample verses for quality, biblical structure, numbering consistency"""
+    def test_content_quality_sampling(self):
+        """REVIEW REQUEST TEST 4: Content Quality Sampling - Sample 10 random Exodus verses for authentic biblical content"""
         try:
             print("\n🔍 EXODUS CONTENT QUALITY - SAMPLING VERSES FOR QUALITY AND BIBLICAL STRUCTURE...")
             
