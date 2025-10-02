@@ -907,10 +907,10 @@ class APITester:
 
 if __name__ == "__main__":
     tester = APITester(BACKEND_URL)
-    success = tester.run_comprehensive_bible_datasets_tests()
+    success = tester.run_final_comprehensive_bible_dataset_tests()
     
     if success:
-        print("\n🎉 Bible datasets tests passed! The comprehensive Bible datasets are working correctly.")
+        print("\n🎉 Final comprehensive Bible dataset tests passed! The 80-book target achievement is confirmed.")
         sys.exit(0)
     else:
         print("\n⚠️  Some tests failed. Please check the detailed results above.")
