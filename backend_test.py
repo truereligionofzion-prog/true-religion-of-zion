@@ -398,8 +398,8 @@ class APITester:
             self.log_test("Database Statistics", False, f"Error: {str(e)}")
             return False
 
-    def test_specific_missing_verses_investigation(self):
-        """REVIEW REQUEST TEST 4: Specific Missing Verses Investigation - Calculate and locate missing verses"""
+    def test_api_response_validation(self):
+        """REVIEW REQUEST TEST 4: API Response Validation - Complete data and pagination"""
         try:
             print("\n🔍 SPECIFIC MISSING VERSES INVESTIGATION - CALCULATING MISSING 38 VERSES...")
             
