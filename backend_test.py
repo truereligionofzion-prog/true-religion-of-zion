@@ -70,91 +70,88 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_genesis_content_accuracy_verification(self):
-        """REVIEW REQUEST TEST 1: Content Accuracy Verification - Genesis specific verses"""
+    def test_genesis_chapter_verse_analysis(self):
+        """REVIEW REQUEST TEST 1: Genesis Chapter/Verse Analysis - Current counts and gaps"""
         try:
-            print("\n🔍 GENESIS CONTENT ACCURACY VERIFICATION - SPECIFIC VERSES...")
+            print("\n🔍 GENESIS CHAPTER/VERSE ANALYSIS - CURRENT COUNTS AND GAPS...")
             
-            # Test Genesis 1:1 - MUST contain exactly "In the beginning God created the heaven and the earth"
+            # Get overall Genesis statistics
             try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Genesis/1/1?version=kjv1611_divine")
-                if response.status_code == 200:
-                    verse_data = response.json()
-                    verse_text = verse_data.get('text', '')
-                    
-                    # Check for exact Genesis 1:1 content
-                    expected_keywords = ['beginning', 'god', 'created', 'heaven', 'earth']
-                    keywords_found = sum(1 for keyword in expected_keywords if keyword.lower() in verse_text.lower())
-                    
-                    if keywords_found >= 4:  # At least 4/5 keywords should be present
-                        self.log_test("Genesis 1:1 - Exact Content", True, f"✅ CORRECT CONTENT! Found: '{verse_text}'")
-                    else:
-                        self.log_test("Genesis 1:1 - Exact Content", False, f"Missing expected content. Found: '{verse_text}'")
-                else:
-                    self.log_test("Genesis 1:1 - Exact Content", False, f"Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Genesis 1:1 - Exact Content", False, f"Error: {str(e)}")
-            
-            # Test Genesis 1:2 - Should contain "earth was without form, and void; and darkness was upon the face of the deep"
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Genesis/1/2?version=kjv1611_divine")
-                if response.status_code == 200:
-                    verse_data = response.json()
-                    verse_text = verse_data.get('text', '')
-                    
-                    # Check for Genesis 1:2 content
-                    expected_keywords = ['earth', 'without form', 'void', 'darkness', 'deep']
-                    keywords_found = sum(1 for keyword in expected_keywords if keyword.lower() in verse_text.lower())
-                    
-                    if keywords_found >= 3:  # At least 3/5 keywords should be present
-                        self.log_test("Genesis 1:2 - Content Verification", True, f"✅ CORRECT CONTENT! Found: '{verse_text}'")
-                    else:
-                        self.log_test("Genesis 1:2 - Content Verification", False, f"Missing expected content. Found: '{verse_text}'")
-                else:
-                    self.log_test("Genesis 1:2 - Content Verification", False, f"Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Genesis 1:2 - Content Verification", False, f"Error: {str(e)}")
-            
-            # Test Genesis 1:28 - Should contain "Be fruitful, and multiply, and replenish the earth"
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Genesis/1/28?version=kjv1611_divine")
-                if response.status_code == 200:
-                    verse_data = response.json()
-                    verse_text = verse_data.get('text', '')
-                    
-                    # Check for Genesis 1:28 content
-                    expected_keywords = ['fruitful', 'multiply', 'replenish', 'earth']
-                    keywords_found = sum(1 for keyword in expected_keywords if keyword.lower() in verse_text.lower())
-                    
-                    if keywords_found >= 3:  # At least 3/4 keywords should be present
-                        self.log_test("Genesis 1:28 - Content Verification", True, f"✅ CORRECT CONTENT! Found: '{verse_text}'")
-                    else:
-                        self.log_test("Genesis 1:28 - Content Verification", False, f"Missing expected content. Found: '{verse_text}'")
-                else:
-                    self.log_test("Genesis 1:28 - Content Verification", False, f"Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Genesis 1:28 - Content Verification", False, f"Error: {str(e)}")
-            
-            # Test for NO cross-contamination or mixed verse content
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&search=Thessalonians&limit=10")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
                 if response.status_code == 200:
                     data = response.json()
-                    contamination_results = data.get('total', 0)
+                    total_verses = data.get('total', 0)
+                    expected_verses = 1533
+                    missing_verses = expected_verses - total_verses
                     
-                    if contamination_results == 0:
-                        self.log_test("Cross-Contamination Check - Genesis", True, "✅ NO CONTAMINATION! No foreign content found in Genesis")
-                    else:
-                        self.log_test("Cross-Contamination Check - Genesis", False, f"❌ CONTAMINATION DETECTED! Found {contamination_results} instances")
+                    self.log_test("Genesis Total Verse Count", True, f"Current: {total_verses} verses, Expected: {expected_verses}, Missing: {missing_verses}")
                 else:
-                    self.log_test("Cross-Contamination Check - Genesis", True, f"No contamination search possible (Status: {response.status_code})")
+                    self.log_test("Genesis Total Verse Count", False, f"Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Cross-Contamination Check - Genesis", True, f"No contamination search possible (Error: {str(e)})")
+                self.log_test("Genesis Total Verse Count", False, f"Error: {str(e)}")
+            
+            # Analyze chapter structure - get all chapters
+            chapter_analysis = {}
+            expected_verses_per_chapter = {
+                1: 31, 2: 25, 3: 24, 4: 26, 5: 32, 6: 22, 7: 24, 8: 22, 9: 29, 10: 32,
+                11: 32, 12: 20, 13: 18, 14: 24, 15: 21, 16: 16, 17: 27, 18: 33, 19: 38, 20: 18,
+                21: 34, 22: 24, 23: 20, 24: 67, 25: 34, 26: 35, 27: 46, 28: 22, 29: 35, 30: 43,
+                31: 55, 32: 32, 33: 20, 34: 31, 35: 29, 36: 43, 37: 36, 38: 30, 39: 23, 40: 23,
+                41: 57, 42: 38, 43: 34, 44: 34, 45: 28, 46: 34, 47: 31, 48: 22, 49: 33, 50: 26
+            }
+            
+            print("\n📊 CHAPTER-BY-CHAPTER ANALYSIS:")
+            chapters_with_issues = []
+            
+            for chapter in range(1, 51):  # Genesis has 50 chapters
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=1")
+                    if response.status_code == 200:
+                        data = response.json()
+                        actual_verses = data.get('total', 0)
+                        expected_verses = expected_verses_per_chapter.get(chapter, 0)
+                        
+                        chapter_analysis[chapter] = {
+                            'actual': actual_verses,
+                            'expected': expected_verses,
+                            'missing': expected_verses - actual_verses
+                        }
+                        
+                        if actual_verses < expected_verses:
+                            chapters_with_issues.append(chapter)
+                            status = "❌ INCOMPLETE"
+                        elif actual_verses == expected_verses:
+                            status = "✅ COMPLETE"
+                        else:
+                            status = "⚠️ EXTRA"
+                        
+                        print(f"   Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses {status}")
+                        
+                    else:
+                        chapter_analysis[chapter] = {'actual': 0, 'expected': expected_verses_per_chapter.get(chapter, 0), 'missing': expected_verses_per_chapter.get(chapter, 0)}
+                        chapters_with_issues.append(chapter)
+                        print(f"   Chapter {chapter:2d}: ERROR - Status {response.status_code}")
+                        
+                except Exception as e:
+                    chapter_analysis[chapter] = {'actual': 0, 'expected': expected_verses_per_chapter.get(chapter, 0), 'missing': expected_verses_per_chapter.get(chapter, 0)}
+                    chapters_with_issues.append(chapter)
+                    print(f"   Chapter {chapter:2d}: ERROR - {str(e)}")
+            
+            # Summary of chapter analysis
+            complete_chapters = sum(1 for ch in chapter_analysis.values() if ch['actual'] == ch['expected'])
+            incomplete_chapters = sum(1 for ch in chapter_analysis.values() if ch['actual'] < ch['expected'])
+            
+            self.log_test("Chapter Completeness Analysis", True, f"Complete: {complete_chapters}/50 chapters, Incomplete: {incomplete_chapters}/50 chapters")
+            
+            if chapters_with_issues:
+                self.log_test("Chapters with Missing Verses", False, f"Chapters with issues: {chapters_with_issues[:10]}{'...' if len(chapters_with_issues) > 10 else ''}")
+            else:
+                self.log_test("Chapters with Missing Verses", True, "All chapters have expected verse counts")
             
             return True
             
         except Exception as e:
-            self.log_test("Genesis Content Accuracy Verification", False, f"Error: {str(e)}")
+            self.log_test("Genesis Chapter/Verse Analysis", False, f"Error: {str(e)}")
             return False
 
     def test_genesis_complete_structure(self):
