@@ -543,165 +543,231 @@ class APITester:
             self.log_test("Testament Distribution Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_sample_book_quality_check(self):
-        """REVIEW REQUEST TEST 4: Sample Book Quality Check - High-value books from different testaments"""
+    def test_data_quality_assessment(self):
+        """REVIEW REQUEST TEST 4: Data Quality Assessment - Verify proper text content and structure"""
         try:
-            print("\n🔍 SAMPLE BOOK QUALITY CHECK - HIGH-VALUE BOOKS FROM DIFFERENT TESTAMENTS...")
+            print("\n🔍 DATA QUALITY ASSESSMENT - TEXT CONTENT & STRUCTURE VERIFICATION...")
             
-            # Define high-value books to test from different testaments
-            high_value_books = [
-                # Old Testament
-                ("Genesis", "old", 1533),  # Web-verified standard verse count
-                ("Psalms", "old", 2461),   # Web-verified standard verse count
-                # New Testament
-                ("Matthew", "new", 1071),  # Web-verified standard verse count
-                ("Romans", "new", 433),    # Web-verified standard verse count
-                # Apocrypha
-                ("Tobit", "apocrypha", 291),      # Web-verified standard verse count
-                ("Wisdom", "apocrypha", 435),     # Web-verified standard verse count
-            ]
-            
-            books_quality_passed = 0
-            
-            for book_name, expected_testament, web_standard_count in high_value_books:
-                print(f"\n📖 Testing {book_name} ({expected_testament.upper()} TESTAMENT)...")
+            # Test 1: Verify all verses have proper text content
+            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=50")
+            if response.status_code == 200:
+                data = response.json()
+                verses = data.get('verses', [])
+                total_verses = data.get('total', 0)
                 
-                # Test Yah Scriptures version
+                if verses:
+                    # Check text content quality
+                    verses_with_good_content = 0
+                    verses_with_empty_content = 0
+                    verses_with_short_content = 0
+                    
+                    for verse in verses[:20]:  # Check first 20 verses
+                        verse_text = verse.get('text', '')
+                        
+                        if not verse_text or verse_text.strip() == '':
+                            verses_with_empty_content += 1
+                        elif len(verse_text.strip()) < 10:
+                            verses_with_short_content += 1
+                        else:
+                            verses_with_good_content += 1
+                    
+                    content_quality_percentage = (verses_with_good_content / 20) * 100
+                    
+                    if content_quality_percentage >= 90:
+                        self.log_test("Verse Text Content Quality", True, f"✅ EXCELLENT! {verses_with_good_content}/20 verses have good content ({content_quality_percentage:.1f}%)")
+                    elif content_quality_percentage >= 75:
+                        self.log_test("Verse Text Content Quality", True, f"Good content quality: {verses_with_good_content}/20 verses ({content_quality_percentage:.1f}%)")
+                    else:
+                        self.log_test("Verse Text Content Quality", False, f"Poor content quality: {verses_with_good_content}/20 verses ({content_quality_percentage:.1f}%)")
+                    
+                    if verses_with_empty_content > 0:
+                        self.log_test("Empty Content Check", False, f"Found {verses_with_empty_content} verses with empty content")
+                    else:
+                        self.log_test("Empty Content Check", True, "✅ NO EMPTY CONTENT! All verses have text")
+                    
+                    self.log_test("Total Verses Available", True, f"Database contains {total_verses} verses for quality assessment")
+                    
+                else:
+                    self.log_test("Verse Text Content Quality", False, "No verses found for quality assessment")
+                    return False
+            else:
+                self.log_test("Verse Text Content Quality", False, f"Status: {response.status_code}")
+                return False
+            
+            # Test 2: Check chapter/verse numbering is sequential and logical
+            books_to_test = ['Genesis', 'Matthew', 'Psalms']
+            numbering_tests_passed = 0
+            
+            for book in books_to_test:
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&book={book_name}&limit=10")
+                    # Get first chapter of each book
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book}&chapter=1&limit=20")
                     if response.status_code == 200:
                         data = response.json()
-                        yah_total = data.get('total', 0)
                         verses = data.get('verses', [])
                         
-                        if yah_total > 0 and verses:
-                            # Check verse count approach to web-verified standards
-                            coverage_ratio = yah_total / web_standard_count
-                            if coverage_ratio >= 0.8:  # At least 80% of web standard
-                                self.log_test(f"{book_name} - Yah Scriptures Verse Count", True, f"Found {yah_total} verses (coverage ratio: {coverage_ratio:.2f}, web standard: {web_standard_count})")
-                            else:
-                                self.log_test(f"{book_name} - Yah Scriptures Verse Count", False, f"Found {yah_total} verses (coverage ratio: {coverage_ratio:.2f}, below 80% of web standard)")
+                        if verses:
+                            # Check verse numbering sequence
+                            verse_numbers = [verse.get('verse', 0) for verse in verses if isinstance(verse.get('verse'), int)]
+                            verse_numbers.sort()
                             
-                            # Check testament accuracy
-                            verse_testament = verses[0].get('testament', 'unknown')
-                            if verse_testament == expected_testament:
-                                self.log_test(f"{book_name} - Yah Testament Accuracy", True, f"Correct testament: {verse_testament}")
-                            else:
-                                self.log_test(f"{book_name} - Yah Testament Accuracy", False, f"Wrong testament: {verse_testament} (expected {expected_testament})")
-                            
-                            # Check sample verse content quality
-                            sample_verse = verses[0]
-                            verse_text = sample_verse.get('text', '')
-                            if verse_text and len(verse_text) > 10:
-                                preview = verse_text[:80] + "..." if len(verse_text) > 80 else verse_text
-                                self.log_test(f"{book_name} - Yah Content Quality", True, f"Good content ({len(verse_text)} chars): '{preview}'")
+                            # Check if numbering starts at 1 and is sequential
+                            if verse_numbers and verse_numbers[0] == 1:
+                                sequential = True
+                                for i in range(1, min(len(verse_numbers), 10)):  # Check first 10 verses
+                                    if verse_numbers[i] != verse_numbers[i-1] + 1:
+                                        sequential = False
+                                        break
                                 
-                                # Check for book-specific content
-                                if book_name == "Genesis" and ('beginning' in verse_text.lower() or 'created' in verse_text.lower()):
-                                    self.log_test(f"{book_name} - Yah Content Accuracy", True, "Contains expected Genesis creation content")
-                                elif book_name == "Psalms" and ('blessed' in verse_text.lower() or 'lord' in verse_text.lower()):
-                                    self.log_test(f"{book_name} - Yah Content Accuracy", True, "Contains expected Psalms worship content")
-                                elif book_name == "Matthew" and ('jesus' in verse_text.lower() or 'christ' in verse_text.lower() or 'generation' in verse_text.lower()):
-                                    self.log_test(f"{book_name} - Yah Content Accuracy", True, "Contains expected Matthew genealogy/Jesus content")
-                                elif book_name == "Romans" and ('paul' in verse_text.lower() or 'apostle' in verse_text.lower() or 'servant' in verse_text.lower()):
-                                    self.log_test(f"{book_name} - Yah Content Accuracy", True, "Contains expected Romans epistle content")
-                                elif book_name == "Tobit" and ('tobit' in verse_text.lower() or 'tobiel' in verse_text.lower()):
-                                    self.log_test(f"{book_name} - Yah Content Accuracy", True, "Contains expected Tobit narrative content")
-                                elif book_name == "Wisdom" and ('wisdom' in verse_text.lower() or 'righteous' in verse_text.lower()):
-                                    self.log_test(f"{book_name} - Yah Content Accuracy", True, "Contains expected Wisdom literature content")
+                                if sequential:
+                                    self.log_test(f"Chapter Numbering - {book} Ch.1", True, f"✅ SEQUENTIAL! Verses 1-{len(verse_numbers)} properly numbered")
+                                    numbering_tests_passed += 1
                                 else:
-                                    self.log_test(f"{book_name} - Yah Content Accuracy", True, "Content appears appropriate for book")
-                                
-                                books_quality_passed += 1
+                                    self.log_test(f"Chapter Numbering - {book} Ch.1", False, f"Non-sequential numbering: {verse_numbers[:10]}")
                             else:
-                                self.log_test(f"{book_name} - Yah Content Quality", False, f"Poor content: '{verse_text}'")
+                                self.log_test(f"Chapter Numbering - {book} Ch.1", False, f"Numbering doesn't start at 1: {verse_numbers[:5]}")
                         else:
-                            self.log_test(f"{book_name} - Yah Scriptures", False, f"Book not found or no verses")
+                            self.log_test(f"Chapter Numbering - {book} Ch.1", False, f"No verses found for {book} chapter 1")
                     else:
-                        self.log_test(f"{book_name} - Yah Scriptures", False, f"Status: {response.status_code}")
+                        self.log_test(f"Chapter Numbering - {book} Ch.1", False, f"Status: {response.status_code}")
                 except Exception as e:
-                    self.log_test(f"{book_name} - Yah Scriptures", False, f"Error: {str(e)}")
-                
-                # Test KJV 1611 version (if available)
+                    self.log_test(f"Chapter Numbering - {book} Ch.1", False, f"Error: {str(e)}")
+            
+            # Test 3: Confirm book names and testament assignments are correct
+            expected_book_testaments = {
+                'Genesis': 'old',
+                'Exodus': 'old', 
+                'Psalms': 'old',
+                'Matthew': 'new',
+                'Mark': 'new'
+            }
+            
+            book_assignment_tests_passed = 0
+            for book_name, expected_testament in expected_book_testaments.items():
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=10")
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=5")
                     if response.status_code == 200:
                         data = response.json()
-                        kjv_total = data.get('total', 0)
                         verses = data.get('verses', [])
                         
-                        if kjv_total > 0 and verses:
-                            # Check verse count approach to web-verified standards
-                            coverage_ratio = kjv_total / web_standard_count
-                            self.log_test(f"{book_name} - KJV 1611 Verse Count", True, f"Found {kjv_total} verses (coverage ratio: {coverage_ratio:.2f})")
+                        if verses:
+                            verse = verses[0]
+                            actual_book = verse.get('book', '')
+                            actual_testament = verse.get('testament', '')
                             
-                            # Check sample verse content quality
-                            sample_verse = verses[0]
-                            verse_text = sample_verse.get('text', '')
-                            if verse_text and len(verse_text) > 10:
-                                preview = verse_text[:80] + "..." if len(verse_text) > 80 else verse_text
-                                self.log_test(f"{book_name} - KJV Content Quality", True, f"Good content ({len(verse_text)} chars): '{preview}'")
+                            # Check book name consistency
+                            if actual_book == book_name:
+                                book_name_correct = True
                             else:
-                                self.log_test(f"{book_name} - KJV Content Quality", False, f"Poor content: '{verse_text}'")
+                                book_name_correct = False
+                            
+                            # Check testament assignment
+                            if actual_testament == expected_testament:
+                                testament_correct = True
+                            else:
+                                testament_correct = False
+                            
+                            if book_name_correct and testament_correct:
+                                self.log_test(f"Book Assignment - {book_name}", True, f"✅ CORRECT! Book: {actual_book}, Testament: {actual_testament}")
+                                book_assignment_tests_passed += 1
+                            else:
+                                issues = []
+                                if not book_name_correct:
+                                    issues.append(f"book name: {actual_book}")
+                                if not testament_correct:
+                                    issues.append(f"testament: {actual_testament}")
+                                self.log_test(f"Book Assignment - {book_name}", False, f"Incorrect {', '.join(issues)}")
                         else:
-                            self.log_test(f"{book_name} - KJV 1611", True, f"Book not available in KJV version (expected for some books)")
+                            self.log_test(f"Book Assignment - {book_name}", False, f"No verses found for {book_name}")
                     else:
-                        self.log_test(f"{book_name} - KJV 1611", True, f"Book not available in KJV version (Status: {response.status_code})")
+                        self.log_test(f"Book Assignment - {book_name}", False, f"Status: {response.status_code}")
                 except Exception as e:
-                    self.log_test(f"{book_name} - KJV 1611", True, f"Book not available in KJV version (Error: {str(e)})")
+                    self.log_test(f"Book Assignment - {book_name}", False, f"Error: {str(e)}")
             
-            # Test specific verse samples for quality verification
-            specific_verses = [
-                ("Genesis", 1, 1, "yah_scriptures", "creation"),
-                ("Psalms", 1, 1, "yah_scriptures", "blessed"),
-                ("Matthew", 1, 1, "yah_scriptures", "genealogy"),
-                ("Romans", 1, 1, "yah_scriptures", "paul")
+            # Test 4: Verify data structure consistency across all verses
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=30")
+                if response.status_code == 200:
+                    data = response.json()
+                    verses = data.get('verses', [])
+                    
+                    if verses:
+                        required_fields = ['book', 'chapter', 'verse', 'text', 'testament']
+                        verses_with_all_fields = 0
+                        field_completeness = {field: 0 for field in required_fields}
+                        
+                        for verse in verses[:15]:  # Check first 15 verses
+                            has_all_fields = True
+                            for field in required_fields:
+                                if field in verse and verse[field] is not None and str(verse[field]).strip() != '':
+                                    field_completeness[field] += 1
+                                else:
+                                    has_all_fields = False
+                            
+                            if has_all_fields:
+                                verses_with_all_fields += 1
+                        
+                        structure_completeness = (verses_with_all_fields / 15) * 100
+                        
+                        if structure_completeness >= 95:
+                            self.log_test("Data Structure Consistency", True, f"✅ EXCELLENT! {verses_with_all_fields}/15 verses have complete structure ({structure_completeness:.1f}%)")
+                        elif structure_completeness >= 80:
+                            self.log_test("Data Structure Consistency", True, f"Good structure: {verses_with_all_fields}/15 verses complete ({structure_completeness:.1f}%)")
+                        else:
+                            self.log_test("Data Structure Consistency", False, f"Poor structure: {verses_with_all_fields}/15 verses complete ({structure_completeness:.1f}%)")
+                        
+                        # Report field completeness
+                        for field, count in field_completeness.items():
+                            completeness = (count / 15) * 100
+                            if completeness >= 95:
+                                self.log_test(f"Field Completeness - {field}", True, f"✅ {count}/15 verses have {field} ({completeness:.1f}%)")
+                            else:
+                                self.log_test(f"Field Completeness - {field}", False, f"Only {count}/15 verses have {field} ({completeness:.1f}%)")
+                    else:
+                        self.log_test("Data Structure Consistency", False, "No verses found for structure check")
+                else:
+                    self.log_test("Data Structure Consistency", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Data Structure Consistency", False, f"Error: {str(e)}")
+            
+            # Test 5: Sample specific verses for content accuracy
+            specific_verse_tests = [
+                ("Genesis", 1, 1, "creation content"),
+                ("Genesis", 1, 2, "earth content"),
+                ("Matthew", 1, 1, "genealogy content"),
+                ("Matthew", 1, 2, "birth content"),
+                ("Psalms", 1, 1, "blessed content")
             ]
             
-            verse_quality_passed = 0
-            for book, chapter, verse_num, version, expected_content in specific_verses:
+            specific_verse_tests_passed = 0
+            for book, chapter, verse_num, expected_content in specific_verse_tests:
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verse/{book}/{chapter}/{verse_num}?version={version}")
+                    response = self.session.get(f"{self.base_url}/bible/verse/{book}/{chapter}/{verse_num}?version=kjv1611_divine")
                     if response.status_code == 200:
                         verse_data = response.json()
                         verse_text = verse_data.get('text', '')
                         
                         if verse_text and len(verse_text) > 15:
-                            preview = verse_text[:100] + "..." if len(verse_text) > 100 else verse_text
-                            self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", True, f"Complete text ({len(verse_text)} chars): '{preview}'")
-                            
-                            # Check structure integrity
-                            if (verse_data.get('book') == book and 
-                                verse_data.get('chapter') == chapter and 
-                                verse_data.get('verse') == verse_num and
-                                verse_data.get('testament')):
-                                self.log_test(f"Verse Structure - {book} {chapter}:{verse_num}", True, "All fields present and correct")
-                                verse_quality_passed += 1
-                            else:
-                                self.log_test(f"Verse Structure - {book} {chapter}:{verse_num}", False, "Missing or incorrect fields")
+                            preview = verse_text[:80] + "..." if len(verse_text) > 80 else verse_text
+                            self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", True, f"✅ COMPLETE TEXT! ({len(verse_text)} chars): '{preview}'")
+                            specific_verse_tests_passed += 1
                         else:
-                            self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, f"Empty or truncated text: '{verse_text}'")
+                            self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, f"Incomplete text: '{verse_text}'")
                     else:
                         self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, f"Status: {response.status_code}")
                 except Exception as e:
                     self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, f"Error: {str(e)}")
             
-            # Overall quality assessment
-            total_books_tested = len(high_value_books)
-            if books_quality_passed >= (total_books_tested * 0.7):  # At least 70% of books should pass quality check
-                self.log_test("Overall Book Quality Assessment", True, f"{books_quality_passed}/{total_books_tested} books passed quality checks")
-            else:
-                self.log_test("Overall Book Quality Assessment", False, f"Only {books_quality_passed}/{total_books_tested} books passed quality checks")
+            # Success criteria: Good content quality, sequential numbering, correct assignments, consistent structure
+            success = (content_quality_percentage >= 80 and 
+                      numbering_tests_passed >= 2 and 
+                      book_assignment_tests_passed >= 4 and 
+                      specific_verse_tests_passed >= 3)
             
-            if verse_quality_passed >= 3:  # At least 3/4 specific verses should pass
-                self.log_test("Overall Verse Quality Assessment", True, f"{verse_quality_passed}/4 specific verses passed quality checks")
-            else:
-                self.log_test("Overall Verse Quality Assessment", False, f"Only {verse_quality_passed}/4 specific verses passed quality checks")
-            
-            return books_quality_passed >= (total_books_tested * 0.7) and verse_quality_passed >= 3
+            return success
             
         except Exception as e:
-            self.log_test("Sample Book Quality Check", False, f"Error: {str(e)}")
+            self.log_test("Data Quality Assessment", False, f"Error: {str(e)}")
             return False
 
     def test_database_performance_with_large_dataset(self):
