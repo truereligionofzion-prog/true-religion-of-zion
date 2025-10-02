@@ -2154,7 +2154,11 @@ const MitzvotApp = () => {
                           {/* Verses in continuous reading format */}
                           <div className="space-y-1 leading-relaxed text-gray-800">
                             {chapter.verses.map((verse) => (
-                              <p key={`${chapter.book}_${chapter.chapter}_${verse.verse}`} className="text-base">
+                              <p 
+                                key={`${chapter.book}_${chapter.chapter}_${verse.verse}`} 
+                                id={`${chapter.book.toLowerCase().replace(/\s+/g, '_')}_${chapter.chapter}_${verse.verse}`}
+                                className="text-base scroll-mt-20"
+                              >
                                 <span className="font-bold text-blue-600 mr-2">{verse.verse}</span>
                                 <span className="text-gray-800">{renderBibleText(verse?.text || '', verse?.id)}</span>
                                 {verse.has_precept && (
