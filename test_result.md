@@ -404,7 +404,7 @@ frontend:
     implemented: true
     working: false
     file: "/app/frontend/src/components/MitzvotApp.jsx"
-    stuck_count: 2
+    stuck_count: 3
     priority: "high"
     needs_retesting: false
     status_history:
@@ -417,6 +417,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ URGENT VERIFICATION FAILED: Bible verse text display issue is NOT FIXED after highlightDivineNames function correction. COMPREHENSIVE TESTING RESULTS: ✅ BACKEND API PERFECT: All API calls successful (200 status), returning complete verse data ('The book of the words of Tobit, son of Tobiel, the son of Ananiel...' - 152 characters), 4 successful API responses captured (/api/bible/verses, /api/bible/stats). ❌ FRONTEND RENDERING BROKEN: All view modes show '...' instead of actual Bible text - Card View: displays '...' in verse text areas, Table View: shows '...' in text columns, Reading View: shows only verse numbers (1, 2, 3) without text content. ❌ ROOT CAUSE: renderHighlightedText() function (lines 103-111) not working properly with dangerouslySetInnerHTML, React console errors (duplicate keys 'tobit_1_4', HTML structure violations), JSX rendering issues preventing text display. USER REPORT 100% ACCURATE - Bible verses still showing placeholders instead of actual biblical content. CRITICAL FIX NEEDED: renderHighlightedText function must be completely rewritten to handle text rendering without breaking React components."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE CONFIRMED AFTER REWRITE: Bible verse text display is STILL BROKEN despite renderHighlightedText function rewrite to avoid dangerouslySetInnerHTML. COMPREHENSIVE TESTING RESULTS: ✅ BACKEND API PERFECT: All API calls successful (Status 200), returning complete verse data ('The book of the words of Tobit, son of Tobiel, the son of Ananiel...' - 152+ characters each). ❌ FRONTEND RENDERING COMPLETELY BROKEN: Table View shows '...' for ALL Bible verses (Ezra 1:1, Ezra 1:2, Ezra 1:3 all display '...' in Text column), Card View and Reading View also affected. ❌ ROOT CAUSE IDENTIFIED: React key conflicts in renderHighlightedText function - console errors show 'Encountered two children with the same key' for divine name highlighting. The function generates keys like '${divineName}-${i}' but these conflict across multiple verses containing same divine names. ❌ CRITICAL IMPACT: User experience shows Bible references (Ezra 1:1, Tobit 1:1) but ZERO actual Bible text content in any view mode. The renderHighlightedText function needs unique keys across ALL verses, not just within each verse. This is a CRITICAL BLOCKER preventing Bible functionality completely."
 
 metadata:
   created_by: "main_agent"
