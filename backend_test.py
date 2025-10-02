@@ -358,13 +358,31 @@ class APITester:
             else:
                 self.log_test("Bible Books Endpoint", False, f"Status: {response.status_code}")
             
-            # Test /api/bible/stats
+            # Test /api/bible/stats - COMPREHENSIVE STATS VERIFICATION
             response = self.session.get(f"{self.base_url}/bible/stats")
             if response.status_code == 200:
                 data = response.json()
                 total_verses = data.get('totalVerses', 0)
                 total_books = data.get('totalBooks', 0)
-                self.log_test("Bible Stats Endpoint", True, f"Stats: {total_books} books, {total_verses} verses")
+                apocrypha_books = data.get('apocryphaBooks', 0)
+                
+                # Verify reasonable numbers as per review request
+                if total_books >= 44:
+                    self.log_test("Bible Stats - Books Count", True, f"Found {total_books} books (expected 44+)")
+                else:
+                    self.log_test("Bible Stats - Books Count", False, f"Only {total_books} books (expected 44+)")
+                
+                if total_verses >= 15000:
+                    self.log_test("Bible Stats - Verses Count", True, f"Found {total_verses} verses (expected 15000+)")
+                else:
+                    self.log_test("Bible Stats - Verses Count", False, f"Only {total_verses} verses (expected 15000+)")
+                
+                if apocrypha_books >= 1:
+                    self.log_test("Bible Stats - Apocrypha Books", True, f"Found {apocrypha_books} apocrypha books")
+                else:
+                    self.log_test("Bible Stats - Apocrypha Books", False, f"Only {apocrypha_books} apocrypha books")
+                
+                self.log_test("Bible Stats Endpoint", True, f"Stats: {total_books} books, {total_verses} verses, {apocrypha_books} apocrypha")
             else:
                 self.log_test("Bible Stats Endpoint", False, f"Status: {response.status_code}")
             
