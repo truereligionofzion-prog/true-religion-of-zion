@@ -75,17 +75,11 @@ const MitzvotApp = () => {
 
   // Phase 3C: Divine name rendering - COMPLETELY REBUILT to fix React key conflicts
   const renderBibleText = (text, verseId) => {
-    // DEBUG: Log what we're receiving
-    console.log('renderBibleText called with:', { text: text?.substring(0, 50), verseId, type: typeof text });
-    
-    // Always return plain text first to get basic functionality working
+    // Return plain text for proper display
     if (!text || typeof text !== 'string') {
-      console.log('renderBibleText returning empty - invalid text:', text);
-      return 'NO TEXT PROVIDED';
+      return '';  // Return empty string instead of placeholder text
     }
     
-    // For now, return plain text without any highlighting to fix the core display issue
-    console.log('renderBibleText returning text:', text.substring(0, 30));
     return text;
   };
 
