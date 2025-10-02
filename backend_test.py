@@ -1,36 +1,37 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Exodus Authentic Biblical Text Verification
+Backend Testing for Leviticus Authentic Biblical Text Verification
 
-REVIEW REQUEST FOCUS - EXODUS AUTHENTIC CONTENT VERIFICATION:
-Please verify that Exodus now contains authentic biblical text without placeholder brackets. Test:
+REVIEW REQUEST FOCUS - LEVITICUS AUTHENTIC CONTENT VERIFICATION:
+Please verify that Leviticus now contains authentic biblical text following the Genesis/Exodus success pattern. Test:
 
-1. **Exodus Authentic Content Verification**:
-   - Verify Exodus has 1,063 verses across all 40 chapters
-   - Check that Exodus 1:1-5 contains proper Israel names content (not Genesis creation content)
-   - Confirm Exodus 3:1-2 has burning bush content
-   - Verify Exodus 20:1-3 has Ten Commandments content
+1. **Leviticus Authentic Content Verification**:
+   - Verify Leviticus has 788 verses across all 27 chapters
+   - Check that Leviticus 1:1-2 contains proper content about LORD calling Moses and offerings
+   - Confirm Leviticus 11:1-2 has clean/unclean animals content
+   - Verify Leviticus 19:1-2 has holiness laws content
 
-2. **No Placeholder Brackets Check**:
-   - Verify NO verses contain "see Exodus [chapter]:[verse]" placeholder text
-   - Check that legitimate KJV brackets (like [is] or [are]) are preserved
-   - Confirm no "complete KJV text" references exist
+2. **No Placeholder Content Check**:
+   - Verify NO verses contain "see Leviticus [chapter]:[verse]" placeholder text
+   - Check that legitimate KJV brackets are preserved
+   - Confirm no generated placeholder references exist
 
-3. **Genesis Preservation Verification**:
-   - Verify Genesis still has exactly 1,533 verses (completely preserved)
-   - Confirm no cross-contamination between Genesis and Exodus
+3. **Previous Books Preservation**:
+   - Verify Genesis still has exactly 1,533 verses (preserved)
+   - Verify Exodus still has 1,063 verses (preserved) 
+   - Confirm no cross-contamination between all three books
 
 4. **Content Quality Sampling**:
-   - Sample 10 random Exodus verses to verify authentic biblical content
-   - Check for proper biblical language and structure
-   - Ensure verses are substantial (not truncated)
+   - Sample 10 random Leviticus verses to verify authentic biblical content
+   - Check for proper Leviticus themes (offerings, sacrifices, holiness, priests)
+   - Ensure verses contain substantial biblical language
 
 5. **Complete Database Status**:
-   - Get total verse count (should be Genesis 1,533 + Exodus 1,063 = 2,596)
-   - Verify both books exist in KJV 1611 Divine version
-   - Confirm proper testament classification
+   - Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 = 3,384)
+   - Verify all three books exist in KJV 1611 Divine version
+   - Confirm proper testament and order classification
 
-This verification confirms Exodus contains only authentic biblical text without any generated placeholder content or brackets.
+This verification confirms Leviticus follows the authentic biblical text pattern established with Genesis and Exodus, with no generated placeholder content.
 """
 
 import requests
