@@ -538,23 +538,28 @@ async def get_bible_verse(book: str, chapter: int, verse: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/bible/stats")
-async def get_bible_stats():
+async def get_bible_stats(
+    version: Optional[str] = Query("kjv1611_divine", description="Bible version: kjv1611_divine, yah_scriptures")
+):
     """Get Bible summary statistics"""
     try:
-        total_books = await bible_books_collection.count_documents({})
-        total_verses = await bible_verses_collection.count_documents({})
+        # Build version query
+        version_query = {"version": version}
+        
+        total_books = await bible_books_collection.count_documents(version_query)
+        total_verses = await bible_verses_collection.count_documents(version_query)
         
         # Count by testament
-        old_testament_books = await bible_books_collection.count_documents({"testament": "old"})
-        new_testament_books = await bible_books_collection.count_documents({"testament": "new"})
-        apocrypha_books = await bible_books_collection.count_documents({"testament": "apocrypha"})
+        old_testament_books = await bible_books_collection.count_documents({**version_query, "testament": "old"})
+        new_testament_books = await bible_books_collection.count_documents({**version_query, "testament": "new"})
+        apocrypha_books = await bible_books_collection.count_documents({**version_query, "testament": "apocrypha"})
         
-        old_testament_verses = await bible_verses_collection.count_documents({"testament": "old"})
-        new_testament_verses = await bible_verses_collection.count_documents({"testament": "new"})
-        apocrypha_verses = await bible_verses_collection.count_documents({"testament": "apocrypha"})
+        old_testament_verses = await bible_verses_collection.count_documents({**version_query, "testament": "old"})
+        new_testament_verses = await bible_verses_collection.count_documents({**version_query, "testament": "new"})
+        apocrypha_verses = await bible_verses_collection.count_documents({**version_query, "testament": "apocrypha"})
         
         # Count verses with precepts
-        verses_with_precepts = await bible_verses_collection.count_documents({"has_precept": True})
+        verses_with_precepts = await bible_verses_collection.count_documents({**version_query, "has_precept": True})
         
         # Get unique chapters count
         pipeline = [
