@@ -1,50 +1,44 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Yah Scriptures Bible API Functionality - COMPREHENSIVE TESTING
+Backend Testing for KJV Bible Data Replacement - COMPREHENSIVE TESTING
 
-REVIEW REQUEST FOCUS - YAH SCRIPTURES VERSION TESTING:
-COMPLETED TASK: Just finished extracting the complete New Testament from yah_scriptures.pdf. 
-The Yah Scriptures version is now complete with:
-- Old Testament: 2,678 verses (39 books) 
-- New Testament: 5,328 verses (26 books) - NEWLY COMPLETED
-- Apocrypha: 2,009 verses (15 books)
-- TOTAL: 10,015 verses (80 books)
+REVIEW REQUEST FOCUS - KJV 1611 VERSION TESTING:
+COMPLETED TASK: New KJV Bible data replacement has been loaded into the database.
+The KJV 1611 Divine Names version should now be complete with:
+- Sample books loaded: Genesis, Exodus, Matthew, Mark, Tobit, Psalms (6 books total)
+- Expected verse counts: ~1,083 verses for the sample books
+- Improved data quality: Genesis (~214 verses vs previous ~48), Matthew (~227 vs previous ~17)
 
 CRITICAL TESTING REQUIRED:
-1. Bible API Endpoints with Yah Scriptures version:
-   - GET /api/bible/stats?version=yah_scriptures (verify all counts are correct)
-   - GET /api/bible/books?version=yah_scriptures (check all 80 books present)
-   - GET /api/bible/verses?version=yah_scriptures (verify verse retrieval works)
-   - GET /api/bible/versions (confirm yah_scriptures is available)
+1. KJV 1611 Version API Testing:
+   - GET /api/bible/versions (verify kjv1611_divine version is available and working)
+   - GET /api/bible/stats?version=kjv1611_divine (verify correct counts)
 
-2. New Testament Data Quality:
-   - Test specific NT books: Matthew, Mark, Luke, John, Acts, Romans, 1 Corinthians, Revelation
-   - Verify chapter/verse structure is correct
-   - Check that verse text contains actual biblical content (not empty or corrupted)
-   - Verify divine name standardization applied (should contain "YHWH" not "{vWHY}")
+2. Bible Books API Testing:
+   - GET /api/bible/books?version=kjv1611_divine (check 6 sample books present)
+   - Verify proper testament distribution (old/new/apocrypha)
+   - Check correct book ordering and metadata
 
-3. Testament Filtering:
-   - Test filtering by testament=new (should return 5,328 NT verses)
-   - Test filtering by testament=old (should return 2,678 OT verses)
-   - Test filtering by testament=apocrypha (should return 2,009 verses)
+3. Bible Verses API Testing:
+   - GET /api/bible/verses?version=kjv1611_divine (verify ~1,083 verses total)
+   - Test proper verse text content quality (not empty or truncated)
+   - Verify correct book/chapter/verse structure
 
-4. Book Navigation:
-   - Test that all 26 NT books are accessible
-   - Check proper ordering (Matthew=40, Mark=41, etc.)
-   - Verify chapter counts match expected (Matthew=28, Mark=16, Luke=24, John=21)
+4. Data Quality Verification:
+   - Compare Genesis verse count (should be ~214 verses vs previous ~48)
+   - Check Matthew verses (should be ~227 vs previous ~17)
+   - Verify verse text content is complete and readable
 
-5. Sample Verse Verification:
-   - Matthew 1:1 (genealogy of Jesus)
-   - John 1:1 (In the beginning was the Word)
-   - Romans 1:1 (Paul's introduction)
-   - Revelation 1:1 (The revelation of Jesus Christ)
+5. API Response Structure:
+   - Ensure all Bible endpoints return proper JSON structure with required fields
+   - Test pagination and filtering functionality
 
 EXPECTED RESULTS:
-- All Bible API endpoints should return 200 OK with yah_scriptures version
-- Stats should show: 80 books, 10,015 verses (2,678 OT + 5,328 NT + 2,009 Apocrypha)
-- New Testament books should be accessible and contain proper biblical content
-- Divine name standardization should be applied (YHWH instead of {vWHY})
-- Testament filtering should work correctly with proper verse counts
+- kjv1611_divine version should be available in versions list
+- Stats should show 6 books with ~1,083 total verses
+- Sample books: Genesis, Exodus, Matthew, Mark, Tobit, Psalms should be accessible
+- Verse content should be complete and readable (not truncated)
+- Significant improvement in verse counts compared to previous incomplete data
 """
 
 import requests
