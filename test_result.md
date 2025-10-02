@@ -402,15 +402,18 @@ frontend:
 
   - task: "Phase 3C: Advanced Bible Features"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/components/MitzvotApp.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE TESTING COMPLETED: All Phase 3C advanced Bible features are working correctly with 95% functionality confirmed. ✅ BIBLE TAB: 'Bible with Apocrypha' tab loads with 15,283 verses statistic verified. ✅ ADVANCED SEARCH: Complete panel with books filter, testament filter, chapters filter, and all 4 checkboxes ('Has Precept Connection', 'Contains Divine Names', 'Exact Phrase Match', 'Highlight Divine Names'). ✅ DIVINE NAMES: '✨ Divine Names' button functional, highlighting system working (4+ elements highlighted), YHWH/Elohim search returns results. ✅ CROSS-REFERENCES: '🔗 Cross-Refs' button working, shows precept connections. ✅ VIEW MODES: Both 'Reading View' and 'Card View' tabs functional. ✅ SEARCH: Basic search works with Bible content. ✅ MOBILE: All features responsive on mobile viewport. ✅ INTEGRATION: Quiz and Flashcards show Bible options. ❌ MINOR ISSUES: Bible books count shows 2 instead of 44, some API 500 errors, React console warnings. Core functionality excellent."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL BIBLE VERSE DISPLAY ISSUE CONFIRMED: User report is ACCURATE - Bible verses are NOT displaying properly despite recent fixes. ✅ WORKING CORRECTLY: Bible tab loads, shows correct statistics (15,283 verses, 2 books), all view modes present (Reading View, Card View, Table View), advanced search panel functional, API returning full verse data (verified: 'The book of the words of Tobit, son of Tobiel...'). ❌ CORE PROBLEM: Actual Bible verse text is displaying as '...' instead of full verse content in ALL view modes. The highlightDivineNames() function returns React element with dangerouslySetInnerHTML which may be causing rendering issues. Backend API works perfectly - frontend text rendering is broken. User experience: clicking Bible tab shows only verse references (Ezra 1:1, Tobit 1:1) but NO actual Bible text content. This is exactly what user reported - Bible verses still not displaying properly."
 
 metadata:
   created_by: "main_agent"
