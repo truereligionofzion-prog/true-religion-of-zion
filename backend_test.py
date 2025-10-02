@@ -204,8 +204,134 @@ class APITester:
             self.log_test("Exodus Authentic Content Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_genesis_preservation_check(self):
-        """REVIEW REQUEST TEST 2: Genesis Preservation Check - Verify Genesis still has exactly 1,533 verses and is intact"""
+    def test_no_placeholder_brackets_check(self):
+        """REVIEW REQUEST TEST 2: No Placeholder Brackets Check - Verify NO placeholder brackets exist"""
+        try:
+            print("\n🔍 NO PLACEHOLDER BRACKETS CHECK - VERIFYING NO PLACEHOLDER TEXT EXISTS...")
+            
+            # Verify NO verses contain "see Exodus [chapter]:[verse]" placeholder text
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=50")
+                if response.status_code == 200:
+                    data = response.json()
+                    verses = data.get('verses', [])
+                    
+                    placeholder_patterns = [
+                        'see exodus [',
+                        'see exodus chapter',
+                        '[chapter]',
+                        '[verse]',
+                        'complete kjv text',
+                        'placeholder',
+                        'see chapter',
+                        'reference:'
+                    ]
+                    
+                    print("\n🚫 PLACEHOLDER BRACKETS DETECTION:")
+                    placeholder_violations = 0
+                    legitimate_brackets = 0
+                    
+                    for verse in verses:
+                        verse_text = verse.get('text', '').lower()
+                        verse_ref = f"Exodus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                        
+                        # Check for placeholder patterns
+                        placeholders_found = [pattern for pattern in placeholder_patterns if pattern in verse_text]
+                        
+                        if placeholders_found:
+                            placeholder_violations += 1
+                            print(f"   ❌ {verse_ref}: PLACEHOLDER FOUND - {', '.join(placeholders_found)} in '{verse_text[:60]}...'")
+                        else:
+                            # Check for legitimate KJV brackets like [is], [are], [them]
+                            import re
+                            legitimate_bracket_matches = re.findall(r'\[[a-z]+\]', verse_text)
+                            if legitimate_bracket_matches:
+                                legitimate_brackets += 1
+                                print(f"   ✅ {verse_ref}: Legitimate KJV brackets preserved - {', '.join(legitimate_bracket_matches)}")
+                    
+                    if placeholder_violations == 0:
+                        self.log_test("No Placeholder Brackets", True, f"✅ CLEAN! No placeholder brackets found in {len(verses)} Exodus verses")
+                    else:
+                        self.log_test("No Placeholder Brackets", False, f"❌ VIOLATIONS! Found {placeholder_violations} placeholder bracket violations")
+                    
+                    if legitimate_brackets > 0:
+                        self.log_test("Legitimate KJV Brackets Preserved", True, f"✅ PRESERVED! Found {legitimate_brackets} verses with legitimate KJV brackets")
+                    else:
+                        self.log_test("Legitimate KJV Brackets Preserved", True, f"✅ NONE NEEDED! No legitimate KJV brackets expected in sample")
+                        
+                else:
+                    self.log_test("No Placeholder Brackets", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Legitimate KJV Brackets Preserved", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("No Placeholder Brackets", False, f"Error: {str(e)}")
+                self.log_test("Legitimate KJV Brackets Preserved", False, f"Error: {str(e)}")
+            
+            # Confirm no "complete KJV text" references exist
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&search=complete%20kjv&limit=10")
+                if response.status_code == 200:
+                    data = response.json()
+                    verses = data.get('verses', [])
+                    
+                    if len(verses) == 0:
+                        self.log_test("No Complete KJV Text References", True, f"✅ CLEAN! No 'complete KJV text' references found")
+                    else:
+                        print(f"\n🚫 COMPLETE KJV TEXT REFERENCES FOUND:")
+                        for verse in verses:
+                            verse_text = verse.get('text', '')
+                            verse_ref = f"{verse.get('book', '?')} {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            print(f"   ❌ {verse_ref}: '{verse_text[:80]}...'")
+                        self.log_test("No Complete KJV Text References", False, f"❌ VIOLATIONS! Found {len(verses)} 'complete KJV text' references")
+                else:
+                    self.log_test("No Complete KJV Text References", True, f"✅ SEARCH CLEAN! No search results for 'complete KJV' (API Status: {response.status_code})")
+            except Exception as e:
+                self.log_test("No Complete KJV Text References", False, f"Error: {str(e)}")
+            
+            # Additional check for common placeholder patterns
+            try:
+                placeholder_searches = [
+                    'see exodus',
+                    'placeholder',
+                    'reference chapter',
+                    'complete text'
+                ]
+                
+                print(f"\n🔍 ADDITIONAL PLACEHOLDER PATTERN SEARCHES:")
+                total_placeholder_hits = 0
+                
+                for search_term in placeholder_searches:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&search={search_term.replace(' ', '%20')}&limit=5")
+                    if response.status_code == 200:
+                        data = response.json()
+                        verses = data.get('verses', [])
+                        
+                        if len(verses) == 0:
+                            print(f"   ✅ '{search_term}': No matches found - CLEAN")
+                        else:
+                            total_placeholder_hits += len(verses)
+                            print(f"   ❌ '{search_term}': {len(verses)} matches found - POTENTIAL PLACEHOLDERS")
+                            for verse in verses[:2]:  # Show first 2 matches
+                                verse_ref = f"{verse.get('book', '?')} {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                                print(f"      - {verse_ref}: '{verse.get('text', '')[:50]}...'")
+                    else:
+                        print(f"   ⚠️ '{search_term}': API Error - Status {response.status_code}")
+                
+                if total_placeholder_hits == 0:
+                    self.log_test("No Additional Placeholder Patterns", True, f"✅ COMPREHENSIVE CLEAN! No placeholder patterns found in additional searches")
+                else:
+                    self.log_test("No Additional Placeholder Patterns", False, f"❌ VIOLATIONS! Found {total_placeholder_hits} potential placeholder patterns")
+                    
+            except Exception as e:
+                self.log_test("No Additional Placeholder Patterns", False, f"Error: {str(e)}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("No Placeholder Brackets Check", False, f"Error: {str(e)}")
+            return False
+
+    def test_genesis_preservation_verification(self):
+        """REVIEW REQUEST TEST 3: Genesis Preservation Verification - Verify Genesis still has exactly 1,533 verses"""
         try:
             print("\n🔍 GENESIS PRESERVATION CHECK - VERIFYING GENESIS WASN'T AFFECTED BY EXODUS COMPLETION...")
             
