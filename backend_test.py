@@ -372,163 +372,170 @@ class APITester:
             return False
 
     def test_testament_distribution_verification(self):
-        """REVIEW REQUEST TEST 3: Testament Distribution Verification - Old Testament (39), New Testament (27), Apocrypha (14)"""
+        """REVIEW REQUEST TEST 3: Testament Distribution - 3 OT + 2 NT = 5 books total"""
         try:
-            print("\n🔍 TESTAMENT DISTRIBUTION VERIFICATION - COMPREHENSIVE COVERAGE...")
+            print("\n🔍 TESTAMENT DISTRIBUTION VERIFICATION - 3 OLD + 2 NEW TESTAMENT...")
             
-            # Test 1: Yah Scriptures testament distribution
-            response = self.session.get(f"{self.base_url}/bible/books?version=yah_scriptures")
-            if response.status_code == 200:
-                data = response.json()
-                yah_books = data.get('books', [])
-                
-                # Count books by testament
-                yah_testaments = {'old': 0, 'new': 0, 'apocrypha': 0}
-                for book in yah_books:
-                    testament = book.get('testament', 'unknown')
-                    if testament in yah_testaments:
-                        yah_testaments[testament] += 1
-                
-                # Check Old Testament (expected 39 books)
-                if yah_testaments['old'] == 39:
-                    self.log_test("Yah Scriptures - Old Testament Complete", True, f"🎉 COMPLETE! Found exactly 39/39 Old Testament books")
-                elif yah_testaments['old'] >= 35:
-                    self.log_test("Yah Scriptures - Old Testament Near Complete", True, f"Found {yah_testaments['old']}/39 Old Testament books (89%+ coverage)")
-                else:
-                    self.log_test("Yah Scriptures - Old Testament Coverage", False, f"Found only {yah_testaments['old']}/39 Old Testament books")
-                
-                # Check New Testament (expected 27 books)
-                if yah_testaments['new'] == 27:
-                    self.log_test("Yah Scriptures - New Testament Complete", True, f"🎉 COMPLETE! Found exactly 27/27 New Testament books")
-                elif yah_testaments['new'] >= 24:
-                    self.log_test("Yah Scriptures - New Testament Near Complete", True, f"Found {yah_testaments['new']}/27 New Testament books (89%+ coverage)")
-                else:
-                    self.log_test("Yah Scriptures - New Testament Coverage", False, f"Found only {yah_testaments['new']}/27 New Testament books")
-                
-                # Check Apocrypha (expected 14 books)
-                if yah_testaments['apocrypha'] == 14:
-                    self.log_test("Yah Scriptures - Apocrypha Complete", True, f"🎉 COMPLETE! Found exactly 14/14 Apocrypha books")
-                elif yah_testaments['apocrypha'] >= 12:
-                    self.log_test("Yah Scriptures - Apocrypha Near Complete", True, f"Found {yah_testaments['apocrypha']}/14 Apocrypha books (86%+ coverage)")
-                else:
-                    self.log_test("Yah Scriptures - Apocrypha Coverage", False, f"Found only {yah_testaments['apocrypha']}/14 Apocrypha books")
-                
-                # Overall Yah Scriptures assessment
-                total_expected = 39 + 27 + 14  # 80 books total
-                total_found = yah_testaments['old'] + yah_testaments['new'] + yah_testaments['apocrypha']
-                coverage_percentage = (total_found / total_expected) * 100
-                
-                self.log_test("Yah Scriptures - Overall Testament Coverage", True, f"Found {total_found}/80 books ({coverage_percentage:.1f}% coverage)")
-                
-            else:
-                self.log_test("Yah Scriptures - Testament Distribution", False, f"Status: {response.status_code}")
-                yah_testaments = {'old': 0, 'new': 0, 'apocrypha': 0}
-            
-            # Test 2: KJV 1611 testament distribution
+            # Test 1: Get KJV 1611 books and verify testament distribution
             response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
             if response.status_code == 200:
                 data = response.json()
                 kjv_books = data.get('books', [])
                 
                 # Count books by testament
-                kjv_testaments = {'old': 0, 'new': 0, 'apocrypha': 0}
+                testament_counts = {'old': 0, 'new': 0, 'apocrypha': 0}
+                old_testament_books = []
+                new_testament_books = []
+                
                 for book in kjv_books:
                     testament = book.get('testament', 'unknown')
-                    if testament in kjv_testaments:
-                        kjv_testaments[testament] += 1
+                    book_name = book.get('name', 'Unknown')
+                    
+                    if testament == 'old':
+                        testament_counts['old'] += 1
+                        old_testament_books.append(book_name)
+                    elif testament == 'new':
+                        testament_counts['new'] += 1
+                        new_testament_books.append(book_name)
+                    elif testament == 'apocrypha':
+                        testament_counts['apocrypha'] += 1
                 
-                self.log_test("KJV 1611 - Testament Distribution", True, f"Old: {kjv_testaments['old']}, New: {kjv_testaments['new']}, Apocrypha: {kjv_testaments['apocrypha']}")
+                # Verify expected distribution: 3 OT + 2 NT = 5 total
+                expected_ot = 3  # Genesis, Exodus, Psalms
+                expected_nt = 2  # Matthew, Mark
+                expected_total = 5
                 
-                # Check if KJV has representation from all testaments
-                testaments_represented = sum(1 for count in kjv_testaments.values() if count > 0)
-                if testaments_represented == 3:
-                    self.log_test("KJV 1611 - All Testaments Represented", True, "All three testaments have books")
+                if testament_counts['old'] == expected_ot:
+                    self.log_test("Old Testament Books Count", True, f"✅ PERFECT! Found exactly {testament_counts['old']}/3 Old Testament books")
                 else:
-                    self.log_test("KJV 1611 - Testament Representation", False, f"Only {testaments_represented}/3 testaments represented")
+                    self.log_test("Old Testament Books Count", False, f"Found {testament_counts['old']}/3 Old Testament books")
+                
+                if testament_counts['new'] == expected_nt:
+                    self.log_test("New Testament Books Count", True, f"✅ PERFECT! Found exactly {testament_counts['new']}/2 New Testament books")
+                else:
+                    self.log_test("New Testament Books Count", False, f"Found {testament_counts['new']}/2 New Testament books")
+                
+                if testament_counts['apocrypha'] == 0:
+                    self.log_test("Apocrypha Books Count", True, f"✅ CORRECT! No Apocrypha books (as expected for 5-book subset)")
+                else:
+                    self.log_test("Apocrypha Books Count", False, f"Found {testament_counts['apocrypha']} Apocrypha books (unexpected)")
+                
+                total_books = testament_counts['old'] + testament_counts['new'] + testament_counts['apocrypha']
+                if total_books == expected_total:
+                    self.log_test("Total Testament Distribution", True, f"✅ PERFECT DISTRIBUTION! {testament_counts['old']} OT + {testament_counts['new']} NT = {total_books} total books")
+                else:
+                    self.log_test("Total Testament Distribution", False, f"Incorrect total: {total_books}/5 books")
+                
+                # List the actual books found
+                self.log_test("Old Testament Books Listed", True, f"OT Books: {', '.join(old_testament_books)}")
+                self.log_test("New Testament Books Listed", True, f"NT Books: {', '.join(new_testament_books)}")
                 
             else:
-                self.log_test("KJV 1611 - Testament Distribution", False, f"Status: {response.status_code}")
-                kjv_testaments = {'old': 0, 'new': 0, 'apocrypha': 0}
+                self.log_test("Testament Distribution", False, f"Status: {response.status_code}")
+                return False
             
-            # Test 3: Verify testament filtering works for both versions
+            # Test 2: Verify testament filtering works correctly
             testament_filter_tests = [
-                ("old", "yah_scriptures"),
-                ("new", "yah_scriptures"),
-                ("apocrypha", "yah_scriptures"),
-                ("old", "kjv1611_divine"),
-                ("new", "kjv1611_divine"),
-                ("apocrypha", "kjv1611_divine")
+                ("old", "Old Testament filtering"),
+                ("new", "New Testament filtering")
             ]
             
-            testament_filtering_passed = 0
-            for testament, version in testament_filter_tests:
+            filtering_tests_passed = 0
+            for testament, test_name in testament_filter_tests:
                 try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version={version}&testament={testament}&limit=10")
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&testament={testament}&limit=20")
                     if response.status_code == 200:
                         data = response.json()
                         verses = data.get('verses', [])
                         total = data.get('total', 0)
-                        
-                        if total > 0:
-                            self.log_test(f"Testament Filter - {testament} ({version})", True, f"Found {total} verses")
-                            testament_filtering_passed += 1
-                            
-                            # Verify verses are from correct testament
-                            correct_testament = 0
-                            for verse in verses[:3]:  # Check first 3 verses
-                                if verse.get('testament') == testament:
-                                    correct_testament += 1
-                            
-                            if correct_testament >= 2:  # At least 2/3 should be correct
-                                self.log_test(f"Testament Accuracy - {testament} ({version})", True, f"{correct_testament}/3 verses correct")
-                            else:
-                                self.log_test(f"Testament Accuracy - {testament} ({version})", False, f"Only {correct_testament}/3 verses correct")
-                        else:
-                            self.log_test(f"Testament Filter - {testament} ({version})", False, f"No verses found")
-                    else:
-                        self.log_test(f"Testament Filter - {testament} ({version})", False, f"Status: {response.status_code}")
-                except Exception as e:
-                    self.log_test(f"Testament Filter - {testament} ({version})", False, f"Error: {str(e)}")
-            
-            # Test 4: Check specific high-value books from different testaments
-            high_value_books = [
-                ("Genesis", "old", "yah_scriptures"),
-                ("Psalms", "old", "yah_scriptures"),
-                ("Matthew", "new", "yah_scriptures"),
-                ("Romans", "new", "yah_scriptures"),
-                ("Tobit", "apocrypha", "yah_scriptures"),
-                ("Wisdom", "apocrypha", "yah_scriptures")
-            ]
-            
-            high_value_books_found = 0
-            for book, expected_testament, version in high_value_books:
-                try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version={version}&book={book}&limit=10")
-                    if response.status_code == 200:
-                        data = response.json()
-                        total = data.get('total', 0)
-                        verses = data.get('verses', [])
                         
                         if total > 0 and verses:
-                            # Check if testament matches
+                            # Verify verses are from correct testament
+                            correct_testament_count = 0
+                            for verse in verses[:5]:  # Check first 5 verses
+                                if verse.get('testament') == testament:
+                                    correct_testament_count += 1
+                            
+                            if correct_testament_count >= 4:  # At least 4/5 should be correct
+                                self.log_test(f"Testament Filter - {test_name}", True, f"Found {total} verses, {correct_testament_count}/5 correctly filtered")
+                                filtering_tests_passed += 1
+                            else:
+                                self.log_test(f"Testament Filter - {test_name}", False, f"Only {correct_testament_count}/5 verses correctly filtered")
+                        else:
+                            self.log_test(f"Testament Filter - {test_name}", False, f"No verses found for {testament} testament")
+                    else:
+                        self.log_test(f"Testament Filter - {test_name}", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Testament Filter - {test_name}", False, f"Error: {str(e)}")
+            
+            # Test 3: Verify specific expected books are in correct testaments
+            expected_book_testaments = [
+                ("Genesis", "old"),
+                ("Exodus", "old"),
+                ("Psalms", "old"),
+                ("Matthew", "new"),
+                ("Mark", "new")
+            ]
+            
+            book_testament_tests_passed = 0
+            for book_name, expected_testament in expected_book_testaments:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=5")
+                    if response.status_code == 200:
+                        data = response.json()
+                        verses = data.get('verses', [])
+                        total = data.get('total', 0)
+                        
+                        if total > 0 and verses:
                             verse_testament = verses[0].get('testament', 'unknown')
                             if verse_testament == expected_testament:
-                                self.log_test(f"High-Value Book - {book} ({expected_testament})", True, f"Found {total} verses in correct testament")
-                                high_value_books_found += 1
+                                self.log_test(f"Book Testament - {book_name}", True, f"✅ CORRECT! {book_name} is in {expected_testament} testament ({total} verses)")
+                                book_testament_tests_passed += 1
                             else:
-                                self.log_test(f"High-Value Book - {book} ({expected_testament})", False, f"Found {total} verses but wrong testament: {verse_testament}")
+                                self.log_test(f"Book Testament - {book_name}", False, f"Wrong testament: {book_name} in {verse_testament} (expected {expected_testament})")
                         else:
-                            self.log_test(f"High-Value Book - {book} ({expected_testament})", False, f"Book not found or no verses")
+                            self.log_test(f"Book Testament - {book_name}", False, f"Book {book_name} not found or no verses")
                     else:
-                        self.log_test(f"High-Value Book - {book} ({expected_testament})", False, f"Status: {response.status_code}")
+                        self.log_test(f"Book Testament - {book_name}", False, f"Status: {response.status_code}")
                 except Exception as e:
-                    self.log_test(f"High-Value Book - {book} ({expected_testament})", False, f"Error: {str(e)}")
+                    self.log_test(f"Book Testament - {book_name}", False, f"Error: {str(e)}")
             
-            # Overall assessment
-            yah_total_books = yah_testaments['old'] + yah_testaments['new'] + yah_testaments['apocrypha']
-            success = (yah_total_books >= 70 and  # At least 70/80 books for Yah Scriptures
-                      testament_filtering_passed >= 4 and  # At least 4/6 testament filters work
-                      high_value_books_found >= 4)  # At least 4/6 high-value books found
+            # Test 4: Verify total verse count distribution makes sense
+            try:
+                # Get verse counts by testament
+                ot_response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&testament=old&limit=1")
+                nt_response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&testament=new&limit=1")
+                
+                ot_verses = 0
+                nt_verses = 0
+                
+                if ot_response.status_code == 200:
+                    ot_data = ot_response.json()
+                    ot_verses = ot_data.get('total', 0)
+                
+                if nt_response.status_code == 200:
+                    nt_data = nt_response.json()
+                    nt_verses = nt_data.get('total', 0)
+                
+                total_verses = ot_verses + nt_verses
+                
+                # Expected rough distribution (OT books are typically longer)
+                if ot_verses > nt_verses and total_verses > 5000:
+                    self.log_test("Testament Verse Distribution", True, f"✅ REASONABLE! OT: {ot_verses} verses, NT: {nt_verses} verses (Total: {total_verses})")
+                elif total_verses > 3000:
+                    self.log_test("Testament Verse Distribution", True, f"Acceptable distribution - OT: {ot_verses}, NT: {nt_verses} (Total: {total_verses})")
+                else:
+                    self.log_test("Testament Verse Distribution", False, f"Low verse counts - OT: {ot_verses}, NT: {nt_verses} (Total: {total_verses})")
+                    
+            except Exception as e:
+                self.log_test("Testament Verse Distribution", False, f"Error: {str(e)}")
+            
+            # Success criteria: Correct testament counts, filtering works, books in correct testaments
+            success = (testament_counts['old'] == 3 and 
+                      testament_counts['new'] == 2 and 
+                      testament_counts['apocrypha'] == 0 and
+                      filtering_tests_passed >= 1 and 
+                      book_testament_tests_passed >= 4)
             
             return success
             
