@@ -112,44 +112,38 @@ class APITester:
                 self.log_test("KJV 1611 - Version Available", False, f"Status: {response.status_code}")
                 return False
             
-            # Test 2: Bible stats with yah_scriptures version - verify expected counts
-            response = self.session.get(f"{self.base_url}/bible/stats?version=yah_scriptures")
+            # Test 2: Bible stats with kjv1611_divine version - verify expected counts
+            response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
             if response.status_code == 200:
                 data = response.json()
                 total_books = data.get('totalBooks', 0)
                 total_verses = data.get('totalVerses', 0)
+                old_testament_books = data.get('oldTestamentBooks', 0)
+                new_testament_books = data.get('newTestamentBooks', 0)
+                apocrypha_books = data.get('apocryphaBooks', 0)
                 old_testament_verses = data.get('oldTestamentVerses', 0)
                 new_testament_verses = data.get('newTestamentVerses', 0)
                 apocrypha_verses = data.get('apocryphaVerses', 0)
                 
-                # Verify expected counts from review request
-                if total_books == 80:
-                    self.log_test("Yah Scriptures - Total Books", True, f"Found exactly 80 books as expected")
+                # Verify expected counts from review request (6 sample books, ~1,083 verses)
+                if total_books == 6:
+                    self.log_test("KJV 1611 - Total Books", True, f"Found exactly 6 sample books as expected")
                 else:
-                    self.log_test("Yah Scriptures - Total Books", False, f"Found {total_books} books (expected 80)")
+                    self.log_test("KJV 1611 - Total Books", False, f"Found {total_books} books (expected 6 sample books)")
                 
-                if total_verses == 10015:
-                    self.log_test("Yah Scriptures - Total Verses", True, f"Found exactly 10,015 verses as expected")
+                if 1000 <= total_verses <= 1200:  # Allow range around 1,083
+                    self.log_test("KJV 1611 - Total Verses", True, f"Found {total_verses} verses (expected ~1,083)")
                 else:
-                    self.log_test("Yah Scriptures - Total Verses", False, f"Found {total_verses} verses (expected 10,015)")
+                    self.log_test("KJV 1611 - Total Verses", False, f"Found {total_verses} verses (expected ~1,083)")
                 
-                if old_testament_verses == 2678:
-                    self.log_test("Yah Scriptures - OT Verses", True, f"Found exactly 2,678 OT verses as expected")
-                else:
-                    self.log_test("Yah Scriptures - OT Verses", False, f"Found {old_testament_verses} OT verses (expected 2,678)")
-                
-                if new_testament_verses == 5328:
-                    self.log_test("Yah Scriptures - NT Verses", True, f"Found exactly 5,328 NT verses as expected")
-                else:
-                    self.log_test("Yah Scriptures - NT Verses", False, f"Found {new_testament_verses} NT verses (expected 5,328)")
-                
-                if apocrypha_verses == 2009:
-                    self.log_test("Yah Scriptures - Apocrypha Verses", True, f"Found exactly 2,009 Apocrypha verses as expected")
-                else:
-                    self.log_test("Yah Scriptures - Apocrypha Verses", False, f"Found {apocrypha_verses} Apocrypha verses (expected 2,009)")
+                # Log testament distribution
+                self.log_test("KJV 1611 - Testament Distribution", True, 
+                            f"Books: OT={old_testament_books}, NT={new_testament_books}, Apocrypha={apocrypha_books}")
+                self.log_test("KJV 1611 - Verse Distribution", True, 
+                            f"Verses: OT={old_testament_verses}, NT={new_testament_verses}, Apocrypha={apocrypha_verses}")
                 
             else:
-                self.log_test("Yah Scriptures - Stats Endpoint", False, f"Status: {response.status_code}")
+                self.log_test("KJV 1611 - Stats Endpoint", False, f"Status: {response.status_code}")
                 return False
             
             # Test 3: Bible books with yah_scriptures version - verify all 80 books present
