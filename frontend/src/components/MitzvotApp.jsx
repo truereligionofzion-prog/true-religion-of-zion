@@ -2027,13 +2027,18 @@ const MitzvotApp = () => {
                       // Filter books based on selected testament
                       let filteredBooks = bibleBooks || [];
                       
+                      console.log('Current testament filter:', advancedFilters.testament);
+                      console.log('Total books available:', filteredBooks.length);
+                      
                       if (advancedFilters.testament && advancedFilters.testament !== 'all') {
+                        const originalCount = filteredBooks.length;
                         filteredBooks = filteredBooks.filter(book => {
                           if (advancedFilters.testament === 'old') return book.testament === 'old';
                           if (advancedFilters.testament === 'new') return book.testament === 'new';  
                           if (advancedFilters.testament === 'apocrypha') return book.testament === 'apocrypha';
                           return true;
                         });
+                        console.log(`Filtered from ${originalCount} to ${filteredBooks.length} books for testament: ${advancedFilters.testament}`);
                       }
                       
                       return filteredBooks.map((book) => (
@@ -2043,6 +2048,20 @@ const MitzvotApp = () => {
                           size="sm"
                           onClick={() => {
                             setSelectedBook(book.name);
+                            
+                            // Navigate to specific verse if chapter and verse are selected
+                            if (selectedChapter && selectedVerse) {
+                              const elementId = `${book.name.toLowerCase().replace(/\s+/g, '_')}_${selectedChapter}_${selectedVerse}`;
+                              setTimeout(() => {
+                                const element = document.getElementById(elementId);
+                                if (element) {
+                                  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                  element.classList.add('bg-yellow-200');
+                                  setTimeout(() => element.classList.remove('bg-yellow-200'), 3000);
+                                }
+                              }, 1000);
+                            }
+                            
                             loadContent(); // Reload content for selected book
                           }}
                           className={selectedBook === book.name ? 'bg-blue-100' : ''}
