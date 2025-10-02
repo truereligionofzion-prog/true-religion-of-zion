@@ -85,25 +85,31 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_yah_scriptures_bible_api_comprehensive(self):
-        """COMPREHENSIVE TEST: Yah Scriptures Bible API functionality"""
+    def test_kjv1611_bible_api_comprehensive(self):
+        """COMPREHENSIVE TEST: KJV 1611 Divine Names Bible API functionality"""
         try:
-            print("\n🔍 COMPREHENSIVE YAH SCRIPTURES BIBLE API TESTING...")
+            print("\n🔍 COMPREHENSIVE KJV 1611 DIVINE NAMES BIBLE API TESTING...")
             
-            # Test 1: Bible versions endpoint - verify yah_scriptures is available
+            # Test 1: Bible versions endpoint - verify kjv1611_divine is available
             response = self.session.get(f"{self.base_url}/bible/versions")
             if response.status_code == 200:
                 data = response.json()
                 versions = data.get('versions', [])
-                yah_scriptures_found = any(v.get('id') == 'yah_scriptures' for v in versions)
+                kjv1611_found = any(v.get('id') == 'kjv1611_divine' for v in versions)
                 
-                if yah_scriptures_found:
-                    self.log_test("Yah Scriptures - Version Available", True, "yah_scriptures version found in versions list")
+                if kjv1611_found:
+                    self.log_test("KJV 1611 - Version Available", True, "kjv1611_divine version found in versions list")
+                    
+                    # Get version details
+                    kjv_version = next((v for v in versions if v.get('id') == 'kjv1611_divine'), {})
+                    version_name = kjv_version.get('name', 'Unknown')
+                    version_desc = kjv_version.get('description', 'No description')
+                    self.log_test("KJV 1611 - Version Details", True, f"Name: {version_name}, Description: {version_desc}")
                 else:
-                    self.log_test("Yah Scriptures - Version Available", False, "yah_scriptures version not found")
+                    self.log_test("KJV 1611 - Version Available", False, "kjv1611_divine version not found")
                     return False
             else:
-                self.log_test("Yah Scriptures - Version Available", False, f"Status: {response.status_code}")
+                self.log_test("KJV 1611 - Version Available", False, f"Status: {response.status_code}")
                 return False
             
             # Test 2: Bible stats with yah_scriptures version - verify expected counts
