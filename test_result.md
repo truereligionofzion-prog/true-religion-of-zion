@@ -434,12 +434,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phase 3C: Advanced Bible Features - CRITICAL ISSUE PERSISTS ❌"
-    - "Bible Verse Text Display - React key conflicts preventing text rendering"
-    - "React Component Structure Issues - Deeper problems beyond renderHighlightedText function"
+    - "Phase 3C: Advanced Bible Features - PARTIALLY RESOLVED ✅❌"
+    - "Bible Verse Text Display - Reading View working, Table/Card views still broken"
+    - "React Key Conflicts - Affecting Table and Card view rendering"
   stuck_tasks: 
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
-    - "Bible Verse Text Display - React key conflicts preventing text display - URGENT FIX NEEDED"
+    - "Bible Table/Card View Display - React key conflicts preventing text display in specific views"
   test_all: false
   test_priority: "high_first"
 
