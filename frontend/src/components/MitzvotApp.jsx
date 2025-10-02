@@ -1828,7 +1828,7 @@ const MitzvotApp = () => {
                                   {verse.book} {verse.chapter}:{verse.verse}
                                 </td>
                                 <td className="p-4 text-sm text-gray-600 italic">
-                                  "{renderBibleText(verse?.text?.substring(0, 100) || '', verse?.id)}..."
+                                  {renderBibleText(verse?.text?.substring(0, 100) || '', verse?.id)}...
                                 </td>
                                 <td className="p-4">
                                   <Badge variant="secondary" className="capitalize">
