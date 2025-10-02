@@ -673,16 +673,16 @@ class APITester:
 
 def main():
     """Main test execution"""
-    print("🚀 Starting Genesis 100% Completion Verification Testing...")
+    print("🚀 Starting Exodus Current State Analysis Testing...")
     
     tester = APITester(BACKEND_URL)
-    success = tester.run_genesis_completion_verification_tests()
+    success = tester.run_exodus_current_state_analysis_tests()
     
     if success:
-        print("\n🎉 Genesis 100% completion verification successful!")
+        print("\n🎉 Exodus current state analysis successful!")
         sys.exit(0)
     else:
-        print("\n❌ Genesis 100% completion verification failed.")
+        print("\n❌ Exodus current state analysis failed.")
         sys.exit(1)
 
 if __name__ == "__main__":
