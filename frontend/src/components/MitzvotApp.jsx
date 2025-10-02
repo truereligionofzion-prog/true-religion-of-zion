@@ -67,6 +67,35 @@ const MitzvotApp = () => {
   const [showCrossReferences, setShowCrossReferences] = useState(false);
   const [divineNameHighlight, setDivineNameHighlight] = useState(true);
   
+  // Filtered books based on testament selection
+  const filteredBooks = React.useMemo(() => {
+    let books = bibleBooks || [];
+    
+    console.log('=== TESTAMENT FILTERING DEBUG ===');
+    console.log('Current testament filter:', advancedFilters.testament);
+    console.log('Total books available:', books.length);
+    console.log('Sample book structure:', books[0]);
+    
+    if (advancedFilters.testament && advancedFilters.testament !== 'all') {
+      const originalCount = books.length;
+      console.log('Filtering for testament:', advancedFilters.testament);
+      
+      books = books.filter(book => {
+        console.log(`Checking book: ${book.name} with testament: ${book.testament}`);
+        if (advancedFilters.testament === 'old') return book.testament === 'old';
+        if (advancedFilters.testament === 'new') return book.testament === 'new';  
+        if (advancedFilters.testament === 'apocrypha') return book.testament === 'apocrypha';
+        return true;
+      });
+      console.log(`Filtered from ${originalCount} to ${books.length} books for testament: ${advancedFilters.testament}`);
+      console.log('Filtered book names:', books.map(b => b.name));
+    } else {
+      console.log('No filtering applied, showing all testaments');
+    }
+    
+    return books;
+  }, [bibleBooks, advancedFilters.testament]);
+  
   // Authentication UI state
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
