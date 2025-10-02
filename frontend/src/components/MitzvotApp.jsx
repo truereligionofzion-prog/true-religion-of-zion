@@ -1252,10 +1252,7 @@ const MitzvotApp = () => {
                   ? 'bg-white text-gray-900 shadow' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
-              onClick={() => {
-                console.log('Precepts button clicked');
-                setContentType('precepts');
-              }}
+              onClick={() => setContentType('precepts')}
             >
               Biblical Precepts
             </button>
