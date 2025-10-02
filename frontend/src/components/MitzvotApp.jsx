@@ -1849,9 +1849,11 @@ const MitzvotApp = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    ))
-                  ) : contentType === 'precepts' ? (
-                    (precepts || []).map((precept) => {
+                    ))}
+                  </div>
+                ) : contentType === 'precepts' ? (
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {(precepts || []).map((precept) => {
                       const currentVerseIndex = preceptVerseIndex[precept.id] || 0;
                       const currentVerse = precept.verses?.[currentVerseIndex];
                       const expandKey = `${precept.id}_${currentVerseIndex}`;
