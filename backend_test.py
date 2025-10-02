@@ -1,15 +1,26 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Bible Verses API Issue - CRITICAL ERROR DIAGNOSIS
-Tests the Bible verses API endpoint to diagnose the 500 error:
-"ERROR:server:Error getting bible verses: '<' not supported between instances of 'str' and 'NoneType'"
+Backend Testing for Bible API Functionality - CRITICAL BIBLE VERSE TEXT RENDERING ISSUE DEBUGGING
 
-Focus areas:
-- Test /api/bible/verses endpoint to reproduce the error
-- Check database content for any data issues (null values, missing fields)
-- Identify the line of code causing the comparison error
-- Test related Bible endpoints (/api/bible/books, /api/bible-stats)
-- Check for any None/null values in the Bible verses collection
+REVIEW REQUEST FOCUS:
+- Test GET /api/bible/verses (should return verses with full text content)
+- Test GET /api/bible/stats (should return correct Bible statistics)
+- Verify verse objects contain 'text' field with actual biblical content
+- Check different testaments (old testament, new testament, apocrypha)
+- Verify data structure: {id, book, chapter, verse, text, testament, has_precept}
+- Verify 'text' field contains full biblical verse content (not empty/null)
+- Test with specific verses like Tobit 1:1, Ezra 1:1
+- Verify API returns proper JSON structure with verses array
+- Check pagination works correctly (page, totalPages)
+- Confirm filters structure is correct
+- Verify stats endpoint returns: totalBooks, totalVerses, apocryphaBooks
+- Numbers should be reasonable (44+ books, 15000+ verses)
+
+EXPECTED RESULTS:
+- All Bible API endpoints should return 200 OK
+- Verse text should contain actual biblical content (e.g., "The book of the words of Tobit...")
+- Stats should show correct numbers matching database content
+- No 500 errors or empty response data
 """
 
 import requests
