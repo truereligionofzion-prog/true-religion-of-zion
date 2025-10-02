@@ -576,7 +576,7 @@ class APITester:
                                 not verse_text.lower().startswith('error') and  # No error messages
                                 not verse_text.lower().startswith('missing') and  # No missing indicators
                                 not 'placeholder' in verse_text.lower() and  # No placeholders
-                                not 'see exodus' in verse_text.lower() and  # No cross-references
+                                not 'see leviticus' in verse_text.lower() and  # No cross-references
                                 verse_text.strip() != ''  # Not empty
                             )
                             
