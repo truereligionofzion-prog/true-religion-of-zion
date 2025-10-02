@@ -99,7 +99,33 @@ const MitzvotApp = () => {
     if (categories.length > 0 || contentType === 'bible' || contentType === 'precepts') {
       loadContent();
     }
-  }, [contentType, searchTerm, selectedCategory, selectedBook, currentPage, categories.length]);
+  }, [contentType, searchTerm, selectedCategory, selectedBook, currentPage, categories.length, selectedBibleVersion]);
+
+  // Load Bible versions and update stats when Bible version changes
+  useEffect(() => {
+    if (contentType === 'bible') {
+      loadBibleVersions();
+      loadBibleStats();
+    }
+  }, [selectedBibleVersion]);
+
+  const loadBibleVersions = async () => {
+    try {
+      const response = await apiService.getBibleVersions();
+      setAvailableVersions(response.versions);
+    } catch (error) {
+      console.error('Error loading Bible versions:', error);
+    }
+  };
+
+  const loadBibleStats = async () => {
+    try {
+      const response = await apiService.getBibleStats(selectedBibleVersion);
+      setBibleStats(response);
+    } catch (error) {
+      console.error('Error loading Bible stats:', error);
+    }
+  };
 
   const loadInitialData = async () => {
     try {
