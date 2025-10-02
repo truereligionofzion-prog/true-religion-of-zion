@@ -298,120 +298,147 @@ class APITester:
             self.log_test("Database Structure Check", False, f"Error: {str(e)}")
             return False
 
-    def test_database_statistics(self):
-        """REVIEW REQUEST TEST 3: Database Statistics - Verify Genesis book record and total database"""
+    def test_exodus_content_quality_check(self):
+        """REVIEW REQUEST TEST 3: Exodus Content Quality Check - Sample verses, cross-contamination, numbering"""
         try:
-            print("\n🔍 DATABASE STATISTICS - VERIFYING GENESIS BOOK RECORD AND TOTAL DATABASE...")
+            print("\n🔍 EXODUS CONTENT QUALITY CHECK - SAMPLING VERSES AND CHECKING QUALITY...")
             
-            # Verify the Genesis book record shows 1,533 verses
+            # Sample a few Exodus verses to check content quality (if exists)
             try:
-                response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
-                if response.status_code == 200:
-                    stats = response.json()
-                    total_verses = stats.get('totalVerses', 0)
-                    total_books = stats.get('totalBooks', 0)
-                    
-                    if total_verses == 1533:
-                        self.log_test("Genesis Book Record - 1,533 Verses", True, f"✅ PERFECT! Genesis book record shows exactly {total_verses} verses")
-                    else:
-                        self.log_test("Genesis Book Record - 1,533 Verses", False, f"❌ INCORRECT! Genesis book record shows {total_verses} verses, expected 1,533")
-                    
-                    if total_books == 1:
-                        self.log_test("Database Contains Only Genesis", True, f"✅ PURE! Database contains exactly {total_books} book (Genesis only)")
-                    else:
-                        self.log_test("Database Contains Only Genesis", False, f"❌ CONTAMINATED! Database contains {total_books} books, expected 1 (Genesis only)")
-                        
-                else:
-                    self.log_test("Genesis Book Record - 1,533 Verses", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Database Contains Only Genesis", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Genesis Book Record - 1,533 Verses", False, f"Error: {str(e)}")
-                self.log_test("Database Contains Only Genesis", False, f"Error: {str(e)}")
-            
-            # Confirm total database contains exactly 1,533 verses (pure Genesis dataset)
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=1")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=10")
                 if response.status_code == 200:
                     data = response.json()
+                    verses = data.get('verses', [])
                     total_verses = data.get('total', 0)
                     
-                    if total_verses == 1533:
-                        self.log_test("Total Database - Pure Genesis Dataset (1,533 verses)", True, f"✅ PERFECT! Total database contains exactly {total_verses} verses (pure Genesis)")
+                    if verses:
+                        print("\n📝 EXODUS VERSE QUALITY SAMPLING:")
+                        quality_verses = 0
+                        total_sampled = len(verses)
+                        
+                        for verse in verses:
+                            verse_text = verse.get('text', '')
+                            verse_ref = f"Exodus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            
+                            # Quality checks for Exodus verses
+                            is_quality = (
+                                len(verse_text) > 10 and  # Reasonable length
+                                not verse_text.startswith('...') and  # Not truncated
+                                not verse_text.endswith('...') and
+                                verse_text.strip() != '' and  # Not empty
+                                not verse_text.lower().startswith('error') and  # No error messages
+                                not verse_text.lower().startswith('missing')  # No missing indicators
+                            )
+                            
+                            if is_quality:
+                                quality_verses += 1
+                                print(f"   ✅ {verse_ref}: '{verse_text[:80]}...'")
+                            else:
+                                print(f"   ❌ {verse_ref}: QUALITY ISSUE - '{verse_text[:80]}...'")
+                        
+                        if total_sampled > 0:
+                            quality_percentage = (quality_verses / total_sampled) * 100
+                            if quality_percentage >= 90:
+                                self.log_test("Exodus Verse Quality", True, f"✅ EXCELLENT! {quality_verses}/{total_sampled} verses are high quality ({quality_percentage:.1f}%)")
+                            elif quality_percentage >= 70:
+                                self.log_test("Exodus Verse Quality", True, f"✅ GOOD! {quality_verses}/{total_sampled} verses are good quality ({quality_percentage:.1f}%)")
+                            else:
+                                self.log_test("Exodus Verse Quality", False, f"❌ POOR! {quality_verses}/{total_sampled} verses have quality issues ({quality_percentage:.1f}%)")
+                        
+                        # Check for Exodus-specific content
+                        exodus_keywords = ['moses', 'pharaoh', 'egypt', 'israelites', 'commandments', 'tabernacle', 'aaron']
+                        exodus_content_found = 0
+                        
+                        for verse in verses:
+                            verse_text = verse.get('text', '').lower()
+                            for keyword in exodus_keywords:
+                                if keyword in verse_text:
+                                    exodus_content_found += 1
+                                    break
+                        
+                        if exodus_content_found > 0:
+                            exodus_content_percentage = (exodus_content_found / len(verses)) * 100
+                            self.log_test("Exodus Content Authenticity", True, f"✅ AUTHENTIC! {exodus_content_found}/{len(verses)} verses contain Exodus-specific content ({exodus_content_percentage:.1f}%)")
+                        else:
+                            self.log_test("Exodus Content Authenticity", False, f"❌ SUSPICIOUS! No Exodus-specific content found in sampled verses")
+                            
                     else:
-                        self.log_test("Total Database - Pure Genesis Dataset (1,533 verses)", False, f"❌ INCORRECT! Total database contains {total_verses} verses, expected 1,533")
+                        self.log_test("Exodus Verse Quality", False, f"❌ NO DATA! No Exodus verses found for quality check")
+                        self.log_test("Exodus Content Authenticity", False, f"❌ NO DATA! No Exodus verses to check authenticity")
                 else:
-                    self.log_test("Total Database - Pure Genesis Dataset (1,533 verses)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Exodus Verse Quality", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Exodus Content Authenticity", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Total Database - Pure Genesis Dataset (1,533 verses)", False, f"Error: {str(e)}")
+                self.log_test("Exodus Verse Quality", False, f"Error: {str(e)}")
+                self.log_test("Exodus Content Authenticity", False, f"Error: {str(e)}")
             
-            # Additional verification - check that all verses are from Genesis
+            # Verify no cross-contamination with other books
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=10")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=20")
                 if response.status_code == 200:
                     data = response.json()
                     verses = data.get('verses', [])
                     
-                    all_genesis = True
-                    non_genesis_books = set()
-                    
-                    for verse in verses:
-                        book = verse.get('book', '')
-                        if book != 'Genesis':
-                            all_genesis = False
-                            non_genesis_books.add(book)
-                    
-                    if all_genesis:
-                        self.log_test("All Verses Are Genesis", True, f"✅ VERIFIED! All sampled verses are from Genesis")
+                    if verses:
+                        all_exodus = True
+                        non_exodus_books = set()
+                        
+                        for verse in verses:
+                            book = verse.get('book', '')
+                            if book != 'Exodus':
+                                all_exodus = False
+                                non_exodus_books.add(book)
+                        
+                        if all_exodus:
+                            self.log_test("No Cross-Contamination in Exodus", True, f"✅ PURE! All {len(verses)} sampled verses are from Exodus")
+                        else:
+                            self.log_test("No Cross-Contamination in Exodus", False, f"❌ CONTAMINATED! Found verses from: {', '.join(non_exodus_books)}")
                     else:
-                        self.log_test("All Verses Are Genesis", False, f"❌ CONTAMINATED! Found verses from: {', '.join(non_genesis_books)}")
+                        self.log_test("No Cross-Contamination in Exodus", False, f"❌ NO DATA! No Exodus verses to check for contamination")
                 else:
-                    self.log_test("All Verses Are Genesis", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("No Cross-Contamination in Exodus", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("All Verses Are Genesis", False, f"Error: {str(e)}")
+                self.log_test("No Cross-Contamination in Exodus", False, f"Error: {str(e)}")
             
-            # Verify chapter distribution matches Genesis structure
-            print("\n📊 GENESIS CHAPTER DISTRIBUTION VERIFICATION:")
-            
-            expected_verses_per_chapter = {
-                1: 31, 2: 25, 3: 24, 4: 26, 5: 32, 6: 22, 7: 24, 8: 22, 9: 29, 10: 32,
-                11: 32, 12: 20, 13: 18, 14: 24, 15: 21, 16: 16, 17: 27, 18: 33, 19: 38, 20: 18,
-                21: 34, 22: 24, 23: 20, 24: 67, 25: 34, 26: 35, 27: 46, 28: 22, 29: 35, 30: 43,
-                31: 55, 32: 32, 33: 20, 34: 31, 35: 29, 36: 43, 37: 36, 38: 30, 39: 23, 40: 23,
-                41: 57, 42: 38, 43: 34, 44: 34, 45: 28, 46: 34, 47: 31, 48: 22, 49: 33, 50: 26
-            }
-            
-            total_expected = sum(expected_verses_per_chapter.values())
-            chapters_verified = 0
-            
-            for chapter in [1, 25, 50]:  # Sample key chapters
-                try:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&chapter={chapter}&limit=1")
+            # Check verse numbering consistency
+            try:
+                # Test a few chapters for proper verse numbering
+                test_chapters = [1, 2, 3]  # Test first few chapters
+                numbering_consistent = True
+                
+                for chapter in test_chapters:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&chapter={chapter}&limit=50")
                     if response.status_code == 200:
                         data = response.json()
-                        actual_verses = data.get('total', 0)
-                        expected_verses = expected_verses_per_chapter.get(chapter, 0)
+                        verses = data.get('verses', [])
                         
-                        if actual_verses == expected_verses:
-                            chapters_verified += 1
-                            print(f"   ✅ Chapter {chapter}: {actual_verses}/{expected_verses} verses - CORRECT")
+                        if verses:
+                            # Check if verse numbers are sequential
+                            verse_numbers = [verse.get('verse', 0) for verse in verses]
+                            expected_numbers = list(range(1, len(verses) + 1))
+                            
+                            if verse_numbers == expected_numbers:
+                                print(f"   ✅ Chapter {chapter}: Verse numbering is sequential (1-{len(verses)})")
+                            else:
+                                numbering_consistent = False
+                                print(f"   ❌ Chapter {chapter}: Verse numbering inconsistent - Found: {verse_numbers[:10]}...")
                         else:
-                            print(f"   ❌ Chapter {chapter}: {actual_verses}/{expected_verses} verses - INCORRECT")
+                            print(f"   ⚠️ Chapter {chapter}: No verses found")
                     else:
                         print(f"   ❌ Chapter {chapter}: API Error - Status {response.status_code}")
-                except Exception as e:
-                    print(f"   ❌ Chapter {chapter}: Error - {str(e)}")
-            
-            if chapters_verified == 3:
-                self.log_test("Genesis Chapter Distribution", True, f"✅ VERIFIED! Sample chapters have correct verse counts")
-            else:
-                self.log_test("Genesis Chapter Distribution", False, f"❌ INCORRECT! {chapters_verified}/3 sample chapters have wrong verse counts")
-            
-            self.log_test("Expected Total Verses Calculation", True, f"Genesis should have {total_expected} verses total (verified calculation)")
+                
+                if numbering_consistent:
+                    self.log_test("Exodus Verse Numbering Consistency", True, f"✅ CONSISTENT! Verse numbering is sequential in tested chapters")
+                else:
+                    self.log_test("Exodus Verse Numbering Consistency", False, f"❌ INCONSISTENT! Verse numbering issues found in some chapters")
+                    
+            except Exception as e:
+                self.log_test("Exodus Verse Numbering Consistency", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Database Statistics", False, f"Error: {str(e)}")
+            self.log_test("Exodus Content Quality Check", False, f"Error: {str(e)}")
             return False
 
     def test_api_response_validation(self):
