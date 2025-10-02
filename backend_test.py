@@ -2949,67 +2949,48 @@ class APITester:
             return False
     
     def run_all_tests(self):
-        """Run all tests and return summary"""
-        print("🔍 Starting Testing for NEW BIBLICAL STRUCTURE IMPLEMENTATION")
+        """Run all tests with focus on Yah Scriptures Bible API"""
+        print("🔍 Starting Yah Scriptures Bible API Testing")
         print("=" * 70)
-        
-        # Initialize database first
-        print("\n📊 Initializing Database...")
-        init_success = self.test_initialize_endpoint()
-        
-        if not init_success:
-            print("❌ Database initialization failed. Stopping tests.")
-            return False
         
         print("\n🔗 Testing API Connectivity...")
         self.test_api_root()
         
-        # Core tests for the review request
-        print("\n🎯 REVIEW REQUEST TESTING:")
+        # Core tests for the Yah Scriptures review request
+        print("\n🎯 YAH SCRIPTURES BIBLE API TESTING:")
         print("-" * 50)
         
-        print("\n1️⃣ Final Status Filtering Test...")
-        self.test_new_biblical_structure_verification()
+        print("\n1️⃣ Yah Scriptures Bible API Comprehensive...")
+        self.test_yah_scriptures_bible_api_comprehensive()
         
-        print("\n2️⃣ Updated Stats Endpoint...")
-        self.test_stats_validation()
+        print("\n2️⃣ Yah Scriptures New Testament Quality...")
+        self.test_yah_scriptures_new_testament_quality()
         
-        print("\n3️⃣ YHWH/YHUH Replacements Verification...")
-        self.test_yhwh_replacements_verification()
+        print("\n3️⃣ Yah Scriptures Divine Name Standardization...")
+        self.test_yah_scriptures_divine_name_standardization()
         
-        print("\n4️⃣ Quiz System with New Structure...")
-        self.test_enhanced_quiz_system()
+        print("\n4️⃣ Yah Scriptures Book Navigation...")
+        self.test_yah_scriptures_book_navigation()
         
-        print("\n5️⃣ Data Completeness...")
-        self.test_categories_validation()
-        
-        print("\n6️⃣ Search Functionality...")
-        self.test_enhanced_search_functionality()
-        
-        # Additional system tests
-        print("\n🔧 ADDITIONAL SYSTEM TESTS:")
+        # Additional Bible API tests
+        print("\n🔧 ADDITIONAL BIBLE API TESTS:")
         print("-" * 50)
         
-        print("\n📈 Testing Progress Tracking System...")
-        self.test_progress_tracking_system()
+        print("\n📊 Testing Bible Database Content...")
+        self.test_bible_database_content()
         
-        print("\n🃏 Testing Flashcard System...")
-        self.test_flashcard_system()
+        print("\n📈 Testing Bible Stats Verification...")
+        self.test_bible_stats_verification()
         
-        print("\n📅 Testing Mitzvah of the Day...")
-        self.test_mitzvah_of_the_day()
+        print("\n🔗 Testing Related Bible Endpoints...")
+        self.test_related_bible_endpoints()
         
-        # PRECEPTS INTEGRATION TESTING
-        print("\n" + "=" * 70)
-        print("🔗 PRECEPTS INTEGRATION TESTING")
-        print("=" * 70)
-        
-        print("\n🗂️ Testing Phase 2: Precepts Integration System...")
-        self.test_precepts_integration_system()
+        print("\n📚 Testing Bible Books Endpoint...")
+        self.test_bible_books_endpoint()
         
         # Summary
         print("\n" + "=" * 70)
-        print("📋 TEST SUMMARY")
+        print("📋 YAH SCRIPTURES BIBLE API TEST SUMMARY")
         print("=" * 70)
         
         passed = sum(1 for result in self.test_results if result['passed'])
