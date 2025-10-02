@@ -67,65 +67,151 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_bible_verses_endpoint_error(self):
-        """Test /api/bible/verses endpoint to reproduce the 500 error"""
+    def test_bible_verses_endpoint_comprehensive(self):
+        """COMPREHENSIVE TEST: /api/bible/verses endpoint for Bible verse text rendering issue"""
         try:
-            print("\n🔍 Testing Bible Verses API Endpoint...")
+            print("\n🔍 COMPREHENSIVE BIBLE VERSES API TESTING...")
             
-            # Test 1: Basic endpoint call to reproduce the error
-            response = self.session.get(f"{self.base_url}/bible/verses")
-            if response.status_code == 500:
-                error_text = response.text
-                if "'<' not supported between instances of 'str' and 'NoneType'" in error_text:
-                    self.log_test("Bible Verses - Error Reproduction", True, "Successfully reproduced the comparison error")
+            # Test 1: Basic endpoint call - should return 200 OK with verses
+            response = self.session.get(f"{self.base_url}/bible/verses?limit=20")
+            if response.status_code == 200:
+                data = response.json()
+                verses = data.get('verses', [])
+                total = data.get('total', 0)
+                
+                if verses:
+                    self.log_test("Bible Verses - Basic Endpoint", True, f"Retrieved {len(verses)} verses, total: {total}")
+                    
+                    # Test verse data structure
+                    first_verse = verses[0]
+                    required_fields = ['id', 'book', 'chapter', 'verse', 'text', 'testament']
+                    missing_fields = [field for field in required_fields if field not in first_verse]
+                    
+                    if not missing_fields:
+                        self.log_test("Bible Verses - Data Structure", True, "All required fields present")
+                    else:
+                        self.log_test("Bible Verses - Data Structure", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    # CRITICAL TEST: Verify 'text' field contains actual biblical content
+                    text_content_tests = 0
+                    empty_text_count = 0
+                    actual_content_count = 0
+                    
+                    for verse in verses[:10]:  # Test first 10 verses
+                        verse_text = verse.get('text', '')
+                        book = verse.get('book', '')
+                        chapter = verse.get('chapter', '')
+                        verse_num = verse.get('verse', '')
+                        
+                        if not verse_text or verse_text.strip() == '':
+                            empty_text_count += 1
+                            self.log_test(f"Bible Verse Text - {book} {chapter}:{verse_num}", False, "Empty text field")
+                        elif len(verse_text) < 10:
+                            empty_text_count += 1
+                            self.log_test(f"Bible Verse Text - {book} {chapter}:{verse_num}", False, f"Text too short: '{verse_text}'")
+                        else:
+                            actual_content_count += 1
+                            # Show first 50 characters of actual content
+                            preview = verse_text[:50] + "..." if len(verse_text) > 50 else verse_text
+                            self.log_test(f"Bible Verse Text - {book} {chapter}:{verse_num}", True, f"Content: '{preview}' ({len(verse_text)} chars)")
+                        
+                        text_content_tests += 1
+                    
+                    # Summary of text content testing
+                    if actual_content_count == text_content_tests:
+                        self.log_test("Bible Verses - Text Content Quality", True, f"All {text_content_tests} verses have proper text content")
+                    elif actual_content_count > 0:
+                        self.log_test("Bible Verses - Text Content Quality", False, f"Only {actual_content_count}/{text_content_tests} verses have proper text content")
+                    else:
+                        self.log_test("Bible Verses - Text Content Quality", False, "NO verses have proper text content - CRITICAL ISSUE")
+                        return False
+                    
                 else:
-                    self.log_test("Bible Verses - Error Reproduction", False, f"Different error: {error_text[:200]}")
-            elif response.status_code == 200:
-                self.log_test("Bible Verses - Error Reproduction", False, "Endpoint working - error may be intermittent")
+                    self.log_test("Bible Verses - Basic Endpoint", False, "No verses returned")
+                    return False
             else:
-                self.log_test("Bible Verses - Error Reproduction", False, f"Unexpected status: {response.status_code}")
+                self.log_test("Bible Verses - Basic Endpoint", False, f"Status: {response.status_code}")
+                return False
             
-            # Test 2: Try with different parameters to isolate the issue
-            test_params = [
-                {},
-                {"page": 1, "limit": 10},
-                {"book": "Genesis"},
-                {"chapter": 1},
-                {"testament": "old"},
-                {"search": "God"},
-                {"has_precept": True}
+            # Test 2: Specific verses mentioned in review (Tobit 1:1, Ezra 1:1)
+            specific_verses = [
+                ("Tobit", 1, 1, "The book of the words of Tobit"),
+                ("Ezra", 1, 1, "Now in the first year")
             ]
             
-            working_params = []
-            failing_params = []
-            
-            for params in test_params:
+            specific_tests_passed = 0
+            for book, chapter, verse_num, expected_content in specific_verses:
                 try:
-                    param_str = "&".join([f"{k}={v}" for k, v in params.items()]) if params else "no params"
-                    response = self.session.get(f"{self.base_url}/bible/verses", params=params)
-                    
+                    response = self.session.get(f"{self.base_url}/bible/verse/{book}/{chapter}/{verse_num}")
                     if response.status_code == 200:
-                        working_params.append(param_str)
-                        self.log_test(f"Bible Verses - Params ({param_str})", True, "Working")
-                    elif response.status_code == 500:
-                        failing_params.append(param_str)
-                        self.log_test(f"Bible Verses - Params ({param_str})", False, "500 Error")
+                        verse_data = response.json()
+                        verse_text = verse_data.get('text', '')
+                        
+                        if verse_text and expected_content.lower() in verse_text.lower():
+                            self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", True, f"Contains expected content: '{verse_text[:60]}...'")
+                            specific_tests_passed += 1
+                        elif verse_text:
+                            self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, f"Unexpected content: '{verse_text[:60]}...'")
+                        else:
+                            self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, "Empty text content")
                     else:
-                        self.log_test(f"Bible Verses - Params ({param_str})", False, f"Status: {response.status_code}")
+                        self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, f"Status: {response.status_code}")
                 except Exception as e:
-                    self.log_test(f"Bible Verses - Params ({param_str})", False, f"Exception: {str(e)}")
-                    failing_params.append(param_str)
+                    self.log_test(f"Specific Verse - {book} {chapter}:{verse_num}", False, f"Error: {str(e)}")
             
-            # Summary of parameter testing
-            if working_params:
-                self.log_test("Bible Verses - Working Parameters", True, f"Working: {working_params}")
-            if failing_params:
-                self.log_test("Bible Verses - Failing Parameters", False, f"Failing: {failing_params}")
+            # Test 3: Different testaments
+            testament_tests = [
+                ("old", "Old Testament verses"),
+                ("new", "New Testament verses"),
+                ("apocrypha", "Apocrypha verses")
+            ]
             
-            return len(failing_params) > 0  # Return True if we found the error
+            testament_tests_passed = 0
+            for testament, description in testament_tests:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verses?testament={testament}&limit=10")
+                    if response.status_code == 200:
+                        data = response.json()
+                        verses = data.get('verses', [])
+                        
+                        if verses:
+                            # Verify all verses are from correct testament
+                            correct_testament = all(v.get('testament') == testament for v in verses)
+                            if correct_testament:
+                                self.log_test(f"Testament Filter - {testament}", True, f"Found {len(verses)} {description}")
+                                testament_tests_passed += 1
+                            else:
+                                self.log_test(f"Testament Filter - {testament}", False, "Testament filter not working correctly")
+                        else:
+                            self.log_test(f"Testament Filter - {testament}", False, f"No {description} found")
+                    else:
+                        self.log_test(f"Testament Filter - {testament}", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Testament Filter - {testament}", False, f"Error: {str(e)}")
+            
+            # Test 4: Pagination
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?page=2&limit=15")
+                if response.status_code == 200:
+                    data = response.json()
+                    page = data.get('page', 0)
+                    total_pages = data.get('totalPages', 0)
+                    verses = data.get('verses', [])
+                    
+                    if page == 2 and total_pages > 1 and verses:
+                        self.log_test("Bible Verses - Pagination", True, f"Page 2 of {total_pages} with {len(verses)} verses")
+                    else:
+                        self.log_test("Bible Verses - Pagination", False, f"Pagination issue: page={page}, totalPages={total_pages}, verses={len(verses)}")
+                else:
+                    self.log_test("Bible Verses - Pagination", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Bible Verses - Pagination", False, f"Error: {str(e)}")
+            
+            return actual_content_count > 0 and specific_tests_passed > 0
             
         except Exception as e:
-            self.log_test("Bible Verses Endpoint Error Test", False, f"Error: {str(e)}")
+            self.log_test("Bible Verses Comprehensive Test", False, f"Error: {str(e)}")
             return False
 
     def test_bible_database_content(self):
