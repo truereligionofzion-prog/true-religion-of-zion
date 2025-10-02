@@ -419,9 +419,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phase 2: Precepts Integration System - Test completed integration with 23 precepts"
-    - "80-Book Bible Integration - Research thepreceptbible.com source and implement"
-    - "Cross-Reference System Development - Link Mitzvot, Precepts, and Bible verses"
+    - "Phase 3C: Advanced Bible Features - TESTING COMPLETED ✅"
+    - "Bible Books Count Issue - Shows 2 instead of 44 books"
+    - "Bible API Stability - Some 500 errors on /api/bible/verses endpoint"
   stuck_tasks: 
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
   test_all: false
