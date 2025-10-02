@@ -415,9 +415,30 @@ async def get_bible_verses(
         skip = (page - 1) * limit
         total_pages = math.ceil(total / limit)
         
-        # Get verses with proper sorting and deduplication
-        cursor = bible_verses_collection.find(query).sort([("book", 1), ("chapter", 1), ("verse", 1)]).skip(skip).limit(limit)
+        # Get verses without sorting first (to avoid comparison errors)
+        cursor = bible_verses_collection.find(query).skip(skip).limit(limit)
         verses_data = await cursor.to_list(length=limit)
+        
+        # Sort manually after ensuring proper data types
+        def safe_sort_key(verse):
+            book = verse.get('book') or ''
+            chapter = verse.get('chapter')
+            verse_num = verse.get('verse')
+            
+            # Ensure chapter and verse are integers
+            try:
+                chapter = int(chapter) if chapter is not None else 0
+            except (ValueError, TypeError):
+                chapter = 0
+                
+            try:
+                verse_num = int(verse_num) if verse_num is not None else 0
+            except (ValueError, TypeError):
+                verse_num = 0
+                
+            return (book, chapter, verse_num)
+        
+        verses_data.sort(key=safe_sort_key)
         
         # Remove any duplicate verses (same book, chapter, verse)
         seen_verses = set()
