@@ -1076,7 +1076,7 @@ class APITester:
         success_rate = (passed_tests / total_tests) * 100
         
         print("\n" + "=" * 80)
-        print("📊 EXODUS AUTHENTIC CONTENT VERIFICATION SUMMARY")
+        print("📊 LEVITICUS AUTHENTIC CONTENT VERIFICATION SUMMARY")
         print("=" * 80)
         
         # Count individual test results
@@ -1089,11 +1089,11 @@ class APITester:
         
         # Show category results
         categories = [
-            "Exodus Authentic Content Verification (1,063 verses, Israel names, burning bush, Ten Commandments)",
-            "No Placeholder Brackets Check (no 'see Exodus [chapter]:[verse]', legitimate KJV brackets preserved)", 
-            "Genesis Preservation Verification (exactly 1,533 verses, no cross-contamination)",
-            "Content Quality Sampling (10 random verses, authentic biblical content, substantial text)",
-            "Complete Database Status (total 2,596 verses, both books in KJV 1611 Divine, proper testament)"
+            "Leviticus Authentic Content Verification (788 verses, LORD calling Moses, offerings, clean/unclean animals, holiness laws)",
+            "No Placeholder Content Check (no 'see Leviticus [chapter]:[verse]', legitimate KJV brackets preserved)", 
+            "Previous Books Preservation (Genesis 1,533 verses, Exodus 1,063 verses, no cross-contamination)",
+            "Content Quality Sampling (10 random verses, authentic biblical content, Leviticus themes)",
+            "Complete Database Status (total 3,384 verses, all three books in KJV 1611 Divine, proper testament)"
         ]
         
         for i, (category, result) in enumerate(zip(categories, test_results)):
@@ -1103,50 +1103,50 @@ class APITester:
         print("\n🎉 KEY VERIFICATION FINDINGS:")
         
         # Analyze results for key findings
-        if test_results[0]:  # Exodus Authentic Content Verification
-            print("✅ Exodus authentic content VERIFIED - proper verse count, Israel names, burning bush, Ten Commandments")
+        if test_results[0]:  # Leviticus Authentic Content Verification
+            print("✅ Leviticus authentic content VERIFIED - proper verse count, LORD/Moses/offerings, clean/unclean animals, holiness laws")
         else:
-            print("❌ Exodus authentic content FAILED - incorrect verse count or missing authentic biblical content")
+            print("❌ Leviticus authentic content FAILED - incorrect verse count or missing authentic biblical content")
         
-        if test_results[1]:  # No Placeholder Brackets Check
-            print("✅ No placeholder brackets CONFIRMED - clean authentic text without generated placeholders")
+        if test_results[1]:  # No Placeholder Content Check
+            print("✅ No placeholder content CONFIRMED - clean authentic text without generated placeholders")
         else:
-            print("❌ Placeholder brackets FOUND - contains generated placeholder text or references")
+            print("❌ Placeholder content FOUND - contains generated placeholder text or references")
         
-        if test_results[2]:  # Genesis Preservation Verification
-            print("✅ Genesis preservation VERIFIED - exactly 1,533 verses intact, no cross-contamination")
+        if test_results[2]:  # Previous Books Preservation
+            print("✅ Previous books preservation VERIFIED - Genesis (1,533) and Exodus (1,063) verses intact, no cross-contamination")
         else:
-            print("❌ Genesis preservation FAILED - verse count changed or cross-contamination detected")
+            print("❌ Previous books preservation FAILED - verse counts changed or cross-contamination detected")
         
         if test_results[3]:  # Content Quality Sampling
-            print("✅ Content quality EXCELLENT - sampled verses contain authentic, substantial biblical content")
+            print("✅ Content quality EXCELLENT - sampled verses contain authentic, substantial Leviticus biblical content")
         else:
             print("❌ Content quality POOR - sampled verses have quality issues or non-authentic content")
         
         if test_results[4]:  # Complete Database Status
-            print("✅ Database status CORRECT - proper total counts, both books present, correct classification")
+            print("✅ Database status CORRECT - proper total counts, all three books present, correct classification")
         else:
             print("❌ Database status INCORRECT - count mismatches or missing books")
         
-        print(f"\n🎯 FINAL EXODUS AUTHENTIC CONTENT ASSESSMENT:")
+        print(f"\n🎯 FINAL LEVITICUS AUTHENTIC CONTENT ASSESSMENT:")
         if individual_success_rate >= 95:
-            print(f"🎉 EXODUS AUTHENTIC CONTENT SUCCESS! Perfect authentic biblical text implementation ({individual_success_rate:.1f}% success)")
-            print("✅ Exodus contains only authentic biblical text without any placeholder brackets")
-            print("✅ Genesis remains completely preserved with exactly 1,533 verses")
-            print("🚀 Both Genesis and Exodus contain clean, authentic biblical content ready for use!")
+            print(f"🎉 LEVITICUS AUTHENTIC CONTENT SUCCESS! Perfect authentic biblical text implementation ({individual_success_rate:.1f}% success)")
+            print("✅ Leviticus contains only authentic biblical text without any placeholder content")
+            print("✅ Genesis and Exodus remain completely preserved with exact verse counts")
+            print("🚀 All three books (Genesis, Exodus, Leviticus) contain clean, authentic biblical content ready for use!")
         elif individual_success_rate >= 85:
-            print(f"✅ EXODUS AUTHENTIC CONTENT EXCELLENT! Very successful authentic text implementation ({individual_success_rate:.1f}% success)")
-            print("✅ Exodus is substantially authentic with minor issues that don't affect core content")
-            print("✅ Genesis preservation confirmed - no negative impact from Exodus work")
+            print(f"✅ LEVITICUS AUTHENTIC CONTENT EXCELLENT! Very successful authentic text implementation ({individual_success_rate:.1f}% success)")
+            print("✅ Leviticus is substantially authentic with minor issues that don't affect core content")
+            print("✅ Previous books preservation confirmed - no negative impact from Leviticus work")
         elif individual_success_rate >= 75:
-            print(f"✅ EXODUS AUTHENTIC CONTENT GOOD! Successful implementation with some issues ({individual_success_rate:.1f}% success)")
-            print("⚠️ Exodus is mostly authentic but may need minor fixes for optimal quality")
+            print(f"✅ LEVITICUS AUTHENTIC CONTENT GOOD! Successful implementation with some issues ({individual_success_rate:.1f}% success)")
+            print("⚠️ Leviticus is mostly authentic but may need minor fixes for optimal quality")
         elif individual_success_rate >= 60:
-            print(f"⚠️ EXODUS AUTHENTIC CONTENT PARTIAL! Some success but significant issues remain ({individual_success_rate:.1f}% success)")
-            print("⚠️ Exodus has authenticity issues or placeholder content that needs attention")
+            print(f"⚠️ LEVITICUS AUTHENTIC CONTENT PARTIAL! Some success but significant issues remain ({individual_success_rate:.1f}% success)")
+            print("⚠️ Leviticus has authenticity issues or placeholder content that needs attention")
         else:
-            print(f"❌ EXODUS AUTHENTIC CONTENT FAILED! Major issues prevent authentic content verification ({individual_success_rate:.1f}% success)")
-            print("❌ Exodus still contains placeholder brackets or non-authentic content")
+            print(f"❌ LEVITICUS AUTHENTIC CONTENT FAILED! Major issues prevent authentic content verification ({individual_success_rate:.1f}% success)")
+            print("❌ Leviticus still contains placeholder content or non-authentic content")
         
         return individual_success_rate >= 85
 
