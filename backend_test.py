@@ -3445,24 +3445,30 @@ class APITester:
             return False
     
     def run_all_tests(self):
-        """Run all tests with focus on KJV 1611 Bible API"""
-        print("🔍 Starting KJV 1611 Divine Names Bible API Testing")
-        print("=" * 70)
+        """Run all tests with focus on KJV 1611 Enhanced Dataset (12,326 verses from 11 books)"""
+        print("🔍 Starting KJV 1611 Enhanced Dataset Testing - 12,326 verses from 11 books")
+        print("=" * 80)
         
         print("\n🔗 Testing API Connectivity...")
         self.test_api_root()
         
-        # Core tests for the KJV 1611 review request
-        print("\n🎯 KJV 1611 BIBLE API TESTING:")
-        print("-" * 50)
+        # Core tests for the KJV 1611 Enhanced Dataset review request
+        print("\n🎯 KJV 1611 ENHANCED DATASET TESTING:")
+        print("-" * 60)
         
-        print("\n1️⃣ KJV 1611 Bible API Comprehensive...")
-        self.test_kjv1611_bible_api_comprehensive()
+        print("\n1️⃣ KJV 1611 Enhanced Dataset Verification...")
+        self.test_kjv1611_enhanced_dataset_verification()
         
-        print("\n2️⃣ KJV 1611 Data Quality Verification...")
-        self.test_kjv1611_data_quality_verification()
+        print("\n2️⃣ KJV 1611 Enhanced Verse Counts (Genesis ~1,276, Matthew ~1,056, Psalms ~1,785)...")
+        self.test_kjv1611_enhanced_verse_counts()
         
-        print("\n3️⃣ KJV 1611 API Response Structure...")
+        print("\n3️⃣ KJV 1611 Testament Filtering (OT=3, NT=6, Apocrypha=2)...")
+        self.test_kjv1611_testament_filtering()
+        
+        print("\n4️⃣ KJV 1611 Performance and Search Testing...")
+        self.test_kjv1611_performance_and_search()
+        
+        print("\n5️⃣ KJV 1611 API Response Structure...")
         self.test_kjv1611_api_response_structure()
         
         # Additional Bible API tests
