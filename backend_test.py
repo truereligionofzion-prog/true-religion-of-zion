@@ -78,10 +78,10 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_kjv_data_quality_verification(self):
-        """REVIEW REQUEST TEST 1: KJV Data Quality Verification - 5 books loaded correctly"""
+    def test_genesis_content_accuracy_verification(self):
+        """REVIEW REQUEST TEST 1: Content Accuracy Verification - Genesis specific verses"""
         try:
-            print("\n🔍 KJV DATA QUALITY VERIFICATION - 5 BOOKS TARGET...")
+            print("\n🔍 GENESIS CONTENT ACCURACY VERIFICATION - SPECIFIC VERSES...")
             
             # Test 1: Verify KJV 1611 Divine Names version is available
             response = self.session.get(f"{self.base_url}/bible/versions")
