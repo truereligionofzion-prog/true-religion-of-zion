@@ -537,6 +537,48 @@ async def get_bible_verse(book: str, chapter: int, verse: int):
         logger.error(f"Error getting verse {book} {chapter}:{verse}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/bible/versions")
+async def get_bible_versions():
+    """Get available Bible versions"""
+    try:
+        # Get distinct versions from both collections
+        book_versions = await bible_books_collection.distinct("version")
+        verse_versions = await bible_verses_collection.distinct("version")
+        
+        # Combine and deduplicate
+        all_versions = list(set(book_versions + verse_versions))
+        
+        # Create version info
+        versions = []
+        for version in all_versions:
+            if version == "kjv1611_divine":
+                versions.append({
+                    "id": version,
+                    "name": "KJV 1611 (Divine Names)",
+                    "description": "King James Version 1611 with YHWH/Elohim divine names",
+                    "source": "thepreceptbible.com"
+                })
+            elif version == "yah_scriptures":
+                versions.append({
+                    "id": version,
+                    "name": "Yah Scriptures",
+                    "description": "Hebrew-focused translation with standardized divine names",
+                    "source": "yah_scriptures_csv"
+                })
+            else:
+                versions.append({
+                    "id": version,
+                    "name": version,
+                    "description": f"Bible version: {version}",
+                    "source": "unknown"
+                })
+        
+        return {"versions": versions}
+        
+    except Exception as e:
+        logger.error(f"Error getting Bible versions: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/bible/stats")
 async def get_bible_stats(
     version: Optional[str] = Query("kjv1611_divine", description="Bible version: kjv1611_divine, yah_scriptures")
