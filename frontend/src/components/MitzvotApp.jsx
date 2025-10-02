@@ -218,6 +218,7 @@ const MitzvotApp = () => {
       setLoading(true);
 
       const params = {
+        version: selectedBibleVersion,
         search: searchTerm,
         testament: selectedCategory,
         book: selectedBook,
