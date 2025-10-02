@@ -615,11 +615,11 @@ class APITester:
             self.log_test("Genesis Completion Recommendations", False, f"Error: {str(e)}")
             return False
 
-    def run_genesis_kjv_1611_tests(self):
-        """Run Genesis KJV 1611 final implementation tests as per review request"""
+    def run_genesis_data_analysis_tests(self):
+        """Run Genesis data analysis tests as per review request"""
         print("=" * 80)
-        print("🔍 GENESIS KJV 1611 FINAL IMPLEMENTATION TESTING")
-        print("Testing the final Genesis KJV 1611 implementation to verify it meets all criteria and reads correctly")
+        print("🔍 GENESIS DATA ANALYSIS - COMPLETION STATUS INVESTIGATION")
+        print("Analyzing the current Genesis data in the database to understand completion status")
         print("=" * 80)
         
         # Test basic connectivity first
@@ -627,23 +627,23 @@ class APITester:
             print("❌ API connectivity failed. Stopping tests.")
             return False
         
-        # Run the 5 main review request tests
+        # Run the 4 main review request tests + recommendations
         test_results = []
         
-        # Test 1: Content Accuracy Verification (Genesis specific verses)
-        test_results.append(self.test_genesis_content_accuracy_verification())
+        # Test 1: Genesis Chapter/Verse Analysis
+        test_results.append(self.test_genesis_chapter_verse_analysis())
         
-        # Test 2: Complete Structure Test (50 chapters, ~1,495 verses)
-        test_results.append(self.test_genesis_complete_structure())
+        # Test 2: Genesis Content Quality Check
+        test_results.append(self.test_genesis_content_quality_check())
         
-        # Test 3: Database Cleanup Verification (only Genesis exists)
-        test_results.append(self.test_database_cleanup_verification())
+        # Test 3: Database Structure Verification
+        test_results.append(self.test_database_structure_verification())
         
-        # Test 4: Reading Quality Test (verse readability)
-        test_results.append(self.test_genesis_reading_quality())
+        # Test 4: Specific Missing Verses Investigation
+        test_results.append(self.test_specific_missing_verses_investigation())
         
-        # Test 5: API Performance (search and navigation)
-        test_results.append(self.test_genesis_api_performance())
+        # Additional: Completion Recommendations
+        test_results.append(self.test_genesis_completion_recommendations())
         
         # Calculate overall results
         passed_tests = sum(test_results)
@@ -651,7 +651,7 @@ class APITester:
         success_rate = (passed_tests / total_tests) * 100
         
         print("\n" + "=" * 80)
-        print("📊 GENESIS KJV 1611 FINAL IMPLEMENTATION TESTING SUMMARY")
+        print("📊 GENESIS DATA ANALYSIS SUMMARY")
         print("=" * 80)
         
         # Count individual test results
@@ -659,63 +659,63 @@ class APITester:
         passed_individual_tests = sum(1 for result in self.test_results if result["passed"])
         individual_success_rate = (passed_individual_tests / total_individual_tests) * 100 if total_individual_tests > 0 else 0
         
-        print(f"📈 OVERALL SUCCESS RATE: {individual_success_rate:.1f}% ({passed_individual_tests}/{total_individual_tests} individual tests passed)")
-        print(f"🎯 MAIN CATEGORIES: {passed_tests}/{total_tests} major test categories passed")
+        print(f"📈 ANALYSIS SUCCESS RATE: {individual_success_rate:.1f}% ({passed_individual_tests}/{total_individual_tests} individual tests passed)")
+        print(f"🎯 MAIN CATEGORIES: {passed_tests}/{total_tests} major analysis categories completed")
         
         # Show category results
         categories = [
-            "Content Accuracy Verification (Genesis 1:1, 1:2, 1:28 specific verses)",
-            "Complete Structure Test (50 chapters, ~1,495 verses)", 
-            "Database Cleanup Verification (only Genesis exists)",
-            "Reading Quality Test (verse readability and completeness)",
-            "API Performance (search and navigation for Genesis)"
+            "Genesis Chapter/Verse Analysis (current counts and gaps)",
+            "Genesis Content Quality Check (key verses and sampling)", 
+            "Database Structure Verification (Genesis only and completeness)",
+            "Specific Missing Verses Investigation (calculate and locate missing verses)",
+            "Genesis Completion Recommendations (path to 100% coverage)"
         ]
         
         for i, (category, result) in enumerate(zip(categories, test_results)):
-            status = "✅ PASS" if result else "❌ FAIL"
+            status = "✅ COMPLETE" if result else "❌ INCOMPLETE"
             print(f"{status}: {category}")
         
-        print("\n🔍 KEY FINDINGS:")
+        print("\n🔍 KEY ANALYSIS FINDINGS:")
         
         # Analyze results for key findings
-        if test_results[0]:  # Content Accuracy Verification
-            print("✅ Genesis content accuracy verified - specific verses contain expected biblical text")
+        if test_results[0]:  # Chapter/Verse Analysis
+            print("✅ Chapter/verse analysis completed - identified current counts and gaps")
         else:
-            print("❌ Genesis content accuracy issues - verses missing expected content")
+            print("❌ Chapter/verse analysis incomplete - unable to determine structure")
         
-        if test_results[1]:  # Complete Structure Test
-            print("✅ Genesis structure verified - 50 chapters with ~1,495 verses approaching web standards")
+        if test_results[1]:  # Content Quality Check
+            print("✅ Content quality verified - Genesis 1:1, 50:26, and random samples checked")
         else:
-            print("❌ Genesis structure issues - incorrect chapter/verse counts")
+            print("❌ Content quality issues - key verses or samples have problems")
         
-        if test_results[2]:  # Database Cleanup Verification
-            print("✅ Database cleanup successful - only Genesis exists (no 104+ book contamination)")
+        if test_results[2]:  # Database Structure Verification
+            print("✅ Database structure analyzed - Genesis purity and chapter completeness assessed")
         else:
-            print("❌ Database cleanup incomplete - multiple books or contamination detected")
+            print("❌ Database structure issues - contamination or structural problems detected")
         
-        if test_results[3]:  # Reading Quality Test
-            print("✅ Genesis reading quality excellent - verses are complete and readable")
+        if test_results[3]:  # Missing Verses Investigation
+            print("✅ Missing verses investigation completed - identified patterns and locations")
         else:
-            print("❌ Genesis reading quality issues - verses fragmented or incomplete")
+            print("❌ Missing verses investigation incomplete - unable to determine missing verse patterns")
         
-        if test_results[4]:  # API Performance
-            print("✅ Genesis API performance excellent - search and navigation working correctly")
+        if test_results[4]:  # Completion Recommendations
+            print("✅ Completion recommendations generated - roadmap to 100% coverage provided")
         else:
-            print("❌ Genesis API performance issues - search or navigation problems")
+            print("❌ Completion recommendations incomplete - unable to generate completion roadmap")
         
-        print(f"\n🎯 FINAL ASSESSMENT:")
+        print(f"\n🎯 FINAL ANALYSIS ASSESSMENT:")
         if individual_success_rate >= 90:
-            print(f"✅ EXCELLENT! Genesis KJV 1611 implementation meets all criteria ({individual_success_rate:.1f}% success)")
-            print("✅ Ready for production use - Genesis reads correctly according to web-verified standards")
+            print(f"✅ COMPREHENSIVE ANALYSIS! Genesis data analysis completed successfully ({individual_success_rate:.1f}% success)")
+            print("✅ Clear understanding of completion status and path to 100% coverage")
         elif individual_success_rate >= 75:
-            print(f"✅ GOOD! Genesis KJV 1611 implementation mostly successful ({individual_success_rate:.1f}% success)")
-            print("✅ Minor issues remain but core functionality working")
+            print(f"✅ GOOD ANALYSIS! Genesis data analysis mostly successful ({individual_success_rate:.1f}% success)")
+            print("✅ Sufficient data to understand completion status with minor gaps")
         elif individual_success_rate >= 50:
-            print(f"⚠️ PARTIAL! Genesis KJV 1611 implementation partially working ({individual_success_rate:.1f}% success)")
-            print("⚠️ Significant issues need addressing before production")
+            print(f"⚠️ PARTIAL ANALYSIS! Genesis data analysis partially completed ({individual_success_rate:.1f}% success)")
+            print("⚠️ Some analysis completed but significant gaps remain")
         else:
-            print(f"❌ FAILED! Genesis KJV 1611 implementation has major issues ({individual_success_rate:.1f}% success)")
-            print("❌ Requires substantial fixes before meeting review criteria")
+            print(f"❌ INCOMPLETE ANALYSIS! Genesis data analysis has major issues ({individual_success_rate:.1f}% success)")
+            print("❌ Unable to provide comprehensive completion status assessment")
         
         return individual_success_rate >= 75
 
