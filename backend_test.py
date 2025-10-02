@@ -1,37 +1,29 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Genesis KJV 1611 Implementation - FINAL VERIFICATION
+Backend Testing for Genesis Data Analysis - COMPLETION STATUS INVESTIGATION
 
-REVIEW REQUEST FOCUS - GENESIS KJV 1611 FINAL IMPLEMENTATION TESTING:
-Test the final Genesis KJV 1611 implementation to verify it meets all criteria and reads correctly:
+REVIEW REQUEST FOCUS - GENESIS DATA ANALYSIS:
+Analyze the current Genesis data in the database to understand the completion status:
 
-1. **Content Accuracy Verification**:
-   - Test Genesis 1:1: MUST contain exactly "In the beginning God created the heaven and the earth"
-   - Test Genesis 1:2: Should contain "earth was without form, and void; and darkness was upon the face of the deep"
-   - Test Genesis 1:28: Should contain "Be fruitful, and multiply, and replenish the earth"
-   - Verify NO cross-contamination or mixed verse content
+1. **Genesis Chapter/Verse Analysis**: 
+   - Get the current chapter count and verse count for Genesis
+   - Check which chapters might have fewer verses than expected
+   - Identify any gaps in verse numbering within chapters
 
-2. **Complete Structure Test**:
-   - Verify Genesis has exactly 50 chapters (all chapters 1-50 present)
-   - Check verse count: ~1,495 verses (97.5% of expected 1,533)
-   - Test different chapters: Genesis 1 (creation), Genesis 3 (fall), Genesis 6 (flood), Genesis 22 (Abraham/Isaac), Genesis 50 (Joseph's death)
+2. **Genesis Content Quality Check**:
+   - Verify that Genesis 1:1 contains the expected creation text
+   - Check Genesis 50:26 (last verse) to ensure we have the complete book
+   - Sample a few random verses to ensure content quality
 
-3. **Database Cleanup Verification**:
-   - Confirm ONLY 1 book (Genesis) exists (not 104+ books)
-   - Test GET /api/bible/books shows only Genesis KJV 1611
-   - Verify statistics show: 1 Total Book, ~1,495 Total Verses
+3. **Database Structure Verification**:
+   - Confirm we only have Genesis data (no cross-contamination)
+   - Check the verse count per chapter to identify any incomplete chapters
 
-4. **Reading Quality Test**:
-   - Sample random verses from different chapters to ensure they read properly
-   - Verify verse text is complete sentences (not fragments or mixed content)
-   - Check that chapters have reasonable verse counts (20-35 verses per chapter typically)
+4. **Specific Missing Verses Investigation**:
+   - Calculate which 38 verses are missing (1533 - 1495 = 38)
+   - Check if certain chapters are truncated or if verses are scattered missing
 
-5. **API Performance**:
-   - Test search for "God created" should find Genesis 1:1
-   - Test navigation: Genesis chapter 1 verse 1 through verse 31
-   - Verify filtering and sorting work correctly
-
-This is the final test to confirm Genesis KJV 1611 now reads correctly according to web-verified biblical standards and meets all the criteria requested. Focus on verifying the text quality and accuracy improvements achieved through the web-verified approach.
+This analysis will provide detailed insights into what needs to be completed to reach 100% Genesis coverage.
 """
 
 import requests
