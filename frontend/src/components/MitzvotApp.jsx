@@ -78,23 +78,11 @@ const MitzvotApp = () => {
 
   const { toast } = useToast();
 
-  // Phase 3C: Divine name rendering - COMPLETELY REBUILT to fix React key conflicts
+  // Bible text rendering - handles divine name display
   const renderBibleText = (text, verseId) => {
-    // Debug logging
-    console.log('renderBibleText called with:', text, 'type:', typeof text);
-    
-    // Handle various text formats
-    if (!text) {
-      console.log('No text provided');
+    if (!text || typeof text !== 'string') {
       return 'No text available';
     }
-    
-    if (typeof text !== 'string') {
-      console.log('Text is not string, converting:', text);
-      return String(text);
-    }
-    
-    console.log('Returning text:', text.substring(0, 50) + '...');
     return text;
   };
 
