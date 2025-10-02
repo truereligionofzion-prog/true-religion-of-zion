@@ -451,9 +451,14 @@ async def get_bible_verses(
                 del verse['_id']
             verses.append(verse)
         
-        # Get filter options
+        # Get filter options with safe sorting
         books = await bible_verses_collection.distinct("book")
         testaments = await bible_verses_collection.distinct("testament")
+        
+        # Remove None values and sort safely
+        books = [book for book in books if book is not None]
+        testaments = [testament for testament in testaments if testament is not None]
+        
         books.sort()
         testaments.sort()
         
