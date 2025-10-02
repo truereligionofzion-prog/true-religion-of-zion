@@ -139,6 +139,11 @@ const MitzvotApp = () => {
   const loadBibleBooks = async () => {
     try {
       const response = await apiService.getBibleBooks(selectedBibleVersion);
+      
+      // Set the full books data (which is already sorted by order from backend)
+      setBibleBooks(response.books);
+      
+      // Also update bibleStats for compatibility
       setBibleStats(prev => ({
         ...prev,
         books: response.books.map(book => book.name)
