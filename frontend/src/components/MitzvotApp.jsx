@@ -1284,8 +1284,8 @@ const MitzvotApp = () => {
           </div>
         )}
 
-        {/* Mitzvah of the Day */}
-        {mitzvahOfTheDay && (
+        {/* Mitzvah of the Day - Only show for mitzvot content */}
+        {mitzvahOfTheDay && contentType === 'mitzvot' && (
           <div className="mb-8">
             <Card className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
               <CardHeader>
