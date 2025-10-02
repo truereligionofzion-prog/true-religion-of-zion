@@ -3163,28 +3163,25 @@ class APITester:
             return False
     
     def run_all_tests(self):
-        """Run all tests with focus on Yah Scriptures Bible API"""
-        print("🔍 Starting Yah Scriptures Bible API Testing")
+        """Run all tests with focus on KJV 1611 Bible API"""
+        print("🔍 Starting KJV 1611 Divine Names Bible API Testing")
         print("=" * 70)
         
         print("\n🔗 Testing API Connectivity...")
         self.test_api_root()
         
-        # Core tests for the Yah Scriptures review request
-        print("\n🎯 YAH SCRIPTURES BIBLE API TESTING:")
+        # Core tests for the KJV 1611 review request
+        print("\n🎯 KJV 1611 BIBLE API TESTING:")
         print("-" * 50)
         
-        print("\n1️⃣ Yah Scriptures Bible API Comprehensive...")
-        self.test_yah_scriptures_bible_api_comprehensive()
+        print("\n1️⃣ KJV 1611 Bible API Comprehensive...")
+        self.test_kjv1611_bible_api_comprehensive()
         
-        print("\n2️⃣ Yah Scriptures New Testament Quality...")
-        self.test_yah_scriptures_new_testament_quality()
+        print("\n2️⃣ KJV 1611 Data Quality Verification...")
+        self.test_kjv1611_data_quality_verification()
         
-        print("\n3️⃣ Yah Scriptures Divine Name Standardization...")
-        self.test_yah_scriptures_divine_name_standardization()
-        
-        print("\n4️⃣ Yah Scriptures Book Navigation...")
-        self.test_yah_scriptures_book_navigation()
+        print("\n3️⃣ KJV 1611 API Response Structure...")
+        self.test_kjv1611_api_response_structure()
         
         # Additional Bible API tests
         print("\n🔧 ADDITIONAL BIBLE API TESTS:")
@@ -3204,7 +3201,7 @@ class APITester:
         
         # Summary
         print("\n" + "=" * 70)
-        print("📋 YAH SCRIPTURES BIBLE API TEST SUMMARY")
+        print("📋 KJV 1611 BIBLE API TEST SUMMARY")
         print("=" * 70)
         
         passed = sum(1 for result in self.test_results if result['passed'])
