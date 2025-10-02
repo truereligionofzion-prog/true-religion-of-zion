@@ -93,7 +93,7 @@ const MitzvotApp = () => {
 
   // Load content when filters change or content type changes
   useEffect(() => {
-    if (categories.length > 0) {
+    if (categories.length > 0 || contentType === 'bible' || contentType === 'precepts') {
       loadContent();
     }
   }, [contentType, searchTerm, selectedCategory, selectedBook, currentPage, categories.length]);
