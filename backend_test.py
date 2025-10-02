@@ -218,7 +218,214 @@ class APITester:
             return total >= 1000 and len(verses) > 0
             
         except Exception as e:
-            self.log_test("Yah Scriptures Bible API Comprehensive Test", False, f"Error: {str(e)}")
+            self.log_test("KJV 1611 Bible API Comprehensive Test", False, f"Error: {str(e)}")
+            return False
+
+    def test_kjv1611_data_quality_verification(self):
+        """TEST: KJV 1611 data quality improvements - Genesis and Matthew verse counts"""
+        try:
+            print("\n🔍 KJV 1611 DATA QUALITY VERIFICATION...")
+            
+            # Test Genesis verse count improvement (should be ~214 vs previous ~48)
+            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1000")
+            if response.status_code == 200:
+                data = response.json()
+                genesis_total = data.get('total', 0)
+                genesis_verses = data.get('verses', [])
+                
+                if genesis_total >= 200:  # Should be around 214
+                    self.log_test("KJV 1611 - Genesis Verse Count", True, f"Found {genesis_total} Genesis verses (expected ~214, major improvement)")
+                else:
+                    self.log_test("KJV 1611 - Genesis Verse Count", False, f"Found only {genesis_total} Genesis verses (expected ~214)")
+                
+                # Test Genesis content quality
+                if genesis_verses:
+                    first_verse = genesis_verses[0]
+                    verse_text = first_verse.get('text', '')
+                    if 'beginning' in verse_text.lower() and len(verse_text) > 20:
+                        preview = verse_text[:80] + "..." if len(verse_text) > 80 else verse_text
+                        self.log_test("KJV 1611 - Genesis Content", True, f"Genesis 1:1: '{preview}'")
+                    else:
+                        self.log_test("KJV 1611 - Genesis Content", False, f"Genesis content issue: '{verse_text[:50]}...'")
+            else:
+                self.log_test("KJV 1611 - Genesis Verse Count", False, f"Status: {response.status_code}")
+            
+            # Test Matthew verse count improvement (should be ~227 vs previous ~17)
+            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Matthew&limit=1000")
+            if response.status_code == 200:
+                data = response.json()
+                matthew_total = data.get('total', 0)
+                matthew_verses = data.get('verses', [])
+                
+                if matthew_total >= 220:  # Should be around 227
+                    self.log_test("KJV 1611 - Matthew Verse Count", True, f"Found {matthew_total} Matthew verses (expected ~227, major improvement)")
+                else:
+                    self.log_test("KJV 1611 - Matthew Verse Count", False, f"Found only {matthew_total} Matthew verses (expected ~227)")
+                
+                # Test Matthew content quality
+                if matthew_verses:
+                    first_verse = matthew_verses[0]
+                    verse_text = first_verse.get('text', '')
+                    if ('generation' in verse_text.lower() or 'genealogy' in verse_text.lower()) and len(verse_text) > 20:
+                        preview = verse_text[:80] + "..." if len(verse_text) > 80 else verse_text
+                        self.log_test("KJV 1611 - Matthew Content", True, f"Matthew 1:1: '{preview}'")
+                    else:
+                        self.log_test("KJV 1611 - Matthew Content", False, f"Matthew content issue: '{verse_text[:50]}...'")
+            else:
+                self.log_test("KJV 1611 - Matthew Verse Count", False, f"Status: {response.status_code}")
+            
+            # Test other sample books
+            sample_books = [
+                ("Exodus", 180, 200),  # Expected range
+                ("Mark", 240, 260),    # Expected range
+                ("Tobit", 90, 120),    # Expected range
+                ("Psalms", 100, 120)   # Expected range (sample)
+            ]
+            
+            sample_books_passed = 0
+            for book_name, min_verses, max_verses in sample_books:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=1000")
+                    if response.status_code == 200:
+                        data = response.json()
+                        book_total = data.get('total', 0)
+                        book_verses = data.get('verses', [])
+                        
+                        if min_verses <= book_total <= max_verses:
+                            self.log_test(f"KJV 1611 - {book_name} Count", True, f"Found {book_total} verses (expected {min_verses}-{max_verses})")
+                            sample_books_passed += 1
+                        else:
+                            self.log_test(f"KJV 1611 - {book_name} Count", False, f"Found {book_total} verses (expected {min_verses}-{max_verses})")
+                        
+                        # Test content quality
+                        if book_verses:
+                            first_verse = book_verses[0]
+                            verse_text = first_verse.get('text', '')
+                            if verse_text and len(verse_text) > 10:
+                                preview = verse_text[:60] + "..." if len(verse_text) > 60 else verse_text
+                                self.log_test(f"KJV 1611 - {book_name} Content", True, f"First verse: '{preview}'")
+                            else:
+                                self.log_test(f"KJV 1611 - {book_name} Content", False, "Empty or too short content")
+                    else:
+                        self.log_test(f"KJV 1611 - {book_name} Count", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"KJV 1611 - {book_name}", False, f"Error: {str(e)}")
+            
+            return genesis_total >= 200 and matthew_total >= 220 and sample_books_passed >= 2
+            
+        except Exception as e:
+            self.log_test("KJV 1611 Data Quality Verification", False, f"Error: {str(e)}")
+            return False
+
+    def test_kjv1611_api_response_structure(self):
+        """TEST: KJV 1611 API response structure and required fields"""
+        try:
+            print("\n🔍 KJV 1611 API RESPONSE STRUCTURE TESTING...")
+            
+            # Test bible/versions response structure
+            response = self.session.get(f"{self.base_url}/bible/versions")
+            if response.status_code == 200:
+                data = response.json()
+                if 'versions' in data and isinstance(data['versions'], list):
+                    self.log_test("KJV 1611 - Versions Structure", True, "Proper JSON structure with versions array")
+                    
+                    # Check KJV version structure
+                    kjv_version = next((v for v in data['versions'] if v.get('id') == 'kjv1611_divine'), None)
+                    if kjv_version:
+                        required_fields = ['id', 'name', 'description']
+                        missing_fields = [field for field in required_fields if field not in kjv_version]
+                        if not missing_fields:
+                            self.log_test("KJV 1611 - Version Fields", True, "All required version fields present")
+                        else:
+                            self.log_test("KJV 1611 - Version Fields", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("KJV 1611 - Versions Structure", False, "Invalid JSON structure")
+            else:
+                self.log_test("KJV 1611 - Versions Structure", False, f"Status: {response.status_code}")
+            
+            # Test bible/books response structure
+            response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['books', 'total', 'filters']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("KJV 1611 - Books Structure", True, "All required fields present")
+                    
+                    # Check individual book structure
+                    books = data.get('books', [])
+                    if books:
+                        first_book = books[0]
+                        book_fields = ['name', 'testament']
+                        missing_book_fields = [field for field in book_fields if field not in first_book]
+                        if not missing_book_fields:
+                            self.log_test("KJV 1611 - Book Fields", True, "All required book fields present")
+                        else:
+                            self.log_test("KJV 1611 - Book Fields", False, f"Missing book fields: {missing_book_fields}")
+                else:
+                    self.log_test("KJV 1611 - Books Structure", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("KJV 1611 - Books Structure", False, f"Status: {response.status_code}")
+            
+            # Test bible/verses response structure
+            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&limit=10")
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['verses', 'total', 'page', 'totalPages', 'filters']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("KJV 1611 - Verses Structure", True, "All required fields present")
+                    
+                    # Check individual verse structure
+                    verses = data.get('verses', [])
+                    if verses:
+                        first_verse = verses[0]
+                        verse_fields = ['book', 'chapter', 'verse', 'text', 'testament']
+                        missing_verse_fields = [field for field in verse_fields if field not in first_verse]
+                        if not missing_verse_fields:
+                            self.log_test("KJV 1611 - Verse Fields", True, "All required verse fields present")
+                        else:
+                            self.log_test("KJV 1611 - Verse Fields", False, f"Missing verse fields: {missing_verse_fields}")
+                        
+                        # Test pagination
+                        total_pages = data.get('totalPages', 0)
+                        current_page = data.get('page', 0)
+                        if total_pages > 0 and current_page == 1:
+                            self.log_test("KJV 1611 - Pagination", True, f"Pagination working: page {current_page} of {total_pages}")
+                        else:
+                            self.log_test("KJV 1611 - Pagination", False, f"Pagination issue: page {current_page} of {total_pages}")
+                else:
+                    self.log_test("KJV 1611 - Verses Structure", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("KJV 1611 - Verses Structure", False, f"Status: {response.status_code}")
+            
+            # Test bible/stats response structure
+            response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['totalBooks', 'totalVerses']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("KJV 1611 - Stats Structure", True, "All required stats fields present")
+                    
+                    # Check for additional useful fields
+                    optional_fields = ['oldTestamentBooks', 'newTestamentBooks', 'apocryphaBooks', 
+                                     'oldTestamentVerses', 'newTestamentVerses', 'apocryphaVerses']
+                    present_optional = [field for field in optional_fields if field in data]
+                    if present_optional:
+                        self.log_test("KJV 1611 - Stats Optional Fields", True, f"Optional fields present: {present_optional}")
+                else:
+                    self.log_test("KJV 1611 - Stats Structure", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("KJV 1611 - Stats Structure", False, f"Status: {response.status_code}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("KJV 1611 API Response Structure", False, f"Error: {str(e)}")
             return False
 
     def test_yah_scriptures_new_testament_quality(self):
