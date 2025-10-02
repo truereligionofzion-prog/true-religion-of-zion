@@ -2010,7 +2010,7 @@ const MitzvotApp = () => {
                           </div>
                           
                           <blockquote className="italic text-gray-700 mb-3 bg-gray-50 p-3 rounded">
-                            "{highlightDivineNames(crossRef?.bible_verse?.text || '')}"
+                            "{renderHighlightedText(crossRef?.bible_verse?.text || '')}"
                           </blockquote>
                           
                           <div className="space-y-2">
