@@ -1,78 +1,107 @@
 <analysis>
-The trajectory details the evolution of a Biblical Study Suite application. Initially, the task was to complete Phase 1 by ingesting a full list of Precepts into a MongoDB database using a Python script. This process involved significant debugging: first, fixing the parsing logic that misidentified verse text as precept titles, and second, realizing the provided data was incomplete.
+The trajectory chronicles the development of a Biblical Study Suite, a complex full-stack application. The initial goal was to fix a critical frontend rendering bug in . This debugging process was extensive, uncovering multiple layers of issues, including React state management failures, CSS click-event blocking, and persistent JSX syntax errors.
 
-This led to a major feature development phase. Since the precepts weren't visible, I built backend FastAPI endpoints and integrated them into the React frontend (). I implemented a dynamic content-switching UI to handle Mitzvot and Precepts. Based on user feedback, I enhanced the UI with expandable verses and verse navigation. I then extended this dynamic system to the Quiz and Flashcards tabs, which required fixing a persistent  error by adding defensive checks across the component, a solution identified with the help of the .
+A major pivot occurred when the user questioned the data integrity. Investigation revealed that the primary web scraping effort () was fundamentally flawed, saving verse numbers instead of actual text content for all 24,815 scraped entries. This rendered the KJV 1611 version unusable.
 
-The project then pivoted to integrating an 80-book Bible. I planned and executed a two-phase prototype: Phase 1 involved creating a web scraping script () to perform a test extraction, and Phase 2 involved building the backend APIs, frontend UI (including a book-style Reading View as requested), and fixing data duplication issues. The most recent task was a critical quality improvement: correcting the divine name replacement logic ( vs. ) in all data processing scripts and reloading the sample data to ensure theological accuracy.
+In response, the project shifted focus to a user-provided CSV and later a PDF for a second version, Yah Scriptures. This involved implementing a dual-version architecture in the backend API and frontend UI. The work involved creating new data loaders, cleaning data artifacts (like BERĔSHITH), and enhancing the database schema.
+
+The current and final task in the trajectory is to complete the Yah Scriptures version by extracting the New Testament from the provided PDF. This has proven difficult due to the PDF's large size, causing memory-related system crashes, and the complexity of parsing its text structure, which has so far resulted in zero verses being successfully extracted.
 </analysis>
 
 <product_requirements>
-The application is a Biblical Study Suite evolving from a simple Mitzvot viewer into an integrated platform.
+The application is a Biblical Study Suite designed for in-depth theological study. It must present text with high theological accuracy, particularly regarding divine names.
 
-**Initial Goal (Phase 1 - Precepts):**
-The primary objective was to integrate a comprehensive list of Precepts into the application. This involved creating a data ingestion pipeline to parse, clean (divine name replacement), and store the precepts in a new MongoDB collection.
+**Core Features:**
+1.  **Dual Bible Versions:** The application must support at least two distinct Bible versions, selectable via a UI toggle:
+    *   **KJV 1611**: Sourced from thepreceptbible.com. This data source is currently broken and requires a corrected extraction process.
+    *   **Yah Scriptures**: Sourced from user-provided CSV and PDF files. This version is partially loaded (Old Testament and Apocrypha) and requires the addition of the New Testament from the PDF.
 
-**Evolved Requirements (UI/UX Integration):**
-After initial data ingestion, the scope expanded significantly based on user feedback:
-1.  **UI Visibility:** Create backend APIs and frontend components to display the precepts. A dynamic content-switcher was implemented to toggle between Mitzvot and Precepts.
-2.  **Enhanced Interaction:** Add features like expandable full-verse text and intra-precept verse navigation.
-3.  **Feature Parity:** Extend the existing Quiz and Flashcards functionalities to work seamlessly with the new Precepts data.
-4.  **Bible Integration:** The next major phase is to add the full 80-book Bible (1611 KJV with Apocrypha). This includes a book-style Reading View for a natural reading experience, accurate divine name translations (YHWH vs. Elohim), and clear separation between books. The system must support cross-referencing between Mitzvot, Precepts, and Bible verses.
+2.  **Divine Name Standardization:** The Yah Scriptures version must standardize various forms of divine names (e.g., HWHY, HWYH) into a consistent YHWH format. The divine name logic for the KJV 1611 version was scrapped by the user.
+
+3.  **Content Sections:** The UI must be organized into three main tabs: the 613 Mitzvot, Biblical Precepts, and the full Bible.
+
+4.  **User-Friendly Navigation:** The Bible view must include an intuitive navigation system, allowing users to select a specific book, chapter, and verse to jump to. The display should also group verses under clear chapter headings.
+
+The current implementation has the UI structure, a partially functional Yah Scriptures version, and a non-functional KJV 1611 version due to a failed data extraction.
 </product_requirements>
 
 <key_technical_concepts>
-- **Full-Stack Architecture**: React frontend () and a FastAPI backend ().
-- **Database**: MongoDB, managed with Pymongo for Python scripts.
-- **Data Ingestion/Extraction**: Standalone Python scripts using  and  for web scraping and data processing.
-- **Dynamic Frontend**: A single, complex React component () that conditionally renders three different content types (Mitzvot, Precepts, Bible) based on user-selected state.
-- **Regex for Data Cleaning**: Used for divine name replacements ( -> ) in text processing scripts.
+- **Full-Stack Architecture**: React frontend () and a Python FastAPI backend.
+- **Database**: MongoDB for storing all application data, structured to support multiple Bible versions.
+- **Data Ingestion**: Python scripts utilizing libraries like ,  (for web scraping),  (for CSV), and /usage: pdfplumber [-h] [--structure | --structure-text]
+                  [--format {csv,json,text}] [--types TYPES [TYPES ...]]
+                  [--include-attrs INCLUDE_ATTRS [INCLUDE_ATTRS ...]]
+                  [--exclude-attrs EXCLUDE_ATTRS [EXCLUDE_ATTRS ...]]
+                  [--laparams LAPARAMS] [--precision PRECISION]
+                  [--pages PAGES [PAGES ...]] [--indent INDENT]
+                  [infile]
+
+positional arguments:
+  infile
+
+options:
+  -h, --help            show this help message and exit
+  --structure           Write the structure tree as JSON. All other arguments
+                        except --pages, --laparams, and --indent will be
+                        ignored
+  --structure-text      Write the structure tree as JSON including text
+                        contents. All other arguments except --pages,
+                        --laparams, and --indent will be ignored
+  --format {csv,json,text}
+  --types TYPES [TYPES ...]
+  --include-attrs INCLUDE_ATTRS [INCLUDE_ATTRS ...]
+                        Include *only* these object attributes in output.
+  --exclude-attrs EXCLUDE_ATTRS [EXCLUDE_ATTRS ...]
+                        Exclude these object attributes from output.
+  --laparams LAPARAMS
+  --precision PRECISION
+  --pages PAGES [PAGES ...]
+  --indent INDENT       Indent level for JSON pretty-printing. (for PDF processing).
+- **Text Processing**: Advanced RegEx for standardizing divine names (e.g., HWHY to YHWH) and cleaning data artifacts.
+- **Asynchronous Processing**: Running long-running data extraction scripts as background processes.
 </key_technical_concepts>
 
 <code_architecture>
-The application is a monolith with distinct frontend and backend services, supplemented by data processing scripts.
+The application is a monolith with a standard frontend/backend structure. Data ingestion is handled by standalone Python scripts in the  directory.
 
 
 
 -   ****
-    -   **Importance**: This is the single most important and complex file in the frontend. It manages the state and renders the UI for all three content types (Mitzvot, Precepts, Bible) and all features (Explore, Quiz, Flashcards).
-    -   **Changes Summary**: Heavily modified to be a three-way dynamic component. Added state for , , , etc. Implemented conditional rendering throughout the JSX for titles, stats, filters, and content display (Cards vs. Table vs. Reading View). Added numerous functions for fetching data, generating quizzes, and handling UI interactions for all content types. Most recently, defensive checks were added to prevent  errors on undefined arrays.
+    -   **Importance**: This is the single, monolithic React component rendering the entire UI. It manages all state for content types, Bible versions, navigation, and display modes.
+    -   **Changes Summary**: This file was the subject of extensive debugging. Major changes include: fixing a state update bug for content type switching, implementing a version toggle dropdown, adding a book/chapter/verse navigation UI, and undergoing multiple complex and error-prone refactors of its conditional rendering logic to correctly display Bible content instead of Mitzvot. It was plagued by persistent JSX syntax errors that repeatedly broke the application.
 
 -   ****
-    -   **Importance**: The core FastAPI application defining all API endpoints.
-    -   **Changes Summary**: Expanded to serve the new content types. Added routes for fetching precepts (, ) and Bible data (, , ).
+    -   **Importance**: The FastAPI backend that serves all data.
+    -   **Changes Summary**: Significantly modified to support the dual-version Bible system. A  query parameter was added to all Bible-related endpoints (, , ) to allow the frontend to request data from a specific version. A new endpoint, , was also added.
 
 -   ****
-    -   **Importance**: The frontend service layer for making API calls to the backend.
-    -   **Changes Summary**: Updated to include methods for fetching precepts (, ) and Bible data (, , ).
+    -   **Importance**: The script intended to scrape 81 books from .
+    -   **Changes Summary**: This script was run, but it was later discovered to be fundamentally flawed. It had a critical parsing bug where it saved verse numbers into the  field instead of the actual verse content, rendering all 24,815 extracted records useless. This data was subsequently deleted.
 
 -   ****
-    -   **Importance**: The script developed to scrape Bible text from . It validates the data source and extraction logic.
-    -   **Changes Summary**: Created and refined multiple times. The most recent and critical change was updating the divine name replacement logic to be more accurate. It now only replaces LORD (all caps) with YHWH and leaves God (Elohim) untouched.
-    
+    -   **Importance**: A new script created to parse the user's  and  files.
+    -   **Changes Summary**: Created and successfully run to load the Old Testament and Apocrypha for the Yah Scriptures version. It was later updated with logic to standardize HWHY to YHWH and to strip out BERĔSHITH text artifacts.
 
 -   ****
-    -   **Importance**: The original script for ingesting precepts.
-    -   **Changes Summary**: Its parsing logic was debugged and improved. It was also updated with the same corrected divine name replacement logic as the Bible extraction script.
+    -   **Importance**: The most recently created script, designed to extract the New Testament from the  file to complete that version.
+    -   **Changes Summary**: This script represents the current work. It correctly identifies New Testament book titles but fails to parse and extract any verse text, indicating its text-parsing logic is incorrect for the PDF's structure.
 </code_architecture>
 
 <pending_tasks>
-- **Ingest Complete Precepts List**: The user still needs to provide the full list of precepts (from Abomination to Your Heart) to be ingested into the database.
-- **Phase 3: Full Bible Extraction**: Execute the full web scraping process to extract all 80 books of the Bible, process them with the correct divine name logic, and load them into the production database.
-- **Connect Bible Button**: The Bible button on the precept cards needs to be wired to navigate the user to the corresponding verse in the new Bible Reading View.
+- Fix or replace the web scraping script () to successfully extract the KJV 1611 version with actual verse text.
+- Implement the cross-reference navigation feature.
+- Ingest the complete list of Biblical Precepts once the user provides the dataset.
+- Address the incorrect ordering of books in the Bible navigation dropdown menu.
 </pending_tasks>
 
 <current_work>
-The most recent work focused on ensuring the theological accuracy of the application's text content, a direct response to the user's request. This involved two key actions:
+The immediate task is to complete the Yah Scriptures Bible version by extracting the New Testament from the user-provided PDF file, . Previous work successfully identified that the New Testament content begins around page 2200 of the PDF and correctly located the headers for books like Matthew, John (Yoḥanan), and Revelation (Ḥazon).
 
-1.  **Correcting Divine Name Translations:** I researched the distinction between YHWH (from LORD) and Elohim (from God). I discovered the initial replacement logic was incorrect as it replaced every instance of God with YHWH. I have now fixed this in both the Bible scraping script () and the precepts integration script (). The logic now correctly targets only the specific English representations of the Tetragrammaton.
+However, the current implementation in  has a critical flaw in its verse-parsing logic. While it can identify the book titles, it fails to extract the actual verse content, resulting in an output of 0 verses extracted.
 
-2.  **Re-processing Sample Data:** After correcting the logic, I re-ran the entire data pipeline for the sample Bible data. This included re-executing the  script to scrape Genesis 1 and Tobit 1 with the new logic, and then running the  script to clear the old data from MongoDB and insert the freshly corrected version.
-
-3.  **UI Refinement:** I also swapped the order of the Card View and Reading View tabs in the UI to place Reading View first, as requested by the user, while ensuring it remains the default view for the Bible section.
-
-The system is now staged with a small but accurate sample of Bible data, ready for final verification before scaling up to the full 80-book extraction.
+The core problem is that the script's assumptions about the PDF's text structure—specifically how verse numbers and text are formatted and laid out on the page—are incorrect. The AI engineer was in the process of debugging this parsing logic right before this summary was requested. The system had also experienced repeated memory-related crashes due to the large size of the PDF, forcing a shift to more memory-efficient, targeted processing strategies. The CSV data for the Old Testament and Apocrypha for this version has already been successfully loaded into the database.
 </current_work>
 
 <optional_next_step>
-Test the Reading View in the UI to visually confirm that the divine names in Genesis 1 now correctly display as God instead of YHWH, reflecting the recent data correction.
+Debug the verse parsing logic in  by sampling the raw text of a single New Testament page from the PDF. This will reveal the true text structure and allow for rewriting the parsing logic to correctly extract chapters, verse numbers, and text content.
 </optional_next_step>
