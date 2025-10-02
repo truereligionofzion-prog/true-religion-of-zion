@@ -425,12 +425,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phase 3C: Advanced Bible Features - CRITICAL ISSUE FOUND ❌"
-    - "Bible Verse Text Display - Showing '...' instead of actual verse content"
-    - "highlightDivineNames Function - May be causing React rendering issues"
+    - "Phase 3C: Advanced Bible Features - CRITICAL ISSUE CONFIRMED ❌"
+    - "Bible Verse Text Display - renderHighlightedText() function broken"
+    - "React JSX Rendering Issues - dangerouslySetInnerHTML not working properly"
   stuck_tasks: 
     - "Data Integrity Correction - Batch 7 (Mitzvot 137-186) - REQUIRES SPECIFIC TRADITIONAL WORDING"
-    - "Bible Verse Text Display - Frontend rendering broken despite working API"
+    - "Bible Verse Text Display - Frontend rendering broken despite working API - URGENT FIX NEEDED"
   test_all: false
   test_priority: "high_first"
 
