@@ -71,32 +71,14 @@ const MitzvotApp = () => {
   const filteredBooks = React.useMemo(() => {
     let books = bibleBooks || [];
     
-    console.log('=== TESTAMENT FILTERING DEBUG ===');
-    console.log('Current testament filter:', advancedFilters.testament);
-    console.log('Total books available:', books.length);
-    console.log('Sample book structure:', books[0]);
-    
-    // FORCE OLD TESTAMENT FOR TESTING
-    const testamentFilter = advancedFilters.testament;
-    console.log('Testament filter value:', testamentFilter, typeof testamentFilter);
-    
-    if (testamentFilter && testamentFilter !== 'all') {
-      const originalCount = books.length;
-      console.log('APPLYING FILTERING for testament:', testamentFilter);
-      
+    // Filter books based on testament selection
+    if (advancedFilters.testament && advancedFilters.testament !== 'all') {
       books = books.filter(book => {
-        const bookTestament = book?.testament;
-        console.log(`Checking book: ${book?.name} with testament: "${bookTestament}"`);
-        
-        if (testamentFilter === 'old') return bookTestament === 'old';
-        if (testamentFilter === 'new') return bookTestament === 'new';  
-        if (testamentFilter === 'apocrypha') return bookTestament === 'apocrypha';
+        if (advancedFilters.testament === 'old') return book?.testament === 'old';
+        if (advancedFilters.testament === 'new') return book?.testament === 'new';  
+        if (advancedFilters.testament === 'apocrypha') return book?.testament === 'apocrypha';
         return true;
       });
-      console.log(`FILTERED from ${originalCount} to ${books.length} books for testament: ${testamentFilter}`);
-      console.log('Filtered book names:', books.map(b => b?.name));
-    } else {
-      console.log('No filtering applied - showing all testaments, filter value was:', testamentFilter);
     }
     
     return books;
