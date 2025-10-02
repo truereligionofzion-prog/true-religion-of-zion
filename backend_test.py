@@ -1028,16 +1028,16 @@ class APITester:
 
 def main():
     """Main test execution"""
-    print("🚀 Starting Exodus Completion Verification Testing...")
+    print("🚀 Starting Exodus Authentic Biblical Text Verification Testing...")
     
     tester = APITester(BACKEND_URL)
-    success = tester.run_exodus_completion_verification_tests()
+    success = tester.run_exodus_authentic_content_verification_tests()
     
     if success:
-        print("\n🎉 Exodus completion verification successful!")
+        print("\n🎉 Exodus authentic biblical text verification successful!")
         sys.exit(0)
     else:
-        print("\n❌ Exodus completion verification failed.")
+        print("\n❌ Exodus authentic biblical text verification failed.")
         sys.exit(1)
 
 if __name__ == "__main__":
