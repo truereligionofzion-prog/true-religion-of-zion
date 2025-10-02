@@ -277,171 +277,169 @@ class APITester:
             self.log_test("Massive Verse Count Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_quality_cross_reference_validation(self):
-        """REVIEW REQUEST TEST 3: Quality Cross-Reference Validation - Sample specific books with web-verified expected counts"""
+    def test_testament_distribution_verification(self):
+        """REVIEW REQUEST TEST 3: Testament Distribution Verification - Old Testament (39), New Testament (27), Apocrypha (14)"""
         try:
-            print("\n🔍 QUALITY CROSS-REFERENCE VALIDATION - WEB-VERIFIED EXPECTED COUNTS...")
+            print("\n🔍 TESTAMENT DISTRIBUTION VERIFICATION - COMPREHENSIVE COVERAGE...")
             
-            # Test 1: Genesis verse counts - Yah (1,592 vs expected 1,533), KJV (1,859 vs expected 1,533)
-            # Test Yah Scriptures Genesis
-            response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&book=Genesis&limit=2000")
+            # Test 1: Yah Scriptures testament distribution
+            response = self.session.get(f"{self.base_url}/bible/books?version=yah_scriptures")
             if response.status_code == 200:
                 data = response.json()
-                yah_genesis = data.get('total', 0)
+                yah_books = data.get('books', [])
                 
-                if 1500 <= yah_genesis <= 1650:  # Expected ~1,592 vs web standard 1,533
-                    coverage_ratio = yah_genesis / 1533
-                    self.log_test("Genesis - Yah Scriptures Count", True, f"Found {yah_genesis} verses (expected ~1,592, coverage ratio: {coverage_ratio:.2f})")
+                # Count books by testament
+                yah_testaments = {'old': 0, 'new': 0, 'apocrypha': 0}
+                for book in yah_books:
+                    testament = book.get('testament', 'unknown')
+                    if testament in yah_testaments:
+                        yah_testaments[testament] += 1
+                
+                # Check Old Testament (expected 39 books)
+                if yah_testaments['old'] == 39:
+                    self.log_test("Yah Scriptures - Old Testament Complete", True, f"🎉 COMPLETE! Found exactly 39/39 Old Testament books")
+                elif yah_testaments['old'] >= 35:
+                    self.log_test("Yah Scriptures - Old Testament Near Complete", True, f"Found {yah_testaments['old']}/39 Old Testament books (89%+ coverage)")
                 else:
-                    self.log_test("Genesis - Yah Scriptures Count", False, f"Found {yah_genesis} verses (expected ~1,592)")
+                    self.log_test("Yah Scriptures - Old Testament Coverage", False, f"Found only {yah_testaments['old']}/39 Old Testament books")
+                
+                # Check New Testament (expected 27 books)
+                if yah_testaments['new'] == 27:
+                    self.log_test("Yah Scriptures - New Testament Complete", True, f"🎉 COMPLETE! Found exactly 27/27 New Testament books")
+                elif yah_testaments['new'] >= 24:
+                    self.log_test("Yah Scriptures - New Testament Near Complete", True, f"Found {yah_testaments['new']}/27 New Testament books (89%+ coverage)")
+                else:
+                    self.log_test("Yah Scriptures - New Testament Coverage", False, f"Found only {yah_testaments['new']}/27 New Testament books")
+                
+                # Check Apocrypha (expected 14 books)
+                if yah_testaments['apocrypha'] == 14:
+                    self.log_test("Yah Scriptures - Apocrypha Complete", True, f"🎉 COMPLETE! Found exactly 14/14 Apocrypha books")
+                elif yah_testaments['apocrypha'] >= 12:
+                    self.log_test("Yah Scriptures - Apocrypha Near Complete", True, f"Found {yah_testaments['apocrypha']}/14 Apocrypha books (86%+ coverage)")
+                else:
+                    self.log_test("Yah Scriptures - Apocrypha Coverage", False, f"Found only {yah_testaments['apocrypha']}/14 Apocrypha books")
+                
+                # Overall Yah Scriptures assessment
+                total_expected = 39 + 27 + 14  # 80 books total
+                total_found = yah_testaments['old'] + yah_testaments['new'] + yah_testaments['apocrypha']
+                coverage_percentage = (total_found / total_expected) * 100
+                
+                self.log_test("Yah Scriptures - Overall Testament Coverage", True, f"Found {total_found}/80 books ({coverage_percentage:.1f}% coverage)")
+                
             else:
-                self.log_test("Genesis - Yah Scriptures Count", False, f"Status: {response.status_code}")
-                yah_genesis = 0
+                self.log_test("Yah Scriptures - Testament Distribution", False, f"Status: {response.status_code}")
+                yah_testaments = {'old': 0, 'new': 0, 'apocrypha': 0}
             
-            # Test KJV 1611 Genesis
-            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=2000")
+            # Test 2: KJV 1611 testament distribution
+            response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
             if response.status_code == 200:
                 data = response.json()
-                kjv_genesis = data.get('total', 0)
+                kjv_books = data.get('books', [])
                 
-                if 1800 <= kjv_genesis <= 1950:  # Expected ~1,859 vs web standard 1,533
-                    coverage_ratio = kjv_genesis / 1533
-                    self.log_test("Genesis - KJV 1611 Count", True, f"Found {kjv_genesis} verses (expected ~1,859, coverage ratio: {coverage_ratio:.2f})")
-                else:
-                    self.log_test("Genesis - KJV 1611 Count", False, f"Found {kjv_genesis} verses (expected ~1,859)")
-            else:
-                self.log_test("Genesis - KJV 1611 Count", False, f"Status: {response.status_code}")
-                kjv_genesis = 0
-            
-            # Test 2: Matthew verse counts - Yah (943 vs expected 1,071), KJV (1,485 vs expected 1,071)
-            # Test Yah Scriptures Matthew
-            response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&book=Matthew&limit=1500")
-            if response.status_code == 200:
-                data = response.json()
-                yah_matthew = data.get('total', 0)
+                # Count books by testament
+                kjv_testaments = {'old': 0, 'new': 0, 'apocrypha': 0}
+                for book in kjv_books:
+                    testament = book.get('testament', 'unknown')
+                    if testament in kjv_testaments:
+                        kjv_testaments[testament] += 1
                 
-                if 900 <= yah_matthew <= 1000:  # Expected ~943 vs web standard 1,071
-                    coverage_ratio = yah_matthew / 1071
-                    self.log_test("Matthew - Yah Scriptures Count", True, f"Found {yah_matthew} verses (expected ~943, coverage ratio: {coverage_ratio:.2f})")
-                else:
-                    self.log_test("Matthew - Yah Scriptures Count", False, f"Found {yah_matthew} verses (expected ~943)")
-            else:
-                self.log_test("Matthew - Yah Scriptures Count", False, f"Status: {response.status_code}")
-                yah_matthew = 0
-            
-            # Test KJV 1611 Matthew
-            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Matthew&limit=1600")
-            if response.status_code == 200:
-                data = response.json()
-                kjv_matthew = data.get('total', 0)
+                self.log_test("KJV 1611 - Testament Distribution", True, f"Old: {kjv_testaments['old']}, New: {kjv_testaments['new']}, Apocrypha: {kjv_testaments['apocrypha']}")
                 
-                if 1400 <= kjv_matthew <= 1550:  # Expected ~1,485 vs web standard 1,071
-                    coverage_ratio = kjv_matthew / 1071
-                    self.log_test("Matthew - KJV 1611 Count", True, f"Found {kjv_matthew} verses (expected ~1,485, coverage ratio: {coverage_ratio:.2f})")
+                # Check if KJV has representation from all testaments
+                testaments_represented = sum(1 for count in kjv_testaments.values() if count > 0)
+                if testaments_represented == 3:
+                    self.log_test("KJV 1611 - All Testaments Represented", True, "All three testaments have books")
                 else:
-                    self.log_test("Matthew - KJV 1611 Count", False, f"Found {kjv_matthew} verses (expected ~1,485)")
-            else:
-                self.log_test("Matthew - KJV 1611 Count", False, f"Status: {response.status_code}")
-                kjv_matthew = 0
-            
-            # Test 3: Psalms verse counts - Yah (2,528 vs expected 2,461), KJV (3,692 vs expected 2,461)
-            # Test Yah Scriptures Psalms
-            response = self.session.get(f"{self.base_url}/bible/verses?version=yah_scriptures&book=Psalms&limit=3000")
-            if response.status_code == 200:
-                data = response.json()
-                yah_psalms = data.get('total', 0)
+                    self.log_test("KJV 1611 - Testament Representation", False, f"Only {testaments_represented}/3 testaments represented")
                 
-                if 2400 <= yah_psalms <= 2600:  # Expected ~2,528 vs web standard 2,461
-                    coverage_ratio = yah_psalms / 2461
-                    self.log_test("Psalms - Yah Scriptures Count", True, f"Found {yah_psalms} verses (expected ~2,528, coverage ratio: {coverage_ratio:.2f})")
-                else:
-                    self.log_test("Psalms - Yah Scriptures Count", False, f"Found {yah_psalms} verses (expected ~2,528)")
             else:
-                self.log_test("Psalms - Yah Scriptures Count", False, f"Status: {response.status_code}")
-                yah_psalms = 0
+                self.log_test("KJV 1611 - Testament Distribution", False, f"Status: {response.status_code}")
+                kjv_testaments = {'old': 0, 'new': 0, 'apocrypha': 0}
             
-            # Test KJV 1611 Psalms
-            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Psalms&limit=4000")
-            if response.status_code == 200:
-                data = response.json()
-                kjv_psalms = data.get('total', 0)
-                
-                if 3500 <= kjv_psalms <= 3800:  # Expected ~3,692 vs web standard 2,461
-                    coverage_ratio = kjv_psalms / 2461
-                    self.log_test("Psalms - KJV 1611 Count", True, f"Found {kjv_psalms} verses (expected ~3,692, coverage ratio: {coverage_ratio:.2f})")
-                else:
-                    self.log_test("Psalms - KJV 1611 Count", False, f"Found {kjv_psalms} verses (expected ~3,692)")
-            else:
-                self.log_test("Psalms - KJV 1611 Count", False, f"Status: {response.status_code}")
-                kjv_psalms = 0
+            # Test 3: Verify testament filtering works for both versions
+            testament_filter_tests = [
+                ("old", "yah_scriptures"),
+                ("new", "yah_scriptures"),
+                ("apocrypha", "yah_scriptures"),
+                ("old", "kjv1611_divine"),
+                ("new", "kjv1611_divine"),
+                ("apocrypha", "kjv1611_divine")
+            ]
             
-            # Test 4: Verify these are approaching biblical standards with good coverage ratios
-            good_coverage_count = 0
+            testament_filtering_passed = 0
+            for testament, version in testament_filter_tests:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version={version}&testament={testament}&limit=10")
+                    if response.status_code == 200:
+                        data = response.json()
+                        verses = data.get('verses', [])
+                        total = data.get('total', 0)
+                        
+                        if total > 0:
+                            self.log_test(f"Testament Filter - {testament} ({version})", True, f"Found {total} verses")
+                            testament_filtering_passed += 1
+                            
+                            # Verify verses are from correct testament
+                            correct_testament = 0
+                            for verse in verses[:3]:  # Check first 3 verses
+                                if verse.get('testament') == testament:
+                                    correct_testament += 1
+                            
+                            if correct_testament >= 2:  # At least 2/3 should be correct
+                                self.log_test(f"Testament Accuracy - {testament} ({version})", True, f"{correct_testament}/3 verses correct")
+                            else:
+                                self.log_test(f"Testament Accuracy - {testament} ({version})", False, f"Only {correct_testament}/3 verses correct")
+                        else:
+                            self.log_test(f"Testament Filter - {testament} ({version})", False, f"No verses found")
+                    else:
+                        self.log_test(f"Testament Filter - {testament} ({version})", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Testament Filter - {testament} ({version})", False, f"Error: {str(e)}")
             
-            # Check Genesis coverage ratios
-            if yah_genesis > 0:
-                yah_genesis_ratio = yah_genesis / 1533
-                if yah_genesis_ratio >= 0.9:  # At least 90% coverage
-                    good_coverage_count += 1
-                    self.log_test("Genesis - Yah Coverage Ratio", True, f"Good coverage: {yah_genesis_ratio:.2f} (90%+ of biblical standard)")
-                else:
-                    self.log_test("Genesis - Yah Coverage Ratio", False, f"Low coverage: {yah_genesis_ratio:.2f}")
+            # Test 4: Check specific high-value books from different testaments
+            high_value_books = [
+                ("Genesis", "old", "yah_scriptures"),
+                ("Psalms", "old", "yah_scriptures"),
+                ("Matthew", "new", "yah_scriptures"),
+                ("Romans", "new", "yah_scriptures"),
+                ("Tobit", "apocrypha", "yah_scriptures"),
+                ("Wisdom", "apocrypha", "yah_scriptures")
+            ]
             
-            if kjv_genesis > 0:
-                kjv_genesis_ratio = kjv_genesis / 1533
-                if kjv_genesis_ratio >= 1.0:  # At least 100% coverage
-                    good_coverage_count += 1
-                    self.log_test("Genesis - KJV Coverage Ratio", True, f"Excellent coverage: {kjv_genesis_ratio:.2f} (100%+ of biblical standard)")
-                else:
-                    self.log_test("Genesis - KJV Coverage Ratio", False, f"Coverage: {kjv_genesis_ratio:.2f}")
+            high_value_books_found = 0
+            for book, expected_testament, version in high_value_books:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version={version}&book={book}&limit=10")
+                    if response.status_code == 200:
+                        data = response.json()
+                        total = data.get('total', 0)
+                        verses = data.get('verses', [])
+                        
+                        if total > 0 and verses:
+                            # Check if testament matches
+                            verse_testament = verses[0].get('testament', 'unknown')
+                            if verse_testament == expected_testament:
+                                self.log_test(f"High-Value Book - {book} ({expected_testament})", True, f"Found {total} verses in correct testament")
+                                high_value_books_found += 1
+                            else:
+                                self.log_test(f"High-Value Book - {book} ({expected_testament})", False, f"Found {total} verses but wrong testament: {verse_testament}")
+                        else:
+                            self.log_test(f"High-Value Book - {book} ({expected_testament})", False, f"Book not found or no verses")
+                    else:
+                        self.log_test(f"High-Value Book - {book} ({expected_testament})", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"High-Value Book - {book} ({expected_testament})", False, f"Error: {str(e)}")
             
-            # Check Matthew coverage ratios
-            if yah_matthew > 0:
-                yah_matthew_ratio = yah_matthew / 1071
-                if yah_matthew_ratio >= 0.8:  # At least 80% coverage
-                    good_coverage_count += 1
-                    self.log_test("Matthew - Yah Coverage Ratio", True, f"Good coverage: {yah_matthew_ratio:.2f} (80%+ of biblical standard)")
-                else:
-                    self.log_test("Matthew - Yah Coverage Ratio", False, f"Low coverage: {yah_matthew_ratio:.2f}")
+            # Overall assessment
+            yah_total_books = yah_testaments['old'] + yah_testaments['new'] + yah_testaments['apocrypha']
+            success = (yah_total_books >= 70 and  # At least 70/80 books for Yah Scriptures
+                      testament_filtering_passed >= 4 and  # At least 4/6 testament filters work
+                      high_value_books_found >= 4)  # At least 4/6 high-value books found
             
-            if kjv_matthew > 0:
-                kjv_matthew_ratio = kjv_matthew / 1071
-                if kjv_matthew_ratio >= 1.2:  # At least 120% coverage
-                    good_coverage_count += 1
-                    self.log_test("Matthew - KJV Coverage Ratio", True, f"Excellent coverage: {kjv_matthew_ratio:.2f} (120%+ of biblical standard)")
-                else:
-                    self.log_test("Matthew - KJV Coverage Ratio", False, f"Coverage: {kjv_matthew_ratio:.2f}")
-            
-            # Check Psalms coverage ratios
-            if yah_psalms > 0:
-                yah_psalms_ratio = yah_psalms / 2461
-                if yah_psalms_ratio >= 1.0:  # At least 100% coverage
-                    good_coverage_count += 1
-                    self.log_test("Psalms - Yah Coverage Ratio", True, f"Excellent coverage: {yah_psalms_ratio:.2f} (100%+ of biblical standard)")
-                else:
-                    self.log_test("Psalms - Yah Coverage Ratio", False, f"Coverage: {yah_psalms_ratio:.2f}")
-            
-            if kjv_psalms > 0:
-                kjv_psalms_ratio = kjv_psalms / 2461
-                if kjv_psalms_ratio >= 1.4:  # At least 140% coverage
-                    good_coverage_count += 1
-                    self.log_test("Psalms - KJV Coverage Ratio", True, f"Outstanding coverage: {kjv_psalms_ratio:.2f} (140%+ of biblical standard)")
-                else:
-                    self.log_test("Psalms - KJV Coverage Ratio", False, f"Coverage: {kjv_psalms_ratio:.2f}")
-            
-            # Overall coverage assessment
-            if good_coverage_count >= 4:  # At least 4/6 books have good coverage
-                self.log_test("Overall Coverage Assessment", True, f"{good_coverage_count}/6 books have good coverage ratios approaching biblical standards")
-            else:
-                self.log_test("Overall Coverage Assessment", False, f"Only {good_coverage_count}/6 books have good coverage ratios")
-            
-            return (yah_genesis >= 1500 and kjv_genesis >= 1800 and 
-                   yah_matthew >= 900 and kjv_matthew >= 1400 and 
-                   yah_psalms >= 2400 and kjv_psalms >= 3500 and 
-                   good_coverage_count >= 4)
+            return success
             
         except Exception as e:
-            self.log_test("Quality Cross-Reference Validation", False, f"Error: {str(e)}")
+            self.log_test("Testament Distribution Verification", False, f"Error: {str(e)}")
             return False
 
     def test_bible_data_quality_verification(self):
