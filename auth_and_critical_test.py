@@ -11,7 +11,7 @@ import os
 from typing import Dict, List, Any
 
 # Get backend URL from environment
-BACKEND_URL = "https://scripturesearch.preview.emergentagent.com/api"
+BACKEND_URL = "https://sacred-verse-hub.preview.emergentagent.com/api"
 
 class CriticalTester:
     def __init__(self, base_url: str):

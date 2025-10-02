@@ -6,7 +6,7 @@ Debug specific API issues
 import requests
 import json
 
-BACKEND_URL = "https://scripturesearch.preview.emergentagent.com/api"
+BACKEND_URL = "https://sacred-verse-hub.preview.emergentagent.com/api"
 
 def test_specific_issues():
     session = requests.Session()
