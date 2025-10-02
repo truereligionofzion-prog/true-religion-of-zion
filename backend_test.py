@@ -324,7 +324,7 @@ class APITester:
             return True
             
         except Exception as e:
-            self.log_test("No Placeholder Brackets Check", False, f"Error: {str(e)}")
+            self.log_test("No Placeholder Content Check", False, f"Error: {str(e)}")
             return False
 
     def test_genesis_preservation_verification(self):
