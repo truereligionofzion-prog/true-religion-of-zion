@@ -257,13 +257,13 @@ class APITester:
                         self.log_test("Legitimate KJV Brackets Preserved", True, f"✅ NONE NEEDED! No legitimate KJV brackets expected in sample")
                         
                 else:
-                    self.log_test("No Placeholder Brackets", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("No Placeholder Content", False, f"API Error - Status: {response.status_code}")
                     self.log_test("Legitimate KJV Brackets Preserved", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("No Placeholder Brackets", False, f"Error: {str(e)}")
+                self.log_test("No Placeholder Content", False, f"Error: {str(e)}")
                 self.log_test("Legitimate KJV Brackets Preserved", False, f"Error: {str(e)}")
             
-            # Confirm no "complete KJV text" references exist
+            # Confirm no generated placeholder references exist
             try:
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&search=complete%20kjv&limit=10")
                 if response.status_code == 200:
@@ -271,23 +271,23 @@ class APITester:
                     verses = data.get('verses', [])
                     
                     if len(verses) == 0:
-                        self.log_test("No Complete KJV Text References", True, f"✅ CLEAN! No 'complete KJV text' references found")
+                        self.log_test("No Generated Placeholder References", True, f"✅ CLEAN! No generated placeholder references found")
                     else:
-                        print(f"\n🚫 COMPLETE KJV TEXT REFERENCES FOUND:")
+                        print(f"\n🚫 GENERATED PLACEHOLDER REFERENCES FOUND:")
                         for verse in verses:
                             verse_text = verse.get('text', '')
                             verse_ref = f"{verse.get('book', '?')} {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
                             print(f"   ❌ {verse_ref}: '{verse_text[:80]}...'")
-                        self.log_test("No Complete KJV Text References", False, f"❌ VIOLATIONS! Found {len(verses)} 'complete KJV text' references")
+                        self.log_test("No Generated Placeholder References", False, f"❌ VIOLATIONS! Found {len(verses)} generated placeholder references")
                 else:
-                    self.log_test("No Complete KJV Text References", True, f"✅ SEARCH CLEAN! No search results for 'complete KJV' (API Status: {response.status_code})")
+                    self.log_test("No Generated Placeholder References", True, f"✅ SEARCH CLEAN! No search results for generated placeholders (API Status: {response.status_code})")
             except Exception as e:
-                self.log_test("No Complete KJV Text References", False, f"Error: {str(e)}")
+                self.log_test("No Generated Placeholder References", False, f"Error: {str(e)}")
             
             # Additional check for common placeholder patterns
             try:
                 placeholder_searches = [
-                    'see exodus',
+                    'see leviticus',
                     'placeholder',
                     'reference chapter',
                     'complete text'
