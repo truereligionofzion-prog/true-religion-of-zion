@@ -78,12 +78,12 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_exodus_current_state_analysis(self):
-        """REVIEW REQUEST TEST 1: Exodus Current State Analysis - Check if Exodus exists and get current counts"""
+    def test_exodus_completion_verification(self):
+        """REVIEW REQUEST TEST 1: Exodus Completion Verification - Verify Exodus exists with proper verse count and all 40 chapters"""
         try:
-            print("\n🔍 EXODUS CURRENT STATE ANALYSIS - CHECKING EXISTENCE AND CURRENT COUNTS...")
+            print("\n🔍 EXODUS COMPLETION VERIFICATION - CHECKING FULL COMPLETION STATUS...")
             
-            # Check if Exodus exists in the database at all
+            # Verify Exodus exists in the database with proper verse count
             try:
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
                 if response.status_code == 200:
@@ -91,27 +91,20 @@ class APITester:
                     total_verses = data.get('total', 0)
                     expected_verses = 1213  # Exodus should have 1,213 verses total
                     
-                    if total_verses > 0:
+                    if total_verses == expected_verses:
+                        self.log_test("Exodus Complete Verse Count", True, f"✅ PERFECT! Exodus has exactly {total_verses} verses (100% complete)")
+                    elif total_verses > 0:
                         completion_percentage = (total_verses / expected_verses) * 100
-                        self.log_test("Exodus Exists in Database", True, f"✅ FOUND! Exodus exists with {total_verses} verses ({completion_percentage:.1f}% of expected {expected_verses})")
-                        
-                        # If Exodus exists, get current chapter and verse count
-                        if total_verses == expected_verses:
-                            self.log_test("Exodus Completion Status", True, f"✅ COMPLETE! Exodus has all {total_verses} verses (100% complete)")
-                        else:
-                            missing_verses = expected_verses - total_verses
-                            self.log_test("Exodus Completion Status", False, f"⚠️ INCOMPLETE! Exodus has {total_verses} verses, missing {missing_verses} ({completion_percentage:.1f}% complete)")
+                        missing_verses = expected_verses - total_verses
+                        self.log_test("Exodus Complete Verse Count", False, f"❌ INCOMPLETE! Exodus has {total_verses} verses, missing {missing_verses} ({completion_percentage:.1f}% complete)")
                     else:
-                        self.log_test("Exodus Exists in Database", False, f"❌ NOT FOUND! Exodus does not exist in database (0 verses)")
-                        self.log_test("Exodus Completion Status", False, f"❌ MISSING! Exodus completely absent from database")
+                        self.log_test("Exodus Complete Verse Count", False, f"❌ NOT FOUND! Exodus does not exist in database (0 verses)")
                 else:
-                    self.log_test("Exodus Exists in Database", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Exodus Completion Status", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Exodus Complete Verse Count", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Exodus Exists in Database", False, f"Error: {str(e)}")
-                self.log_test("Exodus Completion Status", False, f"Error: {str(e)}")
+                self.log_test("Exodus Complete Verse Count", False, f"Error: {str(e)}")
             
-            # Identify which chapters/verses are present vs missing
+            # Check all 40 chapters are present with correct verse counts
             expected_verses_per_chapter = {
                 1: 22, 2: 25, 3: 22, 4: 31, 5: 23, 6: 30, 7: 25, 8: 32, 9: 35, 10: 29,
                 11: 10, 12: 51, 13: 22, 14: 31, 15: 27, 16: 36, 17: 16, 18: 27, 19: 25, 20: 26,
@@ -119,12 +112,10 @@ class APITester:
                 31: 18, 32: 35, 33: 23, 34: 35, 35: 35, 36: 38, 37: 29, 38: 31, 39: 43, 40: 38
             }
             
-            print("\n📊 EXODUS CHAPTER-BY-CHAPTER ANALYSIS (40 chapters expected):")
-            present_chapters = 0
-            missing_chapters = []
-            partial_chapters = []
-            complete_chapters = []
-            total_present_verses = 0
+            print("\n📊 EXODUS ALL 40 CHAPTERS VERIFICATION:")
+            complete_chapters = 0
+            incomplete_chapters = []
+            total_verified_verses = 0
             
             for chapter in range(1, 41):  # Exodus has 40 chapters
                 try:
@@ -135,58 +126,85 @@ class APITester:
                         expected_verses = expected_verses_per_chapter.get(chapter, 0)
                         
                         if actual_verses == expected_verses:
-                            present_chapters += 1
-                            complete_chapters.append(chapter)
-                            total_present_verses += actual_verses
+                            complete_chapters += 1
+                            total_verified_verses += actual_verses
                             print(f"   ✅ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses - COMPLETE")
-                        elif actual_verses > 0:
-                            present_chapters += 1
-                            partial_chapters.append({
+                        else:
+                            incomplete_chapters.append({
                                 'chapter': chapter,
                                 'actual': actual_verses,
                                 'expected': expected_verses,
-                                'missing': expected_verses - actual_verses
+                                'status': 'MISSING' if actual_verses == 0 else 'PARTIAL'
                             })
-                            total_present_verses += actual_verses
-                            print(f"   ⚠️ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses - PARTIAL (missing {expected_verses - actual_verses})")
-                        else:
-                            missing_chapters.append({
-                                'chapter': chapter,
-                                'expected': expected_verses
-                            })
-                            print(f"   ❌ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses - MISSING")
+                            total_verified_verses += actual_verses
+                            status = 'MISSING' if actual_verses == 0 else 'PARTIAL'
+                            print(f"   ❌ Chapter {chapter:2d}: {actual_verses:2d}/{expected_verses:2d} verses - {status}")
                         
                     else:
-                        missing_chapters.append({
+                        incomplete_chapters.append({
                             'chapter': chapter,
-                            'expected': expected_verses_per_chapter.get(chapter, 0)
+                            'actual': 0,
+                            'expected': expected_verses_per_chapter.get(chapter, 0),
+                            'status': 'API_ERROR'
                         })
                         print(f"   ❌ Chapter {chapter:2d}: API ERROR - Status {response.status_code}")
                         
                 except Exception as e:
-                    missing_chapters.append({
+                    incomplete_chapters.append({
                         'chapter': chapter,
-                        'expected': expected_verses_per_chapter.get(chapter, 0)
+                        'actual': 0,
+                        'expected': expected_verses_per_chapter.get(chapter, 0),
+                        'status': 'ERROR'
                     })
                     print(f"   ❌ Chapter {chapter:2d}: ERROR - {str(e)}")
             
-            # Summary of chapter analysis
-            total_missing_verses = sum(ch['expected'] for ch in missing_chapters) + sum(ch['missing'] for ch in partial_chapters)
-            
-            self.log_test("Exodus Chapter Presence Analysis", True, f"Present: {present_chapters}/40 chapters, Complete: {len(complete_chapters)}, Partial: {len(partial_chapters)}, Missing: {len(missing_chapters)}")
-            self.log_test("Exodus Verse Count Analysis", True, f"Present: {total_present_verses} verses, Missing: {total_missing_verses} verses, Total Expected: 1213")
-            
-            if len(complete_chapters) == 40:
-                self.log_test("All Exodus Chapters Complete", True, f"✅ PERFECT! All 40 chapters are complete")
-            elif len(complete_chapters) > 0:
-                self.log_test("All Exodus Chapters Complete", False, f"⚠️ PARTIAL! {len(complete_chapters)}/40 chapters complete, {len(partial_chapters)} partial, {len(missing_chapters)} missing")
+            # Verify all 40 chapters are complete
+            if complete_chapters == 40:
+                self.log_test("All 40 Exodus Chapters Present", True, f"✅ PERFECT! All 40 chapters are complete with correct verse counts")
             else:
-                self.log_test("All Exodus Chapters Complete", False, f"❌ NONE! No complete chapters found")
+                missing_count = len([ch for ch in incomplete_chapters if ch['status'] == 'MISSING'])
+                partial_count = len([ch for ch in incomplete_chapters if ch['status'] == 'PARTIAL'])
+                self.log_test("All 40 Exodus Chapters Present", False, f"❌ INCOMPLETE! {complete_chapters}/40 complete, {partial_count} partial, {missing_count} missing")
+            
+            # Confirm key verses have proper content
+            key_verses = [
+                {'chapter': 1, 'verse': 1, 'description': 'Israel in Egypt'},
+                {'chapter': 3, 'verse': 1, 'description': 'Burning Bush'},
+                {'chapter': 12, 'verse': 1, 'description': 'Passover'},
+                {'chapter': 20, 'verse': 1, 'description': 'Ten Commandments'},
+                {'chapter': 40, 'verse': 1, 'description': 'Tabernacle Completion'}
+            ]
+            
+            print("\n📖 KEY EXODUS VERSES CONTENT VERIFICATION:")
+            key_verses_verified = 0
+            
+            for key_verse in key_verses:
+                try:
+                    response = self.session.get(f"{self.base_url}/bible/verse/Exodus/{key_verse['chapter']}/{key_verse['verse']}")
+                    if response.status_code == 200:
+                        verse_data = response.json()
+                        verse_text = verse_data.get('text', '')
+                        
+                        if len(verse_text) > 20 and not verse_text.startswith('...'):
+                            key_verses_verified += 1
+                            print(f"   ✅ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): '{verse_text[:60]}...'")
+                        else:
+                            print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): POOR CONTENT - '{verse_text}'")
+                    else:
+                        print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): API ERROR - Status {response.status_code}")
+                        
+                except Exception as e:
+                    print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): ERROR - {str(e)}")
+            
+            if key_verses_verified == len(key_verses):
+                self.log_test("Key Exodus Verses Content", True, f"✅ EXCELLENT! All {key_verses_verified}/5 key verses have proper content")
+            else:
+                self.log_test("Key Exodus Verses Content", False, f"❌ ISSUES! Only {key_verses_verified}/5 key verses have proper content")
             
             return True
             
         except Exception as e:
-            self.log_test("Exodus Current State Analysis", False, f"Error: {str(e)}")
+            self.log_test("Exodus Completion Verification", False, f"Error: {str(e)}")
             return False
 
     def test_database_structure_check(self):
