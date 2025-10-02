@@ -73,20 +73,23 @@ const MitzvotApp = () => {
 
   const { toast } = useToast();
 
-  // Phase 3C: Divine name highlighting function - SIMPLIFIED VERSION
-  const renderHighlightedText = (text) => {
+  // Phase 3C: Divine name highlighting function - FIXED with unique keys
+  const renderHighlightedText = (text, uniqueId = '') => {
     // If highlighting is disabled or no text, return plain text
     if (!divineNameHighlight || !text || typeof text !== 'string') {
       return text;
     }
     
+    // Generate unique key prefix to avoid conflicts across verses
+    const keyPrefix = uniqueId || Math.random().toString(36).substr(2, 9);
+    
     // Split text by divine names and create highlighted segments
     const divineNames = ['YHWH', 'Elohim', 'YHUH'];
     let parts = [text];
     
-    divineNames.forEach(divineName => {
+    divineNames.forEach((divineName, nameIndex) => {
       const newParts = [];
-      parts.forEach(part => {
+      parts.forEach((part, partIndex) => {
         if (typeof part === 'string') {
           const regex = new RegExp(`\\b${divineName}\\b`, 'g');
           const segments = part.split(regex);
@@ -95,12 +98,16 @@ const MitzvotApp = () => {
           for (let i = 0; i < segments.length; i++) {
             if (segments[i]) newParts.push(segments[i]);
             if (i < matches.length) {
-              // Create highlighted span for divine name
+              // Create highlighted span with UNIQUE key across all verses
               const colorClass = divineName === 'YHWH' ? 'text-red-600 font-semibold' :
                                divineName === 'Elohim' ? 'text-blue-600 font-semibold' :
                                'text-purple-600 font-semibold';
               newParts.push(
-                <span key={`${divineName}-${i}`} className={colorClass} title={`Hebrew divine name: ${divineName}`}>
+                <span 
+                  key={`${keyPrefix}-${nameIndex}-${partIndex}-${i}-${divineName}`} 
+                  className={colorClass} 
+                  title={`Hebrew divine name: ${divineName}`}
+                >
                   {divineName}
                 </span>
               );
