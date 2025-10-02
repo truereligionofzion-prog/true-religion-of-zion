@@ -108,8 +108,17 @@ const MitzvotApp = () => {
     if (contentType === 'bible') {
       loadBibleVersions();
       loadBibleStats();
+      loadBibleBooks();
     }
   }, [selectedBibleVersion]);
+
+  // Load Bible data when content type changes to bible
+  useEffect(() => {
+    if (contentType === 'bible') {
+      loadBibleStats();
+      loadBibleBooks();
+    }
+  }, [contentType]);
 
   const loadBibleVersions = async () => {
     try {
@@ -126,6 +135,18 @@ const MitzvotApp = () => {
       setBibleStats(response);
     } catch (error) {
       console.error('Error loading Bible stats:', error);
+    }
+  };
+
+  const loadBibleBooks = async () => {
+    try {
+      const response = await apiService.getBibleBooks(selectedBibleVersion);
+      setBibleStats(prev => ({
+        ...prev,
+        books: response.books.map(book => book.name)
+      }));
+    } catch (error) {
+      console.error('Error loading Bible books:', error);
     }
   };
 
