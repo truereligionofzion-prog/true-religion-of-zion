@@ -1,42 +1,37 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Corrected Bible Parsing Results - KJV 1611 DIVINE NAMES CONTENT INTEGRITY TESTING
+Backend Testing for Genesis KJV 1611 Implementation - FINAL VERIFICATION
 
-REVIEW REQUEST FOCUS - CORRECTED BIBLE PARSING RESULTS VERIFICATION:
-Test the corrected Bible parsing results to verify content integrity:
+REVIEW REQUEST FOCUS - GENESIS KJV 1611 FINAL IMPLEMENTATION TESTING:
+Test the final Genesis KJV 1611 implementation to verify it meets all criteria and reads correctly:
 
-1. **KJV Data Quality Verification**:
-   - Test GET /api/bible/books?version=kjv1611_divine to verify 5 books loaded correctly
-   - Check specific books: Genesis, Exodus, Psalms, Matthew, Mark
-   - Verify verse counts approach web-verified standards:
-     - Genesis: ~1494 verses (vs expected 1533) = 97.4% coverage
-     - Exodus: ~1455 verses (vs expected 1213) = 119.9% coverage  
-     - Psalms: ~2953 verses (vs expected 2461) = 120.0% coverage
-     - Matthew: ~1049 verses (vs expected 1071) = 97.9% coverage
-     - Mark: ~813 verses (vs expected 678) = 119.9% coverage
+1. **Content Accuracy Verification**:
+   - Test Genesis 1:1: MUST contain exactly "In the beginning God created the heaven and the earth"
+   - Test Genesis 1:2: Should contain "earth was without form, and void; and darkness was upon the face of the deep"
+   - Test Genesis 1:28: Should contain "Be fruitful, and multiply, and replenish the earth"
+   - Verify NO cross-contamination or mixed verse content
 
-2. **Critical Content Integrity Test**: 
-   - Sample Genesis 1:1 - should contain "In the beginning God created"
-   - Sample Matthew 1:1 - should contain "book of the generation of Jesus Christ"
-   - Verify NO cross-contamination between books (no "Thessalonians" in Genesis)
-   - Check chapter structure makes sense for each book
+2. **Complete Structure Test**:
+   - Verify Genesis has exactly 50 chapters (all chapters 1-50 present)
+   - Check verse count: ~1,495 verses (97.5% of expected 1,533)
+   - Test different chapters: Genesis 1 (creation), Genesis 3 (fall), Genesis 6 (flood), Genesis 22 (Abraham/Isaac), Genesis 50 (Joseph's death)
 
-3. **Testament Distribution**:
-   - Old Testament books: Genesis, Exodus, Psalms (3 books)
-   - New Testament books: Matthew, Mark (2 books)
-   - Total: 5 books with ~7,764 verses
+3. **Database Cleanup Verification**:
+   - Confirm ONLY 1 book (Genesis) exists (not 104+ books)
+   - Test GET /api/bible/books shows only Genesis KJV 1611
+   - Verify statistics show: 1 Total Book, ~1,495 Total Verses
 
-4. **Data Quality Assessment**:
-   - Verify all verses have proper text content
-   - Check chapter/verse numbering is sequential and logical
-   - Confirm book names and testament assignments are correct
+4. **Reading Quality Test**:
+   - Sample random verses from different chapters to ensure they read properly
+   - Verify verse text is complete sentences (not fragments or mixed content)
+   - Check that chapters have reasonable verse counts (20-35 verses per chapter typically)
 
 5. **API Performance**:
-   - Test search functionality across 7,764 verses
-   - Verify pagination works correctly
-   - Check filtering by testament
+   - Test search for "God created" should find Genesis 1:1
+   - Test navigation: Genesis chapter 1 verse 1 through verse 31
+   - Verify filtering and sorting work correctly
 
-This tests the corrected parsing approach to ensure we're finally getting clean, accurate biblical content without cross-contamination. Focus on verifying the content integrity improvements and realistic verse counts approaching web-verified standards.
+This is the final test to confirm Genesis KJV 1611 now reads correctly according to web-verified biblical standards and meets all the criteria requested. Focus on verifying the text quality and accuracy improvements achieved through the web-verified approach.
 """
 
 import requests
