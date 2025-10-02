@@ -2807,11 +2807,13 @@ def main():
         print("❌ Cannot connect to API. Exiting.")
         return
     
-    # Run focused Bible verses tests
+    # Run comprehensive Bible API tests
     test_functions = [
-        tester.test_bible_verses_endpoint_error,
-        tester.test_bible_database_content,
-        tester.test_related_bible_endpoints
+        tester.test_bible_verses_endpoint_comprehensive,
+        tester.test_bible_stats_verification,
+        tester.test_bible_books_endpoint,
+        tester.test_related_bible_endpoints,
+        tester.test_bible_database_content
     ]
     
     passed_tests = 0
