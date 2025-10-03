@@ -508,13 +508,13 @@ class APITester:
                     expected_total = 1533 + 1063 + 788 + 1288  # = 5,672
                     
                     if total_verses == expected_total:
-                        self.log_test("Total Verse Count 4,486", True, f"✅ PERFECT! Total verses: {total_verses} (exactly Genesis + Exodus + Leviticus + Numbers = {expected_total})")
+                        self.log_test("Total Verse Count 5,672", True, f"✅ PERFECT! Total verses: {total_verses} (exactly Genesis + Exodus + Leviticus + Numbers = {expected_total})")
                     elif total_verses >= expected_total * 0.95:  # Within 5%
-                        self.log_test("Total Verse Count 4,486", True, f"✅ CLOSE! Total verses: {total_verses} (close to expected {expected_total})")
+                        self.log_test("Total Verse Count 5,672", True, f"✅ CLOSE! Total verses: {total_verses} (close to expected {expected_total})")
                     elif total_verses > 0:
-                        self.log_test("Total Verse Count 4,486", False, f"❌ INCORRECT! Total verses: {total_verses} (expected {expected_total})")
+                        self.log_test("Total Verse Count 5,672", False, f"❌ INCORRECT! Total verses: {total_verses} (expected {expected_total})")
                     else:
-                        self.log_test("Total Verse Count 4,486", False, f"❌ NO DATA! Total verses: {total_verses}")
+                        self.log_test("Total Verse Count 5,672", False, f"❌ NO DATA! Total verses: {total_verses}")
                     
                     # Verify all 4 books exist
                     if total_books >= 4:
