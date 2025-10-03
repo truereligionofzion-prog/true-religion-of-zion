@@ -1,37 +1,32 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Leviticus Authentic Biblical Text Verification
+Backend Testing for Bible Database Status Verification
 
-REVIEW REQUEST FOCUS - LEVITICUS AUTHENTIC CONTENT VERIFICATION:
-Please verify that Leviticus now contains authentic biblical text following the Genesis/Exodus success pattern. Test:
+REVIEW REQUEST FOCUS - BIBLE DATABASE STATUS VERIFICATION:
+Please check the current status of our Bible database to verify what we have loaded correctly. Test:
 
-1. **Leviticus Authentic Content Verification**:
-   - Verify Leviticus has 788 verses across all 27 chapters
-   - Check that Leviticus 1:1-2 contains proper content about LORD calling Moses and offerings
-   - Confirm Leviticus 11:1-2 has clean/unclean animals content
-   - Verify Leviticus 19:1-2 has holiness laws content
+1. **Foundation Books Verification**:
+   - Verify Genesis still has exactly 1,533 verses (should be preserved)
+   - Verify Exodus still has exactly 1,063 verses (should be preserved)  
+   - Verify Leviticus still has exactly 788 verses (should be preserved)
 
-2. **No Placeholder Content Check**:
-   - Verify NO verses contain "see Leviticus [chapter]:[verse]" placeholder text
-   - Check that legitimate KJV brackets are preserved
-   - Confirm no generated placeholder references exist
+2. **New Books Status Check**:
+   - Check Numbers: verses count and sample content quality
+   - Check Deuteronomy: verses count and content
+   - Check Joshua: verses count (shows only 2 verses, investigate why)
+   - Check Judges: verses count (shows 1,228 vs target 618 - cross-contamination?)
+   - Check Ruth: verses count (shows 413 vs target 85 - cross-contamination?)
 
-3. **Previous Books Preservation**:
-   - Verify Genesis still has exactly 1,533 verses (preserved)
-   - Verify Exodus still has 1,063 verses (preserved) 
-   - Confirm no cross-contamination between all three books
+3. **Content Quality Sampling**:
+   - Sample 5 verses from Numbers to verify authentic biblical content
+   - Check for cross-contamination in Judges and Ruth 
+   - Verify no placeholder brackets exist in new books
 
-4. **Content Quality Sampling**:
-   - Sample 10 random Leviticus verses to verify authentic biblical content
-   - Check for proper Leviticus themes (offerings, sacrifices, holiness, priests)
-   - Ensure verses contain substantial biblical language
+4. **Database Statistics**:
+   - Get total verse count and book count
+   - Identify which books have reasonable verse counts vs cross-contaminated counts
 
-5. **Complete Database Status**:
-   - Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 = 3,384)
-   - Verify all three books exist in KJV 1611 Divine version
-   - Confirm proper testament and order classification
-
-This verification confirms Leviticus follows the authentic biblical text pattern established with Genesis and Exodus, with no generated placeholder content.
+This verification provides analysis of current database state to decide next steps - whether to clean and retry specific books or continue with the current state.
 """
 
 import requests
