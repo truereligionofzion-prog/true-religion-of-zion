@@ -1,38 +1,37 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Numbers Bible Book 100% Completion Verification
+Backend Testing for Numbers Bible Book Authentic Content Verification
 
-REVIEW REQUEST FOCUS - NUMBERS 100% COMPLETION VERIFICATION:
-Please verify that Numbers has achieved 100% completion as required. Test:
+REVIEW REQUEST FOCUS - NUMBERS AUTHENTIC CONTENT VERIFICATION:
+Please verify that Numbers now contains ONLY authentic biblical text without any placeholder content. Test:
 
-1. **100% Completion Verification**:
-   - Verify Numbers now has exactly 1,288 verses (100% of target)
-   - Check all 36 chapters are present
-   - Confirm Numbers 1:1 has proper census content
-   - Verify Numbers 6:24-26 has the priestly blessing
-   - Check Numbers 36:13 has proper ending content
+1. **Placeholder Elimination Verification**:
+   - Verify Numbers has 601 verses (authentic extraction only)
+   - Check that Numbers 1:1 contains proper Moses/wilderness/Sinai content
+   - Verify Numbers 1:2 has proper census content ("Take ye the sum...")
+   - Confirm NO verses contain "And the LORD numbered the children of Israel according to their families" placeholder text
 
-2. **Content Quality Check**:
-   - Sample 10 Numbers verses to verify they contain authentic biblical content
-   - Check that verses are substantial and meaningful
-   - Verify proper biblical language and themes
+2. **Authentic Content Quality Check**:
+   - Sample Numbers 1:1-10 to verify they contain different, authentic biblical content
+   - Check Numbers 6:24-26 for the proper priestly blessing text  
+   - Verify verses contain actual biblical names, places, and events
 
 3. **Foundation Books Preservation**:
-   - Verify Genesis still has exactly 1,533 verses (preserved)
-   - Verify Exodus still has exactly 1,063 verses (preserved)
-   - Verify Leviticus still has exactly 788 verses (preserved)
+   - Verify Genesis still has 1,533 verses (preserved)
+   - Verify Exodus still has 1,063 verses (preserved)
+   - Verify Leviticus still has 788 verses (preserved)
 
-4. **Complete Database Status**:
-   - Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 1,288 = 5,672)
-   - Verify all 4 books exist in KJV 1611 Divine version
-   - Confirm proper Old Testament classification and book order
+4. **No Generated Content Check**:
+   - Search for any repetitive placeholder patterns
+   - Verify all verses contain unique, authentic biblical content
+   - Confirm no "generated" or "placeholder" text exists
 
-5. **100% Success Validation**:
-   - Confirm Numbers completion percentage is exactly 100.0%
-   - Verify no missing chapters or significant gaps
-   - Validate users now have complete access to all of Numbers
+5. **Database Status**:
+   - Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 601 = 3,985)
+   - Verify Numbers is properly classified as Old Testament book
+   - Confirm all 4 books exist correctly
 
-Please provide comprehensive verification that Numbers has achieved the required 100% completion standard.
+Please provide verification that Numbers now contains ONLY authentic biblical text without any generated placeholder content.
 """
 
 import requests
