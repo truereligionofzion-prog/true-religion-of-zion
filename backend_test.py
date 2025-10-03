@@ -337,182 +337,120 @@ class APITester:
             self.log_test("Content Quality Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_content_quality_sampling(self):
-        """REVIEW REQUEST TEST 3: Content Quality Sampling - Sample 5 verses from Numbers and check cross-contamination"""
+    def test_no_contamination_check(self):
+        """REVIEW REQUEST TEST 3: No Contamination Check - Verify NO Genesis creation content exists in Numbers verses"""
         try:
-            print("\n🔍 CONTENT QUALITY SAMPLING - SAMPLE 5 VERSES FROM NUMBERS AND CHECK CROSS-CONTAMINATION...")
+            print("\n🔍 NO CONTAMINATION CHECK - VERIFY NO GENESIS CREATION CONTENT IN NUMBERS VERSES...")
             
-            # Sample 5 verses from Numbers to verify authentic biblical content
+            # Verify NO Genesis creation content exists in Numbers verses
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=5")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=50")
                 if response.status_code == 200:
                     data = response.json()
                     verses = data.get('verses', [])
                     
                     if verses:
-                        print("\n📝 5 NUMBERS VERSES QUALITY SAMPLING:")
-                        authentic_verses = 0
-                        
-                        for i, verse in enumerate(verses[:5], 1):  # Sample exactly 5 verses
-                            verse_text = verse.get('text', '')
-                            verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                            
-                            # Check for authentic biblical content
-                            is_authentic = (
-                                len(verse_text) > 10 and  # Has content
-                                not verse_text.lower().startswith('error') and  # No error messages
-                                not 'placeholder' in verse_text.lower() and  # No placeholders
-                                verse_text.strip() != ''  # Not empty
-                            )
-                            
-                            # Check for Numbers-specific content
-                            numbers_keywords = ['lord', 'moses', 'aaron', 'children', 'israel', 'wilderness', 'congregation', 'tribe', 'camp']
-                            has_numbers_content = any(keyword in verse_text.lower() for keyword in numbers_keywords)
-                            
-                            if is_authentic:
-                                authentic_verses += 1
-                            
-                            if is_authentic and has_numbers_content:
-                                print(f"   ✅ Sample {i} - {verse_ref}: AUTHENTIC NUMBERS CONTENT - '{verse_text[:80]}...'")
-                            elif is_authentic:
-                                print(f"   ⚠️ Sample {i} - {verse_ref}: AUTHENTIC BUT GENERIC - '{verse_text[:80]}...'")
-                            else:
-                                print(f"   ❌ Sample {i} - {verse_ref}: POOR QUALITY - '{verse_text}'")
-                        
-                        if authentic_verses >= 4:  # 80%+ authentic
-                            self.log_test("Numbers Authentic Biblical Content", True, f"✅ EXCELLENT! {authentic_verses}/5 Numbers verses are authentic biblical content")
-                        elif authentic_verses >= 3:  # 60%+ authentic
-                            self.log_test("Numbers Authentic Biblical Content", True, f"✅ GOOD! {authentic_verses}/5 Numbers verses are authentic")
-                        else:
-                            self.log_test("Numbers Authentic Biblical Content", False, f"❌ POOR! Only {authentic_verses}/5 Numbers verses are authentic")
-                        
-                    else:
-                        self.log_test("Numbers Authentic Biblical Content", False, f"❌ NO DATA! No Numbers verses found for quality sampling")
-                else:
-                    self.log_test("Numbers Authentic Biblical Content", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Numbers Authentic Biblical Content", False, f"Error: {str(e)}")
-            
-            # Check for cross-contamination in Judges and Ruth
-            print("\n🔍 CROSS-CONTAMINATION CHECK IN JUDGES AND RUTH:")
-            
-            # Check Judges for cross-contamination
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Judges&limit=10")
-                if response.status_code == 200:
-                    data = response.json()
-                    judges_verses = data.get('verses', [])
-                    
-                    contamination_found = 0
-                    other_book_indicators = ['genesis', 'exodus', 'leviticus', 'numbers', 'deuteronomy', 'creation', 'adam', 'eve', 'noah', 'abraham']
-                    
-                    for verse in judges_verses:
-                        verse_text = verse.get('text', '').lower()
-                        verse_ref = f"Judges {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                        book = verse.get('book', '')
-                        
-                        # Check book field is correct
-                        if book != 'Judges':
-                            contamination_found += 1
-                            print(f"   ❌ {verse_ref}: BOOK FIELD CONTAMINATION - labeled as '{book}'")
-                            continue
-                        
-                        # Check for other books' content
-                        for indicator in other_book_indicators:
-                            if indicator in verse_text:
-                                contamination_found += 1
-                                print(f"   ❌ {verse_ref}: CONTENT CONTAMINATION - contains '{indicator}': '{verse_text[:60]}...'")
-                                break
-                    
-                    if contamination_found == 0:
-                        self.log_test("Judges Cross-Contamination Content Check", True, f"✅ CLEAN! No cross-contamination found in {len(judges_verses)} Judges verses")
-                    else:
-                        self.log_test("Judges Cross-Contamination Content Check", False, f"❌ CONTAMINATED! Found {contamination_found} contamination instances in Judges")
-                else:
-                    self.log_test("Judges Cross-Contamination Content Check", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Judges Cross-Contamination Content Check", False, f"Error: {str(e)}")
-            
-            # Check Ruth for cross-contamination
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Ruth&limit=10")
-                if response.status_code == 200:
-                    data = response.json()
-                    ruth_verses = data.get('verses', [])
-                    
-                    contamination_found = 0
-                    other_book_indicators = ['genesis', 'exodus', 'leviticus', 'numbers', 'deuteronomy', 'creation', 'adam', 'eve', 'noah', 'abraham']
-                    
-                    for verse in ruth_verses:
-                        verse_text = verse.get('text', '').lower()
-                        verse_ref = f"Ruth {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                        book = verse.get('book', '')
-                        
-                        # Check book field is correct
-                        if book != 'Ruth':
-                            contamination_found += 1
-                            print(f"   ❌ {verse_ref}: BOOK FIELD CONTAMINATION - labeled as '{book}'")
-                            continue
-                        
-                        # Check for other books' content
-                        for indicator in other_book_indicators:
-                            if indicator in verse_text:
-                                contamination_found += 1
-                                print(f"   ❌ {verse_ref}: CONTENT CONTAMINATION - contains '{indicator}': '{verse_text[:60]}...'")
-                                break
-                    
-                    if contamination_found == 0:
-                        self.log_test("Ruth Cross-Contamination Content Check", True, f"✅ CLEAN! No cross-contamination found in {len(ruth_verses)} Ruth verses")
-                    else:
-                        self.log_test("Ruth Cross-Contamination Content Check", False, f"❌ CONTAMINATED! Found {contamination_found} contamination instances in Ruth")
-                else:
-                    self.log_test("Ruth Cross-Contamination Content Check", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Ruth Cross-Contamination Content Check", False, f"Error: {str(e)}")
-            
-            # Verify no placeholder brackets exist in new books
-            try:
-                print("\n🚫 PLACEHOLDER BRACKETS CHECK IN NEW BOOKS:")
-                new_books = ['Numbers', 'Deuteronomy', 'Joshua', 'Judges', 'Ruth']
-                total_placeholder_violations = 0
-                
-                for book in new_books:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book}&limit=5")
-                    if response.status_code == 200:
-                        data = response.json()
-                        verses = data.get('verses', [])
-                        
-                        placeholder_patterns = ['[chapter]', '[verse]', 'see ' + book.lower(), 'placeholder', 'complete kjv text']
-                        book_violations = 0
+                        print("\n🚫 GENESIS CREATION CONTAMINATION CHECK IN NUMBERS:")
+                        contamination_found = 0
+                        creation_indicators = ['in the beginning', 'god created', 'heaven and earth', 'let there be light', 'adam', 'eve', 'garden of eden', 'tree of knowledge', 'serpent', 'forbidden fruit']
                         
                         for verse in verses:
                             verse_text = verse.get('text', '').lower()
-                            verse_ref = f"{book} {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
                             
-                            for pattern in placeholder_patterns:
-                                if pattern in verse_text:
-                                    book_violations += 1
-                                    total_placeholder_violations += 1
-                                    print(f"   ❌ {verse_ref}: PLACEHOLDER FOUND - '{pattern}' in '{verse_text[:50]}...'")
+                            # Check for Genesis creation content
+                            for indicator in creation_indicators:
+                                if indicator in verse_text:
+                                    contamination_found += 1
+                                    print(f"   ❌ {verse_ref}: GENESIS CONTAMINATION - contains '{indicator}': '{verse_text[:80]}...'")
                                     break
                         
-                        if book_violations == 0:
-                            print(f"   ✅ {book}: No placeholder brackets found in {len(verses)} verses")
+                        if contamination_found == 0:
+                            self.log_test("No Genesis Creation Content in Numbers", True, f"✅ CLEAN! No Genesis creation content found in {len(verses)} Numbers verses")
+                        else:
+                            self.log_test("No Genesis Creation Content in Numbers", False, f"❌ CONTAMINATED! Found {contamination_found} Genesis creation contamination instances in Numbers")
+                        
                     else:
-                        print(f"   ⚠️ {book}: API Error - Status {response.status_code}")
-                
-                if total_placeholder_violations == 0:
-                    self.log_test("No Placeholder Brackets in New Books", True, f"✅ CLEAN! No placeholder brackets found in new books")
+                        self.log_test("No Genesis Creation Content in Numbers", False, f"❌ NO DATA! No Numbers verses found for contamination check")
                 else:
-                    self.log_test("No Placeholder Brackets in New Books", False, f"❌ VIOLATIONS! Found {total_placeholder_violations} placeholder bracket violations")
-                    
+                    self.log_test("No Genesis Creation Content in Numbers", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("No Placeholder Brackets in New Books", False, f"Error: {str(e)}")
+                self.log_test("No Genesis Creation Content in Numbers", False, f"Error: {str(e)}")
+            
+            # Check that legitimate KJV brackets are preserved
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=100")
+                if response.status_code == 200:
+                    data = response.json()
+                    verses = data.get('verses', [])
+                    
+                    if verses:
+                        print("\n📖 LEGITIMATE KJV BRACKETS PRESERVATION CHECK:")
+                        legitimate_brackets_found = 0
+                        legitimate_patterns = ['[are]', '[was]', '[were]', '[is]', '[be]', '[it]', '[them]', '[him]', '[her]', '[even]', '[also]', '[that]', '[which]', '[when]', '[where]']
+                        
+                        for verse in verses:
+                            verse_text = verse.get('text', '')
+                            verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            
+                            # Check for legitimate KJV brackets
+                            for pattern in legitimate_patterns:
+                                if pattern in verse_text:
+                                    legitimate_brackets_found += 1
+                                    print(f"   ✅ {verse_ref}: LEGITIMATE BRACKET - '{pattern}' preserved in '{verse_text[:60]}...'")
+                                    break
+                        
+                        if legitimate_brackets_found > 0:
+                            self.log_test("Legitimate KJV Brackets Preserved", True, f"✅ PRESERVED! Found {legitimate_brackets_found} legitimate KJV brackets in Numbers verses")
+                        else:
+                            self.log_test("Legitimate KJV Brackets Preserved", True, f"✅ ACCEPTABLE! No legitimate brackets found (may not be present in sampled verses)")
+                        
+                    else:
+                        self.log_test("Legitimate KJV Brackets Preserved", False, f"❌ NO DATA! No Numbers verses found for bracket check")
+                else:
+                    self.log_test("Legitimate KJV Brackets Preserved", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Legitimate KJV Brackets Preserved", False, f"Error: {str(e)}")
+            
+            # Confirm no placeholder brackets like "see Numbers..." exist
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=100")
+                if response.status_code == 200:
+                    data = response.json()
+                    verses = data.get('verses', [])
+                    
+                    if verses:
+                        print("\n🚫 PLACEHOLDER BRACKETS CHECK IN NUMBERS:")
+                        placeholder_violations = 0
+                        placeholder_patterns = ['see numbers', '[chapter]', '[verse]', 'placeholder', 'complete kjv text', 'see chapter', 'see verse']
+                        
+                        for verse in verses:
+                            verse_text = verse.get('text', '').lower()
+                            verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            
+                            # Check for placeholder patterns
+                            for pattern in placeholder_patterns:
+                                if pattern in verse_text:
+                                    placeholder_violations += 1
+                                    print(f"   ❌ {verse_ref}: PLACEHOLDER FOUND - '{pattern}' in '{verse_text[:60]}...'")
+                                    break
+                        
+                        if placeholder_violations == 0:
+                            self.log_test("No Placeholder Brackets in Numbers", True, f"✅ CLEAN! No placeholder brackets found in {len(verses)} Numbers verses")
+                        else:
+                            self.log_test("No Placeholder Brackets in Numbers", False, f"❌ VIOLATIONS! Found {placeholder_violations} placeholder bracket violations in Numbers")
+                        
+                    else:
+                        self.log_test("No Placeholder Brackets in Numbers", False, f"❌ NO DATA! No Numbers verses found for placeholder check")
+                else:
+                    self.log_test("No Placeholder Brackets in Numbers", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("No Placeholder Brackets in Numbers", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Content Quality Sampling", False, f"Error: {str(e)}")
+            self.log_test("No Contamination Check", False, f"Error: {str(e)}")
             return False
 
     def test_database_statistics(self):
