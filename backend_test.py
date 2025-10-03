@@ -886,11 +886,11 @@ class APITester:
 
     # Key chapter verification removed - not needed for Leviticus review request
 
-    def run_leviticus_authentic_content_verification_tests(self):
-        """Run Leviticus authentic content verification tests as per review request"""
+    def run_bible_database_status_verification_tests(self):
+        """Run Bible database status verification tests as per review request"""
         print("=" * 80)
-        print("🎉 LEVITICUS AUTHENTIC BIBLICAL TEXT VERIFICATION")
-        print("Verifying that Leviticus now contains authentic biblical text following the Genesis/Exodus success pattern")
+        print("🎉 BIBLE DATABASE STATUS VERIFICATION")
+        print("Checking the current status of our Bible database to verify what we have loaded correctly")
         print("=" * 80)
         
         # Test basic connectivity first
@@ -898,23 +898,20 @@ class APITester:
             print("❌ API connectivity failed. Stopping tests.")
             return False
         
-        # Run the 5 main review request tests
+        # Run the 4 main review request tests
         test_results = []
         
-        # Test 1: Leviticus Authentic Content Verification
-        test_results.append(self.test_leviticus_authentic_content_verification())
+        # Test 1: Foundation Books Verification
+        test_results.append(self.test_foundation_books_verification())
         
-        # Test 2: No Placeholder Content Check
-        test_results.append(self.test_no_placeholder_content_check())
+        # Test 2: New Books Status Check
+        test_results.append(self.test_new_books_status_check())
         
-        # Test 3: Previous Books Preservation
-        test_results.append(self.test_previous_books_preservation())
-        
-        # Test 4: Content Quality Sampling
+        # Test 3: Content Quality Sampling
         test_results.append(self.test_content_quality_sampling())
         
-        # Test 5: Complete Database Status
-        test_results.append(self.test_complete_database_status())
+        # Test 4: Database Statistics
+        test_results.append(self.test_database_statistics())
         
         # Calculate overall results
         passed_tests = sum(test_results)
@@ -922,7 +919,7 @@ class APITester:
         success_rate = (passed_tests / total_tests) * 100
         
         print("\n" + "=" * 80)
-        print("📊 LEVITICUS AUTHENTIC CONTENT VERIFICATION SUMMARY")
+        print("📊 BIBLE DATABASE STATUS VERIFICATION SUMMARY")
         print("=" * 80)
         
         # Count individual test results
@@ -935,66 +932,63 @@ class APITester:
         
         # Show category results
         categories = [
-            "Leviticus Authentic Content Verification (788 verses, LORD calling Moses, offerings, clean/unclean animals, holiness laws)",
-            "No Placeholder Content Check (no 'see Leviticus [chapter]:[verse]', legitimate KJV brackets preserved)", 
-            "Previous Books Preservation (Genesis 1,533 verses, Exodus 1,063 verses, no cross-contamination)",
-            "Content Quality Sampling (10 random verses, authentic biblical content, Leviticus themes)",
-            "Complete Database Status (total 3,384 verses, all three books in KJV 1611 Divine, proper testament)"
+            "Foundation Books Verification (Genesis 1,533, Exodus 1,063, Leviticus 788 verses preserved)",
+            "New Books Status Check (Numbers, Deuteronomy, Joshua, Judges, Ruth verse counts and cross-contamination)", 
+            "Content Quality Sampling (5 Numbers verses authentic content, Judges/Ruth cross-contamination check, no placeholder brackets)",
+            "Database Statistics (total verse/book counts, reasonable vs cross-contaminated counts, books needing attention)"
         ]
         
         for i, (category, result) in enumerate(zip(categories, test_results)):
             status = "✅ VERIFIED" if result else "❌ FAILED"
             print(f"{status}: {category}")
         
-        print("\n🎉 KEY VERIFICATION FINDINGS:")
+        print("\n🎉 KEY DATABASE STATUS FINDINGS:")
         
         # Analyze results for key findings
-        if test_results[0]:  # Leviticus Authentic Content Verification
-            print("✅ Leviticus authentic content VERIFIED - proper verse count, LORD/Moses/offerings, clean/unclean animals, holiness laws")
+        if test_results[0]:  # Foundation Books Verification
+            print("✅ Foundation books PRESERVED - Genesis (1,533), Exodus (1,063), Leviticus (788) verses intact with key content")
         else:
-            print("❌ Leviticus authentic content FAILED - incorrect verse count or missing authentic biblical content")
+            print("❌ Foundation books COMPROMISED - verse counts changed or key content missing")
         
-        if test_results[1]:  # No Placeholder Content Check
-            print("✅ No placeholder content CONFIRMED - clean authentic text without generated placeholders")
+        if test_results[1]:  # New Books Status Check
+            print("✅ New books STATUS CHECKED - Numbers, Deuteronomy, Joshua, Judges, Ruth verse counts analyzed")
         else:
-            print("❌ Placeholder content FOUND - contains generated placeholder text or references")
+            print("❌ New books STATUS ISSUES - missing books, incorrect counts, or cross-contamination detected")
         
-        if test_results[2]:  # Previous Books Preservation
-            print("✅ Previous books preservation VERIFIED - Genesis (1,533) and Exodus (1,063) verses intact, no cross-contamination")
+        if test_results[2]:  # Content Quality Sampling
+            print("✅ Content quality VERIFIED - Numbers authentic content confirmed, cross-contamination checked, no placeholder brackets")
         else:
-            print("❌ Previous books preservation FAILED - verse counts changed or cross-contamination detected")
+            print("❌ Content quality ISSUES - poor Numbers content, cross-contamination found, or placeholder brackets detected")
         
-        if test_results[3]:  # Content Quality Sampling
-            print("✅ Content quality EXCELLENT - sampled verses contain authentic, substantial Leviticus biblical content")
+        if test_results[3]:  # Database Statistics
+            print("✅ Database statistics ANALYZED - total counts verified, reasonable vs cross-contaminated books identified")
         else:
-            print("❌ Content quality POOR - sampled verses have quality issues or non-authentic content")
+            print("❌ Database statistics PROBLEMATIC - count issues, many cross-contaminated books, or missing data")
         
-        if test_results[4]:  # Complete Database Status
-            print("✅ Database status CORRECT - proper total counts, all three books present, correct classification")
-        else:
-            print("❌ Database status INCORRECT - count mismatches or missing books")
-        
-        print(f"\n🎯 FINAL LEVITICUS AUTHENTIC CONTENT ASSESSMENT:")
-        if individual_success_rate >= 95:
-            print(f"🎉 LEVITICUS AUTHENTIC CONTENT SUCCESS! Perfect authentic biblical text implementation ({individual_success_rate:.1f}% success)")
-            print("✅ Leviticus contains only authentic biblical text without any placeholder content")
-            print("✅ Genesis and Exodus remain completely preserved with exact verse counts")
-            print("🚀 All three books (Genesis, Exodus, Leviticus) contain clean, authentic biblical content ready for use!")
-        elif individual_success_rate >= 85:
-            print(f"✅ LEVITICUS AUTHENTIC CONTENT EXCELLENT! Very successful authentic text implementation ({individual_success_rate:.1f}% success)")
-            print("✅ Leviticus is substantially authentic with minor issues that don't affect core content")
-            print("✅ Previous books preservation confirmed - no negative impact from Leviticus work")
+        print(f"\n🎯 FINAL BIBLE DATABASE STATUS ASSESSMENT:")
+        if individual_success_rate >= 90:
+            print(f"🎉 BIBLE DATABASE EXCELLENT STATUS! Database is in great condition ({individual_success_rate:.1f}% success)")
+            print("✅ Foundation books completely preserved with correct verse counts")
+            print("✅ New books mostly loaded correctly with minimal cross-contamination")
+            print("🚀 Database ready for continued use with current state!")
         elif individual_success_rate >= 75:
-            print(f"✅ LEVITICUS AUTHENTIC CONTENT GOOD! Successful implementation with some issues ({individual_success_rate:.1f}% success)")
-            print("⚠️ Leviticus is mostly authentic but may need minor fixes for optimal quality")
+            print(f"✅ BIBLE DATABASE GOOD STATUS! Database is in good condition with minor issues ({individual_success_rate:.1f}% success)")
+            print("✅ Foundation books preserved, most new books loaded correctly")
+            print("⚠️ Some cross-contamination or count issues that can be addressed")
         elif individual_success_rate >= 60:
-            print(f"⚠️ LEVITICUS AUTHENTIC CONTENT PARTIAL! Some success but significant issues remain ({individual_success_rate:.1f}% success)")
-            print("⚠️ Leviticus has authenticity issues or placeholder content that needs attention")
+            print(f"⚠️ BIBLE DATABASE MIXED STATUS! Database has significant issues requiring attention ({individual_success_rate:.1f}% success)")
+            print("⚠️ Foundation books may have issues, new books show cross-contamination problems")
+            print("🔧 Recommend cleaning and retrying specific problematic books")
+        elif individual_success_rate >= 40:
+            print(f"❌ BIBLE DATABASE POOR STATUS! Database has major issues ({individual_success_rate:.1f}% success)")
+            print("❌ Foundation books compromised or new books heavily cross-contaminated")
+            print("🔧 Recommend comprehensive cleanup and reload of problematic books")
         else:
-            print(f"❌ LEVITICUS AUTHENTIC CONTENT FAILED! Major issues prevent authentic content verification ({individual_success_rate:.1f}% success)")
-            print("❌ Leviticus still contains placeholder content or non-authentic content")
+            print(f"❌ BIBLE DATABASE CRITICAL STATUS! Database requires immediate attention ({individual_success_rate:.1f}% success)")
+            print("❌ Major data integrity issues across foundation and new books")
+            print("🔧 Recommend complete database cleanup and systematic reload")
         
-        return individual_success_rate >= 85
+        return individual_success_rate >= 75
 
 def main():
     """Main test execution"""
