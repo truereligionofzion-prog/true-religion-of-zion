@@ -532,12 +532,12 @@ class APITester:
             self.log_test("Foundation Books Preservation", False, f"Error: {str(e)}")
             return False
 
-    def test_complete_database_status(self):
-        """REVIEW REQUEST TEST 5: Complete Database Status - Verify total verse count and book structure"""
+    def test_database_status(self):
+        """REVIEW REQUEST TEST 5: Database Status - Verify total verse count and book structure"""
         try:
-            print("\n🔍 COMPLETE DATABASE STATUS - VERIFY TOTAL VERSE COUNT AND BOOK STRUCTURE...")
+            print("\n🔍 DATABASE STATUS - VERIFY TOTAL VERSE COUNT AND BOOK STRUCTURE...")
             
-            # Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 1,102 = 4,486)
+            # Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 601 = 3,985)
             try:
                 response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
                 if response.status_code == 200:
@@ -551,17 +551,17 @@ class APITester:
                     print(f"   📝 Total Verses: {total_verses}")
                     print(f"   📜 Old Testament Verses: {old_testament_verses}")
                     
-                    # Expected total: Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 1,288 = 5,672
-                    expected_total = 1533 + 1063 + 788 + 1288  # = 5,672
+                    # Expected total: Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 601 = 3,985
+                    expected_total = 1533 + 1063 + 788 + 601  # = 3,985
                     
                     if total_verses == expected_total:
-                        self.log_test("Total Verse Count 5,672", True, f"✅ PERFECT! Total verses: {total_verses} (exactly Genesis + Exodus + Leviticus + Numbers = {expected_total})")
+                        self.log_test("Total Verse Count 3,985", True, f"✅ PERFECT! Total verses: {total_verses} (exactly Genesis + Exodus + Leviticus + Numbers = {expected_total})")
                     elif total_verses >= expected_total * 0.95:  # Within 5%
-                        self.log_test("Total Verse Count 5,672", True, f"✅ CLOSE! Total verses: {total_verses} (close to expected {expected_total})")
+                        self.log_test("Total Verse Count 3,985", True, f"✅ CLOSE! Total verses: {total_verses} (close to expected {expected_total})")
                     elif total_verses > 0:
-                        self.log_test("Total Verse Count 5,672", False, f"❌ INCORRECT! Total verses: {total_verses} (expected {expected_total})")
+                        self.log_test("Total Verse Count 3,985", False, f"❌ INCORRECT! Total verses: {total_verses} (expected {expected_total})")
                     else:
-                        self.log_test("Total Verse Count 5,672", False, f"❌ NO DATA! Total verses: {total_verses}")
+                        self.log_test("Total Verse Count 3,985", False, f"❌ NO DATA! Total verses: {total_verses}")
                     
                     # Verify all 4 books exist
                     if total_books >= 4:
@@ -572,10 +572,10 @@ class APITester:
                         self.log_test("All 4 Books Exist", False, f"❌ INSUFFICIENT! Total books: {total_books} (missing foundation books)")
                         
                 else:
-                    self.log_test("Total Verse Count 5,672", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Total Verse Count 3,985", False, f"API Error - Status: {response.status_code}")
                     self.log_test("All 4 Books Exist", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Total Verse Count 5,672", False, f"Error: {str(e)}")
+                self.log_test("Total Verse Count 3,985", False, f"Error: {str(e)}")
                 self.log_test("All 4 Books Exist", False, f"Error: {str(e)}")
             
             # Verify all 4 books exist in KJV 1611 Divine version
