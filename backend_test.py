@@ -323,8 +323,8 @@ class APITester:
             self.log_test("New Books Status Check", False, f"Error: {str(e)}")
             return False
 
-    def test_previous_books_preservation(self):
-        """REVIEW REQUEST TEST 3: Previous Books Preservation - Verify Genesis and Exodus are preserved"""
+    def test_content_quality_sampling(self):
+        """REVIEW REQUEST TEST 3: Content Quality Sampling - Sample 5 verses from Numbers and check cross-contamination"""
         try:
             print("\n🔍 PREVIOUS BOOKS PRESERVATION CHECK - VERIFYING GENESIS AND EXODUS WEREN'T AFFECTED BY LEVITICUS...")
             
