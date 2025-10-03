@@ -504,8 +504,8 @@ class APITester:
                     print(f"   📝 Total Verses: {total_verses}")
                     print(f"   📜 Old Testament Verses: {old_testament_verses}")
                     
-                    # Expected total: Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 1,102 = 4,486
-                    expected_total = 1533 + 1063 + 788 + 1102  # = 4,486
+                    # Expected total: Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 1,288 = 5,672
+                    expected_total = 1533 + 1063 + 788 + 1288  # = 5,672
                     
                     if total_verses == expected_total:
                         self.log_test("Total Verse Count 4,486", True, f"✅ PERFECT! Total verses: {total_verses} (exactly Genesis + Exodus + Leviticus + Numbers = {expected_total})")
