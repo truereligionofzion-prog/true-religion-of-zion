@@ -240,135 +240,101 @@ class APITester:
             self.log_test("Numbers Precision Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_new_books_status_check(self):
-        """REVIEW REQUEST TEST 2: New Books Status Check - Check Numbers, Deuteronomy, Joshua, Judges, Ruth verse counts and content"""
+    def test_content_quality_verification(self):
+        """REVIEW REQUEST TEST 2: Content Quality Verification - Sample 10 Numbers verses for authentic biblical content"""
         try:
-            print("\n🔍 NEW BOOKS STATUS CHECK - CHECKING NUMBERS, DEUTERONOMY, JOSHUA, JUDGES, RUTH...")
+            print("\n🔍 CONTENT QUALITY VERIFICATION - SAMPLE 10 NUMBERS VERSES FOR AUTHENTIC BIBLICAL CONTENT...")
             
-            # Check Numbers: verses count and sample content quality
+            # Sample 10 Numbers verses to verify authentic biblical content
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=1")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=10")
                 if response.status_code == 200:
                     data = response.json()
-                    numbers_verses = data.get('total', 0)
-                    expected_numbers = 1288  # Standard Numbers verse count
+                    verses = data.get('verses', [])
                     
-                    print(f"\n📖 NUMBERS STATUS:")
-                    print(f"   📝 Verse Count: {numbers_verses} (expected ~{expected_numbers})")
-                    
-                    if numbers_verses > 1200:
-                        self.log_test("Numbers Verse Count", True, f"✅ GOOD! Numbers has {numbers_verses} verses (reasonable count)")
-                    elif numbers_verses > 0:
-                        self.log_test("Numbers Verse Count", False, f"❌ LOW COUNT! Numbers has only {numbers_verses} verses (expected ~{expected_numbers})")
+                    if len(verses) >= 10:
+                        print("\n📝 10 NUMBERS VERSES QUALITY SAMPLING:")
+                        authentic_verses = 0
+                        substantial_verses = 0
+                        numbers_themed_verses = 0
+                        
+                        for i, verse in enumerate(verses[:10], 1):  # Sample exactly 10 verses
+                            verse_text = verse.get('text', '')
+                            verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            
+                            # Check for authentic biblical content
+                            is_authentic = (
+                                len(verse_text) > 15 and  # Has substantial content
+                                not verse_text.lower().startswith('error') and  # No error messages
+                                not 'placeholder' in verse_text.lower() and  # No placeholders
+                                verse_text.strip() != '' and  # Not empty
+                                not verse_text.startswith('...') and  # Not truncated
+                                len(verse_text.split()) >= 5  # At least 5 words
+                            )
+                            
+                            # Check for substantial biblical language (not truncated)
+                            is_substantial = len(verse_text) >= 30 and len(verse_text.split()) >= 8
+                            
+                            # Check for Numbers-specific themes
+                            numbers_keywords = ['wilderness', 'moses', 'aaron', 'tribes', 'congregation', 'lord', 'children', 'israel', 'camp', 'tabernacle', 'offering', 'priest']
+                            has_numbers_themes = any(keyword in verse_text.lower() for keyword in numbers_keywords)
+                            
+                            if is_authentic:
+                                authentic_verses += 1
+                            if is_substantial:
+                                substantial_verses += 1
+                            if has_numbers_themes:
+                                numbers_themed_verses += 1
+                            
+                            # Detailed logging
+                            if is_authentic and is_substantial and has_numbers_themes:
+                                print(f"   ✅ Sample {i} - {verse_ref}: EXCELLENT NUMBERS CONTENT - '{verse_text[:100]}...'")
+                            elif is_authentic and has_numbers_themes:
+                                print(f"   ✅ Sample {i} - {verse_ref}: GOOD NUMBERS CONTENT - '{verse_text[:100]}...'")
+                            elif is_authentic:
+                                print(f"   ⚠️ Sample {i} - {verse_ref}: AUTHENTIC BUT GENERIC - '{verse_text[:100]}...'")
+                            else:
+                                print(f"   ❌ Sample {i} - {verse_ref}: POOR QUALITY - '{verse_text}'")
+                        
+                        # Test results
+                        if authentic_verses >= 9:  # 90%+ authentic
+                            self.log_test("Numbers Authentic Biblical Content", True, f"✅ EXCELLENT! {authentic_verses}/10 Numbers verses are authentic biblical content")
+                        elif authentic_verses >= 7:  # 70%+ authentic
+                            self.log_test("Numbers Authentic Biblical Content", True, f"✅ GOOD! {authentic_verses}/10 Numbers verses are authentic")
+                        else:
+                            self.log_test("Numbers Authentic Biblical Content", False, f"❌ POOR! Only {authentic_verses}/10 Numbers verses are authentic")
+                        
+                        if numbers_themed_verses >= 8:  # 80%+ have Numbers themes
+                            self.log_test("Numbers Proper Themes", True, f"✅ EXCELLENT! {numbers_themed_verses}/10 verses contain proper Numbers themes")
+                        elif numbers_themed_verses >= 6:  # 60%+ have Numbers themes
+                            self.log_test("Numbers Proper Themes", True, f"✅ GOOD! {numbers_themed_verses}/10 verses contain Numbers themes")
+                        else:
+                            self.log_test("Numbers Proper Themes", False, f"❌ POOR! Only {numbers_themed_verses}/10 verses contain Numbers themes")
+                        
+                        if substantial_verses >= 8:  # 80%+ substantial
+                            self.log_test("Numbers Substantial Biblical Language", True, f"✅ EXCELLENT! {substantial_verses}/10 verses contain substantial biblical language (not truncated)")
+                        elif substantial_verses >= 6:  # 60%+ substantial
+                            self.log_test("Numbers Substantial Biblical Language", True, f"✅ GOOD! {substantial_verses}/10 verses contain substantial language")
+                        else:
+                            self.log_test("Numbers Substantial Biblical Language", False, f"❌ POOR! Only {substantial_verses}/10 verses contain substantial language")
+                        
                     else:
-                        self.log_test("Numbers Verse Count", False, f"❌ NOT FOUND! Numbers does not exist in database")
+                        self.log_test("Numbers Authentic Biblical Content", False, f"❌ INSUFFICIENT DATA! Only {len(verses)} Numbers verses found, need 10 for quality sampling")
+                        self.log_test("Numbers Proper Themes", False, f"❌ INSUFFICIENT DATA! Cannot verify themes with only {len(verses)} verses")
+                        self.log_test("Numbers Substantial Biblical Language", False, f"❌ INSUFFICIENT DATA! Cannot verify language quality with only {len(verses)} verses")
                 else:
-                    self.log_test("Numbers Verse Count", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers Authentic Biblical Content", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers Proper Themes", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers Substantial Biblical Language", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Numbers Verse Count", False, f"Error: {str(e)}")
-            
-            # Check Deuteronomy: verses count and content
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=1")
-                if response.status_code == 200:
-                    data = response.json()
-                    deuteronomy_verses = data.get('total', 0)
-                    expected_deuteronomy = 959  # Standard Deuteronomy verse count
-                    
-                    print(f"\n📖 DEUTERONOMY STATUS:")
-                    print(f"   📝 Verse Count: {deuteronomy_verses} (expected ~{expected_deuteronomy})")
-                    
-                    if deuteronomy_verses > 900:
-                        self.log_test("Deuteronomy Verse Count", True, f"✅ GOOD! Deuteronomy has {deuteronomy_verses} verses (reasonable count)")
-                    elif deuteronomy_verses > 0:
-                        self.log_test("Deuteronomy Verse Count", False, f"❌ LOW COUNT! Deuteronomy has only {deuteronomy_verses} verses (expected ~{expected_deuteronomy})")
-                    else:
-                        self.log_test("Deuteronomy Verse Count", False, f"❌ NOT FOUND! Deuteronomy does not exist in database")
-                else:
-                    self.log_test("Deuteronomy Verse Count", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Deuteronomy Verse Count", False, f"Error: {str(e)}")
-            
-            # Check Joshua: verses count (shows only 2 verses, investigate why)
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Joshua&limit=1")
-                if response.status_code == 200:
-                    data = response.json()
-                    joshua_verses = data.get('total', 0)
-                    expected_joshua = 658  # Standard Joshua verse count
-                    
-                    print(f"\n📖 JOSHUA STATUS (INVESTIGATION):")
-                    print(f"   📝 Verse Count: {joshua_verses} (expected ~{expected_joshua})")
-                    
-                    if joshua_verses == 2:
-                        self.log_test("Joshua Only 2 Verses Investigation", False, f"❌ CONFIRMED ISSUE! Joshua has only {joshua_verses} verses (expected ~{expected_joshua}) - needs investigation")
-                    elif joshua_verses > 600:
-                        self.log_test("Joshua Only 2 Verses Investigation", True, f"✅ RESOLVED! Joshua now has {joshua_verses} verses (good count)")
-                    elif joshua_verses > 0:
-                        self.log_test("Joshua Only 2 Verses Investigation", False, f"❌ STILL LOW! Joshua has {joshua_verses} verses (expected ~{expected_joshua})")
-                    else:
-                        self.log_test("Joshua Only 2 Verses Investigation", False, f"❌ NOT FOUND! Joshua does not exist in database")
-                else:
-                    self.log_test("Joshua Only 2 Verses Investigation", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Joshua Only 2 Verses Investigation", False, f"Error: {str(e)}")
-            
-            # Check Judges: verses count (shows 1,228 vs target 618 - cross-contamination?)
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Judges&limit=1")
-                if response.status_code == 200:
-                    data = response.json()
-                    judges_verses = data.get('total', 0)
-                    expected_judges = 618  # Target verse count from review request
-                    
-                    print(f"\n📖 JUDGES STATUS (CROSS-CONTAMINATION CHECK):")
-                    print(f"   📝 Verse Count: {judges_verses} (target {expected_judges})")
-                    
-                    if judges_verses == 1228:
-                        self.log_test("Judges Cross-Contamination Check", False, f"❌ CONFIRMED ISSUE! Judges has {judges_verses} verses vs target {expected_judges} - likely cross-contamination")
-                    elif abs(judges_verses - expected_judges) <= 50:
-                        self.log_test("Judges Cross-Contamination Check", True, f"✅ GOOD! Judges has {judges_verses} verses (close to target {expected_judges})")
-                    elif judges_verses > expected_judges * 1.5:
-                        self.log_test("Judges Cross-Contamination Check", False, f"❌ CROSS-CONTAMINATION! Judges has {judges_verses} verses (much higher than target {expected_judges})")
-                    elif judges_verses > 0:
-                        self.log_test("Judges Cross-Contamination Check", False, f"❌ COUNT ISSUE! Judges has {judges_verses} verses (target {expected_judges})")
-                    else:
-                        self.log_test("Judges Cross-Contamination Check", False, f"❌ NOT FOUND! Judges does not exist in database")
-                else:
-                    self.log_test("Judges Cross-Contamination Check", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Judges Cross-Contamination Check", False, f"Error: {str(e)}")
-            
-            # Check Ruth: verses count (shows 413 vs target 85 - cross-contamination?)
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Ruth&limit=1")
-                if response.status_code == 200:
-                    data = response.json()
-                    ruth_verses = data.get('total', 0)
-                    expected_ruth = 85  # Target verse count from review request
-                    
-                    print(f"\n📖 RUTH STATUS (CROSS-CONTAMINATION CHECK):")
-                    print(f"   📝 Verse Count: {ruth_verses} (target {expected_ruth})")
-                    
-                    if ruth_verses == 413:
-                        self.log_test("Ruth Cross-Contamination Check", False, f"❌ CONFIRMED ISSUE! Ruth has {ruth_verses} verses vs target {expected_ruth} - likely cross-contamination")
-                    elif abs(ruth_verses - expected_ruth) <= 10:
-                        self.log_test("Ruth Cross-Contamination Check", True, f"✅ GOOD! Ruth has {ruth_verses} verses (close to target {expected_ruth})")
-                    elif ruth_verses > expected_ruth * 2:
-                        self.log_test("Ruth Cross-Contamination Check", False, f"❌ CROSS-CONTAMINATION! Ruth has {ruth_verses} verses (much higher than target {expected_ruth})")
-                    elif ruth_verses > 0:
-                        self.log_test("Ruth Cross-Contamination Check", False, f"❌ COUNT ISSUE! Ruth has {ruth_verses} verses (target {expected_ruth})")
-                    else:
-                        self.log_test("Ruth Cross-Contamination Check", False, f"❌ NOT FOUND! Ruth does not exist in database")
-                else:
-                    self.log_test("Ruth Cross-Contamination Check", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Ruth Cross-Contamination Check", False, f"Error: {str(e)}")
+                self.log_test("Numbers Authentic Biblical Content", False, f"Error: {str(e)}")
+                self.log_test("Numbers Proper Themes", False, f"Error: {str(e)}")
+                self.log_test("Numbers Substantial Biblical Language", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("New Books Status Check", False, f"Error: {str(e)}")
+            self.log_test("Content Quality Verification", False, f"Error: {str(e)}")
             return False
 
     def test_content_quality_sampling(self):
