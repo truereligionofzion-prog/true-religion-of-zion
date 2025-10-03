@@ -489,7 +489,8 @@ class Numbers100PercentFinal:
         
         chapters = {}
         for verse in verses:
-            chapters[chapter] = chapters.get(verse['chapter'], 0) + 1
+            chapter = verse['chapter']
+            chapters[chapter] = chapters.get(chapter, 0) + 1
         
         completion_pct = (len(verses) / self.target_verses * 100)
         logger.info(f"📊 Completion: {len(verses)}/{self.target_verses} verses ({completion_pct:.1f}%)")
