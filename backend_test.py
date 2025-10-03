@@ -501,8 +501,8 @@ class APITester:
             self.log_test("Content Quality Sampling", False, f"Error: {str(e)}")
             return False
 
-    def test_content_quality_sampling(self):
-        """REVIEW REQUEST TEST 4: Content Quality Sampling - Sample 10 random Leviticus verses for authentic biblical content"""
+    def test_database_statistics(self):
+        """REVIEW REQUEST TEST 4: Database Statistics - Get total verse count, book count, identify reasonable vs cross-contaminated counts"""
         try:
             print("\n🔍 CONTENT QUALITY SAMPLING - SAMPLING 10 RANDOM LEVITICUS VERSES FOR AUTHENTIC BIBLICAL CONTENT...")
             
