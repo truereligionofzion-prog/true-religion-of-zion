@@ -1,32 +1,37 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Bible Database Status Verification
+Backend Testing for Numbers Bible Book Verification
 
-REVIEW REQUEST FOCUS - BIBLE DATABASE STATUS VERIFICATION:
-Please check the current status of our Bible database to verify what we have loaded correctly. Test:
+REVIEW REQUEST FOCUS - NUMBERS VERIFICATION:
+Please verify that Numbers has been successfully loaded following our proven formula. Test:
 
-1. **Foundation Books Verification**:
-   - Verify Genesis still has exactly 1,533 verses (should be preserved)
-   - Verify Exodus still has exactly 1,063 verses (should be preserved)  
-   - Verify Leviticus still has exactly 788 verses (should be preserved)
+1. **Numbers Precision Verification**:
+   - Verify Numbers has exactly 1,102 verses across all 36 chapters
+   - Check Numbers 1:1-2 contains proper census content (Moses, wilderness, Sinai, children of Israel)
+   - Verify Numbers 6:24-26 contains the priestly blessing (LORD bless thee, etc.)
+   - Check Numbers 13:1-2 has proper spy narrative content
 
-2. **New Books Status Check**:
-   - Check Numbers: verses count and sample content quality
-   - Check Deuteronomy: verses count and content
-   - Check Joshua: verses count (shows only 2 verses, investigate why)
-   - Check Judges: verses count (shows 1,228 vs target 618 - cross-contamination?)
-   - Check Ruth: verses count (shows 413 vs target 85 - cross-contamination?)
+2. **Content Quality Verification**:
+   - Sample 10 Numbers verses to verify authentic biblical content
+   - Verify proper Numbers themes (wilderness, Moses, Aaron, tribes, congregation)
+   - Check that verses contain substantial biblical language (not truncated)
 
-3. **Content Quality Sampling**:
-   - Sample 5 verses from Numbers to verify authentic biblical content
-   - Check for cross-contamination in Judges and Ruth 
-   - Verify no placeholder brackets exist in new books
+3. **No Contamination Check**:
+   - Verify NO Genesis creation content exists in Numbers verses
+   - Check that legitimate KJV brackets are preserved
+   - Confirm no placeholder brackets like "see Numbers..." exist
 
-4. **Database Statistics**:
-   - Get total verse count and book count
-   - Identify which books have reasonable verse counts vs cross-contaminated counts
+4. **Foundation Books Preservation**:
+   - Verify Genesis still has exactly 1,533 verses (preserved)
+   - Verify Exodus still has exactly 1,063 verses (preserved) 
+   - Verify Leviticus still has exactly 788 verses (preserved)
 
-This verification provides analysis of current database state to decide next steps - whether to clean and retry specific books or continue with the current state.
+5. **Complete Database Status**:
+   - Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 1,102 = 4,486)
+   - Verify all 4 books exist in KJV 1611 Divine version
+   - Confirm proper Old Testament classification and correct book order
+
+Please provide verification that Numbers now follows our proven authentic biblical text formula with no cross-contamination.
 """
 
 import requests
