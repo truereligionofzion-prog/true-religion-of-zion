@@ -78,62 +78,48 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_numbers_100_completion_verification(self):
-        """REVIEW REQUEST TEST 1: 100% Completion Verification - Verify Numbers has exactly 1,288 verses (100% completion)"""
+    def test_placeholder_elimination_verification(self):
+        """REVIEW REQUEST TEST 1: Placeholder Elimination Verification - Verify Numbers has 601 verses with authentic content only"""
         try:
-            print("\n🔍 NUMBERS 100% COMPLETION VERIFICATION - CHECKING EXACT VERSE COUNT FOR 100% COMPLETION...")
+            print("\n🔍 PLACEHOLDER ELIMINATION VERIFICATION - CHECKING NUMBERS HAS 601 AUTHENTIC VERSES ONLY...")
             
-            # Verify Numbers has exactly 1,288 verses (100% completion)
+            # Verify Numbers has exactly 601 verses (authentic extraction only)
             try:
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=1")
                 if response.status_code == 200:
                     data = response.json()
                     total_verses = data.get('total', 0)
-                    expected_verses = 1288  # Review request specifies exactly 1,288 verses for 100% completion
+                    expected_verses = 601  # Review request specifies exactly 601 verses for authentic extraction only
                     
                     if total_verses == expected_verses:
-                        self.log_test("Numbers Exactly 1,288 Verses (100%)", True, f"✅ PERFECT! Numbers has exactly {total_verses} verses (100% completion achieved)")
+                        self.log_test("Numbers Exactly 601 Verses (Authentic Only)", True, f"✅ PERFECT! Numbers has exactly {total_verses} verses (authentic extraction only)")
                     elif total_verses > 0:
-                        completion_percentage = (total_verses / expected_verses) * 100
-                        self.log_test("Numbers Exactly 1,288 Verses (100%)", False, f"❌ INCOMPLETE! Numbers has {total_verses} verses ({completion_percentage:.1f}% completion), expected exactly {expected_verses} for 100%")
+                        self.log_test("Numbers Exactly 601 Verses (Authentic Only)", False, f"❌ INCORRECT COUNT! Numbers has {total_verses} verses, expected exactly {expected_verses} for authentic extraction")
                     else:
-                        self.log_test("Numbers Exactly 1,288 Verses (100%)", False, f"❌ NOT FOUND! Numbers does not exist in database (0 verses)")
+                        self.log_test("Numbers Exactly 601 Verses (Authentic Only)", False, f"❌ NOT FOUND! Numbers does not exist in database (0 verses)")
                 else:
-                    self.log_test("Numbers Exactly 1,288 Verses (100%)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers Exactly 601 Verses (Authentic Only)", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Numbers Exactly 1,288 Verses (100%)", False, f"Error: {str(e)}")
+                self.log_test("Numbers Exactly 601 Verses (Authentic Only)", False, f"Error: {str(e)}")
             
-            # Verify Numbers has all 36 chapters
+            # Check for specific placeholder text that should NOT exist
             try:
-                # Get all Numbers verses to check chapter structure
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=100")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&search=And the LORD numbered the children of Israel according to their families&limit=100")
                 if response.status_code == 200:
                     data = response.json()
-                    verses = data.get('verses', [])
+                    placeholder_verses = data.get('verses', [])
                     
-                    if verses:
-                        # Extract unique chapters
-                        chapters = set()
-                        for verse in verses:
-                            chapter = verse.get('chapter')
-                            if chapter:
-                                chapters.add(int(chapter))
-                        
-                        max_chapter = max(chapters) if chapters else 0
-                        expected_chapters = 36  # Review request specifies 36 chapters
-                        
-                        if max_chapter == expected_chapters:
-                            self.log_test("Numbers All 36 Chapters", True, f"✅ PERFECT! Numbers has all {expected_chapters} chapters (1-{max_chapter})")
-                        elif max_chapter > 0:
-                            self.log_test("Numbers All 36 Chapters", False, f"❌ INCORRECT CHAPTERS! Numbers has {max_chapter} chapters, expected {expected_chapters}")
-                        else:
-                            self.log_test("Numbers All 36 Chapters", False, f"❌ NO CHAPTERS! No chapter data found in Numbers")
+                    if len(placeholder_verses) == 0:
+                        self.log_test("No Placeholder Text in Numbers", True, f"✅ CLEAN! No placeholder text 'And the LORD numbered...' found in Numbers")
                     else:
-                        self.log_test("Numbers All 36 Chapters", False, f"❌ NO DATA! No verses found to check chapter structure")
+                        self.log_test("No Placeholder Text in Numbers", False, f"❌ PLACEHOLDER FOUND! Found {len(placeholder_verses)} verses with placeholder text 'And the LORD numbered...'")
+                        for verse in placeholder_verses[:3]:  # Show first 3 examples
+                            verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            print(f"   ❌ {verse_ref}: PLACEHOLDER - '{verse.get('text', '')[:80]}...'")
                 else:
-                    self.log_test("Numbers All 36 Chapters", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("No Placeholder Text in Numbers", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Numbers All 36 Chapters", False, f"Error: {str(e)}")
+                self.log_test("No Placeholder Text in Numbers", False, f"Error: {str(e)}")
             
             # Check Numbers 1:1 contains proper census content
             print("\n📖 NUMBERS KEY VERSES CONTENT VERIFICATION:")
