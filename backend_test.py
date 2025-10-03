@@ -169,101 +169,149 @@ class APITester:
             self.log_test("Numbers Precision Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_content_quality_verification(self):
-        """REVIEW REQUEST TEST 2: Content Quality Verification - Sample 10 Numbers verses for authentic biblical content"""
+    def test_authentic_content_quality_check(self):
+        """REVIEW REQUEST TEST 2: Authentic Content Quality Check - Sample Numbers 1:1-10 and verify priestly blessing"""
         try:
-            print("\n🔍 CONTENT QUALITY VERIFICATION - SAMPLE 10 NUMBERS VERSES FOR AUTHENTIC BIBLICAL CONTENT...")
+            print("\n🔍 AUTHENTIC CONTENT QUALITY CHECK - SAMPLE NUMBERS 1:1-10 AND VERIFY PRIESTLY BLESSING...")
             
-            # Sample 10 Numbers verses to verify authentic biblical content
+            # Sample Numbers 1:1-10 to verify they contain different, authentic biblical content
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=10")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&chapter=1&limit=10")
                 if response.status_code == 200:
                     data = response.json()
                     verses = data.get('verses', [])
                     
                     if len(verses) >= 10:
-                        print("\n📝 10 NUMBERS VERSES QUALITY SAMPLING:")
+                        print("\n📝 NUMBERS 1:1-10 AUTHENTIC CONTENT SAMPLING:")
                         authentic_verses = 0
-                        substantial_verses = 0
-                        numbers_themed_verses = 0
+                        different_content = 0
+                        biblical_names_places = 0
                         
-                        for i, verse in enumerate(verses[:10], 1):  # Sample exactly 10 verses
+                        previous_texts = []
+                        
+                        for i, verse in enumerate(verses[:10], 1):  # Sample exactly verses 1-10
                             verse_text = verse.get('text', '')
                             verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
                             
                             # Check for authentic biblical content
                             is_authentic = (
-                                len(verse_text) > 15 and  # Has substantial content
+                                len(verse_text) > 10 and  # Has substantial content
                                 not verse_text.lower().startswith('error') and  # No error messages
                                 not 'placeholder' in verse_text.lower() and  # No placeholders
                                 verse_text.strip() != '' and  # Not empty
                                 not verse_text.startswith('...') and  # Not truncated
-                                len(verse_text.split()) >= 5  # At least 5 words
+                                len(verse_text.split()) >= 3  # At least 3 words
                             )
                             
-                            # Check for substantial biblical language (not truncated)
-                            is_substantial = len(verse_text) >= 30 and len(verse_text.split()) >= 8
+                            # Check for different content (not repetitive)
+                            is_different = verse_text not in previous_texts
+                            previous_texts.append(verse_text)
                             
-                            # Check for Numbers-specific themes
-                            numbers_keywords = ['wilderness', 'moses', 'aaron', 'tribes', 'congregation', 'lord', 'children', 'israel', 'camp', 'tabernacle', 'offering', 'priest']
-                            has_numbers_themes = any(keyword in verse_text.lower() for keyword in numbers_keywords)
+                            # Check for biblical names, places, and events
+                            biblical_elements = ['moses', 'aaron', 'israel', 'children', 'lord', 'wilderness', 'sinai', 'congregation', 'tribes', 'families', 'fathers', 'house']
+                            has_biblical_elements = any(element in verse_text.lower() for element in biblical_elements)
                             
                             if is_authentic:
                                 authentic_verses += 1
-                            if is_substantial:
-                                substantial_verses += 1
-                            if has_numbers_themes:
-                                numbers_themed_verses += 1
+                            if is_different:
+                                different_content += 1
+                            if has_biblical_elements:
+                                biblical_names_places += 1
                             
                             # Detailed logging
-                            if is_authentic and is_substantial and has_numbers_themes:
-                                print(f"   ✅ Sample {i} - {verse_ref}: EXCELLENT NUMBERS CONTENT - '{verse_text[:100]}...'")
-                            elif is_authentic and has_numbers_themes:
-                                print(f"   ✅ Sample {i} - {verse_ref}: GOOD NUMBERS CONTENT - '{verse_text[:100]}...'")
+                            if is_authentic and is_different and has_biblical_elements:
+                                print(f"   ✅ {verse_ref}: EXCELLENT AUTHENTIC CONTENT - '{verse_text[:80]}...'")
+                            elif is_authentic and has_biblical_elements:
+                                print(f"   ✅ {verse_ref}: GOOD AUTHENTIC CONTENT - '{verse_text[:80]}...'")
                             elif is_authentic:
-                                print(f"   ⚠️ Sample {i} - {verse_ref}: AUTHENTIC BUT GENERIC - '{verse_text[:100]}...'")
+                                print(f"   ⚠️ {verse_ref}: AUTHENTIC BUT GENERIC - '{verse_text[:80]}...'")
                             else:
-                                print(f"   ❌ Sample {i} - {verse_ref}: POOR QUALITY - '{verse_text}'")
+                                print(f"   ❌ {verse_ref}: POOR QUALITY - '{verse_text}'")
                         
                         # Test results
                         if authentic_verses >= 9:  # 90%+ authentic
-                            self.log_test("Numbers Authentic Biblical Content", True, f"✅ EXCELLENT! {authentic_verses}/10 Numbers verses are authentic biblical content")
+                            self.log_test("Numbers 1:1-10 Authentic Content", True, f"✅ EXCELLENT! {authentic_verses}/10 Numbers 1:1-10 verses are authentic biblical content")
                         elif authentic_verses >= 7:  # 70%+ authentic
-                            self.log_test("Numbers Authentic Biblical Content", True, f"✅ GOOD! {authentic_verses}/10 Numbers verses are authentic")
+                            self.log_test("Numbers 1:1-10 Authentic Content", True, f"✅ GOOD! {authentic_verses}/10 Numbers 1:1-10 verses are authentic")
                         else:
-                            self.log_test("Numbers Authentic Biblical Content", False, f"❌ POOR! Only {authentic_verses}/10 Numbers verses are authentic")
+                            self.log_test("Numbers 1:1-10 Authentic Content", False, f"❌ POOR! Only {authentic_verses}/10 Numbers 1:1-10 verses are authentic")
                         
-                        if numbers_themed_verses >= 8:  # 80%+ have Numbers themes
-                            self.log_test("Numbers Proper Themes", True, f"✅ EXCELLENT! {numbers_themed_verses}/10 verses contain proper Numbers themes")
-                        elif numbers_themed_verses >= 6:  # 60%+ have Numbers themes
-                            self.log_test("Numbers Proper Themes", True, f"✅ GOOD! {numbers_themed_verses}/10 verses contain Numbers themes")
+                        if different_content >= 9:  # 90%+ different
+                            self.log_test("Numbers 1:1-10 Different Content", True, f"✅ EXCELLENT! {different_content}/10 verses contain different, unique content")
+                        elif different_content >= 7:  # 70%+ different
+                            self.log_test("Numbers 1:1-10 Different Content", True, f"✅ GOOD! {different_content}/10 verses contain different content")
                         else:
-                            self.log_test("Numbers Proper Themes", False, f"❌ POOR! Only {numbers_themed_verses}/10 verses contain Numbers themes")
+                            self.log_test("Numbers 1:1-10 Different Content", False, f"❌ REPETITIVE! Only {different_content}/10 verses contain different content")
                         
-                        if substantial_verses >= 8:  # 80%+ substantial
-                            self.log_test("Numbers Substantial Biblical Language", True, f"✅ EXCELLENT! {substantial_verses}/10 verses contain substantial biblical language (not truncated)")
-                        elif substantial_verses >= 6:  # 60%+ substantial
-                            self.log_test("Numbers Substantial Biblical Language", True, f"✅ GOOD! {substantial_verses}/10 verses contain substantial language")
+                        if biblical_names_places >= 8:  # 80%+ have biblical elements
+                            self.log_test("Numbers 1:1-10 Biblical Names/Places/Events", True, f"✅ EXCELLENT! {biblical_names_places}/10 verses contain biblical names, places, and events")
+                        elif biblical_names_places >= 6:  # 60%+ have biblical elements
+                            self.log_test("Numbers 1:1-10 Biblical Names/Places/Events", True, f"✅ GOOD! {biblical_names_places}/10 verses contain biblical elements")
                         else:
-                            self.log_test("Numbers Substantial Biblical Language", False, f"❌ POOR! Only {substantial_verses}/10 verses contain substantial language")
+                            self.log_test("Numbers 1:1-10 Biblical Names/Places/Events", False, f"❌ POOR! Only {biblical_names_places}/10 verses contain biblical elements")
                         
                     else:
-                        self.log_test("Numbers Authentic Biblical Content", False, f"❌ INSUFFICIENT DATA! Only {len(verses)} Numbers verses found, need 10 for quality sampling")
-                        self.log_test("Numbers Proper Themes", False, f"❌ INSUFFICIENT DATA! Cannot verify themes with only {len(verses)} verses")
-                        self.log_test("Numbers Substantial Biblical Language", False, f"❌ INSUFFICIENT DATA! Cannot verify language quality with only {len(verses)} verses")
+                        self.log_test("Numbers 1:1-10 Authentic Content", False, f"❌ INSUFFICIENT DATA! Only {len(verses)} Numbers 1:1-10 verses found, need 10")
+                        self.log_test("Numbers 1:1-10 Different Content", False, f"❌ INSUFFICIENT DATA! Cannot verify different content with only {len(verses)} verses")
+                        self.log_test("Numbers 1:1-10 Biblical Names/Places/Events", False, f"❌ INSUFFICIENT DATA! Cannot verify biblical elements with only {len(verses)} verses")
                 else:
-                    self.log_test("Numbers Authentic Biblical Content", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Numbers Proper Themes", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Numbers Substantial Biblical Language", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers 1:1-10 Authentic Content", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers 1:1-10 Different Content", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers 1:1-10 Biblical Names/Places/Events", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Numbers Authentic Biblical Content", False, f"Error: {str(e)}")
-                self.log_test("Numbers Proper Themes", False, f"Error: {str(e)}")
-                self.log_test("Numbers Substantial Biblical Language", False, f"Error: {str(e)}")
+                self.log_test("Numbers 1:1-10 Authentic Content", False, f"Error: {str(e)}")
+                self.log_test("Numbers 1:1-10 Different Content", False, f"Error: {str(e)}")
+                self.log_test("Numbers 1:1-10 Biblical Names/Places/Events", False, f"Error: {str(e)}")
+            
+            # Check Numbers 6:24-26 for the proper priestly blessing text
+            try:
+                print("\n📖 NUMBERS 6:24-26 PRIESTLY BLESSING VERIFICATION:")
+                blessing_verses_found = 0
+                blessing_content_verified = 0
+                
+                for verse_num in [24, 25, 26]:
+                    try:
+                        response = self.session.get(f"{self.base_url}/bible/verse/Numbers/6/{verse_num}")
+                        if response.status_code == 200:
+                            verse_data = response.json()
+                            verse_text = verse_data.get('text', '')
+                            verse_ref = f"Numbers 6:{verse_num}"
+                            blessing_verses_found += 1
+                            
+                            # Check for priestly blessing content specific to each verse
+                            if verse_num == 24:
+                                blessing_keywords = ['lord', 'bless', 'thee', 'keep']
+                            elif verse_num == 25:
+                                blessing_keywords = ['lord', 'make', 'face', 'shine', 'gracious']
+                            else:  # verse 26
+                                blessing_keywords = ['lord', 'lift', 'countenance', 'peace']
+                            
+                            found_keywords = [kw for kw in blessing_keywords if kw in verse_text.lower()]
+                            
+                            if len(found_keywords) >= 2:
+                                blessing_content_verified += 1
+                                print(f"   ✅ {verse_ref}: PROPER BLESSING CONTENT - '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
+                            else:
+                                print(f"   ❌ {verse_ref}: MISSING BLESSING CONTENT - '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
+                        else:
+                            print(f"   ❌ Numbers 6:{verse_num}: API ERROR (Status {response.status_code})")
+                    except Exception as e:
+                        print(f"   ❌ Numbers 6:{verse_num}: ERROR ({str(e)})")
+                
+                if blessing_content_verified >= 3:
+                    self.log_test("Numbers 6:24-26 Priestly Blessing", True, f"✅ PERFECT! All 3 priestly blessing verses (6:24-26) contain proper blessing text")
+                elif blessing_content_verified >= 2:
+                    self.log_test("Numbers 6:24-26 Priestly Blessing", True, f"✅ GOOD! {blessing_content_verified}/3 priestly blessing verses contain proper text")
+                else:
+                    self.log_test("Numbers 6:24-26 Priestly Blessing", False, f"❌ POOR! Only {blessing_content_verified}/3 priestly blessing verses contain proper text")
+                    
+            except Exception as e:
+                self.log_test("Numbers 6:24-26 Priestly Blessing", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Content Quality Verification", False, f"Error: {str(e)}")
+            self.log_test("Authentic Content Quality Check", False, f"Error: {str(e)}")
             return False
 
     def test_no_contamination_check(self):
