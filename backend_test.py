@@ -326,222 +326,179 @@ class APITester:
     def test_content_quality_sampling(self):
         """REVIEW REQUEST TEST 3: Content Quality Sampling - Sample 5 verses from Numbers and check cross-contamination"""
         try:
-            print("\n🔍 PREVIOUS BOOKS PRESERVATION CHECK - VERIFYING GENESIS AND EXODUS WEREN'T AFFECTED BY LEVITICUS...")
+            print("\n🔍 CONTENT QUALITY SAMPLING - SAMPLE 5 VERSES FROM NUMBERS AND CHECK CROSS-CONTAMINATION...")
             
-            # Verify Genesis still has exactly 1,533 verses
+            # Sample 5 verses from Numbers to verify authentic biblical content
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=5")
                 if response.status_code == 200:
                     data = response.json()
-                    total_verses = data.get('total', 0)
-                    expected_verses = 1533  # Genesis should have exactly 1,533 verses
+                    verses = data.get('verses', [])
                     
-                    if total_verses == expected_verses:
-                        self.log_test("Genesis Exact Verse Count Preserved", True, f"✅ PERFECT! Genesis still has exactly {total_verses} verses (preserved)")
-                    else:
-                        self.log_test("Genesis Exact Verse Count Preserved", False, f"❌ CHANGED! Genesis now has {total_verses} verses, expected {expected_verses}")
-                else:
-                    self.log_test("Genesis Exact Verse Count Preserved", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Genesis Exact Verse Count Preserved", False, f"Error: {str(e)}")
-            
-            # Verify Exodus still has exactly 1,063 verses
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
-                if response.status_code == 200:
-                    data = response.json()
-                    total_verses = data.get('total', 0)
-                    expected_verses = 1063  # Exodus should have exactly 1,063 verses
-                    
-                    if total_verses == expected_verses:
-                        self.log_test("Exodus Exact Verse Count Preserved", True, f"✅ PERFECT! Exodus still has exactly {total_verses} verses (preserved)")
-                    else:
-                        self.log_test("Exodus Exact Verse Count Preserved", False, f"❌ CHANGED! Exodus now has {total_verses} verses, expected {expected_verses}")
-                else:
-                    self.log_test("Exodus Exact Verse Count Preserved", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Exodus Exact Verse Count Preserved", False, f"Error: {str(e)}")
-            
-            # Confirm Genesis 1:1 and 50:26 are still intact
-            key_genesis_verses = [
-                {'chapter': 1, 'verse': 1, 'description': 'Creation Beginning', 'expected_content': 'In the beginning God created'},
-                {'chapter': 50, 'verse': 26, 'description': 'Genesis Ending', 'expected_content': 'So Joseph died'}
-            ]
-            
-            print("\n📖 GENESIS KEY VERSES INTEGRITY CHECK:")
-            genesis_key_verses_intact = 0
-            
-            for key_verse in key_genesis_verses:
-                try:
-                    response = self.session.get(f"{self.base_url}/bible/verse/Genesis/{key_verse['chapter']}/{key_verse['verse']}")
-                    if response.status_code == 200:
-                        verse_data = response.json()
-                        verse_text = verse_data.get('text', '')
+                    if verses:
+                        print("\n📝 5 NUMBERS VERSES QUALITY SAMPLING:")
+                        authentic_verses = 0
                         
-                        if key_verse['expected_content'].lower() in verse_text.lower():
-                            genesis_key_verses_intact += 1
-                            print(f"   ✅ Genesis {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): INTACT - '{verse_text[:60]}...'")
+                        for i, verse in enumerate(verses[:5], 1):  # Sample exactly 5 verses
+                            verse_text = verse.get('text', '')
+                            verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            
+                            # Check for authentic biblical content
+                            is_authentic = (
+                                len(verse_text) > 10 and  # Has content
+                                not verse_text.lower().startswith('error') and  # No error messages
+                                not 'placeholder' in verse_text.lower() and  # No placeholders
+                                verse_text.strip() != ''  # Not empty
+                            )
+                            
+                            # Check for Numbers-specific content
+                            numbers_keywords = ['lord', 'moses', 'aaron', 'children', 'israel', 'wilderness', 'congregation', 'tribe', 'camp']
+                            has_numbers_content = any(keyword in verse_text.lower() for keyword in numbers_keywords)
+                            
+                            if is_authentic:
+                                authentic_verses += 1
+                            
+                            if is_authentic and has_numbers_content:
+                                print(f"   ✅ Sample {i} - {verse_ref}: AUTHENTIC NUMBERS CONTENT - '{verse_text[:80]}...'")
+                            elif is_authentic:
+                                print(f"   ⚠️ Sample {i} - {verse_ref}: AUTHENTIC BUT GENERIC - '{verse_text[:80]}...'")
+                            else:
+                                print(f"   ❌ Sample {i} - {verse_ref}: POOR QUALITY - '{verse_text}'")
+                        
+                        if authentic_verses >= 4:  # 80%+ authentic
+                            self.log_test("Numbers Authentic Biblical Content", True, f"✅ EXCELLENT! {authentic_verses}/5 Numbers verses are authentic biblical content")
+                        elif authentic_verses >= 3:  # 60%+ authentic
+                            self.log_test("Numbers Authentic Biblical Content", True, f"✅ GOOD! {authentic_verses}/5 Numbers verses are authentic")
                         else:
-                            print(f"   ❌ Genesis {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): CHANGED - '{verse_text[:60]}...'")
+                            self.log_test("Numbers Authentic Biblical Content", False, f"❌ POOR! Only {authentic_verses}/5 Numbers verses are authentic")
+                        
                     else:
-                        print(f"   ❌ Genesis {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): API ERROR - Status {response.status_code}")
-                        
-                except Exception as e:
-                    print(f"   ❌ Genesis {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): ERROR - {str(e)}")
+                        self.log_test("Numbers Authentic Biblical Content", False, f"❌ NO DATA! No Numbers verses found for quality sampling")
+                else:
+                    self.log_test("Numbers Authentic Biblical Content", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Numbers Authentic Biblical Content", False, f"Error: {str(e)}")
             
-            if genesis_key_verses_intact == len(key_genesis_verses):
-                self.log_test("Genesis Key Verses Intact", True, f"✅ PRESERVED! All {genesis_key_verses_intact}/2 key Genesis verses are intact")
-            else:
-                self.log_test("Genesis Key Verses Intact", False, f"❌ CORRUPTED! Only {genesis_key_verses_intact}/2 key Genesis verses are intact")
+            # Check for cross-contamination in Judges and Ruth
+            print("\n🔍 CROSS-CONTAMINATION CHECK IN JUDGES AND RUTH:")
             
-            # Confirm Exodus key verses are still intact
-            key_exodus_verses = [
-                {'chapter': 1, 'verse': 1, 'description': 'Israel in Egypt', 'expected_content': 'children of Israel'},
-                {'chapter': 20, 'verse': 1, 'description': 'Ten Commandments', 'expected_content': 'God spake'}
-            ]
-            
-            print("\n📖 EXODUS KEY VERSES INTEGRITY CHECK:")
-            exodus_key_verses_intact = 0
-            
-            for key_verse in key_exodus_verses:
-                try:
-                    response = self.session.get(f"{self.base_url}/bible/verse/Exodus/{key_verse['chapter']}/{key_verse['verse']}")
-                    if response.status_code == 200:
-                        verse_data = response.json()
-                        verse_text = verse_data.get('text', '')
-                        
-                        if key_verse['expected_content'].lower() in verse_text.lower():
-                            exodus_key_verses_intact += 1
-                            print(f"   ✅ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): INTACT - '{verse_text[:60]}...'")
-                        else:
-                            print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): CHANGED - '{verse_text[:60]}...'")
-                    else:
-                        print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): API ERROR - Status {response.status_code}")
-                        
-                except Exception as e:
-                    print(f"   ❌ Exodus {key_verse['chapter']}:{key_verse['verse']} ({key_verse['description']}): ERROR - {str(e)}")
-            
-            if exodus_key_verses_intact == len(key_exodus_verses):
-                self.log_test("Exodus Key Verses Intact", True, f"✅ PRESERVED! All {exodus_key_verses_intact}/2 key Exodus verses are intact")
-            else:
-                self.log_test("Exodus Key Verses Intact", False, f"❌ CORRUPTED! Only {exodus_key_verses_intact}/2 key Exodus verses are intact")
-            
-            # Ensure no cross-contamination between all three books
+            # Check Judges for cross-contamination
             try:
-                print("\n🔍 CROSS-CONTAMINATION CHECK BETWEEN ALL THREE BOOKS:")
-                
-                # Check Genesis verses don't contain Exodus or Leviticus content
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=10")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Judges&limit=10")
                 if response.status_code == 200:
                     data = response.json()
-                    genesis_verses = data.get('verses', [])
+                    judges_verses = data.get('verses', [])
                     
-                    contamination_count = 0
-                    other_books_keywords = ['moses', 'aaron', 'tabernacle', 'offerings', 'sacrifices', 'levites', 'priests']
+                    contamination_found = 0
+                    other_book_indicators = ['genesis', 'exodus', 'leviticus', 'numbers', 'deuteronomy', 'creation', 'adam', 'eve', 'noah', 'abraham']
                     
-                    for verse in genesis_verses:
+                    for verse in judges_verses:
                         verse_text = verse.get('text', '').lower()
+                        verse_ref = f"Judges {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
                         book = verse.get('book', '')
                         
                         # Check book field is correct
-                        if book != 'Genesis':
-                            contamination_count += 1
-                            print(f"   ❌ BOOK CONTAMINATION: Verse labeled as '{book}' in Genesis query")
-                            continue
-                        
-                        # Check for other books' content in Genesis verses
-                        for keyword in other_books_keywords:
-                            if keyword in verse_text:
-                                contamination_count += 1
-                                print(f"   ❌ CONTENT CONTAMINATION: Genesis verse contains '{keyword}': '{verse_text[:50]}...'")
-                                break
-                    
-                    if contamination_count == 0:
-                        self.log_test("No Cross-Contamination Genesis", True, f"✅ PURE! No Exodus/Leviticus contamination found in {len(genesis_verses)} Genesis verses")
-                    else:
-                        self.log_test("No Cross-Contamination Genesis", False, f"❌ CONTAMINATED! Found {contamination_count} instances of contamination in Genesis")
-                else:
-                    self.log_test("No Cross-Contamination Genesis", False, f"API Error getting Genesis verses - Status: {response.status_code}")
-                
-                # Check Exodus verses don't contain Genesis or Leviticus content
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=10")
-                if response.status_code == 200:
-                    data = response.json()
-                    exodus_verses = data.get('verses', [])
-                    
-                    contamination_count = 0
-                    other_books_keywords = ['adam', 'eve', 'noah', 'offerings', 'sacrifices', 'holiness', 'unclean']
-                    
-                    for verse in exodus_verses:
-                        verse_text = verse.get('text', '').lower()
-                        book = verse.get('book', '')
-                        
-                        # Check book field is correct
-                        if book != 'Exodus':
-                            contamination_count += 1
-                            print(f"   ❌ BOOK CONTAMINATION: Verse labeled as '{book}' in Exodus query")
-                            continue
-                        
-                        # Check for other books' content (some overlap expected)
-                        for keyword in other_books_keywords:
-                            if keyword in verse_text:
-                                # Only flag clear contamination
-                                if keyword in ['adam', 'eve', 'noah']:
-                                    contamination_count += 1
-                                    print(f"   ❌ CONTENT CONTAMINATION: Exodus verse contains '{keyword}': '{verse_text[:50]}...'")
-                                    break
-                    
-                    if contamination_count == 0:
-                        self.log_test("No Cross-Contamination Exodus", True, f"✅ PURE! No Genesis/Leviticus contamination found in {len(exodus_verses)} Exodus verses")
-                    else:
-                        self.log_test("No Cross-Contamination Exodus", False, f"❌ CONTAMINATED! Found {contamination_count} instances of contamination in Exodus")
-                else:
-                    self.log_test("No Cross-Contamination Exodus", False, f"API Error getting Exodus verses - Status: {response.status_code}")
-                
-                # Check Leviticus verses don't contain Genesis or Exodus content
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=10")
-                if response.status_code == 200:
-                    data = response.json()
-                    leviticus_verses = data.get('verses', [])
-                    
-                    contamination_count = 0
-                    other_books_keywords = ['adam', 'eve', 'noah', 'abraham', 'isaac', 'jacob', 'pharaoh', 'egypt']
-                    
-                    for verse in leviticus_verses:
-                        verse_text = verse.get('text', '').lower()
-                        book = verse.get('book', '')
-                        
-                        # Check book field is correct
-                        if book != 'Leviticus':
-                            contamination_count += 1
-                            print(f"   ❌ BOOK CONTAMINATION: Verse labeled as '{book}' in Leviticus query")
+                        if book != 'Judges':
+                            contamination_found += 1
+                            print(f"   ❌ {verse_ref}: BOOK FIELD CONTAMINATION - labeled as '{book}'")
                             continue
                         
                         # Check for other books' content
-                        for keyword in other_books_keywords:
-                            if keyword in verse_text:
-                                # Only flag clear contamination
-                                if keyword in ['adam', 'eve', 'noah', 'pharaoh']:
-                                    contamination_count += 1
-                                    print(f"   ❌ CONTENT CONTAMINATION: Leviticus verse contains '{keyword}': '{verse_text[:50]}...'")
-                                    break
+                        for indicator in other_book_indicators:
+                            if indicator in verse_text:
+                                contamination_found += 1
+                                print(f"   ❌ {verse_ref}: CONTENT CONTAMINATION - contains '{indicator}': '{verse_text[:60]}...'")
+                                break
                     
-                    if contamination_count == 0:
-                        self.log_test("No Cross-Contamination Leviticus", True, f"✅ PURE! No Genesis/Exodus contamination found in {len(leviticus_verses)} Leviticus verses")
+                    if contamination_found == 0:
+                        self.log_test("Judges Cross-Contamination Content Check", True, f"✅ CLEAN! No cross-contamination found in {len(judges_verses)} Judges verses")
                     else:
-                        self.log_test("No Cross-Contamination Leviticus", False, f"❌ CONTAMINATED! Found {contamination_count} instances of contamination in Leviticus")
+                        self.log_test("Judges Cross-Contamination Content Check", False, f"❌ CONTAMINATED! Found {contamination_found} contamination instances in Judges")
                 else:
-                    self.log_test("No Cross-Contamination Leviticus", False, f"API Error getting Leviticus verses - Status: {response.status_code}")
+                    self.log_test("Judges Cross-Contamination Content Check", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Judges Cross-Contamination Content Check", False, f"Error: {str(e)}")
+            
+            # Check Ruth for cross-contamination
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Ruth&limit=10")
+                if response.status_code == 200:
+                    data = response.json()
+                    ruth_verses = data.get('verses', [])
+                    
+                    contamination_found = 0
+                    other_book_indicators = ['genesis', 'exodus', 'leviticus', 'numbers', 'deuteronomy', 'creation', 'adam', 'eve', 'noah', 'abraham']
+                    
+                    for verse in ruth_verses:
+                        verse_text = verse.get('text', '').lower()
+                        verse_ref = f"Ruth {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                        book = verse.get('book', '')
+                        
+                        # Check book field is correct
+                        if book != 'Ruth':
+                            contamination_found += 1
+                            print(f"   ❌ {verse_ref}: BOOK FIELD CONTAMINATION - labeled as '{book}'")
+                            continue
+                        
+                        # Check for other books' content
+                        for indicator in other_book_indicators:
+                            if indicator in verse_text:
+                                contamination_found += 1
+                                print(f"   ❌ {verse_ref}: CONTENT CONTAMINATION - contains '{indicator}': '{verse_text[:60]}...'")
+                                break
+                    
+                    if contamination_found == 0:
+                        self.log_test("Ruth Cross-Contamination Content Check", True, f"✅ CLEAN! No cross-contamination found in {len(ruth_verses)} Ruth verses")
+                    else:
+                        self.log_test("Ruth Cross-Contamination Content Check", False, f"❌ CONTAMINATED! Found {contamination_found} contamination instances in Ruth")
+                else:
+                    self.log_test("Ruth Cross-Contamination Content Check", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Ruth Cross-Contamination Content Check", False, f"Error: {str(e)}")
+            
+            # Verify no placeholder brackets exist in new books
+            try:
+                print("\n🚫 PLACEHOLDER BRACKETS CHECK IN NEW BOOKS:")
+                new_books = ['Numbers', 'Deuteronomy', 'Joshua', 'Judges', 'Ruth']
+                total_placeholder_violations = 0
+                
+                for book in new_books:
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book}&limit=5")
+                    if response.status_code == 200:
+                        data = response.json()
+                        verses = data.get('verses', [])
+                        
+                        placeholder_patterns = ['[chapter]', '[verse]', 'see ' + book.lower(), 'placeholder', 'complete kjv text']
+                        book_violations = 0
+                        
+                        for verse in verses:
+                            verse_text = verse.get('text', '').lower()
+                            verse_ref = f"{book} {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            
+                            for pattern in placeholder_patterns:
+                                if pattern in verse_text:
+                                    book_violations += 1
+                                    total_placeholder_violations += 1
+                                    print(f"   ❌ {verse_ref}: PLACEHOLDER FOUND - '{pattern}' in '{verse_text[:50]}...'")
+                                    break
+                        
+                        if book_violations == 0:
+                            print(f"   ✅ {book}: No placeholder brackets found in {len(verses)} verses")
+                    else:
+                        print(f"   ⚠️ {book}: API Error - Status {response.status_code}")
+                
+                if total_placeholder_violations == 0:
+                    self.log_test("No Placeholder Brackets in New Books", True, f"✅ CLEAN! No placeholder brackets found in new books")
+                else:
+                    self.log_test("No Placeholder Brackets in New Books", False, f"❌ VIOLATIONS! Found {total_placeholder_violations} placeholder bracket violations")
                     
             except Exception as e:
-                self.log_test("No Cross-Contamination Genesis", False, f"Error: {str(e)}")
-                self.log_test("No Cross-Contamination Exodus", False, f"Error: {str(e)}")
-                self.log_test("No Cross-Contamination Leviticus", False, f"Error: {str(e)}")
+                self.log_test("No Placeholder Brackets in New Books", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Previous Books Preservation Check", False, f"Error: {str(e)}")
+            self.log_test("Content Quality Sampling", False, f"Error: {str(e)}")
             return False
 
     def test_content_quality_sampling(self):
