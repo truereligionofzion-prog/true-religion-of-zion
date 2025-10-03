@@ -73,12 +73,50 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_leviticus_authentic_content_verification(self):
-        """REVIEW REQUEST TEST 1: Leviticus Authentic Content Verification - Verify Leviticus has authentic biblical text"""
+    def test_foundation_books_verification(self):
+        """REVIEW REQUEST TEST 1: Foundation Books Verification - Verify Genesis, Exodus, Leviticus have correct verse counts"""
         try:
-            print("\n🔍 LEVITICUS AUTHENTIC CONTENT VERIFICATION - CHECKING FOR AUTHENTIC BIBLICAL TEXT...")
+            print("\n🔍 FOUNDATION BOOKS VERIFICATION - CHECKING GENESIS, EXODUS, LEVITICUS VERSE COUNTS...")
             
-            # Verify Leviticus has 788 verses across all 27 chapters (review request specifies 788)
+            # Verify Genesis still has exactly 1,533 verses (should be preserved)
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    total_verses = data.get('total', 0)
+                    expected_verses = 1533  # Review request specifies 1,533 verses
+                    
+                    if total_verses == expected_verses:
+                        self.log_test("Genesis Exactly 1,533 Verses", True, f"✅ PERFECT! Genesis has exactly {total_verses} verses (preserved)")
+                    elif total_verses > 0:
+                        self.log_test("Genesis Exactly 1,533 Verses", False, f"❌ INCORRECT COUNT! Genesis has {total_verses} verses, expected {expected_verses}")
+                    else:
+                        self.log_test("Genesis Exactly 1,533 Verses", False, f"❌ NOT FOUND! Genesis does not exist in database (0 verses)")
+                else:
+                    self.log_test("Genesis Exactly 1,533 Verses", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Genesis Exactly 1,533 Verses", False, f"Error: {str(e)}")
+            
+            # Verify Exodus still has exactly 1,063 verses (should be preserved)
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    total_verses = data.get('total', 0)
+                    expected_verses = 1063  # Review request specifies 1,063 verses
+                    
+                    if total_verses == expected_verses:
+                        self.log_test("Exodus Exactly 1,063 Verses", True, f"✅ PERFECT! Exodus has exactly {total_verses} verses (preserved)")
+                    elif total_verses > 0:
+                        self.log_test("Exodus Exactly 1,063 Verses", False, f"❌ INCORRECT COUNT! Exodus has {total_verses} verses, expected {expected_verses}")
+                    else:
+                        self.log_test("Exodus Exactly 1,063 Verses", False, f"❌ NOT FOUND! Exodus does not exist in database (0 verses)")
+                else:
+                    self.log_test("Exodus Exactly 1,063 Verses", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Exodus Exactly 1,063 Verses", False, f"Error: {str(e)}")
+            
+            # Verify Leviticus still has exactly 788 verses (should be preserved)
             try:
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=1")
                 if response.status_code == 200:
@@ -87,113 +125,71 @@ class APITester:
                     expected_verses = 788  # Review request specifies 788 verses
                     
                     if total_verses == expected_verses:
-                        self.log_test("Leviticus 788 Verses Count", True, f"✅ PERFECT! Leviticus has exactly {total_verses} verses as specified")
+                        self.log_test("Leviticus Exactly 788 Verses", True, f"✅ PERFECT! Leviticus has exactly {total_verses} verses (preserved)")
                     elif total_verses > 0:
-                        self.log_test("Leviticus 788 Verses Count", False, f"❌ INCORRECT COUNT! Leviticus has {total_verses} verses, expected {expected_verses}")
+                        self.log_test("Leviticus Exactly 788 Verses", False, f"❌ INCORRECT COUNT! Leviticus has {total_verses} verses, expected {expected_verses}")
                     else:
-                        self.log_test("Leviticus 788 Verses Count", False, f"❌ NOT FOUND! Leviticus does not exist in database (0 verses)")
+                        self.log_test("Leviticus Exactly 788 Verses", False, f"❌ NOT FOUND! Leviticus does not exist in database (0 verses)")
                 else:
-                    self.log_test("Leviticus 788 Verses Count", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Leviticus Exactly 788 Verses", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Leviticus 788 Verses Count", False, f"Error: {str(e)}")
+                self.log_test("Leviticus Exactly 788 Verses", False, f"Error: {str(e)}")
             
-            # Check that Leviticus 1:1-2 contains proper content about LORD calling Moses and offerings
-            print("\n📖 LEVITICUS 1:1-2 LORD CALLING MOSES AND OFFERINGS CONTENT VERIFICATION:")
-            offerings_verified = 0
-            expected_offerings_content = ['lord', 'moses', 'called', 'tabernacle', 'offering', 'burnt', 'sacrifice', 'congregation']
+            # Verify key verses are intact
+            print("\n📖 FOUNDATION BOOKS KEY VERSES INTEGRITY CHECK:")
             
-            for verse_num in range(1, 3):  # Leviticus 1:1-2
-                try:
-                    response = self.session.get(f"{self.base_url}/bible/verse/Leviticus/1/{verse_num}")
-                    if response.status_code == 200:
-                        verse_data = response.json()
-                        verse_text = verse_data.get('text', '').lower()
-                        
-                        # Check for LORD calling Moses and offerings content
-                        offerings_found = [word for word in expected_offerings_content if word in verse_text]
-                        
-                        if offerings_found:
-                            offerings_verified += 1
-                            print(f"   ✅ Leviticus 1:{verse_num}: LORD/Moses/offerings content - Found: {', '.join(offerings_found)}")
-                        else:
-                            print(f"   ❌ Leviticus 1:{verse_num}: NO OFFERINGS CONTENT - '{verse_text[:60]}...'")
+            # Genesis 1:1 creation verse
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Genesis/1/1")
+                if response.status_code == 200:
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
+                    
+                    if 'in the beginning god created' in verse_text.lower():
+                        self.log_test("Genesis 1:1 Creation Verse Intact", True, f"✅ PRESERVED! Genesis 1:1 contains creation content: '{verse_text[:60]}...'")
                     else:
-                        print(f"   ❌ Leviticus 1:{verse_num}: API ERROR - Status {response.status_code}")
-                        
-                except Exception as e:
-                    print(f"   ❌ Leviticus 1:{verse_num}: ERROR - {str(e)}")
+                        self.log_test("Genesis 1:1 Creation Verse Intact", False, f"❌ CORRUPTED! Genesis 1:1 missing creation content: '{verse_text[:60]}...'")
+                else:
+                    self.log_test("Genesis 1:1 Creation Verse Intact", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Genesis 1:1 Creation Verse Intact", False, f"Error: {str(e)}")
             
-            if offerings_verified >= 1:  # At least 1 verse should have offerings content
-                self.log_test("Leviticus 1:1-2 LORD/Moses/Offerings Content", True, f"✅ AUTHENTIC! {offerings_verified}/2 verses contain proper LORD/Moses/offerings content")
-            else:
-                self.log_test("Leviticus 1:1-2 LORD/Moses/Offerings Content", False, f"❌ MISSING! No LORD/Moses/offerings content found in Leviticus 1:1-2")
-            
-            # Confirm Leviticus 11:1-2 has clean/unclean animals content
-            print("\n🐄 LEVITICUS 11:1-2 CLEAN/UNCLEAN ANIMALS CONTENT VERIFICATION:")
-            animals_verified = 0
-            animals_keywords = ['lord', 'moses', 'aaron', 'children', 'israel', 'beasts', 'animals', 'eat', 'clean', 'unclean']
-            
-            for verse_num in range(1, 3):  # Leviticus 11:1-2
-                try:
-                    response = self.session.get(f"{self.base_url}/bible/verse/Leviticus/11/{verse_num}")
-                    if response.status_code == 200:
-                        verse_data = response.json()
-                        verse_text = verse_data.get('text', '').lower()
-                        
-                        # Check for clean/unclean animals content
-                        animals_keywords_found = [word for word in animals_keywords if word in verse_text]
-                        
-                        if animals_keywords_found:
-                            animals_verified += 1
-                            print(f"   ✅ Leviticus 11:{verse_num}: Clean/unclean animals content - Found: {', '.join(animals_keywords_found)}")
-                        else:
-                            print(f"   ❌ Leviticus 11:{verse_num}: NO ANIMALS CONTENT - '{verse_text[:60]}...'")
+            # Exodus 20:1 Ten Commandments
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Exodus/20/1")
+                if response.status_code == 200:
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
+                    
+                    if 'god spake' in verse_text.lower():
+                        self.log_test("Exodus 20:1 Ten Commandments Intact", True, f"✅ PRESERVED! Exodus 20:1 contains commandments content: '{verse_text[:60]}...'")
                     else:
-                        print(f"   ❌ Leviticus 11:{verse_num}: API ERROR - Status {response.status_code}")
-                        
-                except Exception as e:
-                    print(f"   ❌ Leviticus 11:{verse_num}: ERROR - {str(e)}")
+                        self.log_test("Exodus 20:1 Ten Commandments Intact", False, f"❌ CORRUPTED! Exodus 20:1 missing commandments content: '{verse_text[:60]}...'")
+                else:
+                    self.log_test("Exodus 20:1 Ten Commandments Intact", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Exodus 20:1 Ten Commandments Intact", False, f"Error: {str(e)}")
             
-            if animals_verified >= 1:  # At least 1 verse should have animals content
-                self.log_test("Leviticus 11:1-2 Clean/Unclean Animals Content", True, f"✅ AUTHENTIC! {animals_verified}/2 verses contain clean/unclean animals content")
-            else:
-                self.log_test("Leviticus 11:1-2 Clean/Unclean Animals Content", False, f"❌ MISSING! No clean/unclean animals content found in Leviticus 11:1-2")
-            
-            # Verify Leviticus 19:1-2 has holiness laws content
-            print("\n✨ LEVITICUS 19:1-2 HOLINESS LAWS CONTENT VERIFICATION:")
-            holiness_verified = 0
-            holiness_keywords = ['lord', 'moses', 'congregation', 'children', 'israel', 'holy', 'holiness', 'god']
-            
-            for verse_num in range(1, 3):  # Leviticus 19:1-2
-                try:
-                    response = self.session.get(f"{self.base_url}/bible/verse/Leviticus/19/{verse_num}")
-                    if response.status_code == 200:
-                        verse_data = response.json()
-                        verse_text = verse_data.get('text', '').lower()
-                        
-                        # Check for holiness laws content
-                        holiness_keywords_found = [word for word in holiness_keywords if word in verse_text]
-                        
-                        if holiness_keywords_found:
-                            holiness_verified += 1
-                            print(f"   ✅ Leviticus 19:{verse_num}: Holiness laws content - Found: {', '.join(holiness_keywords_found)}")
-                        else:
-                            print(f"   ❌ Leviticus 19:{verse_num}: NO HOLINESS CONTENT - '{verse_text[:60]}...'")
+            # Leviticus 1:1 offerings
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Leviticus/1/1")
+                if response.status_code == 200:
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
+                    
+                    if any(word in verse_text.lower() for word in ['lord', 'moses', 'called', 'tabernacle']):
+                        self.log_test("Leviticus 1:1 Offerings Verse Intact", True, f"✅ PRESERVED! Leviticus 1:1 contains offerings content: '{verse_text[:60]}...'")
                     else:
-                        print(f"   ❌ Leviticus 19:{verse_num}: API ERROR - Status {response.status_code}")
-                        
-                except Exception as e:
-                    print(f"   ❌ Leviticus 19:{verse_num}: ERROR - {str(e)}")
-            
-            if holiness_verified >= 1:  # At least 1 verse should have holiness content
-                self.log_test("Leviticus 19:1-2 Holiness Laws Content", True, f"✅ AUTHENTIC! {holiness_verified}/2 verses contain holiness laws content")
-            else:
-                self.log_test("Leviticus 19:1-2 Holiness Laws Content", False, f"❌ MISSING! No holiness laws content found in Leviticus 19:1-2")
+                        self.log_test("Leviticus 1:1 Offerings Verse Intact", False, f"❌ CORRUPTED! Leviticus 1:1 missing offerings content: '{verse_text[:60]}...'")
+                else:
+                    self.log_test("Leviticus 1:1 Offerings Verse Intact", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Leviticus 1:1 Offerings Verse Intact", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Leviticus Authentic Content Verification", False, f"Error: {str(e)}")
+            self.log_test("Foundation Books Verification", False, f"Error: {str(e)}")
             return False
 
     def test_no_placeholder_content_check(self):
