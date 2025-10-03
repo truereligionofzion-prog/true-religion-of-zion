@@ -192,130 +192,135 @@ class APITester:
             self.log_test("Foundation Books Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_no_placeholder_content_check(self):
-        """REVIEW REQUEST TEST 2: No Placeholder Content Check - Verify NO placeholder content exists"""
+    def test_new_books_status_check(self):
+        """REVIEW REQUEST TEST 2: New Books Status Check - Check Numbers, Deuteronomy, Joshua, Judges, Ruth verse counts and content"""
         try:
-            print("\n🔍 NO PLACEHOLDER CONTENT CHECK - VERIFYING NO PLACEHOLDER TEXT EXISTS...")
+            print("\n🔍 NEW BOOKS STATUS CHECK - CHECKING NUMBERS, DEUTERONOMY, JOSHUA, JUDGES, RUTH...")
             
-            # Verify NO verses contain "see Leviticus [chapter]:[verse]" placeholder text
+            # Check Numbers: verses count and sample content quality
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=50")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=1")
                 if response.status_code == 200:
                     data = response.json()
-                    verses = data.get('verses', [])
+                    numbers_verses = data.get('total', 0)
+                    expected_numbers = 1288  # Standard Numbers verse count
                     
-                    placeholder_patterns = [
-                        'see leviticus [',
-                        'see leviticus chapter',
-                        '[chapter]',
-                        '[verse]',
-                        'complete kjv text',
-                        'placeholder',
-                        'see chapter',
-                        'reference:'
-                    ]
+                    print(f"\n📖 NUMBERS STATUS:")
+                    print(f"   📝 Verse Count: {numbers_verses} (expected ~{expected_numbers})")
                     
-                    print("\n🚫 PLACEHOLDER CONTENT DETECTION:")
-                    placeholder_violations = 0
-                    legitimate_brackets = 0
-                    
-                    for verse in verses:
-                        verse_text = verse.get('text', '').lower()
-                        verse_ref = f"Leviticus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                        
-                        # Check for placeholder patterns
-                        placeholders_found = [pattern for pattern in placeholder_patterns if pattern in verse_text]
-                        
-                        if placeholders_found:
-                            placeholder_violations += 1
-                            print(f"   ❌ {verse_ref}: PLACEHOLDER FOUND - {', '.join(placeholders_found)} in '{verse_text[:60]}...'")
-                        else:
-                            # Check for legitimate KJV brackets like [is], [are], [them]
-                            import re
-                            legitimate_bracket_matches = re.findall(r'\[[a-z]+\]', verse_text)
-                            if legitimate_bracket_matches:
-                                legitimate_brackets += 1
-                                print(f"   ✅ {verse_ref}: Legitimate KJV brackets preserved - {', '.join(legitimate_bracket_matches)}")
-                    
-                    if placeholder_violations == 0:
-                        self.log_test("No Placeholder Content", True, f"✅ CLEAN! No placeholder content found in {len(verses)} Leviticus verses")
+                    if numbers_verses > 1200:
+                        self.log_test("Numbers Verse Count", True, f"✅ GOOD! Numbers has {numbers_verses} verses (reasonable count)")
+                    elif numbers_verses > 0:
+                        self.log_test("Numbers Verse Count", False, f"❌ LOW COUNT! Numbers has only {numbers_verses} verses (expected ~{expected_numbers})")
                     else:
-                        self.log_test("No Placeholder Content", False, f"❌ VIOLATIONS! Found {placeholder_violations} placeholder content violations")
-                    
-                    if legitimate_brackets > 0:
-                        self.log_test("Legitimate KJV Brackets Preserved", True, f"✅ PRESERVED! Found {legitimate_brackets} verses with legitimate KJV brackets")
-                    else:
-                        self.log_test("Legitimate KJV Brackets Preserved", True, f"✅ NONE NEEDED! No legitimate KJV brackets expected in sample")
-                        
+                        self.log_test("Numbers Verse Count", False, f"❌ NOT FOUND! Numbers does not exist in database")
                 else:
-                    self.log_test("No Placeholder Content", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Legitimate KJV Brackets Preserved", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers Verse Count", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("No Placeholder Content", False, f"Error: {str(e)}")
-                self.log_test("Legitimate KJV Brackets Preserved", False, f"Error: {str(e)}")
+                self.log_test("Numbers Verse Count", False, f"Error: {str(e)}")
             
-            # Confirm no generated placeholder references exist
+            # Check Deuteronomy: verses count and content
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&search=complete%20kjv&limit=10")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=1")
                 if response.status_code == 200:
                     data = response.json()
-                    verses = data.get('verses', [])
+                    deuteronomy_verses = data.get('total', 0)
+                    expected_deuteronomy = 959  # Standard Deuteronomy verse count
                     
-                    if len(verses) == 0:
-                        self.log_test("No Generated Placeholder References", True, f"✅ CLEAN! No generated placeholder references found")
+                    print(f"\n📖 DEUTERONOMY STATUS:")
+                    print(f"   📝 Verse Count: {deuteronomy_verses} (expected ~{expected_deuteronomy})")
+                    
+                    if deuteronomy_verses > 900:
+                        self.log_test("Deuteronomy Verse Count", True, f"✅ GOOD! Deuteronomy has {deuteronomy_verses} verses (reasonable count)")
+                    elif deuteronomy_verses > 0:
+                        self.log_test("Deuteronomy Verse Count", False, f"❌ LOW COUNT! Deuteronomy has only {deuteronomy_verses} verses (expected ~{expected_deuteronomy})")
                     else:
-                        print(f"\n🚫 GENERATED PLACEHOLDER REFERENCES FOUND:")
-                        for verse in verses:
-                            verse_text = verse.get('text', '')
-                            verse_ref = f"{verse.get('book', '?')} {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                            print(f"   ❌ {verse_ref}: '{verse_text[:80]}...'")
-                        self.log_test("No Generated Placeholder References", False, f"❌ VIOLATIONS! Found {len(verses)} generated placeholder references")
+                        self.log_test("Deuteronomy Verse Count", False, f"❌ NOT FOUND! Deuteronomy does not exist in database")
                 else:
-                    self.log_test("No Generated Placeholder References", True, f"✅ SEARCH CLEAN! No search results for generated placeholders (API Status: {response.status_code})")
+                    self.log_test("Deuteronomy Verse Count", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("No Generated Placeholder References", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Verse Count", False, f"Error: {str(e)}")
             
-            # Additional check for common placeholder patterns
+            # Check Joshua: verses count (shows only 2 verses, investigate why)
             try:
-                placeholder_searches = [
-                    'see leviticus',
-                    'placeholder',
-                    'reference chapter',
-                    'complete text'
-                ]
-                
-                print(f"\n🔍 ADDITIONAL PLACEHOLDER PATTERN SEARCHES:")
-                total_placeholder_hits = 0
-                
-                for search_term in placeholder_searches:
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&search={search_term.replace(' ', '%20')}&limit=5")
-                    if response.status_code == 200:
-                        data = response.json()
-                        verses = data.get('verses', [])
-                        
-                        if len(verses) == 0:
-                            print(f"   ✅ '{search_term}': No matches found - CLEAN")
-                        else:
-                            total_placeholder_hits += len(verses)
-                            print(f"   ❌ '{search_term}': {len(verses)} matches found - POTENTIAL PLACEHOLDERS")
-                            for verse in verses[:2]:  # Show first 2 matches
-                                verse_ref = f"{verse.get('book', '?')} {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                                print(f"      - {verse_ref}: '{verse.get('text', '')[:50]}...'")
-                    else:
-                        print(f"   ⚠️ '{search_term}': API Error - Status {response.status_code}")
-                
-                if total_placeholder_hits == 0:
-                    self.log_test("No Additional Placeholder Patterns", True, f"✅ COMPREHENSIVE CLEAN! No placeholder patterns found in additional searches")
-                else:
-                    self.log_test("No Additional Placeholder Patterns", False, f"❌ VIOLATIONS! Found {total_placeholder_hits} potential placeholder patterns")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Joshua&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    joshua_verses = data.get('total', 0)
+                    expected_joshua = 658  # Standard Joshua verse count
                     
+                    print(f"\n📖 JOSHUA STATUS (INVESTIGATION):")
+                    print(f"   📝 Verse Count: {joshua_verses} (expected ~{expected_joshua})")
+                    
+                    if joshua_verses == 2:
+                        self.log_test("Joshua Only 2 Verses Investigation", False, f"❌ CONFIRMED ISSUE! Joshua has only {joshua_verses} verses (expected ~{expected_joshua}) - needs investigation")
+                    elif joshua_verses > 600:
+                        self.log_test("Joshua Only 2 Verses Investigation", True, f"✅ RESOLVED! Joshua now has {joshua_verses} verses (good count)")
+                    elif joshua_verses > 0:
+                        self.log_test("Joshua Only 2 Verses Investigation", False, f"❌ STILL LOW! Joshua has {joshua_verses} verses (expected ~{expected_joshua})")
+                    else:
+                        self.log_test("Joshua Only 2 Verses Investigation", False, f"❌ NOT FOUND! Joshua does not exist in database")
+                else:
+                    self.log_test("Joshua Only 2 Verses Investigation", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("No Additional Placeholder Patterns", False, f"Error: {str(e)}")
+                self.log_test("Joshua Only 2 Verses Investigation", False, f"Error: {str(e)}")
+            
+            # Check Judges: verses count (shows 1,228 vs target 618 - cross-contamination?)
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Judges&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    judges_verses = data.get('total', 0)
+                    expected_judges = 618  # Target verse count from review request
+                    
+                    print(f"\n📖 JUDGES STATUS (CROSS-CONTAMINATION CHECK):")
+                    print(f"   📝 Verse Count: {judges_verses} (target {expected_judges})")
+                    
+                    if judges_verses == 1228:
+                        self.log_test("Judges Cross-Contamination Check", False, f"❌ CONFIRMED ISSUE! Judges has {judges_verses} verses vs target {expected_judges} - likely cross-contamination")
+                    elif abs(judges_verses - expected_judges) <= 50:
+                        self.log_test("Judges Cross-Contamination Check", True, f"✅ GOOD! Judges has {judges_verses} verses (close to target {expected_judges})")
+                    elif judges_verses > expected_judges * 1.5:
+                        self.log_test("Judges Cross-Contamination Check", False, f"❌ CROSS-CONTAMINATION! Judges has {judges_verses} verses (much higher than target {expected_judges})")
+                    elif judges_verses > 0:
+                        self.log_test("Judges Cross-Contamination Check", False, f"❌ COUNT ISSUE! Judges has {judges_verses} verses (target {expected_judges})")
+                    else:
+                        self.log_test("Judges Cross-Contamination Check", False, f"❌ NOT FOUND! Judges does not exist in database")
+                else:
+                    self.log_test("Judges Cross-Contamination Check", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Judges Cross-Contamination Check", False, f"Error: {str(e)}")
+            
+            # Check Ruth: verses count (shows 413 vs target 85 - cross-contamination?)
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Ruth&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    ruth_verses = data.get('total', 0)
+                    expected_ruth = 85  # Target verse count from review request
+                    
+                    print(f"\n📖 RUTH STATUS (CROSS-CONTAMINATION CHECK):")
+                    print(f"   📝 Verse Count: {ruth_verses} (target {expected_ruth})")
+                    
+                    if ruth_verses == 413:
+                        self.log_test("Ruth Cross-Contamination Check", False, f"❌ CONFIRMED ISSUE! Ruth has {ruth_verses} verses vs target {expected_ruth} - likely cross-contamination")
+                    elif abs(ruth_verses - expected_ruth) <= 10:
+                        self.log_test("Ruth Cross-Contamination Check", True, f"✅ GOOD! Ruth has {ruth_verses} verses (close to target {expected_ruth})")
+                    elif ruth_verses > expected_ruth * 2:
+                        self.log_test("Ruth Cross-Contamination Check", False, f"❌ CROSS-CONTAMINATION! Ruth has {ruth_verses} verses (much higher than target {expected_ruth})")
+                    elif ruth_verses > 0:
+                        self.log_test("Ruth Cross-Contamination Check", False, f"❌ COUNT ISSUE! Ruth has {ruth_verses} verses (target {expected_ruth})")
+                    else:
+                        self.log_test("Ruth Cross-Contamination Check", False, f"❌ NOT FOUND! Ruth does not exist in database")
+                else:
+                    self.log_test("Ruth Cross-Contamination Check", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Ruth Cross-Contamination Check", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("No Placeholder Content Check", False, f"Error: {str(e)}")
+            self.log_test("New Books Status Check", False, f"Error: {str(e)}")
             return False
 
     def test_previous_books_preservation(self):
