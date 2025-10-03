@@ -78,123 +78,166 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_foundation_books_verification(self):
-        """REVIEW REQUEST TEST 1: Foundation Books Verification - Verify Genesis, Exodus, Leviticus have correct verse counts"""
+    def test_numbers_precision_verification(self):
+        """REVIEW REQUEST TEST 1: Numbers Precision Verification - Verify Numbers has exactly 1,102 verses across 36 chapters"""
         try:
-            print("\n🔍 FOUNDATION BOOKS VERIFICATION - CHECKING GENESIS, EXODUS, LEVITICUS VERSE COUNTS...")
+            print("\n🔍 NUMBERS PRECISION VERIFICATION - CHECKING EXACT VERSE COUNT AND CHAPTER STRUCTURE...")
             
-            # Verify Genesis still has exactly 1,533 verses (should be preserved)
+            # Verify Numbers has exactly 1,102 verses
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=1")
                 if response.status_code == 200:
                     data = response.json()
                     total_verses = data.get('total', 0)
-                    expected_verses = 1533  # Review request specifies 1,533 verses
+                    expected_verses = 1102  # Review request specifies exactly 1,102 verses
                     
                     if total_verses == expected_verses:
-                        self.log_test("Genesis Exactly 1,533 Verses", True, f"✅ PERFECT! Genesis has exactly {total_verses} verses (preserved)")
+                        self.log_test("Numbers Exactly 1,102 Verses", True, f"✅ PERFECT! Numbers has exactly {total_verses} verses as required")
                     elif total_verses > 0:
-                        self.log_test("Genesis Exactly 1,533 Verses", False, f"❌ INCORRECT COUNT! Genesis has {total_verses} verses, expected {expected_verses}")
+                        self.log_test("Numbers Exactly 1,102 Verses", False, f"❌ INCORRECT COUNT! Numbers has {total_verses} verses, expected exactly {expected_verses}")
                     else:
-                        self.log_test("Genesis Exactly 1,533 Verses", False, f"❌ NOT FOUND! Genesis does not exist in database (0 verses)")
+                        self.log_test("Numbers Exactly 1,102 Verses", False, f"❌ NOT FOUND! Numbers does not exist in database (0 verses)")
                 else:
-                    self.log_test("Genesis Exactly 1,533 Verses", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers Exactly 1,102 Verses", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Genesis Exactly 1,533 Verses", False, f"Error: {str(e)}")
+                self.log_test("Numbers Exactly 1,102 Verses", False, f"Error: {str(e)}")
             
-            # Verify Exodus still has exactly 1,063 verses (should be preserved)
+            # Verify Numbers has all 36 chapters
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
+                # Get all Numbers verses to check chapter structure
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=100")
                 if response.status_code == 200:
                     data = response.json()
-                    total_verses = data.get('total', 0)
-                    expected_verses = 1063  # Review request specifies 1,063 verses
+                    verses = data.get('verses', [])
                     
-                    if total_verses == expected_verses:
-                        self.log_test("Exodus Exactly 1,063 Verses", True, f"✅ PERFECT! Exodus has exactly {total_verses} verses (preserved)")
-                    elif total_verses > 0:
-                        self.log_test("Exodus Exactly 1,063 Verses", False, f"❌ INCORRECT COUNT! Exodus has {total_verses} verses, expected {expected_verses}")
+                    if verses:
+                        # Extract unique chapters
+                        chapters = set()
+                        for verse in verses:
+                            chapter = verse.get('chapter')
+                            if chapter:
+                                chapters.add(int(chapter))
+                        
+                        max_chapter = max(chapters) if chapters else 0
+                        expected_chapters = 36  # Review request specifies 36 chapters
+                        
+                        if max_chapter == expected_chapters:
+                            self.log_test("Numbers All 36 Chapters", True, f"✅ PERFECT! Numbers has all {expected_chapters} chapters (1-{max_chapter})")
+                        elif max_chapter > 0:
+                            self.log_test("Numbers All 36 Chapters", False, f"❌ INCORRECT CHAPTERS! Numbers has {max_chapter} chapters, expected {expected_chapters}")
+                        else:
+                            self.log_test("Numbers All 36 Chapters", False, f"❌ NO CHAPTERS! No chapter data found in Numbers")
                     else:
-                        self.log_test("Exodus Exactly 1,063 Verses", False, f"❌ NOT FOUND! Exodus does not exist in database (0 verses)")
+                        self.log_test("Numbers All 36 Chapters", False, f"❌ NO DATA! No verses found to check chapter structure")
                 else:
-                    self.log_test("Exodus Exactly 1,063 Verses", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers All 36 Chapters", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Exodus Exactly 1,063 Verses", False, f"Error: {str(e)}")
+                self.log_test("Numbers All 36 Chapters", False, f"Error: {str(e)}")
             
-            # Verify Leviticus still has exactly 788 verses (should be preserved)
+            # Check Numbers 1:1-2 contains proper census content
+            print("\n📖 NUMBERS KEY VERSES CONTENT VERIFICATION:")
+            
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=1")
-                if response.status_code == 200:
-                    data = response.json()
-                    total_verses = data.get('total', 0)
-                    expected_verses = 788  # Review request specifies 788 verses
-                    
-                    if total_verses == expected_verses:
-                        self.log_test("Leviticus Exactly 788 Verses", True, f"✅ PERFECT! Leviticus has exactly {total_verses} verses (preserved)")
-                    elif total_verses > 0:
-                        self.log_test("Leviticus Exactly 788 Verses", False, f"❌ INCORRECT COUNT! Leviticus has {total_verses} verses, expected {expected_verses}")
-                    else:
-                        self.log_test("Leviticus Exactly 788 Verses", False, f"❌ NOT FOUND! Leviticus does not exist in database (0 verses)")
-                else:
-                    self.log_test("Leviticus Exactly 788 Verses", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Leviticus Exactly 788 Verses", False, f"Error: {str(e)}")
-            
-            # Verify key verses are intact
-            print("\n📖 FOUNDATION BOOKS KEY VERSES INTEGRITY CHECK:")
-            
-            # Genesis 1:1 creation verse
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Genesis/1/1")
+                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/1/1")
                 if response.status_code == 200:
                     verse_data = response.json()
                     verse_text = verse_data.get('text', '')
                     
-                    if 'in the beginning god created' in verse_text.lower():
-                        self.log_test("Genesis 1:1 Creation Verse Intact", True, f"✅ PRESERVED! Genesis 1:1 contains creation content: '{verse_text[:60]}...'")
+                    # Check for census content keywords
+                    census_keywords = ['moses', 'wilderness', 'sinai', 'children', 'israel']
+                    found_keywords = [kw for kw in census_keywords if kw in verse_text.lower()]
+                    
+                    if len(found_keywords) >= 3:
+                        self.log_test("Numbers 1:1 Census Content", True, f"✅ AUTHENTIC! Numbers 1:1 contains proper census content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
                     else:
-                        self.log_test("Genesis 1:1 Creation Verse Intact", False, f"❌ CORRUPTED! Genesis 1:1 missing creation content: '{verse_text[:60]}...'")
+                        self.log_test("Numbers 1:1 Census Content", False, f"❌ MISSING CONTENT! Numbers 1:1 lacks census keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
                 else:
-                    self.log_test("Genesis 1:1 Creation Verse Intact", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers 1:1 Census Content", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Genesis 1:1 Creation Verse Intact", False, f"Error: {str(e)}")
+                self.log_test("Numbers 1:1 Census Content", False, f"Error: {str(e)}")
             
-            # Exodus 20:1 Ten Commandments
             try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Exodus/20/1")
+                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/1/2")
                 if response.status_code == 200:
                     verse_data = response.json()
                     verse_text = verse_data.get('text', '')
                     
-                    if 'god spake' in verse_text.lower():
-                        self.log_test("Exodus 20:1 Ten Commandments Intact", True, f"✅ PRESERVED! Exodus 20:1 contains commandments content: '{verse_text[:60]}...'")
+                    # Check for census continuation content
+                    census_keywords = ['take', 'sum', 'congregation', 'children', 'israel', 'families', 'fathers']
+                    found_keywords = [kw for kw in census_keywords if kw in verse_text.lower()]
+                    
+                    if len(found_keywords) >= 3:
+                        self.log_test("Numbers 1:2 Census Content", True, f"✅ AUTHENTIC! Numbers 1:2 contains proper census content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
                     else:
-                        self.log_test("Exodus 20:1 Ten Commandments Intact", False, f"❌ CORRUPTED! Exodus 20:1 missing commandments content: '{verse_text[:60]}...'")
+                        self.log_test("Numbers 1:2 Census Content", False, f"❌ MISSING CONTENT! Numbers 1:2 lacks census keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
                 else:
-                    self.log_test("Exodus 20:1 Ten Commandments Intact", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers 1:2 Census Content", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Exodus 20:1 Ten Commandments Intact", False, f"Error: {str(e)}")
+                self.log_test("Numbers 1:2 Census Content", False, f"Error: {str(e)}")
             
-            # Leviticus 1:1 offerings
+            # Verify Numbers 6:24-26 contains the priestly blessing
             try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Leviticus/1/1")
+                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/6/24")
                 if response.status_code == 200:
                     verse_data = response.json()
                     verse_text = verse_data.get('text', '')
                     
-                    if any(word in verse_text.lower() for word in ['lord', 'moses', 'called', 'tabernacle']):
-                        self.log_test("Leviticus 1:1 Offerings Verse Intact", True, f"✅ PRESERVED! Leviticus 1:1 contains offerings content: '{verse_text[:60]}...'")
+                    # Check for priestly blessing content
+                    blessing_keywords = ['lord', 'bless', 'thee', 'keep']
+                    found_keywords = [kw for kw in blessing_keywords if kw in verse_text.lower()]
+                    
+                    if len(found_keywords) >= 3:
+                        self.log_test("Numbers 6:24 Priestly Blessing", True, f"✅ AUTHENTIC! Numbers 6:24 contains priestly blessing: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
                     else:
-                        self.log_test("Leviticus 1:1 Offerings Verse Intact", False, f"❌ CORRUPTED! Leviticus 1:1 missing offerings content: '{verse_text[:60]}...'")
+                        self.log_test("Numbers 6:24 Priestly Blessing", False, f"❌ MISSING CONTENT! Numbers 6:24 lacks blessing keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
                 else:
-                    self.log_test("Leviticus 1:1 Offerings Verse Intact", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers 6:24 Priestly Blessing", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Leviticus 1:1 Offerings Verse Intact", False, f"Error: {str(e)}")
+                self.log_test("Numbers 6:24 Priestly Blessing", False, f"Error: {str(e)}")
+            
+            # Check Numbers 13:1-2 has proper spy narrative content
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/13/1")
+                if response.status_code == 200:
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
+                    
+                    # Check for spy narrative content
+                    spy_keywords = ['lord', 'spake', 'moses', 'saying']
+                    found_keywords = [kw for kw in spy_keywords if kw in verse_text.lower()]
+                    
+                    if len(found_keywords) >= 3:
+                        self.log_test("Numbers 13:1 Spy Narrative", True, f"✅ AUTHENTIC! Numbers 13:1 contains spy narrative: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
+                    else:
+                        self.log_test("Numbers 13:1 Spy Narrative", False, f"❌ MISSING CONTENT! Numbers 13:1 lacks spy keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
+                else:
+                    self.log_test("Numbers 13:1 Spy Narrative", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Numbers 13:1 Spy Narrative", False, f"Error: {str(e)}")
+            
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/13/2")
+                if response.status_code == 200:
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
+                    
+                    # Check for spy narrative continuation
+                    spy_keywords = ['send', 'men', 'search', 'land', 'canaan', 'children', 'israel']
+                    found_keywords = [kw for kw in spy_keywords if kw in verse_text.lower()]
+                    
+                    if len(found_keywords) >= 4:
+                        self.log_test("Numbers 13:2 Spy Narrative", True, f"✅ AUTHENTIC! Numbers 13:2 contains spy narrative: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
+                    else:
+                        self.log_test("Numbers 13:2 Spy Narrative", False, f"❌ MISSING CONTENT! Numbers 13:2 lacks spy keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
+                else:
+                    self.log_test("Numbers 13:2 Spy Narrative", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Numbers 13:2 Spy Narrative", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Foundation Books Verification", False, f"Error: {str(e)}")
+            self.log_test("Numbers Precision Verification", False, f"Error: {str(e)}")
             return False
 
     def test_new_books_status_check(self):
