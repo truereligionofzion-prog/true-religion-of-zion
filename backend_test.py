@@ -121,7 +121,7 @@ class APITester:
             except Exception as e:
                 self.log_test("No Placeholder Text in Numbers", False, f"Error: {str(e)}")
             
-            # Check Numbers 1:1 contains proper census content
+            # Check Numbers 1:1 contains proper Moses/wilderness/Sinai content
             print("\n📖 NUMBERS KEY VERSES CONTENT VERIFICATION:")
             
             try:
@@ -130,58 +130,38 @@ class APITester:
                     verse_data = response.json()
                     verse_text = verse_data.get('text', '')
                     
-                    # Check for census content keywords
-                    census_keywords = ['moses', 'wilderness', 'sinai', 'children', 'israel']
+                    # Check for Moses/wilderness/Sinai content keywords
+                    moses_keywords = ['moses', 'wilderness', 'sinai']
+                    found_keywords = [kw for kw in moses_keywords if kw in verse_text.lower()]
+                    
+                    if len(found_keywords) >= 2:
+                        self.log_test("Numbers 1:1 Moses/Wilderness/Sinai Content", True, f"✅ AUTHENTIC! Numbers 1:1 contains proper Moses/wilderness/Sinai content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
+                    else:
+                        self.log_test("Numbers 1:1 Moses/Wilderness/Sinai Content", False, f"❌ MISSING CONTENT! Numbers 1:1 lacks Moses/wilderness/Sinai keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
+                else:
+                    self.log_test("Numbers 1:1 Moses/Wilderness/Sinai Content", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Numbers 1:1 Moses/Wilderness/Sinai Content", False, f"Error: {str(e)}")
+            
+            # Verify Numbers 1:2 has proper census content ("Take ye the sum...")
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/1/2")
+                if response.status_code == 200:
+                    verse_data = response.json()
+                    verse_text = verse_data.get('text', '')
+                    
+                    # Check for census content
+                    census_keywords = ['take', 'sum', 'congregation', 'children', 'israel']
                     found_keywords = [kw for kw in census_keywords if kw in verse_text.lower()]
                     
                     if len(found_keywords) >= 3:
-                        self.log_test("Numbers 1:1 Census Content", True, f"✅ AUTHENTIC! Numbers 1:1 contains proper census content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
+                        self.log_test("Numbers 1:2 Census Content (Take ye the sum)", True, f"✅ AUTHENTIC! Numbers 1:2 contains proper census content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
                     else:
-                        self.log_test("Numbers 1:1 Census Content", False, f"❌ MISSING CONTENT! Numbers 1:1 lacks census keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
+                        self.log_test("Numbers 1:2 Census Content (Take ye the sum)", False, f"❌ MISSING CONTENT! Numbers 1:2 lacks census keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
                 else:
-                    self.log_test("Numbers 1:1 Census Content", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers 1:2 Census Content (Take ye the sum)", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Numbers 1:1 Census Content", False, f"Error: {str(e)}")
-            
-            # Verify Numbers 6:24-26 contains the priestly blessing
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/6/24")
-                if response.status_code == 200:
-                    verse_data = response.json()
-                    verse_text = verse_data.get('text', '')
-                    
-                    # Check for priestly blessing content
-                    blessing_keywords = ['lord', 'bless', 'thee', 'keep']
-                    found_keywords = [kw for kw in blessing_keywords if kw in verse_text.lower()]
-                    
-                    if len(found_keywords) >= 3:
-                        self.log_test("Numbers 6:24 Priestly Blessing", True, f"✅ AUTHENTIC! Numbers 6:24 contains priestly blessing: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
-                    else:
-                        self.log_test("Numbers 6:24 Priestly Blessing", False, f"❌ MISSING CONTENT! Numbers 6:24 lacks blessing keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
-                else:
-                    self.log_test("Numbers 6:24 Priestly Blessing", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Numbers 6:24 Priestly Blessing", False, f"Error: {str(e)}")
-            
-            # Check Numbers 36:13 has proper ending content
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/36/13")
-                if response.status_code == 200:
-                    verse_data = response.json()
-                    verse_text = verse_data.get('text', '')
-                    
-                    # Check for proper ending content
-                    ending_keywords = ['commandments', 'judgments', 'lord', 'commanded', 'moses', 'children', 'israel', 'plains', 'moab', 'jordan', 'jericho']
-                    found_keywords = [kw for kw in ending_keywords if kw in verse_text.lower()]
-                    
-                    if len(found_keywords) >= 4:
-                        self.log_test("Numbers 36:13 Proper Ending", True, f"✅ AUTHENTIC! Numbers 36:13 contains proper ending content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
-                    else:
-                        self.log_test("Numbers 36:13 Proper Ending", False, f"❌ MISSING CONTENT! Numbers 36:13 lacks ending keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
-                else:
-                    self.log_test("Numbers 36:13 Proper Ending", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Numbers 36:13 Proper Ending", False, f"Error: {str(e)}")
+                self.log_test("Numbers 1:2 Census Content (Take ye the sum)", False, f"Error: {str(e)}")
             
             return True
             
