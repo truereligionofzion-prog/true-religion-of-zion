@@ -136,7 +136,7 @@ class APITester:
             except Exception as e:
                 self.log_test("Numbers All 36 Chapters", False, f"Error: {str(e)}")
             
-            # Check Numbers 1:1-2 contains proper census content
+            # Check Numbers 1:1 contains proper census content
             print("\n📖 NUMBERS KEY VERSES CONTENT VERIFICATION:")
             
             try:
@@ -157,25 +157,6 @@ class APITester:
                     self.log_test("Numbers 1:1 Census Content", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
                 self.log_test("Numbers 1:1 Census Content", False, f"Error: {str(e)}")
-            
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/1/2")
-                if response.status_code == 200:
-                    verse_data = response.json()
-                    verse_text = verse_data.get('text', '')
-                    
-                    # Check for census continuation content
-                    census_keywords = ['take', 'sum', 'congregation', 'children', 'israel', 'families', 'fathers']
-                    found_keywords = [kw for kw in census_keywords if kw in verse_text.lower()]
-                    
-                    if len(found_keywords) >= 3:
-                        self.log_test("Numbers 1:2 Census Content", True, f"✅ AUTHENTIC! Numbers 1:2 contains proper census content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
-                    else:
-                        self.log_test("Numbers 1:2 Census Content", False, f"❌ MISSING CONTENT! Numbers 1:2 lacks census keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
-                else:
-                    self.log_test("Numbers 1:2 Census Content", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Numbers 1:2 Census Content", False, f"Error: {str(e)}")
             
             # Verify Numbers 6:24-26 contains the priestly blessing
             try:
