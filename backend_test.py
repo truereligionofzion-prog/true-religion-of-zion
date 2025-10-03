@@ -525,10 +525,10 @@ class APITester:
                         self.log_test("All 4 Books Exist", False, f"❌ INSUFFICIENT! Total books: {total_books} (missing foundation books)")
                         
                 else:
-                    self.log_test("Total Verse Count 4,486", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Total Verse Count 5,672", False, f"API Error - Status: {response.status_code}")
                     self.log_test("All 4 Books Exist", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Total Verse Count 4,486", False, f"Error: {str(e)}")
+                self.log_test("Total Verse Count 5,672", False, f"Error: {str(e)}")
                 self.log_test("All 4 Books Exist", False, f"Error: {str(e)}")
             
             # Verify all 4 books exist in KJV 1611 Divine version
