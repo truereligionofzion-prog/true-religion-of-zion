@@ -660,18 +660,32 @@ class APITester:
                         self.log_test("Correct Book Order", True, f"✅ PERFECT! All books in correct biblical order")
                     else:
                         self.log_test("Correct Book Order", False, f"❌ WRONG ORDER! Some books not in correct biblical order")
+                    
+                    # Verify Numbers is properly classified as Old Testament book
+                    numbers_found = False
+                    for book_name, actual_order in old_testament_books:
+                        if book_name == 'Numbers':
+                            numbers_found = True
+                            break
+                    
+                    if numbers_found:
+                        self.log_test("Numbers Properly Classified as Old Testament", True, f"✅ CORRECT! Numbers is properly classified as Old Testament book")
+                    else:
+                        self.log_test("Numbers Properly Classified as Old Testament", False, f"❌ MISSING! Numbers not found in Old Testament classification")
                         
                 else:
                     self.log_test("Proper Old Testament Classification", False, f"API Error - Status: {response.status_code}")
                     self.log_test("Correct Book Order", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers Properly Classified as Old Testament", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
                 self.log_test("Proper Old Testament Classification", False, f"Error: {str(e)}")
                 self.log_test("Correct Book Order", False, f"Error: {str(e)}")
+                self.log_test("Numbers Properly Classified as Old Testament", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Complete Database Status", False, f"Error: {str(e)}")
+            self.log_test("Database Status", False, f"Error: {str(e)}")
             return False
 
     def test_100_success_validation(self):
