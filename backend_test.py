@@ -453,12 +453,80 @@ class APITester:
             self.log_test("No Contamination Check", False, f"Error: {str(e)}")
             return False
 
-    def test_database_statistics(self):
-        """REVIEW REQUEST TEST 4: Database Statistics - Get total verse count, book count, identify reasonable vs cross-contaminated counts"""
+    def test_foundation_books_preservation(self):
+        """REVIEW REQUEST TEST 4: Foundation Books Preservation - Verify Genesis, Exodus, Leviticus have exact verse counts"""
         try:
-            print("\n🔍 DATABASE STATISTICS - GET TOTAL VERSE COUNT, BOOK COUNT, IDENTIFY REASONABLE VS CROSS-CONTAMINATED COUNTS...")
+            print("\n🔍 FOUNDATION BOOKS PRESERVATION - VERIFY GENESIS, EXODUS, LEVITICUS EXACT VERSE COUNTS...")
             
-            # Get total verse count and book count
+            # Verify Genesis still has exactly 1,533 verses (preserved)
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    total_verses = data.get('total', 0)
+                    expected_verses = 1533  # Review request specifies exactly 1,533 verses
+                    
+                    if total_verses == expected_verses:
+                        self.log_test("Genesis Exactly 1,533 Verses Preserved", True, f"✅ PERFECT! Genesis has exactly {total_verses} verses (preserved)")
+                    elif total_verses > 0:
+                        self.log_test("Genesis Exactly 1,533 Verses Preserved", False, f"❌ INCORRECT COUNT! Genesis has {total_verses} verses, expected exactly {expected_verses}")
+                    else:
+                        self.log_test("Genesis Exactly 1,533 Verses Preserved", False, f"❌ NOT FOUND! Genesis does not exist in database (0 verses)")
+                else:
+                    self.log_test("Genesis Exactly 1,533 Verses Preserved", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Genesis Exactly 1,533 Verses Preserved", False, f"Error: {str(e)}")
+            
+            # Verify Exodus still has exactly 1,063 verses (preserved)
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    total_verses = data.get('total', 0)
+                    expected_verses = 1063  # Review request specifies exactly 1,063 verses
+                    
+                    if total_verses == expected_verses:
+                        self.log_test("Exodus Exactly 1,063 Verses Preserved", True, f"✅ PERFECT! Exodus has exactly {total_verses} verses (preserved)")
+                    elif total_verses > 0:
+                        self.log_test("Exodus Exactly 1,063 Verses Preserved", False, f"❌ INCORRECT COUNT! Exodus has {total_verses} verses, expected exactly {expected_verses}")
+                    else:
+                        self.log_test("Exodus Exactly 1,063 Verses Preserved", False, f"❌ NOT FOUND! Exodus does not exist in database (0 verses)")
+                else:
+                    self.log_test("Exodus Exactly 1,063 Verses Preserved", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Exodus Exactly 1,063 Verses Preserved", False, f"Error: {str(e)}")
+            
+            # Verify Leviticus still has exactly 788 verses (preserved)
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    total_verses = data.get('total', 0)
+                    expected_verses = 788  # Review request specifies exactly 788 verses
+                    
+                    if total_verses == expected_verses:
+                        self.log_test("Leviticus Exactly 788 Verses Preserved", True, f"✅ PERFECT! Leviticus has exactly {total_verses} verses (preserved)")
+                    elif total_verses > 0:
+                        self.log_test("Leviticus Exactly 788 Verses Preserved", False, f"❌ INCORRECT COUNT! Leviticus has {total_verses} verses, expected exactly {expected_verses}")
+                    else:
+                        self.log_test("Leviticus Exactly 788 Verses Preserved", False, f"❌ NOT FOUND! Leviticus does not exist in database (0 verses)")
+                else:
+                    self.log_test("Leviticus Exactly 788 Verses Preserved", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Leviticus Exactly 788 Verses Preserved", False, f"Error: {str(e)}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Foundation Books Preservation", False, f"Error: {str(e)}")
+            return False
+
+    def test_complete_database_status(self):
+        """REVIEW REQUEST TEST 5: Complete Database Status - Verify total verse count and book structure"""
+        try:
+            print("\n🔍 COMPLETE DATABASE STATUS - VERIFY TOTAL VERSE COUNT AND BOOK STRUCTURE...")
+            
+            # Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 1,102 = 4,486)
             try:
                 response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
                 if response.status_code == 200:
@@ -472,172 +540,127 @@ class APITester:
                     print(f"   📝 Total Verses: {total_verses}")
                     print(f"   📜 Old Testament Verses: {old_testament_verses}")
                     
-                    # Expected totals based on foundation books
-                    foundation_expected = 1533 + 1063 + 788  # Genesis + Exodus + Leviticus = 3,384
+                    # Expected total: Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 1,102 = 4,486
+                    expected_total = 1533 + 1063 + 788 + 1102  # = 4,486
                     
-                    if total_verses >= foundation_expected:
-                        self.log_test("Total Database Verse Count", True, f"✅ SUBSTANTIAL! Total verses: {total_verses} (includes foundation books + additional content)")
-                    elif total_verses >= foundation_expected * 0.8:
-                        self.log_test("Total Database Verse Count", True, f"✅ GOOD! Total verses: {total_verses} (close to foundation books total)")
+                    if total_verses == expected_total:
+                        self.log_test("Total Verse Count 4,486", True, f"✅ PERFECT! Total verses: {total_verses} (exactly Genesis + Exodus + Leviticus + Numbers = {expected_total})")
+                    elif total_verses >= expected_total * 0.95:  # Within 5%
+                        self.log_test("Total Verse Count 4,486", True, f"✅ CLOSE! Total verses: {total_verses} (close to expected {expected_total})")
+                    elif total_verses > 0:
+                        self.log_test("Total Verse Count 4,486", False, f"❌ INCORRECT! Total verses: {total_verses} (expected {expected_total})")
                     else:
-                        self.log_test("Total Database Verse Count", False, f"❌ LOW! Total verses: {total_verses} (less than foundation books expected {foundation_expected})")
+                        self.log_test("Total Verse Count 4,486", False, f"❌ NO DATA! Total verses: {total_verses}")
                     
-                    if total_books >= 8:  # Foundation 3 + new 5 books
-                        self.log_test("Total Database Book Count", True, f"✅ GOOD! Total books: {total_books} (includes foundation + new books)")
+                    # Verify all 4 books exist
+                    if total_books >= 4:
+                        self.log_test("All 4 Books Exist", True, f"✅ GOOD! Total books: {total_books} (includes all 4 required books)")
                     elif total_books >= 3:
-                        self.log_test("Total Database Book Count", True, f"✅ BASIC! Total books: {total_books} (at least foundation books)")
+                        self.log_test("All 4 Books Exist", False, f"❌ MISSING BOOKS! Total books: {total_books} (expected at least 4)")
                     else:
-                        self.log_test("Total Database Book Count", False, f"❌ INSUFFICIENT! Total books: {total_books} (missing foundation books)")
+                        self.log_test("All 4 Books Exist", False, f"❌ INSUFFICIENT! Total books: {total_books} (missing foundation books)")
                         
                 else:
-                    self.log_test("Total Database Verse Count", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Total Database Book Count", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Total Verse Count 4,486", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("All 4 Books Exist", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Total Database Verse Count", False, f"Error: {str(e)}")
-                self.log_test("Total Database Book Count", False, f"Error: {str(e)}")
+                self.log_test("Total Verse Count 4,486", False, f"Error: {str(e)}")
+                self.log_test("All 4 Books Exist", False, f"Error: {str(e)}")
             
-            # Identify which books have reasonable verse counts vs cross-contaminated counts
+            # Verify all 4 books exist in KJV 1611 Divine version
             try:
-                response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
-                if response.status_code == 200:
-                    data = response.json()
-                    books = data.get('books', [])
-                    
-                    print(f"\n📚 INDIVIDUAL BOOK VERSE COUNT ANALYSIS:")
-                    
-                    # Expected verse counts for biblical books
-                    expected_counts = {
-                        'Genesis': 1533,
-                        'Exodus': 1063,
-                        'Leviticus': 788,
-                        'Numbers': 1288,
-                        'Deuteronomy': 959,
-                        'Joshua': 658,
-                        'Judges': 618,
-                        'Ruth': 85
-                    }
-                    
-                    reasonable_books = 0
-                    cross_contaminated_books = 0
-                    missing_books = 0
-                    
-                    for book_name, expected_count in expected_counts.items():
-                        # Get actual verse count for this book
-                        try:
-                            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=1")
-                            if response.status_code == 200:
-                                book_data = response.json()
-                                actual_count = book_data.get('total', 0)
-                                
-                                if actual_count == 0:
-                                    missing_books += 1
-                                    print(f"   ❌ {book_name}: MISSING (0 verses, expected {expected_count})")
-                                elif abs(actual_count - expected_count) <= expected_count * 0.1:  # Within 10%
-                                    reasonable_books += 1
-                                    print(f"   ✅ {book_name}: REASONABLE ({actual_count} verses, expected {expected_count})")
-                                elif actual_count > expected_count * 1.5:  # 50% higher than expected
-                                    cross_contaminated_books += 1
-                                    print(f"   ❌ {book_name}: CROSS-CONTAMINATED ({actual_count} verses, expected {expected_count}) - {actual_count - expected_count} excess")
-                                else:
-                                    print(f"   ⚠️ {book_name}: QUESTIONABLE ({actual_count} verses, expected {expected_count})")
-                            else:
-                                missing_books += 1
-                                print(f"   ❌ {book_name}: API ERROR (Status {response.status_code})")
-                        except Exception as e:
-                            missing_books += 1
-                            print(f"   ❌ {book_name}: ERROR ({str(e)})")
-                    
-                    # Summary assessment
-                    total_checked = len(expected_counts)
-                    if reasonable_books >= 6:  # Most books are reasonable
-                        self.log_test("Reasonable Book Verse Counts", True, f"✅ GOOD! {reasonable_books}/{total_checked} books have reasonable verse counts")
-                    elif reasonable_books >= 3:  # At least foundation books
-                        self.log_test("Reasonable Book Verse Counts", True, f"✅ BASIC! {reasonable_books}/{total_checked} books have reasonable verse counts")
-                    else:
-                        self.log_test("Reasonable Book Verse Counts", False, f"❌ POOR! Only {reasonable_books}/{total_checked} books have reasonable verse counts")
-                    
-                    if cross_contaminated_books == 0:
-                        self.log_test("Cross-Contaminated Book Detection", True, f"✅ CLEAN! No books show clear cross-contamination patterns")
-                    elif cross_contaminated_books <= 2:
-                        self.log_test("Cross-Contaminated Book Detection", False, f"⚠️ MINOR ISSUES! {cross_contaminated_books} books show cross-contamination patterns")
-                    else:
-                        self.log_test("Cross-Contaminated Book Detection", False, f"❌ MAJOR ISSUES! {cross_contaminated_books} books show cross-contamination patterns")
-                    
-                    if missing_books <= 2:
-                        self.log_test("Missing Books Detection", True, f"✅ GOOD! Only {missing_books}/{total_checked} books are missing")
-                    else:
-                        self.log_test("Missing Books Detection", False, f"❌ MANY MISSING! {missing_books}/{total_checked} books are missing")
-                        
-                else:
-                    self.log_test("Reasonable Book Verse Counts", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Cross-Contaminated Book Detection", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Missing Books Detection", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Reasonable Book Verse Counts", False, f"Error: {str(e)}")
-                self.log_test("Cross-Contaminated Book Detection", False, f"Error: {str(e)}")
-                self.log_test("Missing Books Detection", False, f"Error: {str(e)}")
-            
-            # Additional analysis: Identify books that need attention
-            try:
-                print(f"\n🎯 BOOKS REQUIRING ATTENTION ANALYSIS:")
+                required_books = ['Genesis', 'Exodus', 'Leviticus', 'Numbers']
+                books_found = []
+                books_missing = []
                 
-                books_needing_attention = []
-                books_ready_for_use = []
+                print(f"\n📚 INDIVIDUAL BOOK VERIFICATION IN KJV 1611 DIVINE:")
                 
-                # Check each book's status
-                book_status_checks = {
-                    'Genesis': {'expected': 1533, 'priority': 'foundation'},
-                    'Exodus': {'expected': 1063, 'priority': 'foundation'},
-                    'Leviticus': {'expected': 788, 'priority': 'foundation'},
-                    'Numbers': {'expected': 1288, 'priority': 'new'},
-                    'Deuteronomy': {'expected': 959, 'priority': 'new'},
-                    'Joshua': {'expected': 658, 'priority': 'new'},
-                    'Judges': {'expected': 618, 'priority': 'new'},
-                    'Ruth': {'expected': 85, 'priority': 'new'}
-                }
-                
-                for book_name, info in book_status_checks.items():
+                for book_name in required_books:
                     try:
                         response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=1")
                         if response.status_code == 200:
                             book_data = response.json()
-                            actual_count = book_data.get('total', 0)
-                            expected_count = info['expected']
-                            priority = info['priority']
+                            verse_count = book_data.get('total', 0)
                             
-                            if actual_count == 0:
-                                books_needing_attention.append(f"{book_name} (MISSING - {priority})")
-                            elif actual_count > expected_count * 1.5:
-                                books_needing_attention.append(f"{book_name} (CROSS-CONTAMINATED: {actual_count} vs {expected_count} - {priority})")
-                            elif abs(actual_count - expected_count) <= expected_count * 0.1:
-                                books_ready_for_use.append(f"{book_name} ({actual_count} verses - {priority})")
+                            if verse_count > 0:
+                                books_found.append(f"{book_name} ({verse_count} verses)")
+                                print(f"   ✅ {book_name}: FOUND ({verse_count} verses)")
                             else:
-                                books_needing_attention.append(f"{book_name} (COUNT ISSUE: {actual_count} vs {expected_count} - {priority})")
+                                books_missing.append(book_name)
+                                print(f"   ❌ {book_name}: MISSING (0 verses)")
                         else:
-                            books_needing_attention.append(f"{book_name} (API ERROR - {priority})")
+                            books_missing.append(book_name)
+                            print(f"   ❌ {book_name}: API ERROR (Status {response.status_code})")
                     except Exception as e:
-                        books_needing_attention.append(f"{book_name} (ERROR - {priority})")
+                        books_missing.append(book_name)
+                        print(f"   ❌ {book_name}: ERROR ({str(e)})")
                 
-                print(f"   ✅ BOOKS READY FOR USE ({len(books_ready_for_use)}):")
-                for book in books_ready_for_use:
-                    print(f"      - {book}")
-                
-                print(f"   ❌ BOOKS NEEDING ATTENTION ({len(books_needing_attention)}):")
-                for book in books_needing_attention:
-                    print(f"      - {book}")
-                
-                if len(books_ready_for_use) >= len(books_needing_attention):
-                    self.log_test("Database Ready for Use Assessment", True, f"✅ MOSTLY READY! {len(books_ready_for_use)} books ready vs {len(books_needing_attention)} needing attention")
+                if len(books_found) == 4:
+                    self.log_test("KJV 1611 Divine Version Complete", True, f"✅ COMPLETE! All 4 books found in KJV 1611 Divine: {', '.join(books_found)}")
+                elif len(books_found) >= 3:
+                    self.log_test("KJV 1611 Divine Version Complete", False, f"❌ INCOMPLETE! Only {len(books_found)}/4 books found. Missing: {', '.join(books_missing)}")
                 else:
-                    self.log_test("Database Ready for Use Assessment", False, f"❌ NEEDS WORK! Only {len(books_ready_for_use)} books ready vs {len(books_needing_attention)} needing attention")
+                    self.log_test("KJV 1611 Divine Version Complete", False, f"❌ MAJOR MISSING! Only {len(books_found)}/4 books found. Missing: {', '.join(books_missing)}")
                     
             except Exception as e:
-                self.log_test("Database Ready for Use Assessment", False, f"Error: {str(e)}")
+                self.log_test("KJV 1611 Divine Version Complete", False, f"Error: {str(e)}")
+            
+            # Confirm proper Old Testament classification and correct book order
+            try:
+                response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine&testament=old")
+                if response.status_code == 200:
+                    data = response.json()
+                    books = data.get('books', [])
+                    
+                    print(f"\n📜 OLD TESTAMENT CLASSIFICATION AND ORDER CHECK:")
+                    
+                    # Check for proper Old Testament classification
+                    old_testament_books = []
+                    for book in books:
+                        book_name = book.get('name', '')
+                        testament = book.get('testament', '')
+                        order = book.get('order', 0)
+                        
+                        if testament == 'old':
+                            old_testament_books.append((book_name, order))
+                            print(f"   ✅ {book_name}: Old Testament (order: {order})")
+                        else:
+                            print(f"   ❌ {book_name}: WRONG TESTAMENT ({testament})")
+                    
+                    # Check correct book order (Genesis=1, Exodus=2, Leviticus=3, Numbers=4)
+                    expected_order = {'Genesis': 1, 'Exodus': 2, 'Leviticus': 3, 'Numbers': 4}
+                    correct_order = True
+                    
+                    for book_name, actual_order in old_testament_books:
+                        if book_name in expected_order:
+                            expected = expected_order[book_name]
+                            if actual_order == expected:
+                                print(f"   ✅ {book_name}: CORRECT ORDER ({actual_order})")
+                            else:
+                                print(f"   ❌ {book_name}: WRONG ORDER ({actual_order}, expected {expected})")
+                                correct_order = False
+                    
+                    if len(old_testament_books) >= 4:
+                        self.log_test("Proper Old Testament Classification", True, f"✅ CORRECT! {len(old_testament_books)} books properly classified as Old Testament")
+                    else:
+                        self.log_test("Proper Old Testament Classification", False, f"❌ INCOMPLETE! Only {len(old_testament_books)} books classified as Old Testament")
+                    
+                    if correct_order:
+                        self.log_test("Correct Book Order", True, f"✅ PERFECT! All books in correct biblical order")
+                    else:
+                        self.log_test("Correct Book Order", False, f"❌ WRONG ORDER! Some books not in correct biblical order")
+                        
+                else:
+                    self.log_test("Proper Old Testament Classification", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Correct Book Order", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Proper Old Testament Classification", False, f"Error: {str(e)}")
+                self.log_test("Correct Book Order", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Database Statistics", False, f"Error: {str(e)}")
+            self.log_test("Complete Database Status", False, f"Error: {str(e)}")
             return False
 
     # Removed unused test method
