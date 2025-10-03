@@ -504,159 +504,188 @@ class APITester:
     def test_database_statistics(self):
         """REVIEW REQUEST TEST 4: Database Statistics - Get total verse count, book count, identify reasonable vs cross-contaminated counts"""
         try:
-            print("\n🔍 CONTENT QUALITY SAMPLING - SAMPLING 10 RANDOM LEVITICUS VERSES FOR AUTHENTIC BIBLICAL CONTENT...")
+            print("\n🔍 DATABASE STATISTICS - GET TOTAL VERSE COUNT, BOOK COUNT, IDENTIFY REASONABLE VS CROSS-CONTAMINATED COUNTS...")
             
-            # Sample 10 random Leviticus verses to verify authentic biblical content
+            # Get total verse count and book count
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=10")
+                response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
+                if response.status_code == 200:
+                    stats = response.json()
+                    total_verses = stats.get('totalVerses', 0)
+                    total_books = stats.get('totalBooks', 0)
+                    old_testament_verses = stats.get('oldTestamentVerses', 0)
+                    
+                    print(f"\n📊 COMPLETE BIBLE DATABASE STATISTICS:")
+                    print(f"   📖 Total Books: {total_books}")
+                    print(f"   📝 Total Verses: {total_verses}")
+                    print(f"   📜 Old Testament Verses: {old_testament_verses}")
+                    
+                    # Expected totals based on foundation books
+                    foundation_expected = 1533 + 1063 + 788  # Genesis + Exodus + Leviticus = 3,384
+                    
+                    if total_verses >= foundation_expected:
+                        self.log_test("Total Database Verse Count", True, f"✅ SUBSTANTIAL! Total verses: {total_verses} (includes foundation books + additional content)")
+                    elif total_verses >= foundation_expected * 0.8:
+                        self.log_test("Total Database Verse Count", True, f"✅ GOOD! Total verses: {total_verses} (close to foundation books total)")
+                    else:
+                        self.log_test("Total Database Verse Count", False, f"❌ LOW! Total verses: {total_verses} (less than foundation books expected {foundation_expected})")
+                    
+                    if total_books >= 8:  # Foundation 3 + new 5 books
+                        self.log_test("Total Database Book Count", True, f"✅ GOOD! Total books: {total_books} (includes foundation + new books)")
+                    elif total_books >= 3:
+                        self.log_test("Total Database Book Count", True, f"✅ BASIC! Total books: {total_books} (at least foundation books)")
+                    else:
+                        self.log_test("Total Database Book Count", False, f"❌ INSUFFICIENT! Total books: {total_books} (missing foundation books)")
+                        
+                else:
+                    self.log_test("Total Database Verse Count", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Total Database Book Count", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Total Database Verse Count", False, f"Error: {str(e)}")
+                self.log_test("Total Database Book Count", False, f"Error: {str(e)}")
+            
+            # Identify which books have reasonable verse counts vs cross-contaminated counts
+            try:
+                response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
                 if response.status_code == 200:
                     data = response.json()
-                    verses = data.get('verses', [])
+                    books = data.get('books', [])
                     
-                    if verses:
-                        print("\n📝 10 RANDOM LEVITICUS VERSES QUALITY SAMPLING:")
-                        authentic_verses = 0
-                        substantial_verses = 0
-                        proper_language_verses = 0
-                        
-                        for i, verse in enumerate(verses[:10], 1):  # Sample exactly 10 verses
-                            verse_text = verse.get('text', '')
-                            verse_ref = f"Leviticus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                            
-                            # Check for authentic biblical content
-                            is_authentic = (
-                                len(verse_text) > 10 and  # Has content
-                                not verse_text.lower().startswith('error') and  # No error messages
-                                not verse_text.lower().startswith('missing') and  # No missing indicators
-                                not 'placeholder' in verse_text.lower() and  # No placeholders
-                                not 'see leviticus' in verse_text.lower() and  # No cross-references
-                                verse_text.strip() != ''  # Not empty
-                            )
-                            
-                            # Check if verse is substantial (not truncated)
-                            is_substantial = (
-                                len(verse_text) >= 20 and  # Reasonable length
-                                not verse_text.startswith('...') and  # Not truncated at start
-                                not verse_text.endswith('...') and  # Not truncated at end
-                                len(verse_text.split()) >= 4  # At least 4 words
-                            )
-                            
-                            # Check for proper biblical language and structure
-                            has_proper_language = (
-                                verse_text[0].isupper() if verse_text else False and  # Starts with capital
-                                any(word in verse_text.lower() for word in ['and', 'the', 'of', 'to', 'in', 'that', 'he', 'it', 'was', 'for']) and  # Common biblical words
-                                not verse_text.lower().startswith('http') and  # No URLs
-                                not verse_text.lower().startswith('www')  # No web references
-                            )
-                            
-                            if is_authentic:
-                                authentic_verses += 1
-                            if is_substantial:
-                                substantial_verses += 1
-                            if has_proper_language:
-                                proper_language_verses += 1
-                            
-                            # Overall quality assessment
-                            if is_authentic and is_substantial and has_proper_language:
-                                print(f"   ✅ Sample {i:2d} - {verse_ref}: EXCELLENT - '{verse_text[:60]}...'")
-                            elif is_authentic and is_substantial:
-                                print(f"   ✅ Sample {i:2d} - {verse_ref}: GOOD - '{verse_text[:60]}...'")
-                            elif is_authentic:
-                                print(f"   ⚠️ Sample {i:2d} - {verse_ref}: BASIC - '{verse_text[:60]}...'")
+                    print(f"\n📚 INDIVIDUAL BOOK VERSE COUNT ANALYSIS:")
+                    
+                    # Expected verse counts for biblical books
+                    expected_counts = {
+                        'Genesis': 1533,
+                        'Exodus': 1063,
+                        'Leviticus': 788,
+                        'Numbers': 1288,
+                        'Deuteronomy': 959,
+                        'Joshua': 658,
+                        'Judges': 618,
+                        'Ruth': 85
+                    }
+                    
+                    reasonable_books = 0
+                    cross_contaminated_books = 0
+                    missing_books = 0
+                    
+                    for book_name, expected_count in expected_counts.items():
+                        # Get actual verse count for this book
+                        try:
+                            response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=1")
+                            if response.status_code == 200:
+                                book_data = response.json()
+                                actual_count = book_data.get('total', 0)
+                                
+                                if actual_count == 0:
+                                    missing_books += 1
+                                    print(f"   ❌ {book_name}: MISSING (0 verses, expected {expected_count})")
+                                elif abs(actual_count - expected_count) <= expected_count * 0.1:  # Within 10%
+                                    reasonable_books += 1
+                                    print(f"   ✅ {book_name}: REASONABLE ({actual_count} verses, expected {expected_count})")
+                                elif actual_count > expected_count * 1.5:  # 50% higher than expected
+                                    cross_contaminated_books += 1
+                                    print(f"   ❌ {book_name}: CROSS-CONTAMINATED ({actual_count} verses, expected {expected_count}) - {actual_count - expected_count} excess")
+                                else:
+                                    print(f"   ⚠️ {book_name}: QUESTIONABLE ({actual_count} verses, expected {expected_count})")
                             else:
-                                print(f"   ❌ Sample {i:2d} - {verse_ref}: POOR - '{verse_text}'")
-                        
-                        # Quality assessment
-                        total_sampled = len(verses[:10])
-                        if authentic_verses >= 9:  # 90%+ authentic
-                            self.log_test("Authentic Biblical Content", True, f"✅ EXCELLENT! {authentic_verses}/10 verses are authentic biblical content")
-                        elif authentic_verses >= 7:  # 70%+ authentic
-                            self.log_test("Authentic Biblical Content", True, f"✅ GOOD! {authentic_verses}/10 verses are authentic biblical content")
-                        else:
-                            self.log_test("Authentic Biblical Content", False, f"❌ POOR! Only {authentic_verses}/10 verses are authentic biblical content")
-                        
-                        if substantial_verses >= 8:  # 80%+ substantial
-                            self.log_test("Substantial Verse Content", True, f"✅ EXCELLENT! {substantial_verses}/10 verses are substantial (not truncated)")
-                        elif substantial_verses >= 6:  # 60%+ substantial
-                            self.log_test("Substantial Verse Content", True, f"✅ GOOD! {substantial_verses}/10 verses are substantial")
-                        else:
-                            self.log_test("Substantial Verse Content", False, f"❌ POOR! Only {substantial_verses}/10 verses are substantial")
-                        
-                        if proper_language_verses >= 8:  # 80%+ proper language
-                            self.log_test("Proper Biblical Language", True, f"✅ EXCELLENT! {proper_language_verses}/10 verses have proper biblical language")
-                        elif proper_language_verses >= 6:  # 60%+ proper language
-                            self.log_test("Proper Biblical Language", True, f"✅ GOOD! {proper_language_verses}/10 verses have proper biblical language")
-                        else:
-                            self.log_test("Proper Biblical Language", False, f"❌ POOR! Only {proper_language_verses}/10 verses have proper biblical language")
-                        
+                                missing_books += 1
+                                print(f"   ❌ {book_name}: API ERROR (Status {response.status_code})")
+                        except Exception as e:
+                            missing_books += 1
+                            print(f"   ❌ {book_name}: ERROR ({str(e)})")
+                    
+                    # Summary assessment
+                    total_checked = len(expected_counts)
+                    if reasonable_books >= 6:  # Most books are reasonable
+                        self.log_test("Reasonable Book Verse Counts", True, f"✅ GOOD! {reasonable_books}/{total_checked} books have reasonable verse counts")
+                    elif reasonable_books >= 3:  # At least foundation books
+                        self.log_test("Reasonable Book Verse Counts", True, f"✅ BASIC! {reasonable_books}/{total_checked} books have reasonable verse counts")
                     else:
-                        self.log_test("Authentic Biblical Content", False, f"❌ NO DATA! No Leviticus verses found for quality sampling")
-                        self.log_test("Substantial Verse Content", False, f"❌ NO DATA! No Leviticus verses found for content check")
-                        self.log_test("Proper Biblical Language", False, f"❌ NO DATA! No Leviticus verses found for language check")
+                        self.log_test("Reasonable Book Verse Counts", False, f"❌ POOR! Only {reasonable_books}/{total_checked} books have reasonable verse counts")
+                    
+                    if cross_contaminated_books == 0:
+                        self.log_test("Cross-Contaminated Book Detection", True, f"✅ CLEAN! No books show clear cross-contamination patterns")
+                    elif cross_contaminated_books <= 2:
+                        self.log_test("Cross-Contaminated Book Detection", False, f"⚠️ MINOR ISSUES! {cross_contaminated_books} books show cross-contamination patterns")
+                    else:
+                        self.log_test("Cross-Contaminated Book Detection", False, f"❌ MAJOR ISSUES! {cross_contaminated_books} books show cross-contamination patterns")
+                    
+                    if missing_books <= 2:
+                        self.log_test("Missing Books Detection", True, f"✅ GOOD! Only {missing_books}/{total_checked} books are missing")
+                    else:
+                        self.log_test("Missing Books Detection", False, f"❌ MANY MISSING! {missing_books}/{total_checked} books are missing")
+                        
                 else:
-                    self.log_test("Authentic Biblical Content", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Substantial Verse Content", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Proper Biblical Language", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Reasonable Book Verse Counts", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Cross-Contaminated Book Detection", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Missing Books Detection", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Authentic Biblical Content", False, f"Error: {str(e)}")
-                self.log_test("Substantial Verse Content", False, f"Error: {str(e)}")
-                self.log_test("Proper Biblical Language", False, f"Error: {str(e)}")
+                self.log_test("Reasonable Book Verse Counts", False, f"Error: {str(e)}")
+                self.log_test("Cross-Contaminated Book Detection", False, f"Error: {str(e)}")
+                self.log_test("Missing Books Detection", False, f"Error: {str(e)}")
             
-            # Additional check for biblical structure and themes
+            # Additional analysis: Identify books that need attention
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=15")
-                if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    
-                    if verses:
-                        print("\n📖 BIBLICAL STRUCTURE AND THEMES VERIFICATION:")
-                        biblical_structure_count = 0
-                        
-                        # Check for proper biblical content themes in Leviticus
-                        leviticus_themes = {
-                            'lord': 0, 'moses': 0, 'aaron': 0, 'priests': 0, 'offering': 0,
-                            'sacrifice': 0, 'holy': 0, 'holiness': 0, 'clean': 0, 'unclean': 0,
-                            'congregation': 0, 'children': 0, 'israel': 0, 'tabernacle': 0, 'god': 0
-                        }
-                        
-                        for verse in verses:
-                            verse_text = verse.get('text', '').lower()
-                            verse_ref = f"Leviticus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                print(f"\n🎯 BOOKS REQUIRING ATTENTION ANALYSIS:")
+                
+                books_needing_attention = []
+                books_ready_for_use = []
+                
+                # Check each book's status
+                book_status_checks = {
+                    'Genesis': {'expected': 1533, 'priority': 'foundation'},
+                    'Exodus': {'expected': 1063, 'priority': 'foundation'},
+                    'Leviticus': {'expected': 788, 'priority': 'foundation'},
+                    'Numbers': {'expected': 1288, 'priority': 'new'},
+                    'Deuteronomy': {'expected': 959, 'priority': 'new'},
+                    'Joshua': {'expected': 658, 'priority': 'new'},
+                    'Judges': {'expected': 618, 'priority': 'new'},
+                    'Ruth': {'expected': 85, 'priority': 'new'}
+                }
+                
+                for book_name, info in book_status_checks.items():
+                    try:
+                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=1")
+                        if response.status_code == 200:
+                            book_data = response.json()
+                            actual_count = book_data.get('total', 0)
+                            expected_count = info['expected']
+                            priority = info['priority']
                             
-                            # Count biblical themes
-                            themes_found = []
-                            for theme in leviticus_themes:
-                                if theme in verse_text:
-                                    leviticus_themes[theme] += 1
-                                    themes_found.append(theme)
-                            
-                            if themes_found:
-                                biblical_structure_count += 1
-                                print(f"   ✅ {verse_ref}: Biblical themes: {', '.join(themes_found[:3])}")
+                            if actual_count == 0:
+                                books_needing_attention.append(f"{book_name} (MISSING - {priority})")
+                            elif actual_count > expected_count * 1.5:
+                                books_needing_attention.append(f"{book_name} (CROSS-CONTAMINATED: {actual_count} vs {expected_count} - {priority})")
+                            elif abs(actual_count - expected_count) <= expected_count * 0.1:
+                                books_ready_for_use.append(f"{book_name} ({actual_count} verses - {priority})")
                             else:
-                                print(f"   ⚠️ {verse_ref}: No specific themes detected")
-                        
-                        # Summary of biblical themes
-                        total_theme_occurrences = sum(leviticus_themes.values())
-                        themes_with_content = len([theme for theme, count in leviticus_themes.items() if count > 0])
-                        
-                        if biblical_structure_count >= len(verses) * 0.6:  # At least 60% should have biblical themes
-                            self.log_test("Leviticus Biblical Themes", True, f"✅ AUTHENTIC! {biblical_structure_count}/{len(verses)} verses contain Leviticus themes ({themes_with_content} different themes)")
+                                books_needing_attention.append(f"{book_name} (COUNT ISSUE: {actual_count} vs {expected_count} - {priority})")
                         else:
-                            self.log_test("Leviticus Biblical Themes", False, f"❌ QUESTIONABLE! Only {biblical_structure_count}/{len(verses)} verses contain Leviticus themes")
-                        
-                    else:
-                        self.log_test("Leviticus Biblical Themes", False, f"❌ NO DATA! No Leviticus verses found for structure check")
+                            books_needing_attention.append(f"{book_name} (API ERROR - {priority})")
+                    except Exception as e:
+                        books_needing_attention.append(f"{book_name} (ERROR - {priority})")
+                
+                print(f"   ✅ BOOKS READY FOR USE ({len(books_ready_for_use)}):")
+                for book in books_ready_for_use:
+                    print(f"      - {book}")
+                
+                print(f"   ❌ BOOKS NEEDING ATTENTION ({len(books_needing_attention)}):")
+                for book in books_needing_attention:
+                    print(f"      - {book}")
+                
+                if len(books_ready_for_use) >= len(books_needing_attention):
+                    self.log_test("Database Ready for Use Assessment", True, f"✅ MOSTLY READY! {len(books_ready_for_use)} books ready vs {len(books_needing_attention)} needing attention")
                 else:
-                    self.log_test("Leviticus Biblical Themes", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Database Ready for Use Assessment", False, f"❌ NEEDS WORK! Only {len(books_ready_for_use)} books ready vs {len(books_needing_attention)} needing attention")
+                    
             except Exception as e:
-                self.log_test("Leviticus Biblical Themes", False, f"Error: {str(e)}")
+                self.log_test("Database Ready for Use Assessment", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Content Quality Sampling", False, f"Error: {str(e)}")
+            self.log_test("Database Statistics", False, f"Error: {str(e)}")
             return False
 
     def test_complete_database_status(self):
