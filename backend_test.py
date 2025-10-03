@@ -178,44 +178,25 @@ class APITester:
             except Exception as e:
                 self.log_test("Numbers 6:24 Priestly Blessing", False, f"Error: {str(e)}")
             
-            # Check Numbers 13:1-2 has proper spy narrative content
+            # Check Numbers 36:13 has proper ending content
             try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/13/1")
+                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/36/13")
                 if response.status_code == 200:
                     verse_data = response.json()
                     verse_text = verse_data.get('text', '')
                     
-                    # Check for spy narrative content
-                    spy_keywords = ['lord', 'spake', 'moses', 'saying']
-                    found_keywords = [kw for kw in spy_keywords if kw in verse_text.lower()]
-                    
-                    if len(found_keywords) >= 3:
-                        self.log_test("Numbers 13:1 Spy Narrative", True, f"✅ AUTHENTIC! Numbers 13:1 contains spy narrative: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
-                    else:
-                        self.log_test("Numbers 13:1 Spy Narrative", False, f"❌ MISSING CONTENT! Numbers 13:1 lacks spy keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
-                else:
-                    self.log_test("Numbers 13:1 Spy Narrative", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Numbers 13:1 Spy Narrative", False, f"Error: {str(e)}")
-            
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/13/2")
-                if response.status_code == 200:
-                    verse_data = response.json()
-                    verse_text = verse_data.get('text', '')
-                    
-                    # Check for spy narrative continuation
-                    spy_keywords = ['send', 'men', 'search', 'land', 'canaan', 'children', 'israel']
-                    found_keywords = [kw for kw in spy_keywords if kw in verse_text.lower()]
+                    # Check for proper ending content
+                    ending_keywords = ['commandments', 'judgments', 'lord', 'commanded', 'moses', 'children', 'israel', 'plains', 'moab', 'jordan', 'jericho']
+                    found_keywords = [kw for kw in ending_keywords if kw in verse_text.lower()]
                     
                     if len(found_keywords) >= 4:
-                        self.log_test("Numbers 13:2 Spy Narrative", True, f"✅ AUTHENTIC! Numbers 13:2 contains spy narrative: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
+                        self.log_test("Numbers 36:13 Proper Ending", True, f"✅ AUTHENTIC! Numbers 36:13 contains proper ending content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
                     else:
-                        self.log_test("Numbers 13:2 Spy Narrative", False, f"❌ MISSING CONTENT! Numbers 13:2 lacks spy keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
+                        self.log_test("Numbers 36:13 Proper Ending", False, f"❌ MISSING CONTENT! Numbers 36:13 lacks ending keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
                 else:
-                    self.log_test("Numbers 13:2 Spy Narrative", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Numbers 36:13 Proper Ending", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Numbers 13:2 Spy Narrative", False, f"Error: {str(e)}")
+                self.log_test("Numbers 36:13 Proper Ending", False, f"Error: {str(e)}")
             
             return True
             
