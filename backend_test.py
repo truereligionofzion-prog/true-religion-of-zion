@@ -992,16 +992,16 @@ class APITester:
 
 def main():
     """Main test execution"""
-    print("🚀 Starting Leviticus Authentic Biblical Text Verification Testing...")
+    print("🚀 Starting Bible Database Status Verification Testing...")
     
     tester = APITester(BACKEND_URL)
-    success = tester.run_leviticus_authentic_content_verification_tests()
+    success = tester.run_bible_database_status_verification_tests()
     
     if success:
-        print("\n🎉 Leviticus authentic biblical text verification successful!")
+        print("\n🎉 Bible database status verification successful!")
         sys.exit(0)
     else:
-        print("\n❌ Leviticus authentic biblical text verification failed.")
+        print("\n❌ Bible database status verification completed with issues.")
         sys.exit(1)
 
 if __name__ == "__main__":
