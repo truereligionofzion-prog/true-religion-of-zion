@@ -665,11 +665,11 @@ class APITester:
 
     # Removed unused test method
 
-    def run_bible_database_status_verification_tests(self):
-        """Run Bible database status verification tests as per review request"""
+    def run_numbers_verification_tests(self):
+        """Run Numbers verification tests as per review request"""
         print("=" * 80)
-        print("🎉 BIBLE DATABASE STATUS VERIFICATION")
-        print("Checking the current status of our Bible database to verify what we have loaded correctly")
+        print("🎉 NUMBERS BIBLE BOOK VERIFICATION")
+        print("Verifying that Numbers has been successfully loaded following our proven formula")
         print("=" * 80)
         
         # Test basic connectivity first
@@ -677,20 +677,23 @@ class APITester:
             print("❌ API connectivity failed. Stopping tests.")
             return False
         
-        # Run the 4 main review request tests
+        # Run the 5 main review request tests
         test_results = []
         
-        # Test 1: Foundation Books Verification
-        test_results.append(self.test_foundation_books_verification())
+        # Test 1: Numbers Precision Verification
+        test_results.append(self.test_numbers_precision_verification())
         
-        # Test 2: New Books Status Check
-        test_results.append(self.test_new_books_status_check())
+        # Test 2: Content Quality Verification
+        test_results.append(self.test_content_quality_verification())
         
-        # Test 3: Content Quality Sampling
-        test_results.append(self.test_content_quality_sampling())
+        # Test 3: No Contamination Check
+        test_results.append(self.test_no_contamination_check())
         
-        # Test 4: Database Statistics
-        test_results.append(self.test_database_statistics())
+        # Test 4: Foundation Books Preservation
+        test_results.append(self.test_foundation_books_preservation())
+        
+        # Test 5: Complete Database Status
+        test_results.append(self.test_complete_database_status())
         
         # Calculate overall results
         passed_tests = sum(test_results)
@@ -698,7 +701,7 @@ class APITester:
         success_rate = (passed_tests / total_tests) * 100
         
         print("\n" + "=" * 80)
-        print("📊 BIBLE DATABASE STATUS VERIFICATION SUMMARY")
+        print("📊 NUMBERS VERIFICATION SUMMARY")
         print("=" * 80)
         
         # Count individual test results
@@ -706,66 +709,74 @@ class APITester:
         passed_individual_tests = sum(1 for result in self.test_results if result["passed"])
         individual_success_rate = (passed_individual_tests / total_individual_tests) * 100 if total_individual_tests > 0 else 0
         
-        print(f"📈 VERIFICATION SUCCESS RATE: {individual_success_rate:.1f}% ({passed_individual_tests}/{total_individual_tests} individual tests passed)")
+        print(f"📈 NUMBERS VERIFICATION SUCCESS RATE: {individual_success_rate:.1f}% ({passed_individual_tests}/{total_individual_tests} individual tests passed)")
         print(f"🎯 MAIN CATEGORIES: {passed_tests}/{total_tests} major verification categories completed")
         
         # Show category results
         categories = [
-            "Foundation Books Verification (Genesis 1,533, Exodus 1,063, Leviticus 788 verses preserved)",
-            "New Books Status Check (Numbers, Deuteronomy, Joshua, Judges, Ruth verse counts and cross-contamination)", 
-            "Content Quality Sampling (5 Numbers verses authentic content, Judges/Ruth cross-contamination check, no placeholder brackets)",
-            "Database Statistics (total verse/book counts, reasonable vs cross-contaminated counts, books needing attention)"
+            "Numbers Precision Verification (exactly 1,102 verses across 36 chapters, key verses content)",
+            "Content Quality Verification (10 Numbers verses authentic content, proper themes, substantial language)", 
+            "No Contamination Check (no Genesis creation content, legitimate KJV brackets preserved, no placeholder brackets)",
+            "Foundation Books Preservation (Genesis 1,533, Exodus 1,063, Leviticus 788 verses preserved)",
+            "Complete Database Status (total 4,486 verses, all 4 books in KJV 1611 Divine, proper Old Testament classification)"
         ]
         
         for i, (category, result) in enumerate(zip(categories, test_results)):
             status = "✅ VERIFIED" if result else "❌ FAILED"
             print(f"{status}: {category}")
         
-        print("\n🎉 KEY DATABASE STATUS FINDINGS:")
+        print("\n🎉 KEY NUMBERS VERIFICATION FINDINGS:")
         
         # Analyze results for key findings
-        if test_results[0]:  # Foundation Books Verification
-            print("✅ Foundation books PRESERVED - Genesis (1,533), Exodus (1,063), Leviticus (788) verses intact with key content")
+        if test_results[0]:  # Numbers Precision Verification
+            print("✅ Numbers PRECISION VERIFIED - exactly 1,102 verses across 36 chapters with authentic key verses content")
         else:
-            print("❌ Foundation books COMPROMISED - verse counts changed or key content missing")
+            print("❌ Numbers PRECISION FAILED - incorrect verse count, missing chapters, or poor key verses content")
         
-        if test_results[1]:  # New Books Status Check
-            print("✅ New books STATUS CHECKED - Numbers, Deuteronomy, Joshua, Judges, Ruth verse counts analyzed")
+        if test_results[1]:  # Content Quality Verification
+            print("✅ Numbers CONTENT QUALITY VERIFIED - authentic biblical content with proper themes and substantial language")
         else:
-            print("❌ New books STATUS ISSUES - missing books, incorrect counts, or cross-contamination detected")
+            print("❌ Numbers CONTENT QUALITY FAILED - poor authentic content, missing themes, or truncated language")
         
-        if test_results[2]:  # Content Quality Sampling
-            print("✅ Content quality VERIFIED - Numbers authentic content confirmed, cross-contamination checked, no placeholder brackets")
+        if test_results[2]:  # No Contamination Check
+            print("✅ Numbers CONTAMINATION CHECK PASSED - no Genesis creation content, proper KJV brackets, no placeholders")
         else:
-            print("❌ Content quality ISSUES - poor Numbers content, cross-contamination found, or placeholder brackets detected")
+            print("❌ Numbers CONTAMINATION CHECK FAILED - Genesis contamination found, missing brackets, or placeholder issues")
         
-        if test_results[3]:  # Database Statistics
-            print("✅ Database statistics ANALYZED - total counts verified, reasonable vs cross-contaminated books identified")
+        if test_results[3]:  # Foundation Books Preservation
+            print("✅ Foundation books PRESERVED - Genesis (1,533), Exodus (1,063), Leviticus (788) verses intact")
         else:
-            print("❌ Database statistics PROBLEMATIC - count issues, many cross-contaminated books, or missing data")
+            print("❌ Foundation books COMPROMISED - verse counts changed or books missing")
         
-        print(f"\n🎯 FINAL BIBLE DATABASE STATUS ASSESSMENT:")
+        if test_results[4]:  # Complete Database Status
+            print("✅ Database STATUS VERIFIED - total 4,486 verses, all 4 books in KJV 1611 Divine, proper classification")
+        else:
+            print("❌ Database STATUS FAILED - incorrect total count, missing books, or wrong classification")
+        
+        print(f"\n🎯 FINAL NUMBERS VERIFICATION ASSESSMENT:")
         if individual_success_rate >= 90:
-            print(f"🎉 BIBLE DATABASE EXCELLENT STATUS! Database is in great condition ({individual_success_rate:.1f}% success)")
-            print("✅ Foundation books completely preserved with correct verse counts")
-            print("✅ New books mostly loaded correctly with minimal cross-contamination")
-            print("🚀 Database ready for continued use with current state!")
+            print(f"🎉 NUMBERS VERIFICATION EXCELLENT! Numbers successfully loaded following proven formula ({individual_success_rate:.1f}% success)")
+            print("✅ Numbers has exactly 1,102 verses across 36 chapters with authentic biblical content")
+            print("✅ No cross-contamination detected, foundation books preserved")
+            print("✅ Complete database status verified with proper KJV 1611 Divine version")
+            print("🚀 Numbers is ready for production use!")
         elif individual_success_rate >= 75:
-            print(f"✅ BIBLE DATABASE GOOD STATUS! Database is in good condition with minor issues ({individual_success_rate:.1f}% success)")
-            print("✅ Foundation books preserved, most new books loaded correctly")
-            print("⚠️ Some cross-contamination or count issues that can be addressed")
+            print(f"✅ NUMBERS VERIFICATION GOOD! Numbers mostly loaded correctly with minor issues ({individual_success_rate:.1f}% success)")
+            print("✅ Numbers structure and content mostly correct")
+            print("⚠️ Some minor issues with contamination, preservation, or database status")
+            print("🔧 Minor fixes needed but Numbers is largely functional")
         elif individual_success_rate >= 60:
-            print(f"⚠️ BIBLE DATABASE MIXED STATUS! Database has significant issues requiring attention ({individual_success_rate:.1f}% success)")
-            print("⚠️ Foundation books may have issues, new books show cross-contamination problems")
-            print("🔧 Recommend cleaning and retrying specific problematic books")
+            print(f"⚠️ NUMBERS VERIFICATION MIXED! Numbers has significant issues requiring attention ({individual_success_rate:.1f}% success)")
+            print("⚠️ Numbers may have incorrect verse counts, content issues, or contamination problems")
+            print("🔧 Recommend reviewing and fixing specific Numbers loading issues")
         elif individual_success_rate >= 40:
-            print(f"❌ BIBLE DATABASE POOR STATUS! Database has major issues ({individual_success_rate:.1f}% success)")
-            print("❌ Foundation books compromised or new books heavily cross-contaminated")
-            print("🔧 Recommend comprehensive cleanup and reload of problematic books")
+            print(f"❌ NUMBERS VERIFICATION POOR! Numbers has major issues ({individual_success_rate:.1f}% success)")
+            print("❌ Numbers likely has wrong verse counts, poor content, or significant contamination")
+            print("🔧 Recommend reloading Numbers with proven formula approach")
         else:
-            print(f"❌ BIBLE DATABASE CRITICAL STATUS! Database requires immediate attention ({individual_success_rate:.1f}% success)")
-            print("❌ Major data integrity issues across foundation and new books")
-            print("🔧 Recommend complete database cleanup and systematic reload")
+            print(f"❌ NUMBERS VERIFICATION CRITICAL FAILURE! Numbers requires immediate attention ({individual_success_rate:.1f}% success)")
+            print("❌ Major Numbers data integrity issues detected")
+            print("🔧 Recommend complete Numbers reload following proven Genesis/Exodus/Leviticus formula")
         
         return individual_success_rate >= 75
 
