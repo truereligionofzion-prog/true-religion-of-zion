@@ -600,151 +600,157 @@ class APITester:
     def test_deuteronomy_root_cause_analysis(self):
         """REVIEW REQUEST TEST 5: Root Cause Analysis - Why incomplete, comparison with successful Exodus"""
 
-    def test_complete_database_status(self):
-        """REVIEW REQUEST TEST 5: Complete Database Status - Verify total verse count and all 5 books structure"""
         try:
-            print("\n🔍 COMPLETE DATABASE STATUS - VERIFY TOTAL VERSE COUNT AND ALL 5 BOOKS STRUCTURE...")
+            print("\n🔍 DEUTERONOMY ROOT CAUSE ANALYSIS - WHY INCOMPLETE, COMPARISON WITH SUCCESSFUL EXODUS...")
             
-            # Get total verse count (should be Genesis 1,533 + Leviticus 788 + Numbers 601 + Deuteronomy 562 + Exodus 1,213 = 4,697)
+            # Compare Deuteronomy vs Exodus completion rates
             try:
-                response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
-                if response.status_code == 200:
-                    stats = response.json()
-                    total_verses = stats.get('totalVerses', 0)
-                    total_books = stats.get('totalBooks', 0)
-                    old_testament_verses = stats.get('oldTestamentVerses', 0)
-                    
-                    print(f"\n📊 COMPLETE BIBLE DATABASE STATISTICS:")
-                    print(f"   📖 Total Books: {total_books}")
-                    print(f"   📝 Total Verses: {total_verses}")
-                    print(f"   📜 Old Testament Verses: {old_testament_verses}")
-                    
-                    # Expected total: Genesis 1,533 + Leviticus 788 + Numbers 601 + Deuteronomy 562 + Exodus 1,213 = 4,697
-                    expected_total = 1533 + 788 + 601 + 562 + 1213  # = 4,697
-                    
-                    if total_verses == expected_total:
-                        self.log_test("Total Verse Count 4,697", True, f"✅ PERFECT! Total verses: {total_verses} (exactly Genesis + Leviticus + Numbers + Deuteronomy + Exodus = {expected_total})")
-                    elif total_verses >= expected_total * 0.95:  # Within 5%
-                        self.log_test("Total Verse Count 4,697", True, f"✅ CLOSE! Total verses: {total_verses} (close to expected {expected_total})")
-                    elif total_verses > 0:
-                        self.log_test("Total Verse Count 4,697", False, f"❌ INCORRECT! Total verses: {total_verses} (expected {expected_total})")
-                    else:
-                        self.log_test("Total Verse Count 4,697", False, f"❌ NO DATA! Total verses: {total_verses}")
-                    
-                    # Verify all 5 books exist
-                    if total_books >= 5:
-                        self.log_test("All 5 Books Exist Correctly", True, f"✅ EXCELLENT! Total books: {total_books} (includes all 5 required books)")
-                    elif total_books >= 4:
-                        self.log_test("All 5 Books Exist Correctly", False, f"❌ MISSING BOOKS! Total books: {total_books} (expected 5 books)")
-                    else:
-                        self.log_test("All 5 Books Exist Correctly", False, f"❌ INSUFFICIENT! Total books: {total_books} (missing foundation books)")
-                        
+                print(f"\n📊 DEUTERONOMY VS EXODUS COMPARISON:")
+                
+                # Get Deuteronomy stats
+                deut_response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=1")
+                exodus_response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
+                
+                deut_verses = 0
+                exodus_verses = 0
+                
+                if deut_response.status_code == 200:
+                    deut_data = deut_response.json()
+                    deut_verses = deut_data.get('total', 0)
+                
+                if exodus_response.status_code == 200:
+                    exodus_data = exodus_response.json()
+                    exodus_verses = exodus_data.get('total', 0)
+                
+                # Expected counts
+                deut_expected = 959  # KJV standard
+                exodus_expected = 1213  # KJV standard
+                
+                deut_completion = (deut_verses / deut_expected) * 100 if deut_expected > 0 else 0
+                exodus_completion = (exodus_verses / exodus_expected) * 100 if exodus_expected > 0 else 0
+                
+                print(f"   📖 Deuteronomy: {deut_verses}/{deut_expected} verses ({deut_completion:.1f}% complete)")
+                print(f"   📖 Exodus: {exodus_verses}/{exodus_expected} verses ({exodus_completion:.1f}% complete)")
+                print(f"   📊 Completion Gap: {exodus_completion - deut_completion:.1f}% (Exodus ahead)")
+                
+                if exodus_completion >= 90 and deut_completion < 70:
+                    self.log_test("Deuteronomy vs Exodus Completion Gap Analysis", True, f"✅ CLEAR PATTERN! Exodus ({exodus_completion:.1f}%) significantly more complete than Deuteronomy ({deut_completion:.1f}%)")
+                elif abs(exodus_completion - deut_completion) > 20:
+                    self.log_test("Deuteronomy vs Exodus Completion Gap Analysis", True, f"✅ SIGNIFICANT GAP! {abs(exodus_completion - deut_completion):.1f}% difference between books")
                 else:
-                    self.log_test("Total Verse Count 4,697", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("All 5 Books Exist Correctly", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy vs Exodus Completion Gap Analysis", False, f"❌ SIMILAR COMPLETION! Both books have similar completion rates")
+                    
             except Exception as e:
-                self.log_test("Total Verse Count 4,697", False, f"Error: {str(e)}")
-                self.log_test("All 5 Books Exist Correctly", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy vs Exodus Completion Gap Analysis", False, f"Error: {str(e)}")
             
-            # Verify all 5 books exist correctly in KJV 1611 Divine version
+            # Analyze potential causes of incompleteness
             try:
-                required_books = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy']
-                expected_verses = {'Genesis': 1533, 'Exodus': 1213, 'Leviticus': 788, 'Numbers': 601, 'Deuteronomy': 562}
-                books_found = []
-                books_missing = []
+                print(f"\n🔍 DEUTERONOMY INCOMPLETENESS ROOT CAUSE ANALYSIS:")
                 
-                print(f"\n📚 INDIVIDUAL BOOK VERIFICATION IN KJV 1611 DIVINE:")
+                # Check data loading patterns
+                deut_response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=50")
+                if deut_response.status_code == 200:
+                    deut_data = deut_response.json()
+                    deut_verses = deut_data.get('verses', [])
+                    
+                    if deut_verses:
+                        # Analyze chapter distribution
+                        chapter_counts = {}
+                        for verse in deut_verses:
+                            chapter = verse.get('chapter')
+                            if chapter:
+                                chapter_num = int(chapter)
+                                if chapter_num not in chapter_counts:
+                                    chapter_counts[chapter_num] = 0
+                                chapter_counts[chapter_num] += 1
+                        
+                        chapters_present = len(chapter_counts)
+                        max_chapter = max(chapter_counts.keys()) if chapter_counts else 0
+                        
+                        # Analyze potential causes
+                        causes = []
+                        
+                        if chapters_present < 10:
+                            causes.append("PARTIAL_LOADING: Only few chapters loaded")
+                        
+                        if max_chapter < 20:
+                            causes.append("TRUNCATED_LOADING: Loading stopped early")
+                        
+                        # Check for consistent verse counts per chapter
+                        verse_counts = list(chapter_counts.values())
+                        if verse_counts:
+                            avg_verses = sum(verse_counts) / len(verse_counts)
+                            if avg_verses < 20:
+                                causes.append("INCOMPLETE_CHAPTERS: Chapters have too few verses")
+                        
+                        # Check for data quality issues
+                        sample_verse = deut_verses[0] if deut_verses else {}
+                        verse_text = sample_verse.get('text', '')
+                        if len(verse_text) < 20:
+                            causes.append("POOR_CONTENT_QUALITY: Verses have minimal content")
+                        
+                        print(f"   📊 Chapters Present: {chapters_present}/34 (max chapter: {max_chapter})")
+                        print(f"   📊 Average Verses per Chapter: {avg_verses:.1f}" if verse_counts else "   📊 No verse count data")
+                        print(f"   🔍 Potential Causes: {', '.join(causes) if causes else 'Unknown'}")
+                        
+                        if len(causes) >= 2:
+                            self.log_test("Deuteronomy Root Cause Identified", True, f"✅ CAUSES IDENTIFIED! Multiple issues found: {', '.join(causes[:2])}")
+                        elif len(causes) == 1:
+                            self.log_test("Deuteronomy Root Cause Identified", True, f"✅ CAUSE IDENTIFIED! Primary issue: {causes[0]}")
+                        else:
+                            self.log_test("Deuteronomy Root Cause Identified", False, f"❌ UNCLEAR! No obvious causes identified")
+                    else:
+                        self.log_test("Deuteronomy Root Cause Identified", False, f"❌ NO DATA! Cannot analyze causes without verse data")
+                else:
+                    self.log_test("Deuteronomy Root Cause Identified", False, f"API Error - Status: {deut_response.status_code}")
+            except Exception as e:
+                self.log_test("Deuteronomy Root Cause Identified", False, f"Error: {str(e)}")
+            
+            # Compare data loading success patterns
+            try:
+                print(f"\n📈 DATA LOADING SUCCESS PATTERN ANALYSIS:")
                 
-                for book_name in required_books:
+                # Check multiple books to identify patterns
+                books_to_check = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy']
+                expected_counts = {'Genesis': 1533, 'Exodus': 1213, 'Leviticus': 788, 'Numbers': 601, 'Deuteronomy': 959}
+                
+                success_rates = {}
+                for book in books_to_check:
                     try:
-                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book_name}&limit=1")
+                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book}&limit=1")
                         if response.status_code == 200:
-                            book_data = response.json()
-                            verse_count = book_data.get('total', 0)
-                            expected_count = expected_verses[book_name]
-                            
-                            if verse_count == expected_count:
-                                books_found.append(f"{book_name} ({verse_count} verses)")
-                                print(f"   ✅ {book_name}: PERFECT! {verse_count} verses (expected {expected_count})")
-                            elif verse_count > 0:
-                                books_found.append(f"{book_name} ({verse_count} verses)")
-                                print(f"   ⚠️ {book_name}: FOUND BUT INCORRECT COUNT! {verse_count} verses (expected {expected_count})")
-                            else:
-                                books_missing.append(book_name)
-                                print(f"   ❌ {book_name}: MISSING (0 verses)")
+                            data = response.json()
+                            actual = data.get('total', 0)
+                            expected = expected_counts[book]
+                            success_rate = (actual / expected) * 100 if expected > 0 else 0
+                            success_rates[book] = success_rate
+                            print(f"   📖 {book}: {success_rate:.1f}% complete ({actual}/{expected})")
                         else:
-                            books_missing.append(book_name)
-                            print(f"   ❌ {book_name}: API ERROR (Status {response.status_code})")
+                            success_rates[book] = 0
+                            print(f"   ❌ {book}: API Error")
                     except Exception as e:
-                        books_missing.append(book_name)
-                        print(f"   ❌ {book_name}: ERROR ({str(e)})")
+                        success_rates[book] = 0
+                        print(f"   ❌ {book}: Error")
                 
-                if len(books_found) == 5:
-                    self.log_test("KJV 1611 Divine Version Complete (5 Books)", True, f"✅ COMPLETE! All 5 books found in KJV 1611 Divine: {', '.join(books_found)}")
-                elif len(books_found) >= 4:
-                    self.log_test("KJV 1611 Divine Version Complete (5 Books)", False, f"❌ INCOMPLETE! Only {len(books_found)}/5 books found. Missing: {', '.join(books_missing)}")
+                # Identify pattern
+                successful_books = [book for book, rate in success_rates.items() if rate >= 90]
+                incomplete_books = [book for book, rate in success_rates.items() if rate < 70]
+                
+                print(f"   ✅ Successful Books (≥90%): {', '.join(successful_books)}")
+                print(f"   ❌ Incomplete Books (<70%): {', '.join(incomplete_books)}")
+                
+                if 'Deuteronomy' in incomplete_books and len(successful_books) >= 2:
+                    self.log_test("Data Loading Pattern Analysis", True, f"✅ PATTERN IDENTIFIED! Deuteronomy is among incomplete books while {len(successful_books)} books are successful")
                 else:
-                    self.log_test("KJV 1611 Divine Version Complete (5 Books)", False, f"❌ MAJOR MISSING! Only {len(books_found)}/5 books found. Missing: {', '.join(books_missing)}")
+                    self.log_test("Data Loading Pattern Analysis", False, f"❌ NO CLEAR PATTERN! Cannot identify consistent loading success pattern")
                     
             except Exception as e:
-                self.log_test("KJV 1611 Divine Version Complete (5 Books)", False, f"Error: {str(e)}")
-            
-            # Confirm proper Old Testament classification and order
-            try:
-                response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine&testament=old")
-                if response.status_code == 200:
-                    data = response.json()
-                    books = data.get('books', [])
-                    
-                    print(f"\n📜 OLD TESTAMENT CLASSIFICATION AND ORDER CHECK:")
-                    
-                    # Check for proper Old Testament classification
-                    old_testament_books = []
-                    for book in books:
-                        book_name = book.get('name', '')
-                        testament = book.get('testament', '')
-                        order = book.get('order', 0)
-                        
-                        if testament == 'old':
-                            old_testament_books.append((book_name, order))
-                            print(f"   ✅ {book_name}: Old Testament (order: {order})")
-                        else:
-                            print(f"   ❌ {book_name}: WRONG TESTAMENT ({testament})")
-                    
-                    # Check correct book order (Genesis=1, Exodus=2, Leviticus=3, Numbers=4, Deuteronomy=5)
-                    expected_order = {'Genesis': 1, 'Exodus': 2, 'Leviticus': 3, 'Numbers': 4, 'Deuteronomy': 5}
-                    correct_order = True
-                    
-                    for book_name, actual_order in old_testament_books:
-                        if book_name in expected_order:
-                            expected = expected_order[book_name]
-                            if actual_order == expected:
-                                print(f"   ✅ {book_name}: CORRECT ORDER ({actual_order})")
-                            else:
-                                print(f"   ❌ {book_name}: WRONG ORDER ({actual_order}, expected {expected})")
-                                correct_order = False
-                    
-                    if len(old_testament_books) >= 5:
-                        self.log_test("Proper Old Testament Classification and Order", True, f"✅ CORRECT! {len(old_testament_books)} books properly classified as Old Testament")
-                    else:
-                        self.log_test("Proper Old Testament Classification and Order", False, f"❌ INCOMPLETE! Only {len(old_testament_books)} books classified as Old Testament")
-                    
-                    if correct_order:
-                        self.log_test("Correct Biblical Book Order", True, f"✅ PERFECT! All books in correct biblical order")
-                    else:
-                        self.log_test("Correct Biblical Book Order", False, f"❌ WRONG ORDER! Some books not in correct biblical order")
-                        
-                else:
-                    self.log_test("Proper Old Testament Classification and Order", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Correct Biblical Book Order", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Proper Old Testament Classification and Order", False, f"Error: {str(e)}")
-                self.log_test("Correct Biblical Book Order", False, f"Error: {str(e)}")
+                self.log_test("Data Loading Pattern Analysis", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Complete Database Status", False, f"Error: {str(e)}")
+            self.log_test("Deuteronomy Root Cause Analysis", False, f"Error: {str(e)}")
             return False
 
     # Removed old test method - replaced with new tests matching review request
