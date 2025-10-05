@@ -723,11 +723,11 @@ class APITester:
 
     # Removed old test method - replaced with new tests matching review request
 
-    def run_numbers_authentic_content_tests(self):
-        """Run Numbers authentic content verification tests as per review request"""
+    def run_deuteronomy_authentic_content_tests(self):
+        """Run Deuteronomy authentic content verification tests as per review request"""
         print("=" * 80)
-        print("🎉 NUMBERS AUTHENTIC CONTENT VERIFICATION")
-        print("Verifying that Numbers contains ONLY authentic biblical text without any placeholder content")
+        print("🎉 DEUTERONOMY AUTHENTIC CONTENT VERIFICATION")
+        print("Verifying that Deuteronomy contains authentic biblical text following the same pattern as Numbers")
         print("=" * 80)
         
         # Test basic connectivity first
@@ -738,20 +738,20 @@ class APITester:
         # Run the 5 main review request tests
         test_results = []
         
-        # Test 1: Placeholder Elimination Verification
-        test_results.append(self.test_placeholder_elimination_verification())
+        # Test 1: Deuteronomy Authentic Content Verification
+        test_results.append(self.test_deuteronomy_authentic_content_verification())
         
-        # Test 2: Authentic Content Quality Check
-        test_results.append(self.test_authentic_content_quality_check())
+        # Test 2: No Placeholder Content Check
+        test_results.append(self.test_no_placeholder_content_check())
         
         # Test 3: Foundation Books Preservation
         test_results.append(self.test_foundation_books_preservation())
         
-        # Test 4: No Generated Content Check
-        test_results.append(self.test_no_generated_content_check())
+        # Test 4: Content Quality Sampling
+        test_results.append(self.test_content_quality_sampling())
         
-        # Test 5: Database Status
-        test_results.append(self.test_database_status())
+        # Test 5: Complete Database Status
+        test_results.append(self.test_complete_database_status())
         
         # Calculate overall results
         passed_tests = sum(test_results)
@@ -759,7 +759,7 @@ class APITester:
         success_rate = (passed_tests / total_tests) * 100
         
         print("\n" + "=" * 80)
-        print("📊 NUMBERS AUTHENTIC CONTENT SUMMARY")
+        print("📊 DEUTERONOMY AUTHENTIC CONTENT SUMMARY")
         print("=" * 80)
         
         # Count individual test results
@@ -767,74 +767,74 @@ class APITester:
         passed_individual_tests = sum(1 for result in self.test_results if result["passed"])
         individual_success_rate = (passed_individual_tests / total_individual_tests) * 100 if total_individual_tests > 0 else 0
         
-        print(f"📈 NUMBERS AUTHENTIC CONTENT SUCCESS RATE: {individual_success_rate:.1f}% ({passed_individual_tests}/{total_individual_tests} individual tests passed)")
+        print(f"📈 DEUTERONOMY AUTHENTIC CONTENT SUCCESS RATE: {individual_success_rate:.1f}% ({passed_individual_tests}/{total_individual_tests} individual tests passed)")
         print(f"🎯 MAIN CATEGORIES: {passed_tests}/{total_tests} major authentic content verification categories completed")
         
         # Show category results
         categories = [
-            "Placeholder Elimination Verification (exactly 601 verses authentic only, no placeholder text)",
-            "Authentic Content Quality Check (Numbers 1:1-10 different authentic content, Numbers 6:24-26 priestly blessing)", 
-            "Foundation Books Preservation (Genesis 1,533, Exodus 1,063, Leviticus 788 verses preserved)",
-            "No Generated Content Check (no repetitive patterns, unique authentic content, no generated/placeholder text)",
-            "Database Status (total 3,985 verses, all 4 books correctly classified, Numbers as Old Testament)"
+            "Deuteronomy Authentic Content Verification (exactly 562 verses, Moses speaking to Israel, Shema, Deuteronomy themes)",
+            "No Placeholder Content Check (no generated placeholder text, unique authentic content, no repetitive patterns)", 
+            "Foundation Books Preservation (Genesis 1,533, Exodus 1,063, Leviticus 788, Numbers 601 verses preserved)",
+            "Content Quality Sampling (10 Deuteronomy verses authentic, proper themes, substantial content)",
+            "Complete Database Status (total 4,547 verses, all 5 books correctly classified, proper Old Testament order)"
         ]
         
         for i, (category, result) in enumerate(zip(categories, test_results)):
             status = "✅ VERIFIED" if result else "❌ FAILED"
             print(f"{status}: {category}")
         
-        print("\n🎉 KEY NUMBERS AUTHENTIC CONTENT FINDINGS:")
+        print("\n🎉 KEY DEUTERONOMY AUTHENTIC CONTENT FINDINGS:")
         
         # Analyze results for key findings
-        if test_results[0]:  # Placeholder Elimination Verification
-            print("✅ Numbers PLACEHOLDER ELIMINATION VERIFIED - exactly 601 authentic verses with no placeholder text")
+        if test_results[0]:  # Deuteronomy Authentic Content Verification
+            print("✅ Deuteronomy AUTHENTIC CONTENT VERIFIED - exactly 562 authentic verses with Moses speaking to Israel, Shema, and proper themes")
         else:
-            print("❌ Numbers PLACEHOLDER ELIMINATION FAILED - incorrect verse count or placeholder text found")
+            print("❌ Deuteronomy AUTHENTIC CONTENT FAILED - incorrect verse count, missing key content, or theme issues")
         
-        if test_results[1]:  # Authentic Content Quality Check
-            print("✅ Numbers AUTHENTIC CONTENT VERIFIED - Numbers 1:1-10 contain different authentic content, priestly blessing verified")
+        if test_results[1]:  # No Placeholder Content Check
+            print("✅ NO PLACEHOLDER CONTENT VERIFIED - no generated placeholder text, unique authentic content, clean of repetitive patterns")
         else:
-            print("❌ Numbers AUTHENTIC CONTENT FAILED - poor content quality or missing priestly blessing")
+            print("❌ PLACEHOLDER CONTENT FOUND - generated text or repetitive patterns detected in Deuteronomy")
         
         if test_results[2]:  # Foundation Books Preservation
-            print("✅ Foundation books PRESERVED - Genesis (1,533), Exodus (1,063), Leviticus (788) verses intact")
+            print("✅ Foundation books PRESERVED - Genesis (1,533), Exodus (1,063), Leviticus (788), Numbers (601) verses intact")
         else:
             print("❌ Foundation books COMPROMISED - verse counts changed or books missing")
         
-        if test_results[3]:  # No Generated Content Check
-            print("✅ NO GENERATED CONTENT VERIFIED - no repetitive patterns, unique authentic content, clean of generated text")
+        if test_results[3]:  # Content Quality Sampling
+            print("✅ CONTENT QUALITY VERIFIED - 10 Deuteronomy verses contain authentic biblical content with proper themes and substantial text")
         else:
-            print("❌ GENERATED CONTENT FOUND - repetitive patterns or generated/placeholder text detected")
+            print("❌ CONTENT QUALITY FAILED - poor quality verses, missing themes, or insufficient content")
         
-        if test_results[4]:  # Database Status
-            print("✅ Database STATUS VERIFIED - total 3,985 verses, all 4 books correctly classified, Numbers as Old Testament")
+        if test_results[4]:  # Complete Database Status
+            print("✅ Database STATUS VERIFIED - total 4,547 verses, all 5 books correctly classified, proper Old Testament order")
         else:
             print("❌ Database STATUS FAILED - incorrect total count, missing books, or wrong classification")
         
-        print(f"\n🎯 FINAL NUMBERS AUTHENTIC CONTENT ASSESSMENT:")
+        print(f"\n🎯 FINAL DEUTERONOMY AUTHENTIC CONTENT ASSESSMENT:")
         if individual_success_rate >= 90:
-            print(f"🎉 NUMBERS AUTHENTIC CONTENT EXCELLENT! Numbers contains ONLY authentic biblical text without placeholder content ({individual_success_rate:.1f}% success)")
-            print("✅ Numbers has exactly 601 authentic verses with proper Moses/wilderness/Sinai and census content")
-            print("✅ Numbers 1:1-10 contain different authentic biblical content, Numbers 6:24-26 priestly blessing verified")
+            print(f"🎉 DEUTERONOMY AUTHENTIC CONTENT EXCELLENT! Deuteronomy follows the same authentic pattern as Numbers ({individual_success_rate:.1f}% success)")
+            print("✅ Deuteronomy has exactly 562 authentic verses with proper Moses speaking to Israel content")
+            print("✅ Deuteronomy 6:4-5 contains authentic Shema, proper Deuteronomy themes throughout")
             print("✅ Foundation books preserved, no generated content, proper database classification")
-            print("🚀 Numbers authentic content successfully verified!")
+            print("🚀 Deuteronomy authentic content successfully verified following Numbers pattern!")
         elif individual_success_rate >= 75:
-            print(f"✅ NUMBERS AUTHENTIC CONTENT GOOD! Numbers mostly contains authentic content with minor issues ({individual_success_rate:.1f}% success)")
-            print("✅ Numbers structure and authentic content mostly verified")
+            print(f"✅ DEUTERONOMY AUTHENTIC CONTENT GOOD! Deuteronomy mostly follows authentic pattern with minor issues ({individual_success_rate:.1f}% success)")
+            print("✅ Deuteronomy structure and authentic content mostly verified")
             print("⚠️ Some minor issues with verse count, content quality, or database status")
-            print("🔧 Minor fixes needed but Numbers is largely authentic")
+            print("🔧 Minor fixes needed but Deuteronomy is largely authentic")
         elif individual_success_rate >= 60:
-            print(f"⚠️ NUMBERS AUTHENTIC CONTENT MIXED! Numbers has significant authenticity issues requiring attention ({individual_success_rate:.1f}% success)")
-            print("⚠️ Numbers may still contain placeholder content or have authenticity issues")
-            print("🔧 Recommend reviewing and fixing specific Numbers authenticity issues")
+            print(f"⚠️ DEUTERONOMY AUTHENTIC CONTENT MIXED! Deuteronomy has significant authenticity issues requiring attention ({individual_success_rate:.1f}% success)")
+            print("⚠️ Deuteronomy may still contain placeholder content or have authenticity issues")
+            print("🔧 Recommend reviewing and fixing specific Deuteronomy authenticity issues")
         elif individual_success_rate >= 40:
-            print(f"❌ NUMBERS AUTHENTIC CONTENT POOR! Numbers has major authenticity issues ({individual_success_rate:.1f}% success)")
-            print("❌ Numbers likely contains placeholder content or has major authenticity problems")
-            print("🔧 Recommend cleaning Numbers content to achieve authentic biblical text standard")
+            print(f"❌ DEUTERONOMY AUTHENTIC CONTENT POOR! Deuteronomy has major authenticity issues ({individual_success_rate:.1f}% success)")
+            print("❌ Deuteronomy likely contains placeholder content or has major authenticity problems")
+            print("🔧 Recommend cleaning Deuteronomy content to achieve authentic biblical text standard")
         else:
-            print(f"❌ NUMBERS AUTHENTIC CONTENT CRITICAL FAILURE! Numbers requires immediate attention ({individual_success_rate:.1f}% success)")
-            print("❌ Major Numbers authenticity issues detected - far from authentic biblical text standard")
-            print("🔧 Recommend complete Numbers content cleanup to achieve required authentic biblical text")
+            print(f"❌ DEUTERONOMY AUTHENTIC CONTENT CRITICAL FAILURE! Deuteronomy requires immediate attention ({individual_success_rate:.1f}% success)")
+            print("❌ Major Deuteronomy authenticity issues detected - far from authentic biblical text standard")
+            print("🔧 Recommend complete Deuteronomy content cleanup to achieve required authentic biblical text")
         
         return individual_success_rate >= 75
 
