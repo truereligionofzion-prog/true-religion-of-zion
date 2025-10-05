@@ -755,11 +755,11 @@ class APITester:
 
     # Removed old test method - replaced with new tests matching review request
 
-    def run_exodus_100_percent_completion_tests(self):
-        """Run Exodus 100% completion verification tests as per review request"""
+    def run_deuteronomy_structure_analysis_tests(self):
+        """Run Deuteronomy chapter and verse structure analysis tests as per review request"""
         print("=" * 80)
-        print("🎉 EXODUS 100% COMPLETION WITH AUTHENTIC CONTENT VERIFICATION")
-        print("Verifying that the new Exodus loading achieved 100% completion with authentic content")
+        print("🔍 DEUTERONOMY CHAPTER AND VERSE STRUCTURE ISSUES INVESTIGATION")
+        print("Investigating the current Deuteronomy chapter and verse structure problems")
         print("=" * 80)
         
         # Test basic connectivity first
@@ -770,20 +770,20 @@ class APITester:
         # Run the 5 main review request tests
         test_results = []
         
-        # Test 1: 100% Completion Verification
-        test_results.append(self.test_exodus_100_percent_completion_verification())
+        # Test 1: Deuteronomy Chapter Structure Analysis
+        test_results.append(self.test_deuteronomy_chapter_structure_analysis())
         
-        # Test 2: Content Quality Check
-        test_results.append(self.test_exodus_content_quality_check())
+        # Test 2: Deuteronomy Completeness Check
+        test_results.append(self.test_deuteronomy_completeness_check())
         
-        # Test 3: Foundation Books Preservation
-        test_results.append(self.test_foundation_books_preservation())
+        # Test 3: Verse Ordering Issues
+        test_results.append(self.test_deuteronomy_verse_ordering_issues())
         
-        # Test 4: Authenticity vs Generated Content Analysis
-        test_results.append(self.test_authenticity_vs_generated_content_analysis())
+        # Test 4: Data Quality Issues
+        test_results.append(self.test_deuteronomy_data_quality_issues())
         
-        # Test 5: Complete Database Status
-        test_results.append(self.test_complete_database_status())
+        # Test 5: Root Cause Analysis
+        test_results.append(self.test_deuteronomy_root_cause_analysis())
         
         # Calculate overall results
         passed_tests = sum(test_results)
@@ -791,7 +791,7 @@ class APITester:
         success_rate = (passed_tests / total_tests) * 100
         
         print("\n" + "=" * 80)
-        print("📊 EXODUS 100% COMPLETION SUMMARY")
+        print("📊 DEUTERONOMY STRUCTURE ANALYSIS SUMMARY")
         print("=" * 80)
         
         # Count individual test results
@@ -799,76 +799,75 @@ class APITester:
         passed_individual_tests = sum(1 for result in self.test_results if result["passed"])
         individual_success_rate = (passed_individual_tests / total_individual_tests) * 100 if total_individual_tests > 0 else 0
         
-        print(f"📈 EXODUS 100% COMPLETION SUCCESS RATE: {individual_success_rate:.1f}% ({passed_individual_tests}/{total_individual_tests} individual tests passed)")
-        print(f"🎯 MAIN CATEGORIES: {passed_tests}/{total_tests} major completion verification categories completed")
+        print(f"📈 DEUTERONOMY ANALYSIS SUCCESS RATE: {individual_success_rate:.1f}% ({passed_individual_tests}/{total_individual_tests} individual tests passed)")
+        print(f"🎯 MAIN CATEGORIES: {passed_tests}/{total_tests} major analysis categories completed")
         
         # Show category results
         categories = [
-            "100% Completion Verification (exactly 1,213 verses, all 40 chapters, key chapters with proper verse counts)",
-            "Content Quality Check (Exodus 1:1-5 Israel names, Exodus 3:2 burning bush, Exodus 20:1-3 Ten Commandments, authentic vs generated analysis)", 
-            "Foundation Books Preservation (Genesis 1,533, Leviticus 788, Numbers 601, Deuteronomy 562 verses preserved)",
-            "Authenticity vs Generated Content Analysis (percentage authentic vs contextual/generated, cross-referenced verses, gap-filled verses)",
-            "Complete Database Status (total 4,697 verses, all 5 books correctly classified, proper Old Testament order)"
+            "Chapter Structure Analysis (current chapters, Chapter 1 verse count and ordering, verse numbering problems)",
+            "Completeness Check (current 562 vs expected 959 verses, missing chapters, verse gaps, KJV standard comparison)", 
+            "Verse Ordering Issues (Chapter 1 verses 1-15 ordering, duplicate numbers, missing numbers in sequence)",
+            "Data Quality Issues (sequential verses within chapters, chapter boundaries, cross-contamination detection)",
+            "Root Cause Analysis (why incomplete 562/959, comparison with successful Exodus 1,213/1,213, loading patterns)"
         ]
         
         for i, (category, result) in enumerate(zip(categories, test_results)):
-            status = "✅ VERIFIED" if result else "❌ FAILED"
+            status = "✅ ANALYZED" if result else "❌ FAILED"
             print(f"{status}: {category}")
         
-        print("\n🎉 KEY EXODUS 100% COMPLETION FINDINGS:")
+        print("\n🔍 KEY DEUTERONOMY STRUCTURE FINDINGS:")
         
         # Analyze results for key findings
-        if test_results[0]:  # 100% Completion Verification
-            print("✅ EXODUS 100% COMPLETION VERIFIED - exactly 1,213 verses with all 40 chapters and proper key chapter verse counts")
+        if test_results[0]:  # Chapter Structure Analysis
+            print("✅ CHAPTER STRUCTURE ANALYZED - current chapter count, Chapter 1 verse count and ordering issues identified")
         else:
-            print("❌ EXODUS COMPLETION FAILED - incorrect verse count, missing chapters, or wrong key chapter verse counts")
+            print("❌ CHAPTER STRUCTURE ANALYSIS FAILED - unable to analyze current chapter structure")
         
-        if test_results[1]:  # Content Quality Check
-            print("✅ CONTENT QUALITY VERIFIED - Exodus 1:1-5 contain Israel names, Exodus 3:2 has burning bush content, Exodus 20:1-3 has Ten Commandments")
+        if test_results[1]:  # Completeness Check
+            print("✅ COMPLETENESS ISSUES IDENTIFIED - current vs expected verse count gaps, missing chapters analyzed")
         else:
-            print("❌ CONTENT QUALITY FAILED - missing key biblical content in critical Exodus verses")
+            print("❌ COMPLETENESS CHECK FAILED - unable to determine completeness issues")
         
-        if test_results[2]:  # Foundation Books Preservation
-            print("✅ Foundation books PRESERVED - Genesis (1,533), Leviticus (788), Numbers (601), Deuteronomy (562) verses intact")
+        if test_results[2]:  # Verse Ordering Issues
+            print("✅ VERSE ORDERING ANALYZED - Chapter 1 verses 1-15 ordering, duplicates, and missing numbers checked")
         else:
-            print("❌ Foundation books COMPROMISED - verse counts changed or books missing")
+            print("❌ VERSE ORDERING ANALYSIS FAILED - unable to check verse ordering issues")
         
-        if test_results[3]:  # Authenticity vs Generated Content Analysis
-            print("✅ AUTHENTICITY ANALYSIS VERIFIED - high percentage of authentic biblical content, minimal generated/placeholder content")
+        if test_results[3]:  # Data Quality Issues
+            print("✅ DATA QUALITY ASSESSED - sequential verses, chapter boundaries, and cross-contamination checked")
         else:
-            print("❌ AUTHENTICITY ANALYSIS FAILED - too much generated/contextual content, poor cross-referenced verses, or inadequate gap-filled content")
+            print("❌ DATA QUALITY ANALYSIS FAILED - unable to assess data quality issues")
         
-        if test_results[4]:  # Complete Database Status
-            print("✅ Database STATUS VERIFIED - total 4,697 verses, all 5 books correctly classified, proper Old Testament order")
+        if test_results[4]:  # Root Cause Analysis
+            print("✅ ROOT CAUSE IDENTIFIED - incompleteness reasons, comparison with Exodus, loading patterns analyzed")
         else:
-            print("❌ Database STATUS FAILED - incorrect total count, missing books, or wrong classification")
+            print("❌ ROOT CAUSE ANALYSIS FAILED - unable to identify causes of Deuteronomy issues")
         
-        print(f"\n🎯 FINAL EXODUS 100% COMPLETION ASSESSMENT:")
-        if individual_success_rate >= 90:
-            print(f"🎉 EXODUS 100% COMPLETION EXCELLENT! Exodus achieved 100% completion with authentic content ({individual_success_rate:.1f}% success)")
-            print("✅ Exodus has exactly 1,213 verses with all 40 chapters and proper key chapter structure")
-            print("✅ Key verses contain authentic biblical content (Israel names, burning bush, Ten Commandments)")
-            print("✅ Foundation books preserved, high authenticity percentage, proper database classification")
-            print("🚀 Exodus 100% completion successfully verified with authentic biblical text standards!")
-        elif individual_success_rate >= 75:
-            print(f"✅ EXODUS 100% COMPLETION GOOD! Exodus mostly achieved completion with minor issues ({individual_success_rate:.1f}% success)")
-            print("✅ Exodus structure and authentic content mostly verified")
-            print("⚠️ Some minor issues with verse count, content quality, or authenticity analysis")
-            print("🔧 Minor fixes needed but Exodus is largely complete and authentic")
-        elif individual_success_rate >= 60:
-            print(f"⚠️ EXODUS COMPLETION MIXED! Exodus has significant completion issues requiring attention ({individual_success_rate:.1f}% success)")
-            print("⚠️ Exodus may not have achieved 100% completion or has authenticity issues")
-            print("🔧 Recommend reviewing and fixing specific Exodus completion and authenticity issues")
-        elif individual_success_rate >= 40:
-            print(f"❌ EXODUS COMPLETION POOR! Exodus has major completion issues ({individual_success_rate:.1f}% success)")
-            print("❌ Exodus likely incomplete or contains too much generated/contextual content")
-            print("🔧 Recommend completing Exodus loading to achieve 100% completion with authentic biblical text")
+        print(f"\n🎯 FINAL DEUTERONOMY STRUCTURE ASSESSMENT:")
+        if individual_success_rate >= 80:
+            print(f"🔍 DEUTERONOMY STRUCTURE ANALYSIS EXCELLENT! Comprehensive analysis completed ({individual_success_rate:.1f}% success)")
+            print("✅ Chapter structure, completeness, verse ordering, data quality, and root causes all analyzed")
+            print("✅ Clear understanding of Deuteronomy structure problems and their causes")
+            print("🚀 Detailed analysis provides foundation for fixing Deuteronomy structure issues!")
+        elif individual_success_rate >= 65:
+            print(f"✅ DEUTERONOMY ANALYSIS GOOD! Most structure issues identified with minor gaps ({individual_success_rate:.1f}% success)")
+            print("✅ Major structure problems analyzed successfully")
+            print("⚠️ Some minor analysis gaps but overall understanding is solid")
+            print("🔧 Analysis provides good foundation for fixing most Deuteronomy issues")
+        elif individual_success_rate >= 50:
+            print(f"⚠️ DEUTERONOMY ANALYSIS MIXED! Some structure issues identified but gaps remain ({individual_success_rate:.1f}% success)")
+            print("⚠️ Partial understanding of Deuteronomy structure problems")
+            print("🔧 Additional analysis may be needed to fully understand all issues")
+        elif individual_success_rate >= 30:
+            print(f"❌ DEUTERONOMY ANALYSIS POOR! Limited understanding of structure issues ({individual_success_rate:.1f}% success)")
+            print("❌ Major gaps in analysis of Deuteronomy structure problems")
+            print("🔧 Recommend deeper investigation to identify root causes")
         else:
-            print(f"❌ EXODUS COMPLETION CRITICAL FAILURE! Exodus requires immediate attention ({individual_success_rate:.1f}% success)")
-            print("❌ Major Exodus completion issues detected - far from 100% completion standard")
-            print("🔧 Recommend complete Exodus reloading to achieve required 100% completion with authentic biblical text")
+            print(f"❌ DEUTERONOMY ANALYSIS CRITICAL FAILURE! Unable to analyze structure issues ({individual_success_rate:.1f}% success)")
+            print("❌ Cannot determine causes of Deuteronomy structure problems")
+            print("🔧 Recommend complete re-analysis with different approach")
         
-        return individual_success_rate >= 75
+        return individual_success_rate >= 65
 
 def main():
     """Main test execution"""
