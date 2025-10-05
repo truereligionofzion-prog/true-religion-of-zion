@@ -79,95 +79,137 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_placeholder_elimination_verification(self):
-        """REVIEW REQUEST TEST 1: Placeholder Elimination Verification - Verify Numbers has 601 verses with authentic content only"""
+    def test_deuteronomy_authentic_content_verification(self):
+        """REVIEW REQUEST TEST 1: Deuteronomy Authentic Content Verification - Verify Deuteronomy has 562 verses with authentic content"""
         try:
-            print("\n🔍 PLACEHOLDER ELIMINATION VERIFICATION - CHECKING NUMBERS HAS 601 AUTHENTIC VERSES ONLY...")
+            print("\n🔍 DEUTERONOMY AUTHENTIC CONTENT VERIFICATION - CHECKING DEUTERONOMY HAS 562 AUTHENTIC VERSES...")
             
-            # Verify Numbers has exactly 601 verses (authentic extraction only)
+            # Verify Deuteronomy has exactly 562 verses (authentic extraction only)
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=1")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=1")
                 if response.status_code == 200:
                     data = response.json()
                     total_verses = data.get('total', 0)
-                    expected_verses = 601  # Review request specifies exactly 601 verses for authentic extraction only
+                    expected_verses = 562  # Review request specifies exactly 562 verses for authentic extraction only
                     
                     if total_verses == expected_verses:
-                        self.log_test("Numbers Exactly 601 Verses (Authentic Only)", True, f"✅ PERFECT! Numbers has exactly {total_verses} verses (authentic extraction only)")
+                        self.log_test("Deuteronomy Exactly 562 Verses (Authentic Only)", True, f"✅ PERFECT! Deuteronomy has exactly {total_verses} verses (authentic extraction only)")
                     elif total_verses > 0:
-                        self.log_test("Numbers Exactly 601 Verses (Authentic Only)", False, f"❌ INCORRECT COUNT! Numbers has {total_verses} verses, expected exactly {expected_verses} for authentic extraction")
+                        self.log_test("Deuteronomy Exactly 562 Verses (Authentic Only)", False, f"❌ INCORRECT COUNT! Deuteronomy has {total_verses} verses, expected exactly {expected_verses} for authentic extraction")
                     else:
-                        self.log_test("Numbers Exactly 601 Verses (Authentic Only)", False, f"❌ NOT FOUND! Numbers does not exist in database (0 verses)")
+                        self.log_test("Deuteronomy Exactly 562 Verses (Authentic Only)", False, f"❌ NOT FOUND! Deuteronomy does not exist in database (0 verses)")
                 else:
-                    self.log_test("Numbers Exactly 601 Verses (Authentic Only)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Exactly 562 Verses (Authentic Only)", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Numbers Exactly 601 Verses (Authentic Only)", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Exactly 562 Verses (Authentic Only)", False, f"Error: {str(e)}")
             
-            # Check for specific placeholder text that should NOT exist
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&search=And the LORD numbered the children of Israel according to their families&limit=100")
-                if response.status_code == 200:
-                    data = response.json()
-                    placeholder_verses = data.get('verses', [])
-                    
-                    if len(placeholder_verses) == 0:
-                        self.log_test("No Placeholder Text in Numbers", True, f"✅ CLEAN! No placeholder text 'And the LORD numbered...' found in Numbers")
-                    else:
-                        self.log_test("No Placeholder Text in Numbers", False, f"❌ PLACEHOLDER FOUND! Found {len(placeholder_verses)} verses with placeholder text 'And the LORD numbered...'")
-                        for verse in placeholder_verses[:3]:  # Show first 3 examples
-                            verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                            print(f"   ❌ {verse_ref}: PLACEHOLDER - '{verse.get('text', '')[:80]}...'")
-                else:
-                    self.log_test("No Placeholder Text in Numbers", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("No Placeholder Text in Numbers", False, f"Error: {str(e)}")
-            
-            # Check Numbers 1:1 contains proper Moses/wilderness/Sinai content
-            print("\n📖 NUMBERS KEY VERSES CONTENT VERIFICATION:")
+            # Check Deuteronomy 1:1 contains proper Moses speaking to Israel content
+            print("\n📖 DEUTERONOMY KEY VERSES CONTENT VERIFICATION:")
             
             try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/1/1")
+                response = self.session.get(f"{self.base_url}/bible/verse/Deuteronomy/1/1")
                 if response.status_code == 200:
                     verse_data = response.json()
                     verse_text = verse_data.get('text', '')
                     
-                    # Check for Moses/wilderness/Sinai content keywords
-                    moses_keywords = ['moses', 'wilderness', 'sinai']
-                    found_keywords = [kw for kw in moses_keywords if kw in verse_text.lower()]
-                    
-                    if len(found_keywords) >= 2:
-                        self.log_test("Numbers 1:1 Moses/Wilderness/Sinai Content", True, f"✅ AUTHENTIC! Numbers 1:1 contains proper Moses/wilderness/Sinai content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
-                    else:
-                        self.log_test("Numbers 1:1 Moses/Wilderness/Sinai Content", False, f"❌ MISSING CONTENT! Numbers 1:1 lacks Moses/wilderness/Sinai keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
-                else:
-                    self.log_test("Numbers 1:1 Moses/Wilderness/Sinai Content", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Numbers 1:1 Moses/Wilderness/Sinai Content", False, f"Error: {str(e)}")
-            
-            # Verify Numbers 1:2 has proper census content ("Take ye the sum...")
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Numbers/1/2")
-                if response.status_code == 200:
-                    verse_data = response.json()
-                    verse_text = verse_data.get('text', '')
-                    
-                    # Check for census content
-                    census_keywords = ['take', 'sum', 'congregation', 'children', 'israel']
-                    found_keywords = [kw for kw in census_keywords if kw in verse_text.lower()]
+                    # Check for Moses speaking to Israel content keywords
+                    moses_israel_keywords = ['moses', 'israel', 'spake', 'children', 'words']
+                    found_keywords = [kw for kw in moses_israel_keywords if kw in verse_text.lower()]
                     
                     if len(found_keywords) >= 3:
-                        self.log_test("Numbers 1:2 Census Content (Take ye the sum)", True, f"✅ AUTHENTIC! Numbers 1:2 contains proper census content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
+                        self.log_test("Deuteronomy 1:1 Moses Speaking to Israel Content", True, f"✅ AUTHENTIC! Deuteronomy 1:1 contains proper Moses speaking to Israel content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
                     else:
-                        self.log_test("Numbers 1:2 Census Content (Take ye the sum)", False, f"❌ MISSING CONTENT! Numbers 1:2 lacks census keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
+                        self.log_test("Deuteronomy 1:1 Moses Speaking to Israel Content", False, f"❌ MISSING CONTENT! Deuteronomy 1:1 lacks Moses speaking to Israel keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
                 else:
-                    self.log_test("Numbers 1:2 Census Content (Take ye the sum)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy 1:1 Moses Speaking to Israel Content", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Numbers 1:2 Census Content (Take ye the sum)", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy 1:1 Moses Speaking to Israel Content", False, f"Error: {str(e)}")
+            
+            # Verify Deuteronomy 6:4-5 has the authentic Shema ("Hear, O Israel: The LORD our God is one LORD")
+            try:
+                print("\n📖 DEUTERONOMY 6:4-5 SHEMA VERIFICATION:")
+                shema_verses_found = 0
+                shema_content_verified = 0
+                
+                for verse_num in [4, 5]:
+                    try:
+                        response = self.session.get(f"{self.base_url}/bible/verse/Deuteronomy/6/{verse_num}")
+                        if response.status_code == 200:
+                            verse_data = response.json()
+                            verse_text = verse_data.get('text', '')
+                            verse_ref = f"Deuteronomy 6:{verse_num}"
+                            shema_verses_found += 1
+                            
+                            # Check for Shema content specific to each verse
+                            if verse_num == 4:
+                                shema_keywords = ['hear', 'israel', 'lord', 'god', 'one']
+                            else:  # verse 5
+                                shema_keywords = ['love', 'lord', 'god', 'heart', 'soul', 'might']
+                            
+                            found_keywords = [kw for kw in shema_keywords if kw in verse_text.lower()]
+                            
+                            if len(found_keywords) >= 3:
+                                shema_content_verified += 1
+                                print(f"   ✅ {verse_ref}: PROPER SHEMA CONTENT - '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
+                            else:
+                                print(f"   ❌ {verse_ref}: MISSING SHEMA CONTENT - '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
+                        else:
+                            print(f"   ❌ Deuteronomy 6:{verse_num}: API ERROR (Status {response.status_code})")
+                    except Exception as e:
+                        print(f"   ❌ Deuteronomy 6:{verse_num}: ERROR ({str(e)})")
+                
+                if shema_content_verified >= 2:
+                    self.log_test("Deuteronomy 6:4-5 Shema (Hear O Israel)", True, f"✅ PERFECT! Both Shema verses (6:4-5) contain proper authentic Shema text")
+                elif shema_content_verified >= 1:
+                    self.log_test("Deuteronomy 6:4-5 Shema (Hear O Israel)", True, f"✅ PARTIAL! {shema_content_verified}/2 Shema verses contain proper text")
+                else:
+                    self.log_test("Deuteronomy 6:4-5 Shema (Hear O Israel)", False, f"❌ MISSING! No Shema verses contain proper authentic text")
+                    
+            except Exception as e:
+                self.log_test("Deuteronomy 6:4-5 Shema (Hear O Israel)", False, f"Error: {str(e)}")
+            
+            # Check that verses contain actual Deuteronomy themes (Moses, Israel, commandments, wilderness)
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=20")
+                if response.status_code == 200:
+                    data = response.json()
+                    verses = data.get('verses', [])
+                    
+                    if verses:
+                        print("\n📖 DEUTERONOMY THEMES VERIFICATION:")
+                        deuteronomy_themes_count = 0
+                        deuteronomy_themes = ['moses', 'israel', 'commandments', 'wilderness', 'lord', 'god', 'statutes', 'judgments', 'covenant', 'land']
+                        
+                        for verse in verses[:15]:  # Check first 15 verses
+                            verse_text = verse.get('text', '').lower()
+                            verse_ref = f"Deuteronomy {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            
+                            found_themes = [theme for theme in deuteronomy_themes if theme in verse_text]
+                            
+                            if len(found_themes) >= 2:
+                                deuteronomy_themes_count += 1
+                                if len(verse_text) <= 10:  # Only show first 10 for brevity
+                                    print(f"   ✅ {verse_ref}: DEUTERONOMY THEMES - (found: {', '.join(found_themes[:3])})")
+                        
+                        themes_percentage = (deuteronomy_themes_count / min(15, len(verses))) * 100 if verses else 0
+                        
+                        if themes_percentage >= 60:
+                            self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", True, f"✅ EXCELLENT! {themes_percentage:.1f}% ({deuteronomy_themes_count}/{min(15, len(verses))}) verses contain proper Deuteronomy themes")
+                        elif themes_percentage >= 40:
+                            self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", True, f"✅ GOOD! {themes_percentage:.1f}% verses contain Deuteronomy themes")
+                        else:
+                            self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", False, f"❌ POOR! Only {themes_percentage:.1f}% verses contain proper Deuteronomy themes")
+                    else:
+                        self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", False, f"❌ NO DATA! No Deuteronomy verses found for theme check")
+                else:
+                    self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Numbers Precision Verification", False, f"Error: {str(e)}")
+            self.log_test("Deuteronomy Authentic Content Verification", False, f"Error: {str(e)}")
             return False
 
     def test_authentic_content_quality_check(self):
