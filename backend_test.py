@@ -840,16 +840,16 @@ class APITester:
 
 def main():
     """Main test execution"""
-    print("🚀 Starting Numbers Authentic Content Verification Testing...")
+    print("🚀 Starting Deuteronomy Authentic Content Verification Testing...")
     
     tester = APITester(BACKEND_URL)
-    success = tester.run_numbers_authentic_content_tests()
+    success = tester.run_deuteronomy_authentic_content_tests()
     
     if success:
-        print("\n🎉 Numbers authentic content verification successful!")
+        print("\n🎉 Deuteronomy authentic content verification successful!")
         sys.exit(0)
     else:
-        print("\n❌ Numbers authentic content verification completed with issues.")
+        print("\n❌ Deuteronomy authentic content verification completed with issues.")
         sys.exit(1)
 
 if __name__ == "__main__":
