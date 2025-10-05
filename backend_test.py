@@ -1,37 +1,38 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Numbers Bible Book Authentic Content Verification
+Backend Testing for Deuteronomy Bible Book Authentic Content Verification
 
-REVIEW REQUEST FOCUS - NUMBERS AUTHENTIC CONTENT VERIFICATION:
-Please verify that Numbers now contains ONLY authentic biblical text without any placeholder content. Test:
+REVIEW REQUEST FOCUS - DEUTERONOMY AUTHENTIC CONTENT VERIFICATION:
+Please verify that Deuteronomy now contains authentic biblical text following the same pattern as Numbers. Test:
 
-1. **Placeholder Elimination Verification**:
-   - Verify Numbers has 601 verses (authentic extraction only)
-   - Check that Numbers 1:1 contains proper Moses/wilderness/Sinai content
-   - Verify Numbers 1:2 has proper census content ("Take ye the sum...")
-   - Confirm NO verses contain "And the LORD numbered the children of Israel according to their families" placeholder text
+1. **Deuteronomy Authentic Content Verification**:
+   - Verify Deuteronomy has 562 verses (authentic extraction only)
+   - Check Deuteronomy 1:1 contains proper Moses speaking to Israel content
+   - Verify Deuteronomy 6:4-5 has the authentic Shema ("Hear, O Israel: The LORD our God is one LORD")
+   - Check that verses contain actual Deuteronomy themes (Moses, Israel, commandments, wilderness)
 
-2. **Authentic Content Quality Check**:
-   - Sample Numbers 1:1-10 to verify they contain different, authentic biblical content
-   - Check Numbers 6:24-26 for the proper priestly blessing text  
-   - Verify verses contain actual biblical names, places, and events
+2. **No Placeholder Content Check**:
+   - Verify NO verses contain generated placeholder text
+   - Check that all verses are unique and authentic biblical content
+   - Confirm no repetitive patterns exist
 
 3. **Foundation Books Preservation**:
    - Verify Genesis still has 1,533 verses (preserved)
-   - Verify Exodus still has 1,063 verses (preserved)
+   - Verify Exodus still has 1,063 verses (preserved) 
    - Verify Leviticus still has 788 verses (preserved)
+   - Verify Numbers still has 601 verses (preserved)
 
-4. **No Generated Content Check**:
-   - Search for any repetitive placeholder patterns
-   - Verify all verses contain unique, authentic biblical content
-   - Confirm no "generated" or "placeholder" text exists
+4. **Content Quality Sampling**:
+   - Sample 10 Deuteronomy verses to verify authentic biblical content
+   - Check for proper Deuteronomy themes and language
+   - Verify verses contain substantial biblical content
 
-5. **Database Status**:
-   - Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 601 = 3,985)
-   - Verify Numbers is properly classified as Old Testament book
-   - Confirm all 4 books exist correctly
+5. **Complete Database Status**:
+   - Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 601 + Deuteronomy 562 = 4,547)
+   - Verify all 5 books exist in KJV 1611 Divine version
+   - Confirm proper Old Testament classification and correct order
 
-Please provide verification that Numbers now contains ONLY authentic biblical text without any generated placeholder content.
+Please provide verification that Deuteronomy follows the same authentic extraction pattern as Numbers with no generated content.
 """
 
 import requests
