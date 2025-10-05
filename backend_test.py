@@ -565,12 +565,12 @@ class APITester:
             self.log_test("Foundation Books Preservation", False, f"Error: {str(e)}")
             return False
 
-    def test_database_status(self):
-        """REVIEW REQUEST TEST 5: Database Status - Verify total verse count and book structure"""
+    def test_complete_database_status(self):
+        """REVIEW REQUEST TEST 5: Complete Database Status - Verify total verse count and all 5 books structure"""
         try:
-            print("\n🔍 DATABASE STATUS - VERIFY TOTAL VERSE COUNT AND BOOK STRUCTURE...")
+            print("\n🔍 COMPLETE DATABASE STATUS - VERIFY TOTAL VERSE COUNT AND ALL 5 BOOKS STRUCTURE...")
             
-            # Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 601 = 3,985)
+            # Get total verse count (should be Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 601 + Deuteronomy 562 = 4,547)
             try:
                 response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
                 if response.status_code == 200:
@@ -584,36 +584,36 @@ class APITester:
                     print(f"   📝 Total Verses: {total_verses}")
                     print(f"   📜 Old Testament Verses: {old_testament_verses}")
                     
-                    # Expected total: Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 601 = 3,985
-                    expected_total = 1533 + 1063 + 788 + 601  # = 3,985
+                    # Expected total: Genesis 1,533 + Exodus 1,063 + Leviticus 788 + Numbers 601 + Deuteronomy 562 = 4,547
+                    expected_total = 1533 + 1063 + 788 + 601 + 562  # = 4,547
                     
                     if total_verses == expected_total:
-                        self.log_test("Total Verse Count 3,985", True, f"✅ PERFECT! Total verses: {total_verses} (exactly Genesis + Exodus + Leviticus + Numbers = {expected_total})")
+                        self.log_test("Total Verse Count 4,547", True, f"✅ PERFECT! Total verses: {total_verses} (exactly Genesis + Exodus + Leviticus + Numbers + Deuteronomy = {expected_total})")
                     elif total_verses >= expected_total * 0.95:  # Within 5%
-                        self.log_test("Total Verse Count 3,985", True, f"✅ CLOSE! Total verses: {total_verses} (close to expected {expected_total})")
+                        self.log_test("Total Verse Count 4,547", True, f"✅ CLOSE! Total verses: {total_verses} (close to expected {expected_total})")
                     elif total_verses > 0:
-                        self.log_test("Total Verse Count 3,985", False, f"❌ INCORRECT! Total verses: {total_verses} (expected {expected_total})")
+                        self.log_test("Total Verse Count 4,547", False, f"❌ INCORRECT! Total verses: {total_verses} (expected {expected_total})")
                     else:
-                        self.log_test("Total Verse Count 3,985", False, f"❌ NO DATA! Total verses: {total_verses}")
+                        self.log_test("Total Verse Count 4,547", False, f"❌ NO DATA! Total verses: {total_verses}")
                     
-                    # Verify all 4 books exist
-                    if total_books >= 4:
-                        self.log_test("All 4 Books Exist", True, f"✅ GOOD! Total books: {total_books} (includes all 4 required books)")
-                    elif total_books >= 3:
-                        self.log_test("All 4 Books Exist", False, f"❌ MISSING BOOKS! Total books: {total_books} (expected at least 4)")
+                    # Verify all 5 books exist
+                    if total_books >= 5:
+                        self.log_test("All 5 Books Exist", True, f"✅ EXCELLENT! Total books: {total_books} (includes all 5 required books)")
+                    elif total_books >= 4:
+                        self.log_test("All 5 Books Exist", False, f"❌ MISSING DEUTERONOMY! Total books: {total_books} (expected 5 books)")
                     else:
-                        self.log_test("All 4 Books Exist", False, f"❌ INSUFFICIENT! Total books: {total_books} (missing foundation books)")
+                        self.log_test("All 5 Books Exist", False, f"❌ INSUFFICIENT! Total books: {total_books} (missing foundation books)")
                         
                 else:
-                    self.log_test("Total Verse Count 3,985", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("All 4 Books Exist", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Total Verse Count 4,547", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("All 5 Books Exist", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Total Verse Count 3,985", False, f"Error: {str(e)}")
-                self.log_test("All 4 Books Exist", False, f"Error: {str(e)}")
+                self.log_test("Total Verse Count 4,547", False, f"Error: {str(e)}")
+                self.log_test("All 5 Books Exist", False, f"Error: {str(e)}")
             
-            # Verify all 4 books exist in KJV 1611 Divine version
+            # Verify all 5 books exist in KJV 1611 Divine version
             try:
-                required_books = ['Genesis', 'Exodus', 'Leviticus', 'Numbers']
+                required_books = ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy']
                 books_found = []
                 books_missing = []
                 
@@ -639,17 +639,17 @@ class APITester:
                         books_missing.append(book_name)
                         print(f"   ❌ {book_name}: ERROR ({str(e)})")
                 
-                if len(books_found) == 4:
-                    self.log_test("KJV 1611 Divine Version Complete", True, f"✅ COMPLETE! All 4 books found in KJV 1611 Divine: {', '.join(books_found)}")
-                elif len(books_found) >= 3:
-                    self.log_test("KJV 1611 Divine Version Complete", False, f"❌ INCOMPLETE! Only {len(books_found)}/4 books found. Missing: {', '.join(books_missing)}")
+                if len(books_found) == 5:
+                    self.log_test("KJV 1611 Divine Version Complete (5 Books)", True, f"✅ COMPLETE! All 5 books found in KJV 1611 Divine: {', '.join(books_found)}")
+                elif len(books_found) >= 4:
+                    self.log_test("KJV 1611 Divine Version Complete (5 Books)", False, f"❌ INCOMPLETE! Only {len(books_found)}/5 books found. Missing: {', '.join(books_missing)}")
                 else:
-                    self.log_test("KJV 1611 Divine Version Complete", False, f"❌ MAJOR MISSING! Only {len(books_found)}/4 books found. Missing: {', '.join(books_missing)}")
+                    self.log_test("KJV 1611 Divine Version Complete (5 Books)", False, f"❌ MAJOR MISSING! Only {len(books_found)}/5 books found. Missing: {', '.join(books_missing)}")
                     
             except Exception as e:
-                self.log_test("KJV 1611 Divine Version Complete", False, f"Error: {str(e)}")
+                self.log_test("KJV 1611 Divine Version Complete (5 Books)", False, f"Error: {str(e)}")
             
-            # Confirm proper Old Testament classification and correct book order
+            # Confirm proper Old Testament classification and correct order
             try:
                 response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine&testament=old")
                 if response.status_code == 200:
@@ -671,8 +671,8 @@ class APITester:
                         else:
                             print(f"   ❌ {book_name}: WRONG TESTAMENT ({testament})")
                     
-                    # Check correct book order (Genesis=1, Exodus=2, Leviticus=3, Numbers=4)
-                    expected_order = {'Genesis': 1, 'Exodus': 2, 'Leviticus': 3, 'Numbers': 4}
+                    # Check correct book order (Genesis=1, Exodus=2, Leviticus=3, Numbers=4, Deuteronomy=5)
+                    expected_order = {'Genesis': 1, 'Exodus': 2, 'Leviticus': 3, 'Numbers': 4, 'Deuteronomy': 5}
                     correct_order = True
                     
                     for book_name, actual_order in old_testament_books:
@@ -684,41 +684,41 @@ class APITester:
                                 print(f"   ❌ {book_name}: WRONG ORDER ({actual_order}, expected {expected})")
                                 correct_order = False
                     
-                    if len(old_testament_books) >= 4:
-                        self.log_test("Proper Old Testament Classification", True, f"✅ CORRECT! {len(old_testament_books)} books properly classified as Old Testament")
+                    if len(old_testament_books) >= 5:
+                        self.log_test("Proper Old Testament Classification (5 Books)", True, f"✅ CORRECT! {len(old_testament_books)} books properly classified as Old Testament")
                     else:
-                        self.log_test("Proper Old Testament Classification", False, f"❌ INCOMPLETE! Only {len(old_testament_books)} books classified as Old Testament")
+                        self.log_test("Proper Old Testament Classification (5 Books)", False, f"❌ INCOMPLETE! Only {len(old_testament_books)} books classified as Old Testament")
                     
                     if correct_order:
-                        self.log_test("Correct Book Order", True, f"✅ PERFECT! All books in correct biblical order")
+                        self.log_test("Correct Book Order (Including Deuteronomy)", True, f"✅ PERFECT! All books in correct biblical order")
                     else:
-                        self.log_test("Correct Book Order", False, f"❌ WRONG ORDER! Some books not in correct biblical order")
+                        self.log_test("Correct Book Order (Including Deuteronomy)", False, f"❌ WRONG ORDER! Some books not in correct biblical order")
                     
-                    # Verify Numbers is properly classified as Old Testament book
-                    numbers_found = False
+                    # Verify Deuteronomy is properly classified as Old Testament book
+                    deuteronomy_found = False
                     for book_name, actual_order in old_testament_books:
-                        if book_name == 'Numbers':
-                            numbers_found = True
+                        if book_name == 'Deuteronomy':
+                            deuteronomy_found = True
                             break
                     
-                    if numbers_found:
-                        self.log_test("Numbers Properly Classified as Old Testament", True, f"✅ CORRECT! Numbers is properly classified as Old Testament book")
+                    if deuteronomy_found:
+                        self.log_test("Deuteronomy Properly Classified as Old Testament", True, f"✅ CORRECT! Deuteronomy is properly classified as Old Testament book")
                     else:
-                        self.log_test("Numbers Properly Classified as Old Testament", False, f"❌ MISSING! Numbers not found in Old Testament classification")
+                        self.log_test("Deuteronomy Properly Classified as Old Testament", False, f"❌ MISSING! Deuteronomy not found in Old Testament classification")
                         
                 else:
-                    self.log_test("Proper Old Testament Classification", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Correct Book Order", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Numbers Properly Classified as Old Testament", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Proper Old Testament Classification (5 Books)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Correct Book Order (Including Deuteronomy)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Properly Classified as Old Testament", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Proper Old Testament Classification", False, f"Error: {str(e)}")
-                self.log_test("Correct Book Order", False, f"Error: {str(e)}")
-                self.log_test("Numbers Properly Classified as Old Testament", False, f"Error: {str(e)}")
+                self.log_test("Proper Old Testament Classification (5 Books)", False, f"Error: {str(e)}")
+                self.log_test("Correct Book Order (Including Deuteronomy)", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Properly Classified as Old Testament", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Database Status", False, f"Error: {str(e)}")
+            self.log_test("Complete Database Status", False, f"Error: {str(e)}")
             return False
 
     # Removed old test method - replaced with new tests matching review request
