@@ -322,225 +322,112 @@ class APITester:
     def test_deuteronomy_verse_ordering_issues(self):
         """REVIEW REQUEST TEST 3: Verse Ordering Issues - Sample Chapter 1 verses 1-15 and check for duplicates/missing numbers"""
         try:
-            print("\n🔍 AUTHENTICITY VS GENERATED CONTENT ANALYSIS - CHECK PERCENTAGE OF AUTHENTIC VS CONTEXTUAL/GENERATED CONTENT...")
+            print("\n🔍 DEUTERONOMY VERSE ORDERING ISSUES - SAMPLE CHAPTER 1 VERSES 1-15 AND CHECK FOR DUPLICATES/MISSING NUMBERS...")
             
-            # Check what percentage of Exodus verses are authentic vs contextual/generated
+            # Sample Deuteronomy Chapter 1 verses 1-15 to check ordering
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=100")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter=1&limit=20")
                 if response.status_code == 200:
                     data = response.json()
                     verses = data.get('verses', [])
                     
                     if verses:
-                        print("\n📊 EXODUS AUTHENTICITY ANALYSIS (100 VERSES SAMPLE):")
-                        authentic_verses = 0
-                        contextual_verses = 0
-                        generated_verses = 0
-                        placeholder_verses = 0
+                        print(f"\n📖 DEUTERONOMY CHAPTER 1 VERSES 1-15 ORDERING ANALYSIS:")
                         
+                        # Extract verse numbers and content for verses 1-15
+                        verse_data = []
                         for verse in verses:
+                            verse_num = verse.get('verse')
                             verse_text = verse.get('text', '')
-                            verse_ref = f"Exodus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                            
-                            # Check for authentic biblical content
-                            is_authentic = (
-                                len(verse_text) > 20 and  # Has substantial content
-                                not verse_text.lower().startswith('error') and  # No error messages
-                                not 'placeholder' in verse_text.lower() and  # No placeholders
-                                not 'generated' in verse_text.lower() and  # No generated markers
-                                not 'contextual' in verse_text.lower() and  # No contextual markers
-                                not 'see exodus' in verse_text.lower() and  # No cross-references
-                                verse_text.strip() != '' and  # Not empty
-                                not verse_text.startswith('...') and  # Not truncated
-                                len(verse_text.split()) >= 8  # At least 8 words for substantial content
-                            )
-                            
-                            # Check for contextual content
-                            is_contextual = (
-                                'contextual' in verse_text.lower() or
-                                ('and' in verse_text.lower() and len(verse_text.split()) < 15) or
-                                (len(verse_text) >= 10 and len(verse_text) <= 50 and not is_authentic)
-                            )
-                            
-                            # Check for generated content
-                            is_generated = (
-                                'generated' in verse_text.lower() or
-                                'auto-generated' in verse_text.lower() or
-                                'computer-generated' in verse_text.lower()
-                            )
-                            
-                            # Check for placeholder content
-                            is_placeholder = (
-                                'placeholder' in verse_text.lower() or
-                                'see exodus' in verse_text.lower() or
-                                '[chapter]' in verse_text.lower() or
-                                '[verse]' in verse_text.lower() or
-                                len(verse_text) < 10
-                            )
-                            
-                            if is_authentic:
-                                authentic_verses += 1
-                            elif is_contextual:
-                                contextual_verses += 1
-                            elif is_generated:
-                                generated_verses += 1
-                            elif is_placeholder:
-                                placeholder_verses += 1
+                            if verse_num and int(verse_num) <= 15:
+                                verse_data.append({
+                                    'number': int(verse_num),
+                                    'text': verse_text,
+                                    'ref': f"Deuteronomy 1:{verse_num}"
+                                })
                         
-                        # Calculate percentages
-                        total_analyzed = len(verses)
-                        authentic_percentage = (authentic_verses / total_analyzed) * 100
-                        contextual_percentage = (contextual_verses / total_analyzed) * 100
-                        generated_percentage = (generated_verses / total_analyzed) * 100
-                        placeholder_percentage = (placeholder_verses / total_analyzed) * 100
+                        # Sort by verse number for analysis
+                        verse_data.sort(key=lambda x: x['number'])
                         
-                        print(f"   📈 AUTHENTICITY BREAKDOWN:")
-                        print(f"   ✅ Authentic Biblical Content: {authentic_percentage:.1f}% ({authentic_verses}/{total_analyzed})")
-                        print(f"   ⚠️ Contextual Content: {contextual_percentage:.1f}% ({contextual_verses}/{total_analyzed})")
-                        print(f"   ❌ Generated Content: {generated_percentage:.1f}% ({generated_verses}/{total_analyzed})")
-                        print(f"   ❌ Placeholder Content: {placeholder_percentage:.1f}% ({placeholder_verses}/{total_analyzed})")
+                        # Check for proper sequential ordering (1-15)
+                        verse_numbers = [v['number'] for v in verse_data]
+                        expected_sequence = list(range(1, min(16, len(verse_numbers) + 1)))
                         
-                        if authentic_percentage >= 85:
-                            self.log_test("Exodus Authenticity Percentage (85%+ Authentic)", True, f"✅ EXCELLENT! {authentic_percentage:.1f}% of Exodus verses are authentic biblical content")
-                        elif authentic_percentage >= 70:
-                            self.log_test("Exodus Authenticity Percentage (85%+ Authentic)", True, f"✅ GOOD! {authentic_percentage:.1f}% of Exodus verses are authentic")
+                        print(f"   📊 Verses Found (1-15): {verse_numbers}")
+                        print(f"   📊 Expected Sequence: {expected_sequence}")
+                        
+                        # Check for duplicates
+                        duplicates = []
+                        seen = set()
+                        for num in verse_numbers:
+                            if num in seen:
+                                duplicates.append(num)
+                            seen.add(num)
+                        
+                        # Check for missing numbers in sequence
+                        missing_numbers = []
+                        for i in range(1, 16):
+                            if i not in verse_numbers:
+                                missing_numbers.append(i)
+                        
+                        # Check for out-of-order verses
+                        is_sequential = verse_numbers == sorted(verse_numbers)
+                        
+                        print(f"\n📝 DETAILED VERSE ANALYSIS (First 10):")
+                        for i, verse in enumerate(verse_data[:10]):
+                            print(f"   {verse['ref']}: '{verse['text'][:60]}...'")
+                        
+                        # Test results
+                        if len(duplicates) == 0:
+                            self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", True, f"✅ GOOD! No duplicate verse numbers found in Chapter 1")
                         else:
-                            self.log_test("Exodus Authenticity Percentage (85%+ Authentic)", False, f"❌ POOR! Only {authentic_percentage:.1f}% of Exodus verses are authentic (too much generated/contextual content)")
+                            self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"❌ DUPLICATES! Found duplicate verse numbers: {duplicates}")
                         
-                        # Check if generated/placeholder content is minimal
-                        non_authentic_percentage = generated_percentage + placeholder_percentage
-                        if non_authentic_percentage <= 10:
-                            self.log_test("Minimal Generated/Placeholder Content (≤10%)", True, f"✅ CLEAN! Only {non_authentic_percentage:.1f}% generated/placeholder content")
-                        elif non_authentic_percentage <= 20:
-                            self.log_test("Minimal Generated/Placeholder Content (≤10%)", False, f"⚠️ MODERATE! {non_authentic_percentage:.1f}% generated/placeholder content (acceptable but not ideal)")
+                        if len(missing_numbers) == 0:
+                            self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", True, f"✅ COMPLETE! All verse numbers 1-15 present")
+                        elif len(missing_numbers) <= 3:
+                            self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", True, f"✅ MOSTLY COMPLETE! Only {len(missing_numbers)} missing: {missing_numbers}")
                         else:
-                            self.log_test("Minimal Generated/Placeholder Content (≤10%)", False, f"❌ HIGH! {non_authentic_percentage:.1f}% generated/placeholder content (too much non-authentic content)")
+                            self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", False, f"❌ GAPS! Missing verse numbers: {missing_numbers}")
+                        
+                        if is_sequential:
+                            self.log_test("Deuteronomy Ch1 Proper Sequential Order", True, f"✅ ORDERED! Verses are in proper sequential order")
+                        else:
+                            self.log_test("Deuteronomy Ch1 Proper Sequential Order", False, f"❌ OUT OF ORDER! Verses not in sequential order")
+                        
+                        # Overall ordering assessment
+                        ordering_issues = len(duplicates) + len(missing_numbers) + (0 if is_sequential else 1)
+                        if ordering_issues == 0:
+                            self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", True, f"✅ PERFECT! No ordering issues detected in Chapter 1 verses 1-15")
+                        elif ordering_issues <= 2:
+                            self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", True, f"✅ MINOR ISSUES! {ordering_issues} ordering issues detected")
+                        else:
+                            self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", False, f"❌ MAJOR ISSUES! {ordering_issues} ordering problems detected")
                         
                     else:
-                        self.log_test("Exodus Authenticity Percentage (85%+ Authentic)", False, f"❌ NO DATA! No Exodus verses found for authenticity analysis")
-                        self.log_test("Minimal Generated/Placeholder Content (≤10%)", False, f"❌ NO DATA! Cannot analyze generated/placeholder content")
+                        self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"❌ NO DATA! No verses found in Deuteronomy Chapter 1")
+                        self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", False, f"❌ NO DATA! Cannot check for missing verse numbers")
+                        self.log_test("Deuteronomy Ch1 Proper Sequential Order", False, f"❌ NO DATA! Cannot check sequential order")
+                        self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", False, f"❌ NO DATA! No verses available for ordering analysis")
                 else:
-                    self.log_test("Exodus Authenticity Percentage (85%+ Authentic)", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Minimal Generated/Placeholder Content (≤10%)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Ch1 Proper Sequential Order", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Exodus Authenticity Percentage (85%+ Authentic)", False, f"Error: {str(e)}")
-                self.log_test("Minimal Generated/Placeholder Content (≤10%)", False, f"Error: {str(e)}")
-            
-            # Verify the 20 cross-referenced verses have proper biblical content
-            try:
-                # Search for verses that might be cross-referenced with precepts
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&has_precept=true&limit=20")
-                if response.status_code == 200:
-                    data = response.json()
-                    cross_ref_verses = data.get('verses', [])
-                    
-                    if len(cross_ref_verses) >= 10:  # At least 10 cross-referenced verses
-                        print(f"\n🔗 CROSS-REFERENCED VERSES BIBLICAL CONTENT CHECK ({len(cross_ref_verses)} verses):")
-                        proper_biblical_content = 0
-                        
-                        for verse in cross_ref_verses[:20]:  # Check up to 20 verses
-                            verse_text = verse.get('text', '')
-                            verse_ref = f"Exodus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                            
-                            # Check for proper biblical content in cross-referenced verses
-                            has_proper_content = (
-                                len(verse_text) > 15 and  # Substantial content
-                                not 'placeholder' in verse_text.lower() and  # No placeholders
-                                not 'see exodus' in verse_text.lower() and  # No self-references
-                                len(verse_text.split()) >= 5 and  # At least 5 words
-                                any(word in verse_text.lower() for word in ['lord', 'god', 'moses', 'israel', 'pharaoh', 'egypt', 'children'])  # Biblical themes
-                            )
-                            
-                            if has_proper_content:
-                                proper_biblical_content += 1
-                                if len(cross_ref_verses) <= 10:  # Show details for smaller samples
-                                    print(f"   ✅ {verse_ref}: PROPER BIBLICAL CONTENT - '{verse_text[:60]}...'")
-                            else:
-                                if len(cross_ref_verses) <= 10:  # Show details for smaller samples
-                                    print(f"   ❌ {verse_ref}: POOR CONTENT - '{verse_text}'")
-                        
-                        cross_ref_percentage = (proper_biblical_content / len(cross_ref_verses)) * 100
-                        
-                        if cross_ref_percentage >= 90:
-                            self.log_test("Cross-Referenced Verses Proper Biblical Content", True, f"✅ EXCELLENT! {cross_ref_percentage:.1f}% ({proper_biblical_content}/{len(cross_ref_verses)}) cross-referenced verses have proper biblical content")
-                        elif cross_ref_percentage >= 75:
-                            self.log_test("Cross-Referenced Verses Proper Biblical Content", True, f"✅ GOOD! {cross_ref_percentage:.1f}% cross-referenced verses have proper content")
-                        else:
-                            self.log_test("Cross-Referenced Verses Proper Biblical Content", False, f"❌ POOR! Only {cross_ref_percentage:.1f}% cross-referenced verses have proper biblical content")
-                    else:
-                        self.log_test("Cross-Referenced Verses Proper Biblical Content", False, f"❌ INSUFFICIENT DATA! Only {len(cross_ref_verses)} cross-referenced verses found, expected at least 10")
-                else:
-                    self.log_test("Cross-Referenced Verses Proper Biblical Content", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Cross-Referenced Verses Proper Biblical Content", False, f"Error: {str(e)}")
-            
-            # Identify if gap-filled verses contain meaningful biblical text
-            try:
-                # Look for verses that might be gap-filled (shorter or potentially generated)
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=50")
-                if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    
-                    if verses:
-                        print(f"\n🔍 GAP-FILLED VERSES MEANINGFUL CONTENT CHECK:")
-                        gap_filled_verses = []
-                        meaningful_gap_filled = 0
-                        
-                        for verse in verses:
-                            verse_text = verse.get('text', '')
-                            verse_ref = f"Exodus {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                            
-                            # Identify potential gap-filled verses (shorter, simpler, or potentially generated)
-                            is_potentially_gap_filled = (
-                                len(verse_text) < 50 or  # Shorter verses
-                                len(verse_text.split()) < 8 or  # Few words
-                                verse_text.count(',') == 0 or  # Simple structure
-                                'and' == verse_text.lower().strip()[:3]  # Starts with simple conjunction
-                            )
-                            
-                            if is_potentially_gap_filled:
-                                gap_filled_verses.append(verse)
-                                
-                                # Check if gap-filled verse contains meaningful biblical text
-                                has_meaningful_content = (
-                                    len(verse_text) > 10 and  # Not too short
-                                    not 'placeholder' in verse_text.lower() and  # No placeholders
-                                    any(word in verse_text.lower() for word in ['lord', 'god', 'moses', 'israel', 'pharaoh', 'egypt', 'children', 'said', 'spake']) and  # Biblical words
-                                    len(verse_text.split()) >= 3  # At least 3 words
-                                )
-                                
-                                if has_meaningful_content:
-                                    meaningful_gap_filled += 1
-                                    if len(gap_filled_verses) <= 10:  # Show details for first 10
-                                        print(f"   ✅ {verse_ref}: MEANINGFUL GAP-FILLED - '{verse_text}'")
-                                else:
-                                    if len(gap_filled_verses) <= 10:  # Show details for first 10
-                                        print(f"   ❌ {verse_ref}: POOR GAP-FILLED - '{verse_text}'")
-                        
-                        if len(gap_filled_verses) > 0:
-                            gap_filled_percentage = (meaningful_gap_filled / len(gap_filled_verses)) * 100
-                            
-                            if gap_filled_percentage >= 80:
-                                self.log_test("Gap-Filled Verses Meaningful Biblical Text", True, f"✅ GOOD! {gap_filled_percentage:.1f}% ({meaningful_gap_filled}/{len(gap_filled_verses)}) gap-filled verses contain meaningful biblical text")
-                            elif gap_filled_percentage >= 60:
-                                self.log_test("Gap-Filled Verses Meaningful Biblical Text", True, f"✅ ACCEPTABLE! {gap_filled_percentage:.1f}% gap-filled verses contain meaningful text")
-                            else:
-                                self.log_test("Gap-Filled Verses Meaningful Biblical Text", False, f"❌ POOR! Only {gap_filled_percentage:.1f}% gap-filled verses contain meaningful biblical text")
-                        else:
-                            self.log_test("Gap-Filled Verses Meaningful Biblical Text", True, f"✅ NO GAP-FILLED VERSES! All verses appear to be complete biblical text")
-                    else:
-                        self.log_test("Gap-Filled Verses Meaningful Biblical Text", False, f"❌ NO DATA! No Exodus verses found for gap-filled analysis")
-                else:
-                    self.log_test("Gap-Filled Verses Meaningful Biblical Text", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Gap-Filled Verses Meaningful Biblical Text", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Ch1 Proper Sequential Order", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Authenticity vs Generated Content Analysis", False, f"Error: {str(e)}")
+            self.log_test("Deuteronomy Verse Ordering Issues", False, f"Error: {str(e)}")
             return False
+
+    def test_deuteronomy_data_quality_issues(self):
+        """REVIEW REQUEST TEST 4: Data Quality Issues - Check sequential verses, chapter boundaries, cross-contamination"""
 
     def test_foundation_books_preservation(self):
         """REVIEW REQUEST TEST 3: Foundation Books Preservation - Verify Genesis, Leviticus, Numbers, Deuteronomy have exact verse counts"""
