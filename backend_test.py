@@ -1,38 +1,36 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Exodus Bible Book 100% Completion Verification
+Backend Testing for Deuteronomy Chapter and Verse Structure Issues Investigation
 
-REVIEW REQUEST FOCUS - EXODUS 100% COMPLETION WITH AUTHENTIC CONTENT:
-Please verify that the new Exodus loading achieved 100% completion with authentic content. Test:
+REVIEW REQUEST FOCUS - DEUTERONOMY STRUCTURE ANALYSIS:
+Please investigate the current Deuteronomy chapter and verse structure issues. Test:
 
-1. **100% Completion Verification**:
-   - Verify Exodus now has exactly 1,213 verses (100% of target)
-   - Check all 40 chapters are present with proper verse counts
-   - Verify key chapters: Chapter 1 (22 verses), Chapter 12 (51 verses), Chapter 20 (26 verses), Chapter 40 (38 verses)
+1. **Deuteronomy Chapter Structure Analysis**:
+   - Check how many chapters Deuteronomy currently has
+   - Verify Deuteronomy Chapter 1 verse count and ordering
+   - Identify any verse numbering problems in Chapter 1 (verses out of order, wrong numbers, gaps)
 
-2. **Content Quality Check**:
-   - Sample Exodus 1:1-5 to verify they contain proper Israel names content (not placeholder text)
-   - Check Exodus 3:2 has burning bush content
-   - Verify Exodus 20:1-3 has Ten Commandments content
-   - Sample 10 random Exodus verses to check for authentic vs generated content
+2. **Deuteronomy Completeness Check**:
+   - Current total verse count (should be 959, but we have 562)
+   - Missing chapters and verse gaps
+   - Compare current count vs KJV standard (34 chapters, 959 verses)
 
-3. **Foundation Books Preservation**:
-   - Verify Genesis still has 1,533 verses (preserved)
-   - Verify Leviticus still has 788 verses (preserved)  
-   - Verify Numbers still has 601 verses (preserved)
-   - Verify Deuteronomy still has 562 verses (preserved)
+3. **Verse Ordering Issues**:
+   - Sample Deuteronomy Chapter 1 verses 1-15 to check ordering
+   - Identify any duplicate verse numbers
+   - Check for missing verse numbers in sequence
 
-4. **Authenticity vs Generated Content Analysis**:
-   - Check what percentage of Exodus verses are authentic vs contextual/generated
-   - Verify the 20 cross-referenced verses have proper biblical content
-   - Identify if gap-filled verses contain meaningful biblical text
+4. **Data Quality Issues**:
+   - Check if verses are properly sequential within chapters
+   - Verify chapter boundaries are correct
+   - Identify any cross-contamination or data corruption
 
-5. **Complete Database Status**:
-   - Get total verse count (should be Genesis 1,533 + Leviticus 788 + Numbers 601 + Deuteronomy 562 + Exodus 1,213 = 4,697)
-   - Verify all 5 books exist correctly in KJV 1611 Divine version
-   - Confirm proper Old Testament classification and order
+5. **Root Cause Analysis**:
+   - Why is Deuteronomy incomplete (562/959 verses)?
+   - What caused the verse ordering/numbering issues?
+   - How does this compare to our successful Exodus (1,213/1,213 verses)?
 
-Please provide verification focusing on whether the content quality meets our authentic biblical text standards or if we have too much generated/contextual content.
+Please provide detailed analysis of the Deuteronomy structure problems so we can fix them properly.
 """
 
 import requests
