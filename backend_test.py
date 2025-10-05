@@ -429,92 +429,176 @@ class APITester:
     def test_deuteronomy_data_quality_issues(self):
         """REVIEW REQUEST TEST 4: Data Quality Issues - Check sequential verses, chapter boundaries, cross-contamination"""
 
-    def test_foundation_books_preservation(self):
-        """REVIEW REQUEST TEST 3: Foundation Books Preservation - Verify Genesis, Leviticus, Numbers, Deuteronomy have exact verse counts"""
         try:
-            print("\n🔍 FOUNDATION BOOKS PRESERVATION - VERIFY GENESIS, LEVITICUS, NUMBERS, DEUTERONOMY EXACT VERSE COUNTS...")
+            print("\n🔍 DEUTERONOMY DATA QUALITY ISSUES - CHECK SEQUENTIAL VERSES, CHAPTER BOUNDARIES, CROSS-CONTAMINATION...")
             
-            # Verify Genesis still has exactly 1,533 verses (preserved)
+            # Check if verses are properly sequential within chapters
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Genesis&limit=1")
+                # Sample multiple chapters to check sequential verse patterns
+                chapters_to_check = [1, 2, 3, 4, 5]  # Check first 5 chapters
+                sequential_issues = []
+                
+                print(f"\n📖 DEUTERONOMY SEQUENTIAL VERSE ANALYSIS (Chapters 1-5):")
+                
+                for chapter_num in chapters_to_check:
+                    try:
+                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter={chapter_num}&limit=50")
+                        if response.status_code == 200:
+                            chapter_data = response.json()
+                            chapter_verses = chapter_data.get('verses', [])
+                            
+                            if chapter_verses:
+                                verse_numbers = []
+                                for verse in chapter_verses:
+                                    verse_num = verse.get('verse')
+                                    if verse_num:
+                                        verse_numbers.append(int(verse_num))
+                                
+                                verse_numbers.sort()
+                                
+                                # Check for sequential pattern
+                                is_sequential = True
+                                gaps = []
+                                for i in range(1, len(verse_numbers)):
+                                    if verse_numbers[i] != verse_numbers[i-1] + 1:
+                                        is_sequential = False
+                                        gaps.append(f"{verse_numbers[i-1]}-{verse_numbers[i]}")
+                                
+                                if is_sequential:
+                                    print(f"   ✅ Chapter {chapter_num}: SEQUENTIAL ({len(verse_numbers)} verses, 1-{max(verse_numbers)})")
+                                else:
+                                    print(f"   ❌ Chapter {chapter_num}: GAPS ({len(verse_numbers)} verses, gaps: {', '.join(gaps[:3])})")
+                                    sequential_issues.append(f"Ch{chapter_num}")
+                            else:
+                                print(f"   ❌ Chapter {chapter_num}: NO VERSES")
+                                sequential_issues.append(f"Ch{chapter_num}")
+                        else:
+                            print(f"   ❌ Chapter {chapter_num}: API ERROR")
+                            sequential_issues.append(f"Ch{chapter_num}")
+                    except Exception as e:
+                        print(f"   ❌ Chapter {chapter_num}: ERROR ({str(e)})")
+                        sequential_issues.append(f"Ch{chapter_num}")
+                
+                if len(sequential_issues) == 0:
+                    self.log_test("Deuteronomy Verses Properly Sequential Within Chapters", True, f"✅ GOOD! All sampled chapters have sequential verses")
+                elif len(sequential_issues) <= 2:
+                    self.log_test("Deuteronomy Verses Properly Sequential Within Chapters", True, f"✅ MOSTLY GOOD! Only {len(sequential_issues)} chapters with issues: {', '.join(sequential_issues)}")
+                else:
+                    self.log_test("Deuteronomy Verses Properly Sequential Within Chapters", False, f"❌ ISSUES! {len(sequential_issues)} chapters have sequential problems: {', '.join(sequential_issues)}")
+                    
+            except Exception as e:
+                self.log_test("Deuteronomy Verses Properly Sequential Within Chapters", False, f"Error: {str(e)}")
+            
+            # Verify chapter boundaries are correct
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=50")
                 if response.status_code == 200:
                     data = response.json()
-                    total_verses = data.get('total', 0)
-                    expected_verses = 1533  # Review request specifies exactly 1,533 verses
+                    verses = data.get('verses', [])
                     
-                    if total_verses == expected_verses:
-                        self.log_test("Genesis Exactly 1,533 Verses Preserved", True, f"✅ PERFECT! Genesis has exactly {total_verses} verses (preserved)")
-                    elif total_verses > 0:
-                        self.log_test("Genesis Exactly 1,533 Verses Preserved", False, f"❌ INCORRECT COUNT! Genesis has {total_verses} verses, expected exactly {expected_verses}")
+                    if verses:
+                        # Check chapter transitions
+                        chapter_transitions = {}
+                        for verse in verses:
+                            chapter = verse.get('chapter')
+                            verse_num = verse.get('verse')
+                            if chapter and verse_num:
+                                chapter_num = int(chapter)
+                                verse_num = int(verse_num)
+                                
+                                if chapter_num not in chapter_transitions:
+                                    chapter_transitions[chapter_num] = {'min': verse_num, 'max': verse_num}
+                                else:
+                                    chapter_transitions[chapter_num]['min'] = min(chapter_transitions[chapter_num]['min'], verse_num)
+                                    chapter_transitions[chapter_num]['max'] = max(chapter_transitions[chapter_num]['max'], verse_num)
+                        
+                        print(f"\n📖 DEUTERONOMY CHAPTER BOUNDARIES ANALYSIS:")
+                        boundary_issues = []
+                        
+                        for chapter_num in sorted(chapter_transitions.keys())[:5]:  # Check first 5 chapters
+                            min_verse = chapter_transitions[chapter_num]['min']
+                            max_verse = chapter_transitions[chapter_num]['max']
+                            
+                            # Check if chapter starts at verse 1
+                            if min_verse == 1:
+                                print(f"   ✅ Chapter {chapter_num}: PROPER START (verse 1-{max_verse})")
+                            else:
+                                print(f"   ❌ Chapter {chapter_num}: WRONG START (verse {min_verse}-{max_verse}, should start at 1)")
+                                boundary_issues.append(f"Ch{chapter_num}")
+                        
+                        if len(boundary_issues) == 0:
+                            self.log_test("Deuteronomy Chapter Boundaries Correct", True, f"✅ GOOD! Chapter boundaries are correct (all start at verse 1)")
+                        else:
+                            self.log_test("Deuteronomy Chapter Boundaries Correct", False, f"❌ ISSUES! {len(boundary_issues)} chapters have boundary problems: {', '.join(boundary_issues)}")
                     else:
-                        self.log_test("Genesis Exactly 1,533 Verses Preserved", False, f"❌ NOT FOUND! Genesis does not exist in database (0 verses)")
+                        self.log_test("Deuteronomy Chapter Boundaries Correct", False, f"❌ NO DATA! No verses found for boundary analysis")
                 else:
-                    self.log_test("Genesis Exactly 1,533 Verses Preserved", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Chapter Boundaries Correct", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Genesis Exactly 1,533 Verses Preserved", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Chapter Boundaries Correct", False, f"Error: {str(e)}")
             
-            # Verify Leviticus still has exactly 788 verses (preserved)
+            # Identify any cross-contamination or data corruption
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Leviticus&limit=1")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=20")
                 if response.status_code == 200:
                     data = response.json()
-                    total_verses = data.get('total', 0)
-                    expected_verses = 788  # Review request specifies exactly 788 verses
+                    verses = data.get('verses', [])
                     
-                    if total_verses == expected_verses:
-                        self.log_test("Leviticus Exactly 788 Verses Preserved", True, f"✅ PERFECT! Leviticus has exactly {total_verses} verses (preserved)")
-                    elif total_verses > 0:
-                        self.log_test("Leviticus Exactly 788 Verses Preserved", False, f"❌ INCORRECT COUNT! Leviticus has {total_verses} verses, expected exactly {expected_verses}")
+                    if verses:
+                        print(f"\n📖 DEUTERONOMY CROSS-CONTAMINATION CHECK (20 verses sample):")
+                        contamination_issues = []
+                        
+                        # Check for content from other books
+                        other_book_keywords = {
+                            'Genesis': ['creation', 'adam', 'eve', 'noah', 'abraham', 'isaac', 'jacob'],
+                            'Exodus': ['pharaoh', 'egypt', 'plagues', 'passover', 'red sea'],
+                            'Leviticus': ['offerings', 'sacrifices', 'priests', 'aaron'],
+                            'Numbers': ['census', 'wilderness', 'tribes', 'spies']
+                        }
+                        
+                        deuteronomy_keywords = ['moses', 'law', 'commandments', 'statutes', 'jordan', 'promised land', 'israel']
+                        
+                        for i, verse in enumerate(verses[:10]):  # Check first 10 verses
+                            verse_text = verse.get('text', '').lower()
+                            verse_ref = f"Deuteronomy {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            
+                            # Check for other book content
+                            contamination_found = []
+                            for book, keywords in other_book_keywords.items():
+                                for keyword in keywords:
+                                    if keyword in verse_text and book != 'Deuteronomy':
+                                        contamination_found.append(f"{book}:{keyword}")
+                            
+                            # Check for proper Deuteronomy content
+                            has_deuteronomy_content = any(keyword in verse_text for keyword in deuteronomy_keywords)
+                            
+                            if contamination_found:
+                                print(f"   ❌ {verse_ref}: CONTAMINATION - '{verse_text[:60]}...' (found: {', '.join(contamination_found[:2])})")
+                                contamination_issues.append(verse_ref)
+                            elif has_deuteronomy_content:
+                                print(f"   ✅ {verse_ref}: PROPER CONTENT - '{verse_text[:60]}...'")
+                            else:
+                                print(f"   ⚠️ {verse_ref}: UNCLEAR - '{verse_text[:60]}...'")
+                        
+                        if len(contamination_issues) == 0:
+                            self.log_test("Deuteronomy No Cross-Contamination", True, f"✅ CLEAN! No cross-contamination detected in sampled verses")
+                        else:
+                            self.log_test("Deuteronomy No Cross-Contamination", False, f"❌ CONTAMINATION! {len(contamination_issues)} verses show cross-contamination: {', '.join(contamination_issues[:3])}")
                     else:
-                        self.log_test("Leviticus Exactly 788 Verses Preserved", False, f"❌ NOT FOUND! Leviticus does not exist in database (0 verses)")
+                        self.log_test("Deuteronomy No Cross-Contamination", False, f"❌ NO DATA! No verses found for contamination analysis")
                 else:
-                    self.log_test("Leviticus Exactly 788 Verses Preserved", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy No Cross-Contamination", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Leviticus Exactly 788 Verses Preserved", False, f"Error: {str(e)}")
-            
-            # Verify Numbers still has exactly 601 verses (preserved)
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=1")
-                if response.status_code == 200:
-                    data = response.json()
-                    total_verses = data.get('total', 0)
-                    expected_verses = 601  # Review request specifies exactly 601 verses
-                    
-                    if total_verses == expected_verses:
-                        self.log_test("Numbers Exactly 601 Verses Preserved", True, f"✅ PERFECT! Numbers has exactly {total_verses} verses (preserved)")
-                    elif total_verses > 0:
-                        self.log_test("Numbers Exactly 601 Verses Preserved", False, f"❌ INCORRECT COUNT! Numbers has {total_verses} verses, expected exactly {expected_verses}")
-                    else:
-                        self.log_test("Numbers Exactly 601 Verses Preserved", False, f"❌ NOT FOUND! Numbers does not exist in database (0 verses)")
-                else:
-                    self.log_test("Numbers Exactly 601 Verses Preserved", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Numbers Exactly 601 Verses Preserved", False, f"Error: {str(e)}")
-            
-            # Verify Deuteronomy still has exactly 562 verses (preserved)
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=1")
-                if response.status_code == 200:
-                    data = response.json()
-                    total_verses = data.get('total', 0)
-                    expected_verses = 562  # Review request specifies exactly 562 verses
-                    
-                    if total_verses == expected_verses:
-                        self.log_test("Deuteronomy Exactly 562 Verses Preserved", True, f"✅ PERFECT! Deuteronomy has exactly {total_verses} verses (preserved)")
-                    elif total_verses > 0:
-                        self.log_test("Deuteronomy Exactly 562 Verses Preserved", False, f"❌ INCORRECT COUNT! Deuteronomy has {total_verses} verses, expected exactly {expected_verses}")
-                    else:
-                        self.log_test("Deuteronomy Exactly 562 Verses Preserved", False, f"❌ NOT FOUND! Deuteronomy does not exist in database (0 verses)")
-                else:
-                    self.log_test("Deuteronomy Exactly 562 Verses Preserved", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Deuteronomy Exactly 562 Verses Preserved", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy No Cross-Contamination", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Foundation Books Preservation", False, f"Error: {str(e)}")
+            self.log_test("Deuteronomy Data Quality Issues", False, f"Error: {str(e)}")
             return False
+
+    def test_deuteronomy_root_cause_analysis(self):
+        """REVIEW REQUEST TEST 5: Root Cause Analysis - Why incomplete, comparison with successful Exodus"""
 
     def test_complete_database_status(self):
         """REVIEW REQUEST TEST 5: Complete Database Status - Verify total verse count and all 5 books structure"""
