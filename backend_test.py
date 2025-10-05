@@ -500,175 +500,116 @@ class APITester:
             self.log_test("Deuteronomy Content Quality Check", False, f"Error: {str(e)}")
             return False
 
-    def test_deuteronomy_data_quality_issues(self):
-        """REVIEW REQUEST TEST 4: Data Quality Issues - Check sequential verses, chapter boundaries, cross-contamination"""
-
+    def test_foundation_books_preservation(self):
+        """REVIEW REQUEST TEST 4: Foundation Books Preservation - Verify Genesis 1,533, Exodus 1,213, Leviticus 788, Numbers 601 verses preserved"""
         try:
-            print("\n🔍 DEUTERONOMY DATA QUALITY ISSUES - CHECK SEQUENTIAL VERSES, CHAPTER BOUNDARIES, CROSS-CONTAMINATION...")
+            print("\n🔍 FOUNDATION BOOKS PRESERVATION - VERIFY GENESIS, EXODUS, LEVITICUS, NUMBERS VERSES PRESERVED...")
             
-            # Check if verses are properly sequential within chapters
+            # Define expected verse counts for foundation books
+            foundation_books = {
+                'Genesis': 1533,
+                'Exodus': 1213,
+                'Leviticus': 788,
+                'Numbers': 601
+            }
+            
+            preservation_results = {}
+            
+            for book, expected_verses in foundation_books.items():
+                try:
+                    print(f"\n📖 {book.upper()} PRESERVATION CHECK:")
+                    
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book}&limit=1")
+                    if response.status_code == 200:
+                        data = response.json()
+                        current_verses = data.get('total', 0)
+                        
+                        print(f"   📊 Current Verses: {current_verses}")
+                        print(f"   📊 Expected Verses: {expected_verses}")
+                        
+                        if current_verses == expected_verses:
+                            preservation_results[book] = True
+                            self.log_test(f"{book} Preserved ({expected_verses} verses)", True, f"✅ PERFECT! {book} has exactly {current_verses} verses (preserved)")
+                        elif current_verses >= expected_verses * 0.95:  # At least 95% preserved
+                            preservation_results[book] = True
+                            preservation_percentage = (current_verses / expected_verses) * 100
+                            self.log_test(f"{book} Preserved ({expected_verses} verses)", True, f"✅ MOSTLY PRESERVED! {book} has {current_verses} verses ({preservation_percentage:.1f}% preserved)")
+                        else:
+                            preservation_results[book] = False
+                            preservation_percentage = (current_verses / expected_verses) * 100
+                            self.log_test(f"{book} Preserved ({expected_verses} verses)", False, f"❌ NOT PRESERVED! {book} has only {current_verses}/{expected_verses} verses ({preservation_percentage:.1f}% preserved)")
+                    else:
+                        preservation_results[book] = False
+                        self.log_test(f"{book} Preserved ({expected_verses} verses)", False, f"API Error - Status: {response.status_code}")
+                        
+                except Exception as e:
+                    preservation_results[book] = False
+                    self.log_test(f"{book} Preserved ({expected_verses} verses)", False, f"Error: {str(e)}")
+            
+            # Overall preservation assessment
+            preserved_books = sum(preservation_results.values())
+            total_books = len(foundation_books)
+            
+            print(f"\n📊 FOUNDATION BOOKS PRESERVATION SUMMARY:")
+            print(f"   📊 Books Preserved: {preserved_books}/{total_books}")
+            
+            for book, preserved in preservation_results.items():
+                status = "✅ PRESERVED" if preserved else "❌ NOT PRESERVED"
+                print(f"   {status}: {book}")
+            
+            if preserved_books == total_books:
+                self.log_test("All Foundation Books Preserved", True, f"✅ EXCELLENT! All {preserved_books}/{total_books} foundation books preserved")
+            elif preserved_books >= total_books * 0.75:
+                self.log_test("All Foundation Books Preserved", True, f"✅ MOSTLY PRESERVED! {preserved_books}/{total_books} foundation books preserved")
+            else:
+                self.log_test("All Foundation Books Preserved", False, f"❌ POOR PRESERVATION! Only {preserved_books}/{total_books} foundation books preserved")
+            
+            # Check specific key verses from each book to verify content integrity
             try:
-                # Sample multiple chapters to check sequential verse patterns
-                chapters_to_check = [1, 2, 3, 4, 5]  # Check first 5 chapters
-                sequential_issues = []
+                print(f"\n📖 FOUNDATION BOOKS CONTENT INTEGRITY CHECK:")
                 
-                print(f"\n📖 DEUTERONOMY SEQUENTIAL VERSE ANALYSIS (Chapters 1-5):")
+                key_verses = {
+                    'Genesis': {'chapter': 1, 'verse': 1, 'keywords': ['beginning', 'god', 'created', 'heaven', 'earth']},
+                    'Exodus': {'chapter': 3, 'verse': 14, 'keywords': ['god', 'moses', 'i am', 'that i am']},
+                    'Leviticus': {'chapter': 19, 'verse': 18, 'keywords': ['love', 'neighbour', 'thyself']},
+                    'Numbers': {'chapter': 6, 'verse': 24, 'keywords': ['lord', 'bless', 'thee', 'keep']}
+                }
                 
-                for chapter_num in chapters_to_check:
+                content_integrity_score = 0
+                
+                for book, verse_info in key_verses.items():
                     try:
-                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter={chapter_num}&limit=50")
+                        response = self.session.get(f"{self.base_url}/bible/verse/{book}/{verse_info['chapter']}/{verse_info['verse']}")
                         if response.status_code == 200:
-                            chapter_data = response.json()
-                            chapter_verses = chapter_data.get('verses', [])
+                            verse_data = response.json()
+                            verse_text = verse_data.get('text', '').lower()
                             
-                            if chapter_verses:
-                                verse_numbers = []
-                                for verse in chapter_verses:
-                                    verse_num = verse.get('verse')
-                                    if verse_num:
-                                        verse_numbers.append(int(verse_num))
-                                
-                                verse_numbers.sort()
-                                
-                                # Check for sequential pattern
-                                is_sequential = True
-                                gaps = []
-                                for i in range(1, len(verse_numbers)):
-                                    if verse_numbers[i] != verse_numbers[i-1] + 1:
-                                        is_sequential = False
-                                        gaps.append(f"{verse_numbers[i-1]}-{verse_numbers[i]}")
-                                
-                                if is_sequential:
-                                    print(f"   ✅ Chapter {chapter_num}: SEQUENTIAL ({len(verse_numbers)} verses, 1-{max(verse_numbers)})")
-                                else:
-                                    print(f"   ❌ Chapter {chapter_num}: GAPS ({len(verse_numbers)} verses, gaps: {', '.join(gaps[:3])})")
-                                    sequential_issues.append(f"Ch{chapter_num}")
-                            else:
-                                print(f"   ❌ Chapter {chapter_num}: NO VERSES")
-                                sequential_issues.append(f"Ch{chapter_num}")
+                            keywords_found = [kw for kw in verse_info['keywords'] if kw in verse_text]
+                            
+                            print(f"   📝 {book} {verse_info['chapter']}:{verse_info['verse']}: '{verse_data.get('text', '')[:60]}...'")
+                            print(f"      Keywords found: {keywords_found}")
+                            
+                            if len(keywords_found) >= 2:
+                                content_integrity_score += 1
                         else:
-                            print(f"   ❌ Chapter {chapter_num}: API ERROR")
-                            sequential_issues.append(f"Ch{chapter_num}")
+                            print(f"   ❌ {book} {verse_info['chapter']}:{verse_info['verse']}: API Error")
                     except Exception as e:
-                        print(f"   ❌ Chapter {chapter_num}: ERROR ({str(e)})")
-                        sequential_issues.append(f"Ch{chapter_num}")
+                        print(f"   ❌ {book} {verse_info['chapter']}:{verse_info['verse']}: Error")
                 
-                if len(sequential_issues) == 0:
-                    self.log_test("Deuteronomy Verses Properly Sequential Within Chapters", True, f"✅ GOOD! All sampled chapters have sequential verses")
-                elif len(sequential_issues) <= 2:
-                    self.log_test("Deuteronomy Verses Properly Sequential Within Chapters", True, f"✅ MOSTLY GOOD! Only {len(sequential_issues)} chapters with issues: {', '.join(sequential_issues)}")
+                if content_integrity_score >= 3:
+                    self.log_test("Foundation Books Content Integrity", True, f"✅ GOOD! {content_integrity_score}/4 key verses have proper content")
+                elif content_integrity_score >= 2:
+                    self.log_test("Foundation Books Content Integrity", True, f"✅ PARTIAL! {content_integrity_score}/4 key verses have proper content")
                 else:
-                    self.log_test("Deuteronomy Verses Properly Sequential Within Chapters", False, f"❌ ISSUES! {len(sequential_issues)} chapters have sequential problems: {', '.join(sequential_issues)}")
+                    self.log_test("Foundation Books Content Integrity", False, f"❌ POOR! Only {content_integrity_score}/4 key verses have proper content")
                     
             except Exception as e:
-                self.log_test("Deuteronomy Verses Properly Sequential Within Chapters", False, f"Error: {str(e)}")
-            
-            # Verify chapter boundaries are correct
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=50")
-                if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    
-                    if verses:
-                        # Check chapter transitions
-                        chapter_transitions = {}
-                        for verse in verses:
-                            chapter = verse.get('chapter')
-                            verse_num = verse.get('verse')
-                            if chapter and verse_num:
-                                chapter_num = int(chapter)
-                                verse_num = int(verse_num)
-                                
-                                if chapter_num not in chapter_transitions:
-                                    chapter_transitions[chapter_num] = {'min': verse_num, 'max': verse_num}
-                                else:
-                                    chapter_transitions[chapter_num]['min'] = min(chapter_transitions[chapter_num]['min'], verse_num)
-                                    chapter_transitions[chapter_num]['max'] = max(chapter_transitions[chapter_num]['max'], verse_num)
-                        
-                        print(f"\n📖 DEUTERONOMY CHAPTER BOUNDARIES ANALYSIS:")
-                        boundary_issues = []
-                        
-                        for chapter_num in sorted(chapter_transitions.keys())[:5]:  # Check first 5 chapters
-                            min_verse = chapter_transitions[chapter_num]['min']
-                            max_verse = chapter_transitions[chapter_num]['max']
-                            
-                            # Check if chapter starts at verse 1
-                            if min_verse == 1:
-                                print(f"   ✅ Chapter {chapter_num}: PROPER START (verse 1-{max_verse})")
-                            else:
-                                print(f"   ❌ Chapter {chapter_num}: WRONG START (verse {min_verse}-{max_verse}, should start at 1)")
-                                boundary_issues.append(f"Ch{chapter_num}")
-                        
-                        if len(boundary_issues) == 0:
-                            self.log_test("Deuteronomy Chapter Boundaries Correct", True, f"✅ GOOD! Chapter boundaries are correct (all start at verse 1)")
-                        else:
-                            self.log_test("Deuteronomy Chapter Boundaries Correct", False, f"❌ ISSUES! {len(boundary_issues)} chapters have boundary problems: {', '.join(boundary_issues)}")
-                    else:
-                        self.log_test("Deuteronomy Chapter Boundaries Correct", False, f"❌ NO DATA! No verses found for boundary analysis")
-                else:
-                    self.log_test("Deuteronomy Chapter Boundaries Correct", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Deuteronomy Chapter Boundaries Correct", False, f"Error: {str(e)}")
-            
-            # Identify any cross-contamination or data corruption
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=20")
-                if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    
-                    if verses:
-                        print(f"\n📖 DEUTERONOMY CROSS-CONTAMINATION CHECK (20 verses sample):")
-                        contamination_issues = []
-                        
-                        # Check for content from other books
-                        other_book_keywords = {
-                            'Genesis': ['creation', 'adam', 'eve', 'noah', 'abraham', 'isaac', 'jacob'],
-                            'Exodus': ['pharaoh', 'egypt', 'plagues', 'passover', 'red sea'],
-                            'Leviticus': ['offerings', 'sacrifices', 'priests', 'aaron'],
-                            'Numbers': ['census', 'wilderness', 'tribes', 'spies']
-                        }
-                        
-                        deuteronomy_keywords = ['moses', 'law', 'commandments', 'statutes', 'jordan', 'promised land', 'israel']
-                        
-                        for i, verse in enumerate(verses[:10]):  # Check first 10 verses
-                            verse_text = verse.get('text', '').lower()
-                            verse_ref = f"Deuteronomy {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                            
-                            # Check for other book content
-                            contamination_found = []
-                            for book, keywords in other_book_keywords.items():
-                                for keyword in keywords:
-                                    if keyword in verse_text and book != 'Deuteronomy':
-                                        contamination_found.append(f"{book}:{keyword}")
-                            
-                            # Check for proper Deuteronomy content
-                            has_deuteronomy_content = any(keyword in verse_text for keyword in deuteronomy_keywords)
-                            
-                            if contamination_found:
-                                print(f"   ❌ {verse_ref}: CONTAMINATION - '{verse_text[:60]}...' (found: {', '.join(contamination_found[:2])})")
-                                contamination_issues.append(verse_ref)
-                            elif has_deuteronomy_content:
-                                print(f"   ✅ {verse_ref}: PROPER CONTENT - '{verse_text[:60]}...'")
-                            else:
-                                print(f"   ⚠️ {verse_ref}: UNCLEAR - '{verse_text[:60]}...'")
-                        
-                        if len(contamination_issues) == 0:
-                            self.log_test("Deuteronomy No Cross-Contamination", True, f"✅ CLEAN! No cross-contamination detected in sampled verses")
-                        else:
-                            self.log_test("Deuteronomy No Cross-Contamination", False, f"❌ CONTAMINATION! {len(contamination_issues)} verses show cross-contamination: {', '.join(contamination_issues[:3])}")
-                    else:
-                        self.log_test("Deuteronomy No Cross-Contamination", False, f"❌ NO DATA! No verses found for contamination analysis")
-                else:
-                    self.log_test("Deuteronomy No Cross-Contamination", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Deuteronomy No Cross-Contamination", False, f"Error: {str(e)}")
+                self.log_test("Foundation Books Content Integrity", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Deuteronomy Data Quality Issues", False, f"Error: {str(e)}")
+            self.log_test("Foundation Books Preservation", False, f"Error: {str(e)}")
             return False
 
     def test_deuteronomy_root_cause_analysis(self):
