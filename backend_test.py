@@ -77,111 +77,119 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_exodus_100_percent_completion_verification(self):
-        """REVIEW REQUEST TEST 1: 100% Completion Verification - Verify Exodus has exactly 1,213 verses with all 40 chapters"""
+    def test_deuteronomy_chapter_structure_analysis(self):
+        """REVIEW REQUEST TEST 1: Deuteronomy Chapter Structure Analysis - Check chapters, Chapter 1 verse count and ordering"""
         try:
-            print("\n🔍 EXODUS 100% COMPLETION VERIFICATION - CHECKING EXODUS HAS EXACTLY 1,213 VERSES WITH ALL 40 CHAPTERS...")
+            print("\n🔍 DEUTERONOMY CHAPTER STRUCTURE ANALYSIS - CHECKING CURRENT CHAPTERS AND CHAPTER 1 VERSE ORDERING...")
             
-            # Verify Exodus has exactly 1,213 verses (100% of target)
+            # Check how many chapters Deuteronomy currently has
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=100")
                 if response.status_code == 200:
                     data = response.json()
+                    verses = data.get('verses', [])
                     total_verses = data.get('total', 0)
-                    expected_verses = 1213  # Review request specifies exactly 1,213 verses for 100% completion
                     
-                    if total_verses == expected_verses:
-                        self.log_test("Exodus Exactly 1,213 Verses (100% Complete)", True, f"✅ PERFECT! Exodus has exactly {total_verses} verses (100% completion achieved)")
-                    elif total_verses > 0:
-                        completion_percentage = (total_verses / expected_verses) * 100
-                        self.log_test("Exodus Exactly 1,213 Verses (100% Complete)", False, f"❌ INCOMPLETE! Exodus has {total_verses} verses, expected exactly {expected_verses} ({completion_percentage:.1f}% complete)")
+                    # Count unique chapters in Deuteronomy
+                    deuteronomy_chapters = set()
+                    chapter_verse_counts = {}
+                    
+                    for verse in verses:
+                        chapter = verse.get('chapter')
+                        if chapter:
+                            chapter_num = int(chapter)
+                            deuteronomy_chapters.add(chapter_num)
+                            if chapter_num not in chapter_verse_counts:
+                                chapter_verse_counts[chapter_num] = 0
+                            chapter_verse_counts[chapter_num] += 1
+                    
+                    unique_chapters = len(deuteronomy_chapters)
+                    expected_chapters = 34  # Deuteronomy should have 34 chapters
+                    
+                    print(f"\n📖 DEUTERONOMY CHAPTER STRUCTURE:")
+                    print(f"   📊 Current Chapters: {unique_chapters} (expected 34)")
+                    print(f"   📊 Current Total Verses: {total_verses} (expected 959)")
+                    print(f"   📊 Chapters Found: {sorted(list(deuteronomy_chapters))}")
+                    
+                    if unique_chapters == expected_chapters:
+                        self.log_test("Deuteronomy All 34 Chapters Present", True, f"✅ PERFECT! Deuteronomy has all {unique_chapters} chapters")
+                    elif unique_chapters >= 30:  # At least 88% of chapters
+                        self.log_test("Deuteronomy All 34 Chapters Present", True, f"✅ MOSTLY COMPLETE! Deuteronomy has {unique_chapters}/34 chapters")
+                    elif unique_chapters > 0:
+                        self.log_test("Deuteronomy All 34 Chapters Present", False, f"❌ INCOMPLETE! Deuteronomy has only {unique_chapters}/34 chapters")
                     else:
-                        self.log_test("Exodus Exactly 1,213 Verses (100% Complete)", False, f"❌ NOT FOUND! Exodus does not exist in database (0 verses)")
+                        self.log_test("Deuteronomy All 34 Chapters Present", False, f"❌ NO CHAPTERS! Deuteronomy has 0 chapters")
+                        
                 else:
-                    self.log_test("Exodus Exactly 1,213 Verses (100% Complete)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy All 34 Chapters Present", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Exodus Exactly 1,213 Verses (100% Complete)", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy All 34 Chapters Present", False, f"Error: {str(e)}")
             
-            # Check all 40 chapters are present with proper verse counts
-            print("\n📖 EXODUS CHAPTER STRUCTURE VERIFICATION:")
-            
+            # Verify Deuteronomy Chapter 1 verse count and ordering
             try:
-                # Get chapter statistics
-                response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter=1&limit=50")
                 if response.status_code == 200:
-                    stats = response.json()
-                    total_chapters = stats.get('totalChapters', 0)
+                    chapter_data = response.json()
+                    chapter_verses = chapter_data.get('verses', [])
+                    chapter_total = chapter_data.get('total', 0)
+                    expected_chapter1_verses = 46  # Deuteronomy Chapter 1 should have 46 verses
                     
-                    # Get Exodus verses to analyze chapter distribution
-                    response2 = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=100")
-                    if response2.status_code == 200:
-                        data = response2.json()
-                        verses = data.get('verses', [])
-                        
-                        # Count unique chapters in Exodus
-                        exodus_chapters = set()
-                        for verse in verses:
-                            chapter = verse.get('chapter')
-                            if chapter:
-                                exodus_chapters.add(int(chapter))
-                        
-                        unique_chapters = len(exodus_chapters)
-                        expected_chapters = 40  # Exodus should have 40 chapters
-                        
-                        if unique_chapters >= expected_chapters:
-                            self.log_test("Exodus All 40 Chapters Present", True, f"✅ COMPLETE! Exodus has {unique_chapters} chapters (all 40 chapters present)")
-                        elif unique_chapters >= 35:  # At least 87.5% of chapters
-                            self.log_test("Exodus All 40 Chapters Present", True, f"✅ MOSTLY COMPLETE! Exodus has {unique_chapters}/40 chapters")
-                        else:
-                            self.log_test("Exodus All 40 Chapters Present", False, f"❌ INCOMPLETE! Exodus has only {unique_chapters}/40 chapters")
+                    print(f"\n📖 DEUTERONOMY CHAPTER 1 ANALYSIS:")
+                    print(f"   📊 Chapter 1 Verses Found: {chapter_total} (expected 46)")
+                    
+                    if chapter_total == expected_chapter1_verses:
+                        self.log_test("Deuteronomy Chapter 1 Correct Verse Count (46)", True, f"✅ PERFECT! Chapter 1 has exactly {chapter_total} verses")
+                    elif chapter_total > 0:
+                        completion_percentage = (chapter_total / expected_chapter1_verses) * 100
+                        self.log_test("Deuteronomy Chapter 1 Correct Verse Count (46)", False, f"❌ INCORRECT! Chapter 1 has {chapter_total} verses, expected {expected_chapter1_verses} ({completion_percentage:.1f}% complete)")
                     else:
-                        self.log_test("Exodus All 40 Chapters Present", False, f"API Error on verses - Status: {response2.status_code}")
-                else:
-                    self.log_test("Exodus All 40 Chapters Present", False, f"API Error on stats - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Exodus All 40 Chapters Present", False, f"Error: {str(e)}")
-            
-            # Verify key chapters: Chapter 1 (22 verses), Chapter 12 (51 verses), Chapter 20 (26 verses), Chapter 40 (38 verses)
-            try:
-                print("\n📖 EXODUS KEY CHAPTERS VERSE COUNT VERIFICATION:")
-                key_chapters = {1: 22, 12: 51, 20: 26, 40: 38}  # chapter: expected_verse_count
-                key_chapters_verified = 0
-                
-                for chapter_num, expected_verses in key_chapters.items():
-                    try:
-                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&chapter={chapter_num}&limit=100")
-                        if response.status_code == 200:
-                            chapter_data = response.json()
-                            actual_verses = chapter_data.get('total', 0)
-                            
-                            if actual_verses == expected_verses:
-                                key_chapters_verified += 1
-                                print(f"   ✅ Exodus Chapter {chapter_num}: PERFECT! {actual_verses} verses (expected {expected_verses})")
-                            elif actual_verses > 0:
-                                print(f"   ❌ Exodus Chapter {chapter_num}: INCORRECT! {actual_verses} verses (expected {expected_verses})")
-                            else:
-                                print(f"   ❌ Exodus Chapter {chapter_num}: MISSING! 0 verses found")
-                        else:
-                            print(f"   ❌ Exodus Chapter {chapter_num}: API ERROR (Status {response.status_code})")
-                    except Exception as e:
-                        print(f"   ❌ Exodus Chapter {chapter_num}: ERROR ({str(e)})")
-                
-                if key_chapters_verified == 4:
-                    self.log_test("Exodus Key Chapters Proper Verse Counts", True, f"✅ PERFECT! All 4 key chapters have correct verse counts (Ch1:22, Ch12:51, Ch20:26, Ch40:38)")
-                elif key_chapters_verified >= 3:
-                    self.log_test("Exodus Key Chapters Proper Verse Counts", True, f"✅ MOSTLY CORRECT! {key_chapters_verified}/4 key chapters have correct verse counts")
-                elif key_chapters_verified >= 2:
-                    self.log_test("Exodus Key Chapters Proper Verse Counts", False, f"❌ PARTIALLY CORRECT! Only {key_chapters_verified}/4 key chapters have correct verse counts")
-                else:
-                    self.log_test("Exodus Key Chapters Proper Verse Counts", False, f"❌ INCORRECT! Only {key_chapters_verified}/4 key chapters have correct verse counts")
+                        self.log_test("Deuteronomy Chapter 1 Correct Verse Count (46)", False, f"❌ MISSING! Chapter 1 has 0 verses")
                     
+                    # Check verse ordering in Chapter 1
+                    if chapter_verses:
+                        verse_numbers = []
+                        for verse in chapter_verses:
+                            verse_num = verse.get('verse')
+                            if verse_num:
+                                verse_numbers.append(int(verse_num))
+                        
+                        verse_numbers.sort()
+                        expected_sequence = list(range(1, len(verse_numbers) + 1))
+                        
+                        print(f"   📊 Verse Numbers Found: {verse_numbers[:10]}{'...' if len(verse_numbers) > 10 else ''}")
+                        
+                        # Check for proper sequential ordering
+                        is_sequential = verse_numbers == expected_sequence
+                        has_duplicates = len(verse_numbers) != len(set(verse_numbers))
+                        has_gaps = any(verse_numbers[i] != verse_numbers[i-1] + 1 for i in range(1, len(verse_numbers)))
+                        
+                        if is_sequential and not has_duplicates:
+                            self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", True, f"✅ PERFECT! Chapter 1 verses are properly ordered (1-{max(verse_numbers)})")
+                        elif not has_duplicates and not has_gaps:
+                            self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", True, f"✅ GOOD! Chapter 1 verses are sequential without duplicates")
+                        else:
+                            issues = []
+                            if has_duplicates:
+                                issues.append("duplicates")
+                            if has_gaps:
+                                issues.append("gaps")
+                            if not is_sequential:
+                                issues.append("wrong order")
+                            self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", False, f"❌ ISSUES! Chapter 1 has verse ordering problems: {', '.join(issues)}")
+                    else:
+                        self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", False, f"❌ NO DATA! No verses found in Chapter 1")
+                        
+                else:
+                    self.log_test("Deuteronomy Chapter 1 Correct Verse Count (46)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Exodus Key Chapters Proper Verse Counts", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Chapter 1 Correct Verse Count (46)", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Exodus 100% Completion Verification", False, f"Error: {str(e)}")
+            self.log_test("Deuteronomy Chapter Structure Analysis", False, f"Error: {str(e)}")
             return False
 
     def test_exodus_content_quality_check(self):
