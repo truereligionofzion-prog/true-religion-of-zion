@@ -334,111 +334,170 @@ class APITester:
             self.log_test("Deuteronomy Verse Ordering Fix Verification", False, f"Error: {str(e)}")
             return False
 
-    def test_deuteronomy_verse_ordering_issues(self):
-        """REVIEW REQUEST TEST 3: Verse Ordering Issues - Sample Chapter 1 verses 1-15 and check for duplicates/missing numbers"""
+    def test_deuteronomy_content_quality_check(self):
+        """REVIEW REQUEST TEST 3: Content Quality Check - Verify Deuteronomy 1:1-3 Moses/Israel content, Deuteronomy 6:4-5 Shema, other key verses"""
         try:
-            print("\n🔍 DEUTERONOMY VERSE ORDERING ISSUES - SAMPLE CHAPTER 1 VERSES 1-15 AND CHECK FOR DUPLICATES/MISSING NUMBERS...")
+            print("\n🔍 DEUTERONOMY CONTENT QUALITY CHECK - VERIFY MOSES/ISRAEL CONTENT, SHEMA, KEY VERSES...")
             
-            # Sample Deuteronomy Chapter 1 verses 1-15 to check ordering
+            # Verify Deuteronomy 1:1-3 have proper Moses/Israel content
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter=1&limit=20")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter=1&limit=10")
                 if response.status_code == 200:
                     data = response.json()
                     verses = data.get('verses', [])
                     
                     if verses:
-                        print(f"\n📖 DEUTERONOMY CHAPTER 1 VERSES 1-15 ORDERING ANALYSIS:")
+                        print(f"\n📖 DEUTERONOMY 1:1-3 MOSES/ISRAEL CONTENT VERIFICATION:")
                         
-                        # Extract verse numbers and content for verses 1-15
-                        verse_data = []
+                        # Check verses 1-3 for proper Moses/Israel content
+                        verses_1_3 = []
                         for verse in verses:
                             verse_num = verse.get('verse')
-                            verse_text = verse.get('text', '')
-                            if verse_num and int(verse_num) <= 15:
-                                verse_data.append({
+                            if verse_num and int(verse_num) <= 3:
+                                verses_1_3.append({
                                     'number': int(verse_num),
-                                    'text': verse_text,
+                                    'text': verse.get('text', ''),
                                     'ref': f"Deuteronomy 1:{verse_num}"
                                 })
                         
-                        # Sort by verse number for analysis
-                        verse_data.sort(key=lambda x: x['number'])
+                        verses_1_3.sort(key=lambda x: x['number'])
                         
-                        # Check for proper sequential ordering (1-15)
-                        verse_numbers = [v['number'] for v in verse_data]
-                        expected_sequence = list(range(1, min(16, len(verse_numbers) + 1)))
+                        # Check for Moses/Israel content keywords
+                        moses_israel_keywords = ['moses', 'israel', 'children of israel', 'israelites', 'lord', 'god', 'commandments', 'law']
+                        content_quality_score = 0
                         
-                        print(f"   📊 Verses Found (1-15): {verse_numbers}")
-                        print(f"   📊 Expected Sequence: {expected_sequence}")
+                        for verse in verses_1_3:
+                            verse_text = verse['text'].lower()
+                            keywords_found = []
+                            for keyword in moses_israel_keywords:
+                                if keyword in verse_text:
+                                    keywords_found.append(keyword)
+                            
+                            print(f"   📝 {verse['ref']}: '{verse['text'][:80]}...'")
+                            print(f"      Keywords found: {keywords_found}")
+                            
+                            if len(keywords_found) >= 2:
+                                content_quality_score += 1
                         
-                        # Check for duplicates
-                        duplicates = []
-                        seen = set()
-                        for num in verse_numbers:
-                            if num in seen:
-                                duplicates.append(num)
-                            seen.add(num)
-                        
-                        # Check for missing numbers in sequence
-                        missing_numbers = []
-                        for i in range(1, 16):
-                            if i not in verse_numbers:
-                                missing_numbers.append(i)
-                        
-                        # Check for out-of-order verses
-                        is_sequential = verse_numbers == sorted(verse_numbers)
-                        
-                        print(f"\n📝 DETAILED VERSE ANALYSIS (First 10):")
-                        for i, verse in enumerate(verse_data[:10]):
-                            print(f"   {verse['ref']}: '{verse['text'][:60]}...'")
-                        
-                        # Test results
-                        if len(duplicates) == 0:
-                            self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", True, f"✅ GOOD! No duplicate verse numbers found in Chapter 1")
+                        if content_quality_score >= 2:
+                            self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", True, f"✅ GOOD! {content_quality_score}/3 verses have proper Moses/Israel content")
+                        elif content_quality_score >= 1:
+                            self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", True, f"✅ PARTIAL! {content_quality_score}/3 verses have Moses/Israel content")
                         else:
-                            self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"❌ DUPLICATES! Found duplicate verse numbers: {duplicates}")
-                        
-                        if len(missing_numbers) == 0:
-                            self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", True, f"✅ COMPLETE! All verse numbers 1-15 present")
-                        elif len(missing_numbers) <= 3:
-                            self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", True, f"✅ MOSTLY COMPLETE! Only {len(missing_numbers)} missing: {missing_numbers}")
-                        else:
-                            self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", False, f"❌ GAPS! Missing verse numbers: {missing_numbers}")
-                        
-                        if is_sequential:
-                            self.log_test("Deuteronomy Ch1 Proper Sequential Order", True, f"✅ ORDERED! Verses are in proper sequential order")
-                        else:
-                            self.log_test("Deuteronomy Ch1 Proper Sequential Order", False, f"❌ OUT OF ORDER! Verses not in sequential order")
-                        
-                        # Overall ordering assessment
-                        ordering_issues = len(duplicates) + len(missing_numbers) + (0 if is_sequential else 1)
-                        if ordering_issues == 0:
-                            self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", True, f"✅ PERFECT! No ordering issues detected in Chapter 1 verses 1-15")
-                        elif ordering_issues <= 2:
-                            self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", True, f"✅ MINOR ISSUES! {ordering_issues} ordering issues detected")
-                        else:
-                            self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", False, f"❌ MAJOR ISSUES! {ordering_issues} ordering problems detected")
+                            self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", False, f"❌ POOR! Only {content_quality_score}/3 verses have proper content")
                         
                     else:
-                        self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"❌ NO DATA! No verses found in Deuteronomy Chapter 1")
-                        self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", False, f"❌ NO DATA! Cannot check for missing verse numbers")
-                        self.log_test("Deuteronomy Ch1 Proper Sequential Order", False, f"❌ NO DATA! Cannot check sequential order")
-                        self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", False, f"❌ NO DATA! No verses available for ordering analysis")
+                        self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", False, f"❌ NO DATA! No verses found in Deuteronomy Chapter 1")
                 else:
-                    self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Deuteronomy Ch1 Proper Sequential Order", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"Error: {str(e)}")
-                self.log_test("Deuteronomy Ch1 No Missing Verse Numbers (1-15)", False, f"Error: {str(e)}")
-                self.log_test("Deuteronomy Ch1 Proper Sequential Order", False, f"Error: {str(e)}")
-                self.log_test("Deuteronomy Ch1 Overall Verse Ordering Quality", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", False, f"Error: {str(e)}")
+            
+            # Check Deuteronomy 6:4-5 still has the Shema
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter=6&limit=10")
+                if response.status_code == 200:
+                    data = response.json()
+                    verses = data.get('verses', [])
+                    
+                    if verses:
+                        print(f"\n📖 DEUTERONOMY 6:4-5 SHEMA VERIFICATION:")
+                        
+                        # Check verses 4-5 for Shema content
+                        shema_verses = []
+                        for verse in verses:
+                            verse_num = verse.get('verse')
+                            if verse_num and int(verse_num) in [4, 5]:
+                                shema_verses.append({
+                                    'number': int(verse_num),
+                                    'text': verse.get('text', ''),
+                                    'ref': f"Deuteronomy 6:{verse_num}"
+                                })
+                        
+                        shema_verses.sort(key=lambda x: x['number'])
+                        
+                        # Check for Shema keywords
+                        shema_keywords = ['hear', 'israel', 'lord', 'god', 'one', 'love', 'heart', 'soul', 'might']
+                        shema_quality_score = 0
+                        
+                        for verse in shema_verses:
+                            verse_text = verse['text'].lower()
+                            keywords_found = []
+                            for keyword in shema_keywords:
+                                if keyword in verse_text:
+                                    keywords_found.append(keyword)
+                            
+                            print(f"   📝 {verse['ref']}: '{verse['text'][:80]}...'")
+                            print(f"      Shema keywords found: {keywords_found}")
+                            
+                            if len(keywords_found) >= 3:
+                                shema_quality_score += 1
+                        
+                        if shema_quality_score >= 2:
+                            self.log_test("Deuteronomy 6:4-5 Contains Shema", True, f"✅ EXCELLENT! Both verses contain proper Shema content")
+                        elif shema_quality_score >= 1:
+                            self.log_test("Deuteronomy 6:4-5 Contains Shema", True, f"✅ PARTIAL! {shema_quality_score}/2 verses contain Shema content")
+                        else:
+                            self.log_test("Deuteronomy 6:4-5 Contains Shema", False, f"❌ MISSING! Shema content not found in verses 4-5")
+                        
+                    else:
+                        self.log_test("Deuteronomy 6:4-5 Contains Shema", False, f"❌ NO DATA! No verses found in Deuteronomy Chapter 6")
+                else:
+                    self.log_test("Deuteronomy 6:4-5 Contains Shema", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Deuteronomy 6:4-5 Contains Shema", False, f"Error: {str(e)}")
+            
+            # Sample other key verses for proper biblical content
+            try:
+                key_chapters = [8, 30, 34]  # Sample other important Deuteronomy chapters
+                print(f"\n📖 OTHER KEY DEUTERONOMY VERSES CONTENT VERIFICATION:")
+                
+                key_verse_quality = 0
+                total_key_chapters = len(key_chapters)
+                
+                for chapter in key_chapters:
+                    try:
+                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter={chapter}&limit=5")
+                        if response.status_code == 200:
+                            chapter_data = response.json()
+                            chapter_verses = chapter_data.get('verses', [])
+                            
+                            if chapter_verses:
+                                # Check first verse of each chapter for biblical content
+                                first_verse = chapter_verses[0]
+                                verse_text = first_verse.get('text', '').lower()
+                                verse_ref = f"Deuteronomy {chapter}:{first_verse.get('verse', '?')}"
+                                
+                                # Check for general biblical content
+                                biblical_keywords = ['lord', 'god', 'israel', 'moses', 'commandments', 'law', 'covenant', 'people']
+                                keywords_found = [kw for kw in biblical_keywords if kw in verse_text]
+                                
+                                print(f"   📝 {verse_ref}: '{first_verse.get('text', '')[:60]}...'")
+                                print(f"      Biblical keywords: {keywords_found}")
+                                
+                                if len(keywords_found) >= 2:
+                                    key_verse_quality += 1
+                            else:
+                                print(f"   ❌ Chapter {chapter}: No verses found")
+                        else:
+                            print(f"   ❌ Chapter {chapter}: API Error")
+                    except Exception as e:
+                        print(f"   ❌ Chapter {chapter}: Error ({str(e)})")
+                
+                if key_verse_quality >= total_key_chapters:
+                    self.log_test("Deuteronomy Other Key Verses Proper Biblical Content", True, f"✅ EXCELLENT! All {key_verse_quality}/{total_key_chapters} sampled chapters have proper biblical content")
+                elif key_verse_quality >= total_key_chapters * 0.7:
+                    self.log_test("Deuteronomy Other Key Verses Proper Biblical Content", True, f"✅ GOOD! {key_verse_quality}/{total_key_chapters} sampled chapters have proper biblical content")
+                else:
+                    self.log_test("Deuteronomy Other Key Verses Proper Biblical Content", False, f"❌ POOR! Only {key_verse_quality}/{total_key_chapters} sampled chapters have proper biblical content")
+                    
+            except Exception as e:
+                self.log_test("Deuteronomy Other Key Verses Proper Biblical Content", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Deuteronomy Verse Ordering Issues", False, f"Error: {str(e)}")
+            self.log_test("Deuteronomy Content Quality Check", False, f"Error: {str(e)}")
             return False
 
     def test_deuteronomy_data_quality_issues(self):
