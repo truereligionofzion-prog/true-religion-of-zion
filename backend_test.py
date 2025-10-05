@@ -479,9 +479,9 @@ class APITester:
             return False
 
     def test_foundation_books_preservation(self):
-        """REVIEW REQUEST TEST 4: Foundation Books Preservation - Verify Genesis, Exodus, Leviticus have exact verse counts"""
+        """REVIEW REQUEST TEST 3: Foundation Books Preservation - Verify Genesis, Exodus, Leviticus, Numbers have exact verse counts"""
         try:
-            print("\n🔍 FOUNDATION BOOKS PRESERVATION - VERIFY GENESIS, EXODUS, LEVITICUS EXACT VERSE COUNTS...")
+            print("\n🔍 FOUNDATION BOOKS PRESERVATION - VERIFY GENESIS, EXODUS, LEVITICUS, NUMBERS EXACT VERSE COUNTS...")
             
             # Verify Genesis still has exactly 1,533 verses (preserved)
             try:
@@ -539,6 +539,25 @@ class APITester:
                     self.log_test("Leviticus Exactly 788 Verses Preserved", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
                 self.log_test("Leviticus Exactly 788 Verses Preserved", False, f"Error: {str(e)}")
+            
+            # Verify Numbers still has exactly 601 verses (preserved)
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    total_verses = data.get('total', 0)
+                    expected_verses = 601  # Review request specifies exactly 601 verses
+                    
+                    if total_verses == expected_verses:
+                        self.log_test("Numbers Exactly 601 Verses Preserved", True, f"✅ PERFECT! Numbers has exactly {total_verses} verses (preserved)")
+                    elif total_verses > 0:
+                        self.log_test("Numbers Exactly 601 Verses Preserved", False, f"❌ INCORRECT COUNT! Numbers has {total_verses} verses, expected exactly {expected_verses}")
+                    else:
+                        self.log_test("Numbers Exactly 601 Verses Preserved", False, f"❌ NOT FOUND! Numbers does not exist in database (0 verses)")
+                else:
+                    self.log_test("Numbers Exactly 601 Verses Preserved", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Numbers Exactly 601 Verses Preserved", False, f"Error: {str(e)}")
             
             return True
             
