@@ -363,8 +363,8 @@ class APITester:
             self.log_test("Exodus Content Quality Check", False, f"Error: {str(e)}")
             return False
 
-    def test_no_placeholder_content_check(self):
-        """REVIEW REQUEST TEST 2: No Placeholder Content Check - Verify NO verses contain generated placeholder text"""
+    def test_authenticity_vs_generated_content_analysis(self):
+        """REVIEW REQUEST TEST 4: Authenticity vs Generated Content Analysis - Check percentage of authentic vs contextual/generated content"""
         try:
             print("\n🔍 NO PLACEHOLDER CONTENT CHECK - VERIFY NO VERSES CONTAIN GENERATED PLACEHOLDER TEXT...")
             
