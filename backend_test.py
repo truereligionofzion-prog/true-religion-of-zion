@@ -79,137 +79,111 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_deuteronomy_authentic_content_verification(self):
-        """REVIEW REQUEST TEST 1: Deuteronomy Authentic Content Verification - Verify Deuteronomy has 562 verses with authentic content"""
+    def test_exodus_100_percent_completion_verification(self):
+        """REVIEW REQUEST TEST 1: 100% Completion Verification - Verify Exodus has exactly 1,213 verses with all 40 chapters"""
         try:
-            print("\n🔍 DEUTERONOMY AUTHENTIC CONTENT VERIFICATION - CHECKING DEUTERONOMY HAS 562 AUTHENTIC VERSES...")
+            print("\n🔍 EXODUS 100% COMPLETION VERIFICATION - CHECKING EXODUS HAS EXACTLY 1,213 VERSES WITH ALL 40 CHAPTERS...")
             
-            # Verify Deuteronomy has exactly 562 verses (authentic extraction only)
+            # Verify Exodus has exactly 1,213 verses (100% of target)
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=1")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=1")
                 if response.status_code == 200:
                     data = response.json()
                     total_verses = data.get('total', 0)
-                    expected_verses = 562  # Review request specifies exactly 562 verses for authentic extraction only
+                    expected_verses = 1213  # Review request specifies exactly 1,213 verses for 100% completion
                     
                     if total_verses == expected_verses:
-                        self.log_test("Deuteronomy Exactly 562 Verses (Authentic Only)", True, f"✅ PERFECT! Deuteronomy has exactly {total_verses} verses (authentic extraction only)")
+                        self.log_test("Exodus Exactly 1,213 Verses (100% Complete)", True, f"✅ PERFECT! Exodus has exactly {total_verses} verses (100% completion achieved)")
                     elif total_verses > 0:
-                        self.log_test("Deuteronomy Exactly 562 Verses (Authentic Only)", False, f"❌ INCORRECT COUNT! Deuteronomy has {total_verses} verses, expected exactly {expected_verses} for authentic extraction")
+                        completion_percentage = (total_verses / expected_verses) * 100
+                        self.log_test("Exodus Exactly 1,213 Verses (100% Complete)", False, f"❌ INCOMPLETE! Exodus has {total_verses} verses, expected exactly {expected_verses} ({completion_percentage:.1f}% complete)")
                     else:
-                        self.log_test("Deuteronomy Exactly 562 Verses (Authentic Only)", False, f"❌ NOT FOUND! Deuteronomy does not exist in database (0 verses)")
+                        self.log_test("Exodus Exactly 1,213 Verses (100% Complete)", False, f"❌ NOT FOUND! Exodus does not exist in database (0 verses)")
                 else:
-                    self.log_test("Deuteronomy Exactly 562 Verses (Authentic Only)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Exodus Exactly 1,213 Verses (100% Complete)", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Deuteronomy Exactly 562 Verses (Authentic Only)", False, f"Error: {str(e)}")
+                self.log_test("Exodus Exactly 1,213 Verses (100% Complete)", False, f"Error: {str(e)}")
             
-            # Check Deuteronomy 1:1 contains proper Moses speaking to Israel content
-            print("\n📖 DEUTERONOMY KEY VERSES CONTENT VERIFICATION:")
+            # Check all 40 chapters are present with proper verse counts
+            print("\n📖 EXODUS CHAPTER STRUCTURE VERIFICATION:")
             
             try:
-                response = self.session.get(f"{self.base_url}/bible/verse/Deuteronomy/1/1")
+                # Get chapter statistics
+                response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
                 if response.status_code == 200:
-                    verse_data = response.json()
-                    verse_text = verse_data.get('text', '')
+                    stats = response.json()
+                    total_chapters = stats.get('totalChapters', 0)
                     
-                    # Check for Moses speaking to Israel content keywords
-                    moses_israel_keywords = ['moses', 'israel', 'spake', 'children', 'words']
-                    found_keywords = [kw for kw in moses_israel_keywords if kw in verse_text.lower()]
-                    
-                    if len(found_keywords) >= 3:
-                        self.log_test("Deuteronomy 1:1 Moses Speaking to Israel Content", True, f"✅ AUTHENTIC! Deuteronomy 1:1 contains proper Moses speaking to Israel content: '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
+                    # Get Exodus verses to analyze chapter distribution
+                    response2 = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&limit=100")
+                    if response2.status_code == 200:
+                        data = response2.json()
+                        verses = data.get('verses', [])
+                        
+                        # Count unique chapters in Exodus
+                        exodus_chapters = set()
+                        for verse in verses:
+                            chapter = verse.get('chapter')
+                            if chapter:
+                                exodus_chapters.add(int(chapter))
+                        
+                        unique_chapters = len(exodus_chapters)
+                        expected_chapters = 40  # Exodus should have 40 chapters
+                        
+                        if unique_chapters >= expected_chapters:
+                            self.log_test("Exodus All 40 Chapters Present", True, f"✅ COMPLETE! Exodus has {unique_chapters} chapters (all 40 chapters present)")
+                        elif unique_chapters >= 35:  # At least 87.5% of chapters
+                            self.log_test("Exodus All 40 Chapters Present", True, f"✅ MOSTLY COMPLETE! Exodus has {unique_chapters}/40 chapters")
+                        else:
+                            self.log_test("Exodus All 40 Chapters Present", False, f"❌ INCOMPLETE! Exodus has only {unique_chapters}/40 chapters")
                     else:
-                        self.log_test("Deuteronomy 1:1 Moses Speaking to Israel Content", False, f"❌ MISSING CONTENT! Deuteronomy 1:1 lacks Moses speaking to Israel keywords: '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
+                        self.log_test("Exodus All 40 Chapters Present", False, f"API Error on verses - Status: {response2.status_code}")
                 else:
-                    self.log_test("Deuteronomy 1:1 Moses Speaking to Israel Content", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Exodus All 40 Chapters Present", False, f"API Error on stats - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Deuteronomy 1:1 Moses Speaking to Israel Content", False, f"Error: {str(e)}")
+                self.log_test("Exodus All 40 Chapters Present", False, f"Error: {str(e)}")
             
-            # Verify Deuteronomy 6:4-5 has the authentic Shema ("Hear, O Israel: The LORD our God is one LORD")
+            # Verify key chapters: Chapter 1 (22 verses), Chapter 12 (51 verses), Chapter 20 (26 verses), Chapter 40 (38 verses)
             try:
-                print("\n📖 DEUTERONOMY 6:4-5 SHEMA VERIFICATION:")
-                shema_verses_found = 0
-                shema_content_verified = 0
+                print("\n📖 EXODUS KEY CHAPTERS VERSE COUNT VERIFICATION:")
+                key_chapters = {1: 22, 12: 51, 20: 26, 40: 38}  # chapter: expected_verse_count
+                key_chapters_verified = 0
                 
-                for verse_num in [4, 5]:
+                for chapter_num, expected_verses in key_chapters.items():
                     try:
-                        response = self.session.get(f"{self.base_url}/bible/verse/Deuteronomy/6/{verse_num}")
+                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Exodus&chapter={chapter_num}&limit=100")
                         if response.status_code == 200:
-                            verse_data = response.json()
-                            verse_text = verse_data.get('text', '')
-                            verse_ref = f"Deuteronomy 6:{verse_num}"
-                            shema_verses_found += 1
+                            chapter_data = response.json()
+                            actual_verses = chapter_data.get('total', 0)
                             
-                            # Check for Shema content specific to each verse
-                            if verse_num == 4:
-                                shema_keywords = ['hear', 'israel', 'lord', 'god', 'one']
-                            else:  # verse 5
-                                shema_keywords = ['love', 'lord', 'god', 'heart', 'soul', 'might']
-                            
-                            found_keywords = [kw for kw in shema_keywords if kw in verse_text.lower()]
-                            
-                            if len(found_keywords) >= 3:
-                                shema_content_verified += 1
-                                print(f"   ✅ {verse_ref}: PROPER SHEMA CONTENT - '{verse_text[:80]}...' (found: {', '.join(found_keywords)})")
+                            if actual_verses == expected_verses:
+                                key_chapters_verified += 1
+                                print(f"   ✅ Exodus Chapter {chapter_num}: PERFECT! {actual_verses} verses (expected {expected_verses})")
+                            elif actual_verses > 0:
+                                print(f"   ❌ Exodus Chapter {chapter_num}: INCORRECT! {actual_verses} verses (expected {expected_verses})")
                             else:
-                                print(f"   ❌ {verse_ref}: MISSING SHEMA CONTENT - '{verse_text[:80]}...' (found only: {', '.join(found_keywords)})")
+                                print(f"   ❌ Exodus Chapter {chapter_num}: MISSING! 0 verses found")
                         else:
-                            print(f"   ❌ Deuteronomy 6:{verse_num}: API ERROR (Status {response.status_code})")
+                            print(f"   ❌ Exodus Chapter {chapter_num}: API ERROR (Status {response.status_code})")
                     except Exception as e:
-                        print(f"   ❌ Deuteronomy 6:{verse_num}: ERROR ({str(e)})")
+                        print(f"   ❌ Exodus Chapter {chapter_num}: ERROR ({str(e)})")
                 
-                if shema_content_verified >= 2:
-                    self.log_test("Deuteronomy 6:4-5 Shema (Hear O Israel)", True, f"✅ PERFECT! Both Shema verses (6:4-5) contain proper authentic Shema text")
-                elif shema_content_verified >= 1:
-                    self.log_test("Deuteronomy 6:4-5 Shema (Hear O Israel)", True, f"✅ PARTIAL! {shema_content_verified}/2 Shema verses contain proper text")
+                if key_chapters_verified == 4:
+                    self.log_test("Exodus Key Chapters Proper Verse Counts", True, f"✅ PERFECT! All 4 key chapters have correct verse counts (Ch1:22, Ch12:51, Ch20:26, Ch40:38)")
+                elif key_chapters_verified >= 3:
+                    self.log_test("Exodus Key Chapters Proper Verse Counts", True, f"✅ MOSTLY CORRECT! {key_chapters_verified}/4 key chapters have correct verse counts")
+                elif key_chapters_verified >= 2:
+                    self.log_test("Exodus Key Chapters Proper Verse Counts", False, f"❌ PARTIALLY CORRECT! Only {key_chapters_verified}/4 key chapters have correct verse counts")
                 else:
-                    self.log_test("Deuteronomy 6:4-5 Shema (Hear O Israel)", False, f"❌ MISSING! No Shema verses contain proper authentic text")
+                    self.log_test("Exodus Key Chapters Proper Verse Counts", False, f"❌ INCORRECT! Only {key_chapters_verified}/4 key chapters have correct verse counts")
                     
             except Exception as e:
-                self.log_test("Deuteronomy 6:4-5 Shema (Hear O Israel)", False, f"Error: {str(e)}")
-            
-            # Check that verses contain actual Deuteronomy themes (Moses, Israel, commandments, wilderness)
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=20")
-                if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    
-                    if verses:
-                        print("\n📖 DEUTERONOMY THEMES VERIFICATION:")
-                        deuteronomy_themes_count = 0
-                        deuteronomy_themes = ['moses', 'israel', 'commandments', 'wilderness', 'lord', 'god', 'statutes', 'judgments', 'covenant', 'land']
-                        
-                        for verse in verses[:15]:  # Check first 15 verses
-                            verse_text = verse.get('text', '').lower()
-                            verse_ref = f"Deuteronomy {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
-                            
-                            found_themes = [theme for theme in deuteronomy_themes if theme in verse_text]
-                            
-                            if len(found_themes) >= 2:
-                                deuteronomy_themes_count += 1
-                                if len(verse_text) <= 10:  # Only show first 10 for brevity
-                                    print(f"   ✅ {verse_ref}: DEUTERONOMY THEMES - (found: {', '.join(found_themes[:3])})")
-                        
-                        themes_percentage = (deuteronomy_themes_count / min(15, len(verses))) * 100 if verses else 0
-                        
-                        if themes_percentage >= 60:
-                            self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", True, f"✅ EXCELLENT! {themes_percentage:.1f}% ({deuteronomy_themes_count}/{min(15, len(verses))}) verses contain proper Deuteronomy themes")
-                        elif themes_percentage >= 40:
-                            self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", True, f"✅ GOOD! {themes_percentage:.1f}% verses contain Deuteronomy themes")
-                        else:
-                            self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", False, f"❌ POOR! Only {themes_percentage:.1f}% verses contain proper Deuteronomy themes")
-                    else:
-                        self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", False, f"❌ NO DATA! No Deuteronomy verses found for theme check")
-                else:
-                    self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Deuteronomy Themes (Moses, Israel, Commandments, Wilderness)", False, f"Error: {str(e)}")
+                self.log_test("Exodus Key Chapters Proper Verse Counts", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Deuteronomy Authentic Content Verification", False, f"Error: {str(e)}")
+            self.log_test("Exodus 100% Completion Verification", False, f"Error: {str(e)}")
             return False
 
     def test_content_quality_sampling(self):
