@@ -328,14 +328,14 @@ class APITester:
             self.log_test("Content Quality Sampling", False, f"Error: {str(e)}")
             return False
 
-    def test_no_generated_content_check(self):
-        """REVIEW REQUEST TEST 4: No Generated Content Check - Search for repetitive placeholder patterns and verify unique content"""
+    def test_no_placeholder_content_check(self):
+        """REVIEW REQUEST TEST 2: No Placeholder Content Check - Verify NO verses contain generated placeholder text"""
         try:
-            print("\n🔍 NO GENERATED CONTENT CHECK - SEARCH FOR REPETITIVE PLACEHOLDER PATTERNS AND VERIFY UNIQUE CONTENT...")
+            print("\n🔍 NO PLACEHOLDER CONTENT CHECK - VERIFY NO VERSES CONTAIN GENERATED PLACEHOLDER TEXT...")
             
-            # Search for any repetitive placeholder patterns
+            # Search for any repetitive placeholder patterns in Deuteronomy
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=100")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=100")
                 if response.status_code == 200:
                     data = response.json()
                     verses = data.get('verses', [])
@@ -343,11 +343,11 @@ class APITester:
                     if verses:
                         print("\n🚫 REPETITIVE PLACEHOLDER PATTERNS CHECK:")
                         repetitive_patterns_found = 0
-                        placeholder_patterns = ['placeholder', 'generated', 'see numbers', '[chapter]', '[verse]', 'complete kjv text', 'see chapter', 'see verse', 'and the lord numbered the children of israel according to their families']
+                        placeholder_patterns = ['placeholder', 'generated', 'see deuteronomy', '[chapter]', '[verse]', 'complete kjv text', 'see chapter', 'see verse', 'and moses spake unto the children of israel according to']
                         
                         for verse in verses:
                             verse_text = verse.get('text', '').lower()
-                            verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            verse_ref = f"Deuteronomy {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
                             
                             # Check for repetitive placeholder patterns
                             for pattern in placeholder_patterns:
@@ -357,20 +357,20 @@ class APITester:
                                     break
                         
                         if repetitive_patterns_found == 0:
-                            self.log_test("No Repetitive Placeholder Patterns", True, f"✅ CLEAN! No repetitive placeholder patterns found in {len(verses)} Numbers verses")
+                            self.log_test("No Repetitive Placeholder Patterns", True, f"✅ CLEAN! No repetitive placeholder patterns found in {len(verses)} Deuteronomy verses")
                         else:
-                            self.log_test("No Repetitive Placeholder Patterns", False, f"❌ PATTERNS FOUND! Found {repetitive_patterns_found} repetitive placeholder patterns in Numbers")
+                            self.log_test("No Repetitive Placeholder Patterns", False, f"❌ PATTERNS FOUND! Found {repetitive_patterns_found} repetitive placeholder patterns in Deuteronomy")
                         
                     else:
-                        self.log_test("No Repetitive Placeholder Patterns", False, f"❌ NO DATA! No Numbers verses found for pattern check")
+                        self.log_test("No Repetitive Placeholder Patterns", False, f"❌ NO DATA! No Deuteronomy verses found for pattern check")
                 else:
                     self.log_test("No Repetitive Placeholder Patterns", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
                 self.log_test("No Repetitive Placeholder Patterns", False, f"Error: {str(e)}")
             
-            # Verify all verses contain unique, authentic biblical content
+            # Verify all verses are unique and authentic biblical content
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&limit=50")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=50")
                 if response.status_code == 200:
                     data = response.json()
                     verses = data.get('verses', [])
@@ -383,7 +383,7 @@ class APITester:
                         
                         for verse in verses:
                             verse_text = verse.get('text', '')
-                            verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            verse_ref = f"Deuteronomy {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
                             
                             # Check for unique content (not repetitive)
                             is_unique = verse_text not in verse_texts
@@ -419,37 +419,37 @@ class APITester:
                         authentic_percentage = (authentic_verses / len(verses)) * 100 if len(verses) > 0 else 0
                         
                         if unique_percentage >= 95:
-                            self.log_test("All Verses Unique Content", True, f"✅ EXCELLENT! {unique_percentage:.1f}% ({unique_verses}/{len(verses)}) verses contain unique content")
+                            self.log_test("All Deuteronomy Verses Unique Content", True, f"✅ EXCELLENT! {unique_percentage:.1f}% ({unique_verses}/{len(verses)}) verses contain unique content")
                         elif unique_percentage >= 85:
-                            self.log_test("All Verses Unique Content", True, f"✅ GOOD! {unique_percentage:.1f}% ({unique_verses}/{len(verses)}) verses contain unique content")
+                            self.log_test("All Deuteronomy Verses Unique Content", True, f"✅ GOOD! {unique_percentage:.1f}% ({unique_verses}/{len(verses)}) verses contain unique content")
                         else:
-                            self.log_test("All Verses Unique Content", False, f"❌ REPETITIVE! Only {unique_percentage:.1f}% ({unique_verses}/{len(verses)}) verses contain unique content")
+                            self.log_test("All Deuteronomy Verses Unique Content", False, f"❌ REPETITIVE! Only {unique_percentage:.1f}% ({unique_verses}/{len(verses)}) verses contain unique content")
                         
                         if authentic_percentage >= 95:
-                            self.log_test("All Verses Authentic Biblical Content", True, f"✅ EXCELLENT! {authentic_percentage:.1f}% ({authentic_verses}/{len(verses)}) verses contain authentic biblical content")
+                            self.log_test("All Deuteronomy Verses Authentic Biblical Content", True, f"✅ EXCELLENT! {authentic_percentage:.1f}% ({authentic_verses}/{len(verses)}) verses contain authentic biblical content")
                         elif authentic_percentage >= 85:
-                            self.log_test("All Verses Authentic Biblical Content", True, f"✅ GOOD! {authentic_percentage:.1f}% ({authentic_verses}/{len(verses)}) verses contain authentic content")
+                            self.log_test("All Deuteronomy Verses Authentic Biblical Content", True, f"✅ GOOD! {authentic_percentage:.1f}% ({authentic_verses}/{len(verses)}) verses contain authentic content")
                         else:
-                            self.log_test("All Verses Authentic Biblical Content", False, f"❌ POOR! Only {authentic_percentage:.1f}% ({authentic_verses}/{len(verses)}) verses contain authentic content")
+                            self.log_test("All Deuteronomy Verses Authentic Biblical Content", False, f"❌ POOR! Only {authentic_percentage:.1f}% ({authentic_verses}/{len(verses)}) verses contain authentic content")
                         
                     else:
-                        self.log_test("All Verses Unique Content", False, f"❌ NO DATA! No Numbers verses found for uniqueness check")
-                        self.log_test("All Verses Authentic Biblical Content", False, f"❌ NO DATA! No Numbers verses found for authenticity check")
+                        self.log_test("All Deuteronomy Verses Unique Content", False, f"❌ NO DATA! No Deuteronomy verses found for uniqueness check")
+                        self.log_test("All Deuteronomy Verses Authentic Biblical Content", False, f"❌ NO DATA! No Deuteronomy verses found for authenticity check")
                 else:
-                    self.log_test("All Verses Unique Content", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("All Verses Authentic Biblical Content", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("All Deuteronomy Verses Unique Content", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("All Deuteronomy Verses Authentic Biblical Content", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("All Verses Unique Content", False, f"Error: {str(e)}")
-                self.log_test("All Verses Authentic Biblical Content", False, f"Error: {str(e)}")
+                self.log_test("All Deuteronomy Verses Unique Content", False, f"Error: {str(e)}")
+                self.log_test("All Deuteronomy Verses Authentic Biblical Content", False, f"Error: {str(e)}")
             
-            # Confirm no "generated" or "placeholder" text exists
+            # Confirm no repetitive patterns exist
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&search=generated&limit=100")
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&search=generated&limit=100")
                 if response.status_code == 200:
                     generated_data = response.json()
                     generated_verses = generated_data.get('verses', [])
                     
-                    response2 = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Numbers&search=placeholder&limit=100")
+                    response2 = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&search=placeholder&limit=100")
                     if response2.status_code == 200:
                         placeholder_data = response2.json()
                         placeholder_verses = placeholder_data.get('verses', [])
@@ -457,25 +457,25 @@ class APITester:
                         total_violations = len(generated_verses) + len(placeholder_verses)
                         
                         if total_violations == 0:
-                            self.log_test("No Generated or Placeholder Text", True, f"✅ CLEAN! No 'generated' or 'placeholder' text found in Numbers")
+                            self.log_test("No Generated or Placeholder Text in Deuteronomy", True, f"✅ CLEAN! No 'generated' or 'placeholder' text found in Deuteronomy")
                         else:
-                            self.log_test("No Generated or Placeholder Text", False, f"❌ VIOLATIONS! Found {len(generated_verses)} 'generated' and {len(placeholder_verses)} 'placeholder' text instances")
+                            self.log_test("No Generated or Placeholder Text in Deuteronomy", False, f"❌ VIOLATIONS! Found {len(generated_verses)} 'generated' and {len(placeholder_verses)} 'placeholder' text instances")
                             
                             # Show examples
                             for verse in (generated_verses + placeholder_verses)[:3]:
-                                verse_ref = f"Numbers {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                                verse_ref = f"Deuteronomy {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
                                 print(f"   ❌ {verse_ref}: VIOLATION - '{verse.get('text', '')[:60]}...'")
                     else:
-                        self.log_test("No Generated or Placeholder Text", False, f"API Error on placeholder search - Status: {response2.status_code}")
+                        self.log_test("No Generated or Placeholder Text in Deuteronomy", False, f"API Error on placeholder search - Status: {response2.status_code}")
                 else:
-                    self.log_test("No Generated or Placeholder Text", False, f"API Error on generated search - Status: {response.status_code}")
+                    self.log_test("No Generated or Placeholder Text in Deuteronomy", False, f"API Error on generated search - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("No Generated or Placeholder Text", False, f"Error: {str(e)}")
+                self.log_test("No Generated or Placeholder Text in Deuteronomy", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("No Generated Content Check", False, f"Error: {str(e)}")
+            self.log_test("No Placeholder Content Check", False, f"Error: {str(e)}")
             return False
 
     def test_foundation_books_preservation(self):
