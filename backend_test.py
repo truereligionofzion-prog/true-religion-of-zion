@@ -78,12 +78,12 @@ class APITester:
             self.log_test("API Root Connectivity", False, f"Error: {str(e)}")
             return False
 
-    def test_deuteronomy_chapter_structure_analysis(self):
-        """REVIEW REQUEST TEST 1: Deuteronomy Chapter Structure Analysis - Check chapters, Chapter 1 verse count and ordering"""
+    def test_deuteronomy_complete_structure_verification(self):
+        """REVIEW REQUEST TEST 1: Complete Structure Verification - Verify 34 chapters, 959 verses, Chapter 1 has 46 verses"""
         try:
-            print("\n🔍 DEUTERONOMY CHAPTER STRUCTURE ANALYSIS - CHECKING CURRENT CHAPTERS AND CHAPTER 1 VERSE ORDERING...")
+            print("\n🔍 DEUTERONOMY COMPLETE STRUCTURE VERIFICATION - CHECKING 34 CHAPTERS, 959 VERSES, CHAPTER 1 SEQUENTIAL ORDER...")
             
-            # Check how many chapters Deuteronomy currently has
+            # Verify Deuteronomy now has exactly 34 chapters (was 4)
             try:
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=100")
                 if response.status_code == 200:
@@ -93,60 +93,74 @@ class APITester:
                     
                     # Count unique chapters in Deuteronomy
                     deuteronomy_chapters = set()
-                    chapter_verse_counts = {}
                     
                     for verse in verses:
                         chapter = verse.get('chapter')
                         if chapter:
                             chapter_num = int(chapter)
                             deuteronomy_chapters.add(chapter_num)
-                            if chapter_num not in chapter_verse_counts:
-                                chapter_verse_counts[chapter_num] = 0
-                            chapter_verse_counts[chapter_num] += 1
                     
                     unique_chapters = len(deuteronomy_chapters)
-                    expected_chapters = 34  # Deuteronomy should have 34 chapters
+                    expected_chapters = 34  # Deuteronomy should have exactly 34 chapters
                     
-                    print(f"\n📖 DEUTERONOMY CHAPTER STRUCTURE:")
-                    print(f"   📊 Current Chapters: {unique_chapters} (expected 34)")
-                    print(f"   📊 Current Total Verses: {total_verses} (expected 959)")
+                    print(f"\n📖 DEUTERONOMY COMPLETE STRUCTURE:")
+                    print(f"   📊 Current Chapters: {unique_chapters} (expected exactly 34)")
+                    print(f"   📊 Current Total Verses: {total_verses} (expected exactly 959)")
                     print(f"   📊 Chapters Found: {sorted(list(deuteronomy_chapters))}")
                     
                     if unique_chapters == expected_chapters:
-                        self.log_test("Deuteronomy All 34 Chapters Present", True, f"✅ PERFECT! Deuteronomy has all {unique_chapters} chapters")
-                    elif unique_chapters >= 30:  # At least 88% of chapters
-                        self.log_test("Deuteronomy All 34 Chapters Present", True, f"✅ MOSTLY COMPLETE! Deuteronomy has {unique_chapters}/34 chapters")
-                    elif unique_chapters > 0:
-                        self.log_test("Deuteronomy All 34 Chapters Present", False, f"❌ INCOMPLETE! Deuteronomy has only {unique_chapters}/34 chapters")
+                        self.log_test("Deuteronomy Has Exactly 34 Chapters (Fixed)", True, f"✅ PERFECT! Deuteronomy now has exactly {unique_chapters} chapters (was 4)")
                     else:
-                        self.log_test("Deuteronomy All 34 Chapters Present", False, f"❌ NO CHAPTERS! Deuteronomy has 0 chapters")
+                        self.log_test("Deuteronomy Has Exactly 34 Chapters (Fixed)", False, f"❌ INCORRECT! Deuteronomy has {unique_chapters} chapters, expected exactly 34 (was 4)")
                         
                 else:
-                    self.log_test("Deuteronomy All 34 Chapters Present", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Has Exactly 34 Chapters (Fixed)", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Deuteronomy All 34 Chapters Present", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Has Exactly 34 Chapters (Fixed)", False, f"Error: {str(e)}")
             
-            # Verify Deuteronomy Chapter 1 verse count and ordering
+            # Verify Deuteronomy now has exactly 959 verses (was 562)
+            try:
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=1")
+                if response.status_code == 200:
+                    data = response.json()
+                    current_verses = data.get('total', 0)
+                    expected_verses = 959  # Deuteronomy should have exactly 959 verses
+                    previous_verses = 562  # Was 562 verses before fix
+                    
+                    print(f"\n📊 DEUTERONOMY VERSE COUNT VERIFICATION:")
+                    print(f"   📊 Current Verses: {current_verses}")
+                    print(f"   📊 Expected Verses: {expected_verses}")
+                    print(f"   📊 Previous Verses (before fix): {previous_verses}")
+                    
+                    if current_verses == expected_verses:
+                        self.log_test("Deuteronomy Has Exactly 959 Verses (Fixed)", True, f"✅ PERFECT! Deuteronomy now has exactly {current_verses} verses (was {previous_verses})")
+                    else:
+                        completion_percentage = (current_verses / expected_verses) * 100
+                        self.log_test("Deuteronomy Has Exactly 959 Verses (Fixed)", False, f"❌ INCORRECT! Deuteronomy has {current_verses} verses, expected exactly {expected_verses} ({completion_percentage:.1f}% complete, was {previous_verses})")
+                        
+                else:
+                    self.log_test("Deuteronomy Has Exactly 959 Verses (Fixed)", False, f"API Error - Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Deuteronomy Has Exactly 959 Verses (Fixed)", False, f"Error: {str(e)}")
+            
+            # Check Chapter 1 has all 46 verses in sequential order (1,2,3,4,5,6,7,8,9,10...)
             try:
                 response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter=1&limit=50")
                 if response.status_code == 200:
                     chapter_data = response.json()
                     chapter_verses = chapter_data.get('verses', [])
                     chapter_total = chapter_data.get('total', 0)
-                    expected_chapter1_verses = 46  # Deuteronomy Chapter 1 should have 46 verses
+                    expected_chapter1_verses = 46  # Deuteronomy Chapter 1 should have exactly 46 verses
                     
-                    print(f"\n📖 DEUTERONOMY CHAPTER 1 ANALYSIS:")
-                    print(f"   📊 Chapter 1 Verses Found: {chapter_total} (expected 46)")
+                    print(f"\n📖 DEUTERONOMY CHAPTER 1 SEQUENTIAL ORDER VERIFICATION:")
+                    print(f"   📊 Chapter 1 Verses Found: {chapter_total} (expected exactly 46)")
                     
                     if chapter_total == expected_chapter1_verses:
-                        self.log_test("Deuteronomy Chapter 1 Correct Verse Count (46)", True, f"✅ PERFECT! Chapter 1 has exactly {chapter_total} verses")
-                    elif chapter_total > 0:
-                        completion_percentage = (chapter_total / expected_chapter1_verses) * 100
-                        self.log_test("Deuteronomy Chapter 1 Correct Verse Count (46)", False, f"❌ INCORRECT! Chapter 1 has {chapter_total} verses, expected {expected_chapter1_verses} ({completion_percentage:.1f}% complete)")
+                        self.log_test("Deuteronomy Chapter 1 Has All 46 Verses", True, f"✅ PERFECT! Chapter 1 has exactly {chapter_total} verses")
                     else:
-                        self.log_test("Deuteronomy Chapter 1 Correct Verse Count (46)", False, f"❌ MISSING! Chapter 1 has 0 verses")
+                        self.log_test("Deuteronomy Chapter 1 Has All 46 Verses", False, f"❌ INCORRECT! Chapter 1 has {chapter_total} verses, expected exactly {expected_chapter1_verses}")
                     
-                    # Check verse ordering in Chapter 1
+                    # Check sequential ordering (1,2,3,4,5,6,7,8,9,10...)
                     if chapter_verses:
                         verse_numbers = []
                         for verse in chapter_verses:
@@ -155,42 +169,43 @@ class APITester:
                                 verse_numbers.append(int(verse_num))
                         
                         verse_numbers.sort()
-                        expected_sequence = list(range(1, len(verse_numbers) + 1))
+                        expected_sequence = list(range(1, chapter_total + 1))  # Should be 1,2,3,4,5,6,7,8,9,10...46
                         
-                        print(f"   📊 Verse Numbers Found: {verse_numbers[:10]}{'...' if len(verse_numbers) > 10 else ''}")
+                        print(f"   📊 Verse Numbers Found: {verse_numbers[:15]}{'...' if len(verse_numbers) > 15 else ''}")
+                        print(f"   📊 Expected Sequence: {expected_sequence[:15]}{'...' if len(expected_sequence) > 15 else ''}")
                         
-                        # Check for proper sequential ordering
-                        is_sequential = verse_numbers == expected_sequence
+                        # Check for perfect sequential ordering
+                        is_perfect_sequence = verse_numbers == expected_sequence
                         has_duplicates = len(verse_numbers) != len(set(verse_numbers))
-                        has_gaps = any(verse_numbers[i] != verse_numbers[i-1] + 1 for i in range(1, len(verse_numbers)))
                         
-                        if is_sequential and not has_duplicates:
-                            self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", True, f"✅ PERFECT! Chapter 1 verses are properly ordered (1-{max(verse_numbers)})")
-                        elif not has_duplicates and not has_gaps:
-                            self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", True, f"✅ GOOD! Chapter 1 verses are sequential without duplicates")
+                        if is_perfect_sequence and not has_duplicates:
+                            self.log_test("Deuteronomy Chapter 1 Perfect Sequential Order (1,2,3...46)", True, f"✅ PERFECT! Chapter 1 verses are in perfect sequential order (1,2,3...{max(verse_numbers)})")
                         else:
                             issues = []
                             if has_duplicates:
                                 issues.append("duplicates")
-                            if has_gaps:
-                                issues.append("gaps")
-                            if not is_sequential:
-                                issues.append("wrong order")
-                            self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", False, f"❌ ISSUES! Chapter 1 has verse ordering problems: {', '.join(issues)}")
+                            if not is_perfect_sequence:
+                                missing = set(expected_sequence) - set(verse_numbers)
+                                extra = set(verse_numbers) - set(expected_sequence)
+                                if missing:
+                                    issues.append(f"missing {sorted(list(missing))[:5]}")
+                                if extra:
+                                    issues.append(f"extra {sorted(list(extra))[:5]}")
+                            self.log_test("Deuteronomy Chapter 1 Perfect Sequential Order (1,2,3...46)", False, f"❌ ISSUES! Chapter 1 has ordering problems: {', '.join(issues)}")
                     else:
-                        self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", False, f"❌ NO DATA! No verses found in Chapter 1")
+                        self.log_test("Deuteronomy Chapter 1 Perfect Sequential Order (1,2,3...46)", False, f"❌ NO DATA! No verses found in Chapter 1")
                         
                 else:
-                    self.log_test("Deuteronomy Chapter 1 Correct Verse Count (46)", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Chapter 1 Has All 46 Verses", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Chapter 1 Perfect Sequential Order (1,2,3...46)", False, f"API Error - Status: {response.status_code}")
             except Exception as e:
-                self.log_test("Deuteronomy Chapter 1 Correct Verse Count (46)", False, f"Error: {str(e)}")
-                self.log_test("Deuteronomy Chapter 1 Proper Verse Ordering", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Chapter 1 Has All 46 Verses", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Chapter 1 Perfect Sequential Order (1,2,3...46)", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Deuteronomy Chapter Structure Analysis", False, f"Error: {str(e)}")
+            self.log_test("Deuteronomy Complete Structure Verification", False, f"Error: {str(e)}")
             return False
 
     def test_deuteronomy_completeness_check(self):
