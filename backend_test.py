@@ -319,8 +319,8 @@ class APITester:
             self.log_test("Deuteronomy Completeness Check", False, f"Error: {str(e)}")
             return False
 
-    def test_authenticity_vs_generated_content_analysis(self):
-        """REVIEW REQUEST TEST 4: Authenticity vs Generated Content Analysis - Check percentage of authentic vs contextual/generated content"""
+    def test_deuteronomy_verse_ordering_issues(self):
+        """REVIEW REQUEST TEST 3: Verse Ordering Issues - Sample Chapter 1 verses 1-15 and check for duplicates/missing numbers"""
         try:
             print("\n🔍 AUTHENTICITY VS GENERATED CONTENT ANALYSIS - CHECK PERCENTAGE OF AUTHENTIC VS CONTEXTUAL/GENERATED CONTENT...")
             
