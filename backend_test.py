@@ -894,16 +894,16 @@ class APITester:
 
 def main():
     """Main test execution"""
-    print("🚀 Starting Deuteronomy Chapter and Verse Structure Issues Investigation...")
+    print("🚀 Starting Deuteronomy Complete Fix Verification...")
     
     tester = APITester(BACKEND_URL)
-    success = tester.run_deuteronomy_structure_analysis_tests()
+    success = tester.run_deuteronomy_complete_fix_verification_tests()
     
     if success:
-        print("\n🔍 Deuteronomy structure analysis completed successfully!")
+        print("\n🎉 Deuteronomy complete fix verification completed successfully!")
         sys.exit(0)
     else:
-        print("\n❌ Deuteronomy structure analysis completed with issues.")
+        print("\n❌ Deuteronomy complete fix verification completed with issues.")
         sys.exit(1)
 
 if __name__ == "__main__":
