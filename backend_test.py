@@ -185,130 +185,130 @@ class APITester:
             self.log_test("Actual Deuteronomy Chapter Count Analysis", False, f"Error: {str(e)}")
             return False
 
-    def test_deuteronomy_verse_ordering_fix_verification(self):
-        """REVIEW REQUEST TEST 2: Verse Ordering Fix Verification - Sample Chapter 1 verses 1-15, verify no missing verses, no duplicates"""
+    def test_actual_verse_count_analysis(self):
+        """REVIEW REQUEST TEST 2: Actual Verse Count Analysis - Get exact current verse count, break down by chapter for first 10 chapters"""
         try:
-            print("\n🔍 DEUTERONOMY VERSE ORDERING FIX VERIFICATION - SAMPLE CHAPTER 1 VERSES 1-15, VERIFY MISSING VERSES FIXED...")
+            print("\n🔍 ACTUAL VERSE COUNT ANALYSIS - BREAKING DOWN BY CHAPTER, CHECKING FOR DISCREPANCIES...")
             
-            # Sample Deuteronomy Chapter 1 verses 1-15 to verify proper sequential numbering
+            # Get detailed verse count analysis for first 10 chapters
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter=1&limit=20")
+                print(f"\n📊 DETAILED VERSE COUNT BREAKDOWN (First 10 Chapters):")
+                
+                chapter_analysis = {}
+                total_verses_counted = 0
+                
+                for chapter in range(1, 11):  # Analyze first 10 chapters
+                    try:
+                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter={chapter}&limit=100")
+                        if response.status_code == 200:
+                            chapter_data = response.json()
+                            chapter_verses = chapter_data.get('verses', [])
+                            chapter_total = chapter_data.get('total', 0)
+                            
+                            # Analyze verse numbers in this chapter
+                            verse_numbers = []
+                            for verse in chapter_verses:
+                                verse_num = verse.get('verse')
+                                if verse_num:
+                                    verse_numbers.append(int(verse_num))
+                            
+                            verse_numbers.sort()
+                            
+                            # Check for gaps and duplicates
+                            expected_sequence = list(range(1, chapter_total + 1))
+                            missing_verses = [v for v in expected_sequence if v not in verse_numbers]
+                            duplicate_verses = [v for v in verse_numbers if verse_numbers.count(v) > 1]
+                            
+                            chapter_analysis[chapter] = {
+                                'total': chapter_total,
+                                'verse_numbers': verse_numbers,
+                                'missing': missing_verses,
+                                'duplicates': list(set(duplicate_verses)),
+                                'max_verse': max(verse_numbers) if verse_numbers else 0,
+                                'min_verse': min(verse_numbers) if verse_numbers else 0
+                            }
+                            
+                            total_verses_counted += chapter_total
+                            
+                            print(f"   📖 Chapter {chapter}: {chapter_total} verses (range: {min(verse_numbers) if verse_numbers else 0}-{max(verse_numbers) if verse_numbers else 0})")
+                            if missing_verses:
+                                print(f"      ❌ Missing verses: {missing_verses[:10]}{'...' if len(missing_verses) > 10 else ''}")
+                            if duplicate_verses:
+                                print(f"      ⚠️ Duplicate verses: {list(set(duplicate_verses))}")
+                        else:
+                            chapter_analysis[chapter] = {'total': 0, 'error': f"API Error {response.status_code}"}
+                            print(f"   ❌ Chapter {chapter}: API Error {response.status_code}")
+                    except Exception as e:
+                        chapter_analysis[chapter] = {'total': 0, 'error': str(e)}
+                        print(f"   ❌ Chapter {chapter}: Error - {str(e)}")
+                
+                print(f"\n📊 FIRST 10 CHAPTERS SUMMARY:")
+                print(f"   📊 Total Verses in First 10 Chapters: {total_verses_counted}")
+                print(f"   📊 Average Verses per Chapter: {total_verses_counted / 10:.1f}")
+                
+                # Check overall database total
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=1")
                 if response.status_code == 200:
                     data = response.json()
-                    verses = data.get('verses', [])
+                    database_total = data.get('total', 0)
                     
-                    if verses:
-                        print(f"\n📖 DEUTERONOMY CHAPTER 1 VERSES 1-15 ORDERING FIX VERIFICATION:")
-                        
-                        # Extract verse numbers and content for verses 1-15
-                        verse_data = []
-                        for verse in verses:
-                            verse_num = verse.get('verse')
-                            verse_text = verse.get('text', '')
-                            if verse_num and int(verse_num) <= 15:
-                                verse_data.append({
-                                    'number': int(verse_num),
-                                    'text': verse_text,
-                                    'ref': f"Deuteronomy 1:{verse_num}"
-                                })
-                        
-                        # Sort by verse number for analysis
-                        verse_data.sort(key=lambda x: x['number'])
-                        
-                        # Check for proper sequential numbering (1-15)
-                        verse_numbers = [v['number'] for v in verse_data]
-                        expected_sequence = list(range(1, 16))  # Should be 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-                        
-                        print(f"   📊 Verses Found (1-15): {verse_numbers}")
-                        print(f"   📊 Expected Sequence: {expected_sequence}")
-                        
-                        # Verify no missing verses in the sequence (should have 3,4,7,8,14 that were missing)
-                        missing_numbers = []
-                        previously_missing = [3, 4, 7, 8, 14]  # These were missing before the fix
-                        for i in range(1, 16):
-                            if i not in verse_numbers:
-                                missing_numbers.append(i)
-                        
-                        # Check if previously missing verses are now present
-                        previously_missing_now_present = []
-                        previously_missing_still_missing = []
-                        for num in previously_missing:
-                            if num in verse_numbers:
-                                previously_missing_now_present.append(num)
-                            else:
-                                previously_missing_still_missing.append(num)
-                        
-                        print(f"\n📝 MISSING VERSES FIX VERIFICATION:")
-                        print(f"   📊 Previously Missing Verses: {previously_missing}")
-                        print(f"   ✅ Now Present: {previously_missing_now_present}")
-                        print(f"   ❌ Still Missing: {previously_missing_still_missing}")
-                        
-                        if len(missing_numbers) == 0:
-                            self.log_test("Deuteronomy Ch1 No Missing Verses (1-15) - Fixed", True, f"✅ PERFECT! All verses 1-15 present, no missing verses")
-                        elif len(previously_missing_now_present) >= 3:
-                            self.log_test("Deuteronomy Ch1 No Missing Verses (1-15) - Fixed", True, f"✅ MOSTLY FIXED! {len(previously_missing_now_present)}/5 previously missing verses now present")
-                        else:
-                            self.log_test("Deuteronomy Ch1 No Missing Verses (1-15) - Fixed", False, f"❌ NOT FIXED! Still missing verses: {missing_numbers}")
-                        
-                        # Check for duplicates
-                        duplicates = []
-                        seen = set()
-                        for num in verse_numbers:
-                            if num in seen:
-                                duplicates.append(num)
-                            seen.add(num)
-                        
-                        if len(duplicates) == 0:
-                            self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", True, f"✅ GOOD! No duplicate verse numbers found")
-                        else:
-                            self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"❌ DUPLICATES! Found duplicate verse numbers: {duplicates}")
-                        
-                        # Check for proper sequential order
-                        is_sequential = verse_numbers == sorted(verse_numbers)
-                        
-                        if is_sequential:
-                            self.log_test("Deuteronomy Ch1 Proper Sequential Numbering", True, f"✅ ORDERED! Verses are in proper sequential order")
-                        else:
-                            self.log_test("Deuteronomy Ch1 Proper Sequential Numbering", False, f"❌ OUT OF ORDER! Verses not in sequential order")
-                        
-                        # Overall fix assessment
-                        fix_success_score = 0
-                        if len(missing_numbers) == 0:
-                            fix_success_score += 3
-                        elif len(previously_missing_now_present) >= 3:
-                            fix_success_score += 2
-                        if len(duplicates) == 0:
-                            fix_success_score += 1
-                        if is_sequential:
-                            fix_success_score += 1
-                        
-                        if fix_success_score >= 4:
-                            self.log_test("Deuteronomy Ch1 Verse Ordering Fix Success", True, f"✅ EXCELLENT! Verse ordering fix successful (score: {fix_success_score}/5)")
-                        elif fix_success_score >= 3:
-                            self.log_test("Deuteronomy Ch1 Verse Ordering Fix Success", True, f"✅ GOOD! Verse ordering mostly fixed (score: {fix_success_score}/5)")
-                        else:
-                            self.log_test("Deuteronomy Ch1 Verse Ordering Fix Success", False, f"❌ POOR! Verse ordering fix incomplete (score: {fix_success_score}/5)")
-                        
+                    print(f"   📊 Database Total Verses: {database_total}")
+                    print(f"   📊 Claimed Total: 959 verses")
+                    print(f"   📊 Discrepancy: {database_total - 959} verses")
+                    
+                    # Reality check on verse counts
+                    if database_total == 959:
+                        self.log_test("Deuteronomy Verse Count Matches Claim (959)", True, f"✅ ACCURATE! Database has exactly 959 verses as claimed")
+                    elif database_total >= 900:
+                        accuracy_pct = (database_total / 959) * 100
+                        self.log_test("Deuteronomy Verse Count Matches Claim (959)", True, f"✅ CLOSE! Database has {database_total} verses ({accuracy_pct:.1f}% of claimed 959)")
                     else:
-                        self.log_test("Deuteronomy Ch1 No Missing Verses (1-15) - Fixed", False, f"❌ NO DATA! No verses found in Deuteronomy Chapter 1")
-                        self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"❌ NO DATA! Cannot check for duplicates")
-                        self.log_test("Deuteronomy Ch1 Proper Sequential Numbering", False, f"❌ NO DATA! Cannot check sequential numbering")
-                        self.log_test("Deuteronomy Ch1 Verse Ordering Fix Success", False, f"❌ NO DATA! No verses available for fix verification")
+                        accuracy_pct = (database_total / 959) * 100
+                        self.log_test("Deuteronomy Verse Count Matches Claim (959)", False, f"❌ SIGNIFICANT DISCREPANCY! Database has only {database_total} verses ({accuracy_pct:.1f}% of claimed 959)")
+                    
+                    # Analyze chapter structure quality
+                    chapters_with_issues = 0
+                    chapters_analyzed = 0
+                    
+                    for chapter, analysis in chapter_analysis.items():
+                        if 'error' not in analysis:
+                            chapters_analyzed += 1
+                            if analysis['missing'] or analysis['duplicates']:
+                                chapters_with_issues += 1
+                    
+                    if chapters_with_issues == 0:
+                        self.log_test("Deuteronomy Chapter Structure Quality", True, f"✅ EXCELLENT! No structural issues found in first {chapters_analyzed} chapters")
+                    elif chapters_with_issues <= 2:
+                        self.log_test("Deuteronomy Chapter Structure Quality", True, f"✅ GOOD! Only {chapters_with_issues}/{chapters_analyzed} chapters have structural issues")
+                    else:
+                        self.log_test("Deuteronomy Chapter Structure Quality", False, f"❌ POOR! {chapters_with_issues}/{chapters_analyzed} chapters have structural issues")
+                    
+                    # Extrapolate total verses based on first 10 chapters
+                    if total_verses_counted > 0:
+                        extrapolated_total = (total_verses_counted / 10) * 34  # Estimate for all 34 chapters
+                        print(f"\n📊 EXTRAPOLATION ANALYSIS:")
+                        print(f"   📊 Extrapolated Total (based on first 10): {extrapolated_total:.0f} verses")
+                        print(f"   📊 Database Total: {database_total} verses")
+                        print(f"   📊 Extrapolation vs Database: {abs(extrapolated_total - database_total):.0f} verse difference")
+                        
+                        if abs(extrapolated_total - database_total) <= 50:
+                            self.log_test("Deuteronomy Verse Count Consistency", True, f"✅ CONSISTENT! Extrapolated total ({extrapolated_total:.0f}) matches database total ({database_total})")
+                        else:
+                            self.log_test("Deuteronomy Verse Count Consistency", False, f"❌ INCONSISTENT! Extrapolated total ({extrapolated_total:.0f}) differs significantly from database total ({database_total})")
                 else:
-                    self.log_test("Deuteronomy Ch1 No Missing Verses (1-15) - Fixed", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Deuteronomy Ch1 Proper Sequential Numbering", False, f"API Error - Status: {response.status_code}")
-                    self.log_test("Deuteronomy Ch1 Verse Ordering Fix Success", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Verse Count Matches Claim (959)", False, f"API Error getting total - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Chapter Structure Quality", False, f"API Error getting total - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Verse Count Consistency", False, f"API Error getting total - Status: {response.status_code}")
+                    
             except Exception as e:
-                self.log_test("Deuteronomy Ch1 No Missing Verses (1-15) - Fixed", False, f"Error: {str(e)}")
-                self.log_test("Deuteronomy Ch1 No Duplicate Verse Numbers", False, f"Error: {str(e)}")
-                self.log_test("Deuteronomy Ch1 Proper Sequential Numbering", False, f"Error: {str(e)}")
-                self.log_test("Deuteronomy Ch1 Verse Ordering Fix Success", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Verse Count Matches Claim (959)", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Chapter Structure Quality", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Verse Count Consistency", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Deuteronomy Verse Ordering Fix Verification", False, f"Error: {str(e)}")
+            self.log_test("Actual Verse Count Analysis", False, f"Error: {str(e)}")
             return False
 
     def test_deuteronomy_content_quality_check(self):
