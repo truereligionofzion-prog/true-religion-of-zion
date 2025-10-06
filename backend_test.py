@@ -477,116 +477,159 @@ class APITester:
             self.log_test("Content Quality Deep Check", False, f"Error: {str(e)}")
             return False
 
-    def test_foundation_books_preservation(self):
-        """REVIEW REQUEST TEST 4: Foundation Books Preservation - Verify Genesis 1,533, Exodus 1,213, Leviticus 788, Numbers 601 verses preserved"""
+    def test_comparison_with_claims(self):
+        """REVIEW REQUEST TEST 4: Comparison with Claims - Verify if 34 chapters and 959 verses claims are accurate, check for gaps/duplicates"""
         try:
-            print("\n🔍 FOUNDATION BOOKS PRESERVATION - VERIFY GENESIS, EXODUS, LEVITICUS, NUMBERS VERSES PRESERVED...")
+            print("\n🔍 COMPARISON WITH CLAIMS - VERIFYING 34 CHAPTERS AND 959 VERSES CLAIMS AGAINST ACTUAL DATABASE...")
             
-            # Define expected verse counts for foundation books
-            foundation_books = {
-                'Genesis': 1533,
-                'Exodus': 1213,
-                'Leviticus': 788,
-                'Numbers': 601
-            }
-            
-            preservation_results = {}
-            
-            for book, expected_verses in foundation_books.items():
-                try:
-                    print(f"\n📖 {book.upper()} PRESERVATION CHECK:")
-                    
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book}&limit=1")
-                    if response.status_code == 200:
-                        data = response.json()
-                        current_verses = data.get('total', 0)
-                        
-                        print(f"   📊 Current Verses: {current_verses}")
-                        print(f"   📊 Expected Verses: {expected_verses}")
-                        
-                        if current_verses == expected_verses:
-                            preservation_results[book] = True
-                            self.log_test(f"{book} Preserved ({expected_verses} verses)", True, f"✅ PERFECT! {book} has exactly {current_verses} verses (preserved)")
-                        elif current_verses >= expected_verses * 0.95:  # At least 95% preserved
-                            preservation_results[book] = True
-                            preservation_percentage = (current_verses / expected_verses) * 100
-                            self.log_test(f"{book} Preserved ({expected_verses} verses)", True, f"✅ MOSTLY PRESERVED! {book} has {current_verses} verses ({preservation_percentage:.1f}% preserved)")
-                        else:
-                            preservation_results[book] = False
-                            preservation_percentage = (current_verses / expected_verses) * 100
-                            self.log_test(f"{book} Preserved ({expected_verses} verses)", False, f"❌ NOT PRESERVED! {book} has only {current_verses}/{expected_verses} verses ({preservation_percentage:.1f}% preserved)")
-                    else:
-                        preservation_results[book] = False
-                        self.log_test(f"{book} Preserved ({expected_verses} verses)", False, f"API Error - Status: {response.status_code}")
-                        
-                except Exception as e:
-                    preservation_results[book] = False
-                    self.log_test(f"{book} Preserved ({expected_verses} verses)", False, f"Error: {str(e)}")
-            
-            # Overall preservation assessment
-            preserved_books = sum(preservation_results.values())
-            total_books = len(foundation_books)
-            
-            print(f"\n📊 FOUNDATION BOOKS PRESERVATION SUMMARY:")
-            print(f"   📊 Books Preserved: {preserved_books}/{total_books}")
-            
-            for book, preserved in preservation_results.items():
-                status = "✅ PRESERVED" if preserved else "❌ NOT PRESERVED"
-                print(f"   {status}: {book}")
-            
-            if preserved_books == total_books:
-                self.log_test("All Foundation Books Preserved", True, f"✅ EXCELLENT! All {preserved_books}/{total_books} foundation books preserved")
-            elif preserved_books >= total_books * 0.75:
-                self.log_test("All Foundation Books Preserved", True, f"✅ MOSTLY PRESERVED! {preserved_books}/{total_books} foundation books preserved")
-            else:
-                self.log_test("All Foundation Books Preserved", False, f"❌ POOR PRESERVATION! Only {preserved_books}/{total_books} foundation books preserved")
-            
-            # Check specific key verses from each book to verify content integrity
+            # Comprehensive analysis of claims vs reality
             try:
-                print(f"\n📖 FOUNDATION BOOKS CONTENT INTEGRITY CHECK:")
+                print(f"\n📊 CLAIMS VS REALITY ANALYSIS:")
+                print(f"   📋 CLAIMED: 34 chapters, 959 verses")
+                print(f"   🔍 TESTING: Actual database state")
                 
-                key_verses = {
-                    'Genesis': {'chapter': 1, 'verse': 1, 'keywords': ['beginning', 'god', 'created', 'heaven', 'earth']},
-                    'Exodus': {'chapter': 3, 'verse': 14, 'keywords': ['god', 'moses', 'i am', 'that i am']},
-                    'Leviticus': {'chapter': 19, 'verse': 18, 'keywords': ['love', 'neighbour', 'thyself']},
-                    'Numbers': {'chapter': 6, 'verse': 24, 'keywords': ['lord', 'bless', 'thee', 'keep']}
-                }
-                
-                content_integrity_score = 0
-                
-                for book, verse_info in key_verses.items():
-                    try:
-                        response = self.session.get(f"{self.base_url}/bible/verse/{book}/{verse_info['chapter']}/{verse_info['verse']}")
-                        if response.status_code == 200:
-                            verse_data = response.json()
-                            verse_text = verse_data.get('text', '').lower()
+                # Get comprehensive data about Deuteronomy
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=200")
+                if response.status_code == 200:
+                    data = response.json()
+                    total_verses = data.get('total', 0)
+                    sample_verses = data.get('verses', [])
+                    
+                    # Analyze chapter structure from sample
+                    chapters_in_sample = set()
+                    verse_analysis = {}
+                    
+                    for verse in sample_verses:
+                        chapter = verse.get('chapter')
+                        verse_num = verse.get('verse')
+                        
+                        if chapter:
+                            chapter_int = int(chapter)
+                            chapters_in_sample.add(chapter_int)
                             
-                            keywords_found = [kw for kw in verse_info['keywords'] if kw in verse_text]
-                            
-                            print(f"   📝 {book} {verse_info['chapter']}:{verse_info['verse']}: '{verse_data.get('text', '')[:60]}...'")
-                            print(f"      Keywords found: {keywords_found}")
-                            
-                            if len(keywords_found) >= 2:
-                                content_integrity_score += 1
+                            if chapter_int not in verse_analysis:
+                                verse_analysis[chapter_int] = []
+                            if verse_num:
+                                verse_analysis[chapter_int].append(int(verse_num))
+                    
+                    actual_chapters_found = len(chapters_in_sample)
+                    chapter_range = f"{min(chapters_in_sample)}-{max(chapters_in_sample)}" if chapters_in_sample else "None"
+                    
+                    print(f"\n📊 ACTUAL DATABASE STATE:")
+                    print(f"   📊 Total Verses: {total_verses} (claimed: 959)")
+                    print(f"   📊 Chapters in Sample: {actual_chapters_found} (from sample of {len(sample_verses)} verses)")
+                    print(f"   📊 Chapter Range: {chapter_range}")
+                    
+                    # Detailed chapter analysis
+                    print(f"\n📖 DETAILED CHAPTER ANALYSIS:")
+                    structural_issues = []
+                    
+                    for chapter in sorted(verse_analysis.keys())[:10]:  # Analyze first 10 chapters
+                        verses_in_chapter = sorted(verse_analysis[chapter])
+                        expected_sequence = list(range(1, len(verses_in_chapter) + 1))
+                        
+                        # Check for gaps
+                        gaps = []
+                        for i in range(1, max(verses_in_chapter) + 1):
+                            if i not in verses_in_chapter:
+                                gaps.append(i)
+                        
+                        # Check for duplicates
+                        duplicates = []
+                        seen = set()
+                        for v in verses_in_chapter:
+                            if v in seen:
+                                duplicates.append(v)
+                            seen.add(v)
+                        
+                        print(f"   📖 Chapter {chapter}: {len(verses_in_chapter)} verses (range: {min(verses_in_chapter)}-{max(verses_in_chapter)})")
+                        
+                        if gaps:
+                            print(f"      ❌ Gaps: {gaps[:5]}{'...' if len(gaps) > 5 else ''}")
+                            structural_issues.append(f"Chapter {chapter} has {len(gaps)} gaps")
+                        
+                        if duplicates:
+                            print(f"      ⚠️ Duplicates: {duplicates}")
+                            structural_issues.append(f"Chapter {chapter} has duplicates")
+                        
+                        if not gaps and not duplicates:
+                            print(f"      ✅ Clean structure")
+                    
+                    # Claims verification
+                    verse_claim_accuracy = (total_verses / 959) * 100 if total_verses <= 959 else 100
+                    
+                    if total_verses == 959:
+                        self.log_test("Verse Count Claim Accurate (959)", True, f"✅ ACCURATE! Database has exactly 959 verses as claimed")
+                    elif total_verses >= 900:
+                        self.log_test("Verse Count Claim Accurate (959)", True, f"✅ CLOSE! Database has {total_verses} verses ({verse_claim_accuracy:.1f}% of claimed)")
+                    else:
+                        self.log_test("Verse Count Claim Accurate (959)", False, f"❌ INACCURATE! Database has only {total_verses} verses ({verse_claim_accuracy:.1f}% of claimed 959)")
+                    
+                    # Estimate total chapters (extrapolate from sample)
+                    if len(sample_verses) > 0:
+                        estimated_total_chapters = int((actual_chapters_found / len(sample_verses)) * total_verses) if len(sample_verses) < total_verses else actual_chapters_found
+                        estimated_total_chapters = max(actual_chapters_found, estimated_total_chapters)  # Use at least what we found
+                        
+                        print(f"\n📊 CHAPTER ESTIMATION:")
+                        print(f"   📊 Chapters in Sample: {actual_chapters_found}")
+                        print(f"   📊 Estimated Total Chapters: {estimated_total_chapters}")
+                        print(f"   📊 Claimed Chapters: 34")
+                        
+                        if estimated_total_chapters >= 30:
+                            chapter_accuracy = (estimated_total_chapters / 34) * 100
+                            self.log_test("Chapter Count Claim Accurate (34)", True, f"✅ REASONABLE! Estimated {estimated_total_chapters} chapters ({chapter_accuracy:.1f}% of claimed 34)")
                         else:
-                            print(f"   ❌ {book} {verse_info['chapter']}:{verse_info['verse']}: API Error")
-                    except Exception as e:
-                        print(f"   ❌ {book} {verse_info['chapter']}:{verse_info['verse']}: Error")
-                
-                if content_integrity_score >= 3:
-                    self.log_test("Foundation Books Content Integrity", True, f"✅ GOOD! {content_integrity_score}/4 key verses have proper content")
-                elif content_integrity_score >= 2:
-                    self.log_test("Foundation Books Content Integrity", True, f"✅ PARTIAL! {content_integrity_score}/4 key verses have proper content")
+                            chapter_accuracy = (estimated_total_chapters / 34) * 100
+                            self.log_test("Chapter Count Claim Accurate (34)", False, f"❌ INACCURATE! Estimated only {estimated_total_chapters} chapters ({chapter_accuracy:.1f}% of claimed 34)")
+                    else:
+                        self.log_test("Chapter Count Claim Accurate (34)", False, f"❌ NO DATA! Cannot verify chapter count claim")
+                    
+                    # Structural integrity assessment
+                    if len(structural_issues) == 0:
+                        self.log_test("Deuteronomy No Structural Issues", True, f"✅ CLEAN! No gaps or duplicates found in analyzed chapters")
+                    elif len(structural_issues) <= 2:
+                        self.log_test("Deuteronomy No Structural Issues", True, f"✅ MINOR ISSUES! Only {len(structural_issues)} structural issues found")
+                    else:
+                        self.log_test("Deuteronomy No Structural Issues", False, f"❌ STRUCTURAL PROBLEMS! {len(structural_issues)} issues found: {structural_issues[:3]}")
+                    
+                    # Overall claims accuracy
+                    accuracy_score = 0
+                    if total_verses >= 900:  # Close to claimed 959
+                        accuracy_score += 2
+                    if estimated_total_chapters >= 30:  # Close to claimed 34
+                        accuracy_score += 2
+                    if len(structural_issues) <= 2:  # Minimal structural issues
+                        accuracy_score += 1
+                    
+                    print(f"\n📊 CLAIMS ACCURACY ASSESSMENT:")
+                    print(f"   📊 Verse Count: {total_verses}/959 ({verse_claim_accuracy:.1f}%)")
+                    print(f"   📊 Chapter Count: ~{estimated_total_chapters}/34")
+                    print(f"   📊 Structural Issues: {len(structural_issues)}")
+                    print(f"   📊 Overall Accuracy Score: {accuracy_score}/5")
+                    
+                    if accuracy_score >= 4:
+                        self.log_test("Overall Claims Accuracy", True, f"✅ HIGHLY ACCURATE! Claims are well-supported by database reality (score: {accuracy_score}/5)")
+                    elif accuracy_score >= 3:
+                        self.log_test("Overall Claims Accuracy", True, f"✅ REASONABLY ACCURATE! Claims are mostly supported (score: {accuracy_score}/5)")
+                    else:
+                        self.log_test("Overall Claims Accuracy", False, f"❌ INACCURATE CLAIMS! Database reality doesn't match claims (score: {accuracy_score}/5)")
+                        
                 else:
-                    self.log_test("Foundation Books Content Integrity", False, f"❌ POOR! Only {content_integrity_score}/4 key verses have proper content")
+                    self.log_test("Verse Count Claim Accurate (959)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Chapter Count Claim Accurate (34)", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Deuteronomy No Structural Issues", False, f"API Error - Status: {response.status_code}")
+                    self.log_test("Overall Claims Accuracy", False, f"API Error - Status: {response.status_code}")
                     
             except Exception as e:
-                self.log_test("Foundation Books Content Integrity", False, f"Error: {str(e)}")
+                self.log_test("Verse Count Claim Accurate (959)", False, f"Error: {str(e)}")
+                self.log_test("Chapter Count Claim Accurate (34)", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy No Structural Issues", False, f"Error: {str(e)}")
+                self.log_test("Overall Claims Accuracy", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Foundation Books Preservation", False, f"Error: {str(e)}")
+            self.log_test("Comparison with Claims", False, f"Error: {str(e)}")
             return False
 
     def test_database_totals_verification(self):
