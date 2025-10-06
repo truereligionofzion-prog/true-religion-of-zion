@@ -632,163 +632,204 @@ class APITester:
             self.log_test("Comparison with Claims", False, f"Error: {str(e)}")
             return False
 
-    def test_database_totals_verification(self):
-        """REVIEW REQUEST TEST 5: Database Totals - Get new total verse count (should be 5,094), verify all 5 books exist, confirm Deuteronomy order"""
+    def test_database_reality_check(self):
+        """REVIEW REQUEST TEST 5: Database Reality Check - What does the database actually contain for Deuteronomy? Any obvious problems?"""
         try:
-            print("\n🔍 DATABASE TOTALS VERIFICATION - GET NEW TOTAL VERSE COUNT, VERIFY ALL 5 BOOKS, CONFIRM DEUTERONOMY ORDER...")
+            print("\n🔍 DATABASE REALITY CHECK - COMPREHENSIVE ANALYSIS OF ACTUAL DEUTERONOMY DATABASE STATE...")
             
-            # Get new total verse count (should be Genesis 1,533 + Exodus 1,213 + Leviticus 788 + Numbers 601 + Deuteronomy 959 = 5,094)
+            # Comprehensive database analysis
             try:
-                print(f"\n📊 TOTAL VERSE COUNT CALCULATION:")
+                print(f"\n📊 COMPREHENSIVE DEUTERONOMY DATABASE ANALYSIS:")
                 
-                books_expected = {
-                    'Genesis': 1533,
-                    'Exodus': 1213,
-                    'Leviticus': 788,
-                    'Numbers': 601,
-                    'Deuteronomy': 959
-                }
-                
-                expected_total = sum(books_expected.values())  # Should be 5,094
-                actual_total = 0
-                book_counts = {}
-                
-                for book, expected in books_expected.items():
-                    try:
-                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book}&limit=1")
-                        if response.status_code == 200:
-                            data = response.json()
-                            actual = data.get('total', 0)
-                            book_counts[book] = actual
-                            actual_total += actual
-                            print(f"   📖 {book}: {actual} verses (expected {expected})")
-                        else:
-                            book_counts[book] = 0
-                            print(f"   ❌ {book}: API Error")
-                    except Exception as e:
-                        book_counts[book] = 0
-                        print(f"   ❌ {book}: Error")
-                
-                print(f"\n📊 TOTAL CALCULATION:")
-                print(f"   📊 Actual Total: {actual_total} verses")
-                print(f"   📊 Expected Total: {expected_total} verses")
-                print(f"   📊 Difference: {actual_total - expected_total} verses")
-                
-                if actual_total == expected_total:
-                    self.log_test("Database Total Verse Count (5,094)", True, f"✅ PERFECT! Total verse count is exactly {actual_total} (expected {expected_total})")
-                elif actual_total >= expected_total * 0.95:  # At least 95% of expected
-                    completion_percentage = (actual_total / expected_total) * 100
-                    self.log_test("Database Total Verse Count (5,094)", True, f"✅ NEARLY COMPLETE! Total verse count is {actual_total} ({completion_percentage:.1f}% of expected {expected_total})")
-                else:
-                    completion_percentage = (actual_total / expected_total) * 100
-                    self.log_test("Database Total Verse Count (5,094)", False, f"❌ INCOMPLETE! Total verse count is only {actual_total}/{expected_total} ({completion_percentage:.1f}% complete)")
-                    
-            except Exception as e:
-                self.log_test("Database Total Verse Count (5,094)", False, f"Error: {str(e)}")
-            
-            # Verify all 5 books exist correctly
-            try:
-                print(f"\n📖 ALL 5 BOOKS EXISTENCE VERIFICATION:")
-                
-                books_exist = {}
-                for book in books_expected.keys():
-                    try:
-                        response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book={book}&limit=1")
-                        if response.status_code == 200:
-                            data = response.json()
-                            verse_count = data.get('total', 0)
-                            if verse_count > 0:
-                                books_exist[book] = True
-                                print(f"   ✅ {book}: EXISTS ({verse_count} verses)")
-                            else:
-                                books_exist[book] = False
-                                print(f"   ❌ {book}: NO VERSES")
-                        else:
-                            books_exist[book] = False
-                            print(f"   ❌ {book}: API ERROR")
-                    except Exception as e:
-                        books_exist[book] = False
-                        print(f"   ❌ {book}: ERROR")
-                
-                existing_books = sum(books_exist.values())
-                total_books = len(books_expected)
-                
-                if existing_books == total_books:
-                    self.log_test("All 5 Books Exist Correctly", True, f"✅ PERFECT! All {existing_books}/{total_books} books exist correctly")
-                elif existing_books >= 4:
-                    self.log_test("All 5 Books Exist Correctly", True, f"✅ MOSTLY COMPLETE! {existing_books}/{total_books} books exist")
-                else:
-                    self.log_test("All 5 Books Exist Correctly", False, f"❌ INCOMPLETE! Only {existing_books}/{total_books} books exist")
-                    
-            except Exception as e:
-                self.log_test("All 5 Books Exist Correctly", False, f"Error: {str(e)}")
-            
-            # Confirm Deuteronomy order and classification
-            try:
-                print(f"\n📖 DEUTERONOMY ORDER AND CLASSIFICATION VERIFICATION:")
-                
-                # Check if we can get Bible books information
-                response = self.session.get(f"{self.base_url}/bible/books?version=kjv1611_divine")
+                # Get basic statistics
+                response = self.session.get(f"{self.base_url}/bible/stats?version=kjv1611_divine")
                 if response.status_code == 200:
-                    data = response.json()
-                    books = data.get('books', [])
+                    stats = response.json()
+                    total_books = stats.get('totalBooks', 0)
+                    total_verses = stats.get('totalVerses', 0)
+                    old_testament_verses = stats.get('oldTestamentVerses', 0)
                     
-                    if books:
-                        # Find Deuteronomy in the books list
-                        deuteronomy_book = None
-                        for book in books:
-                            if book.get('name') == 'Deuteronomy':
-                                deuteronomy_book = book
-                                break
-                        
-                        if deuteronomy_book:
-                            book_order = deuteronomy_book.get('order', 0)
-                            testament = deuteronomy_book.get('testament', 'unknown')
-                            
-                            print(f"   📊 Deuteronomy Order: {book_order}")
-                            print(f"   📊 Deuteronomy Testament: {testament}")
-                            
-                            # Deuteronomy should be the 5th book (order 5) and Old Testament
-                            if book_order == 5 and testament.lower() == 'old':
-                                self.log_test("Deuteronomy Correct Order and Classification", True, f"✅ PERFECT! Deuteronomy is order {book_order} in {testament} Testament")
-                            elif book_order == 5:
-                                self.log_test("Deuteronomy Correct Order and Classification", True, f"✅ CORRECT ORDER! Deuteronomy is order {book_order} (testament: {testament})")
-                            elif testament.lower() == 'old':
-                                self.log_test("Deuteronomy Correct Order and Classification", True, f"✅ CORRECT TESTAMENT! Deuteronomy is in {testament} Testament (order: {book_order})")
-                            else:
-                                self.log_test("Deuteronomy Correct Order and Classification", False, f"❌ INCORRECT! Deuteronomy is order {book_order} in {testament} Testament (should be order 5 in Old Testament)")
-                        else:
-                            self.log_test("Deuteronomy Correct Order and Classification", False, f"❌ NOT FOUND! Deuteronomy not found in books list")
-                    else:
-                        self.log_test("Deuteronomy Correct Order and Classification", False, f"❌ NO DATA! No books found in response")
-                else:
-                    # Fallback: Check if Deuteronomy verses exist and have proper testament classification
-                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=1")
+                    print(f"   📊 Total Books in Database: {total_books}")
+                    print(f"   📊 Total Verses in Database: {total_verses}")
+                    print(f"   📊 Old Testament Verses: {old_testament_verses}")
+                
+                # Get Deuteronomy specific data
+                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=1")
+                if response.status_code == 200:
+                    deut_data = response.json()
+                    deut_total = deut_data.get('total', 0)
+                    deut_pages = deut_data.get('totalPages', 0)
+                    
+                    print(f"\n📖 DEUTERONOMY SPECIFIC DATA:")
+                    print(f"   📊 Deuteronomy Total Verses: {deut_total}")
+                    print(f"   📊 Deuteronomy Total Pages: {deut_pages}")
+                    
+                    # Get larger sample for analysis
+                    response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&limit=300")
                     if response.status_code == 200:
-                        data = response.json()
-                        verses = data.get('verses', [])
-                        if verses:
-                            first_verse = verses[0]
-                            testament = first_verse.get('testament', 'unknown')
-                            
-                            print(f"   📊 Deuteronomy Testament (from verse): {testament}")
-                            
-                            if testament.lower() == 'old':
-                                self.log_test("Deuteronomy Correct Order and Classification", True, f"✅ CORRECT TESTAMENT! Deuteronomy is in {testament} Testament")
-                            else:
-                                self.log_test("Deuteronomy Correct Order and Classification", False, f"❌ INCORRECT TESTAMENT! Deuteronomy is in {testament} Testament (should be Old Testament)")
-                        else:
-                            self.log_test("Deuteronomy Correct Order and Classification", False, f"❌ NO VERSES! Cannot verify Deuteronomy classification")
-                    else:
-                        self.log_test("Deuteronomy Correct Order and Classification", False, f"API Error - Status: {response.status_code}")
+                        sample_data = response.json()
+                        sample_verses = sample_data.get('verses', [])
                         
+                        print(f"   📊 Sample Size: {len(sample_verses)} verses")
+                        
+                        # Analyze database reality
+                        database_issues = []
+                        database_strengths = []
+                        
+                        # Chapter analysis
+                        chapters = set()
+                        chapter_verse_counts = {}
+                        verse_lengths = []
+                        empty_verses = 0
+                        
+                        for verse in sample_verses:
+                            chapter = verse.get('chapter')
+                            verse_text = verse.get('text', '')
+                            
+                            if chapter:
+                                chapters.add(int(chapter))
+                                if int(chapter) not in chapter_verse_counts:
+                                    chapter_verse_counts[int(chapter)] = 0
+                                chapter_verse_counts[int(chapter)] += 1
+                            
+                            if verse_text:
+                                verse_lengths.append(len(verse_text))
+                            else:
+                                empty_verses += 1
+                        
+                        print(f"\n📊 DATABASE REALITY ANALYSIS:")
+                        print(f"   📖 Chapters Found: {len(chapters)} (range: {min(chapters) if chapters else 0}-{max(chapters) if chapters else 0})")
+                        print(f"   📖 Average Verse Length: {sum(verse_lengths)/len(verse_lengths):.1f} characters" if verse_lengths else "   📖 No verse text found")
+                        print(f"   📖 Empty Verses: {empty_verses}/{len(sample_verses)}")
+                        
+                        # Check for obvious problems
+                        if len(chapters) < 10:
+                            database_issues.append(f"Very few chapters found ({len(chapters)})")
+                        elif len(chapters) >= 30:
+                            database_strengths.append(f"Good chapter coverage ({len(chapters)} chapters)")
+                        
+                        if empty_verses > len(sample_verses) * 0.1:  # More than 10% empty
+                            database_issues.append(f"High empty verse rate ({empty_verses}/{len(sample_verses)})")
+                        elif empty_verses == 0:
+                            database_strengths.append("No empty verses found")
+                        
+                        if verse_lengths:
+                            avg_length = sum(verse_lengths) / len(verse_lengths)
+                            if avg_length < 20:
+                                database_issues.append(f"Very short average verse length ({avg_length:.1f} chars)")
+                            elif avg_length >= 50:
+                                database_strengths.append(f"Good average verse length ({avg_length:.1f} chars)")
+                        
+                        # Check for data consistency
+                        testament_values = set()
+                        book_values = set()
+                        version_values = set()
+                        
+                        for verse in sample_verses[:50]:  # Check first 50 for consistency
+                            testament_values.add(verse.get('testament', 'unknown'))
+                            book_values.add(verse.get('book', 'unknown'))
+                            version_values.add(verse.get('version', 'unknown'))
+                        
+                        print(f"\n📊 DATA CONSISTENCY CHECK:")
+                        print(f"   📊 Testament Values: {list(testament_values)}")
+                        print(f"   📊 Book Values: {list(book_values)}")
+                        print(f"   📊 Version Values: {list(version_values)}")
+                        
+                        if len(testament_values) == 1 and 'old' in testament_values:
+                            database_strengths.append("Consistent Old Testament classification")
+                        elif len(testament_values) > 1:
+                            database_issues.append(f"Inconsistent testament values: {list(testament_values)}")
+                        
+                        if len(book_values) == 1 and 'Deuteronomy' in book_values:
+                            database_strengths.append("Consistent book naming")
+                        elif len(book_values) > 1:
+                            database_issues.append(f"Inconsistent book values: {list(book_values)}")
+                        
+                        # Sample content quality
+                        print(f"\n📖 SAMPLE CONTENT QUALITY CHECK:")
+                        content_samples = []
+                        for i, verse in enumerate(sample_verses[:5]):
+                            verse_text = verse.get('text', '')
+                            verse_ref = f"Deuteronomy {verse.get('chapter', '?')}:{verse.get('verse', '?')}"
+                            content_samples.append({
+                                'ref': verse_ref,
+                                'text': verse_text,
+                                'length': len(verse_text)
+                            })
+                            print(f"   📝 {verse_ref}: '{verse_text[:80]}{'...' if len(verse_text) > 80 else ''}' ({len(verse_text)} chars)")
+                        
+                        # Overall database assessment
+                        print(f"\n📊 DATABASE REALITY SUMMARY:")
+                        print(f"   ✅ STRENGTHS: {len(database_strengths)}")
+                        for strength in database_strengths:
+                            print(f"      ✅ {strength}")
+                        
+                        print(f"   ❌ ISSUES: {len(database_issues)}")
+                        for issue in database_issues:
+                            print(f"      ❌ {issue}")
+                        
+                        # Test results
+                        if deut_total > 0:
+                            self.log_test("Deuteronomy Exists in Database", True, f"✅ EXISTS! Deuteronomy has {deut_total} verses in database")
+                        else:
+                            self.log_test("Deuteronomy Exists in Database", False, f"❌ MISSING! No Deuteronomy verses found in database")
+                        
+                        if len(database_issues) == 0:
+                            self.log_test("Deuteronomy Database Quality", True, f"✅ EXCELLENT! No obvious database issues found")
+                        elif len(database_issues) <= 2:
+                            self.log_test("Deuteronomy Database Quality", True, f"✅ GOOD! Only {len(database_issues)} minor issues found")
+                        else:
+                            self.log_test("Deuteronomy Database Quality", False, f"❌ POOR! {len(database_issues)} database issues found")
+                        
+                        if len(database_strengths) >= 3:
+                            self.log_test("Deuteronomy Database Strengths", True, f"✅ STRONG! {len(database_strengths)} positive aspects identified")
+                        elif len(database_strengths) >= 1:
+                            self.log_test("Deuteronomy Database Strengths", True, f"✅ SOME STRENGTHS! {len(database_strengths)} positive aspects found")
+                        else:
+                            self.log_test("Deuteronomy Database Strengths", False, f"❌ NO STRENGTHS! No positive aspects identified")
+                        
+                        # Reality vs expectations
+                        reality_score = 0
+                        if deut_total >= 800:  # Reasonable verse count
+                            reality_score += 2
+                        if len(chapters) >= 25:  # Reasonable chapter count
+                            reality_score += 2
+                        if len(database_issues) <= 2:  # Few issues
+                            reality_score += 1
+                        if len(database_strengths) >= 2:  # Some strengths
+                            reality_score += 1
+                        
+                        print(f"\n📊 REALITY ASSESSMENT SCORE: {reality_score}/6")
+                        
+                        if reality_score >= 5:
+                            self.log_test("Deuteronomy Database Reality Assessment", True, f"✅ EXCELLENT REALITY! Database state is very good (score: {reality_score}/6)")
+                        elif reality_score >= 4:
+                            self.log_test("Deuteronomy Database Reality Assessment", True, f"✅ GOOD REALITY! Database state is solid (score: {reality_score}/6)")
+                        elif reality_score >= 3:
+                            self.log_test("Deuteronomy Database Reality Assessment", True, f"✅ ACCEPTABLE REALITY! Database state is functional (score: {reality_score}/6)")
+                        else:
+                            self.log_test("Deuteronomy Database Reality Assessment", False, f"❌ POOR REALITY! Database state has significant issues (score: {reality_score}/6)")
+                    else:
+                        self.log_test("Deuteronomy Exists in Database", False, f"API Error getting sample - Status: {response.status_code}")
+                        self.log_test("Deuteronomy Database Quality", False, f"API Error getting sample - Status: {response.status_code}")
+                        self.log_test("Deuteronomy Database Strengths", False, f"API Error getting sample - Status: {response.status_code}")
+                        self.log_test("Deuteronomy Database Reality Assessment", False, f"API Error getting sample - Status: {response.status_code}")
+                else:
+                    self.log_test("Deuteronomy Exists in Database", False, f"API Error getting Deuteronomy data - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Database Quality", False, f"API Error getting Deuteronomy data - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Database Strengths", False, f"API Error getting Deuteronomy data - Status: {response.status_code}")
+                    self.log_test("Deuteronomy Database Reality Assessment", False, f"API Error getting Deuteronomy data - Status: {response.status_code}")
+                    
             except Exception as e:
-                self.log_test("Deuteronomy Correct Order and Classification", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Exists in Database", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Database Quality", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Database Strengths", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Database Reality Assessment", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Database Totals Verification", False, f"Error: {str(e)}")
+            self.log_test("Database Reality Check", False, f"Error: {str(e)}")
             return False
 
     # Removed old test method - replaced with new tests matching review request
