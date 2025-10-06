@@ -834,11 +834,11 @@ class APITester:
 
     # Removed old test method - replaced with new tests matching review request
 
-    def run_deuteronomy_complete_fix_verification_tests(self):
-        """Run Deuteronomy complete fix verification tests as per review request"""
+    def run_deuteronomy_reality_analysis_tests(self):
+        """Run Deuteronomy reality analysis tests as per review request"""
         print("=" * 80)
-        print("🔍 DEUTERONOMY COMPLETE FIX VERIFICATION")
-        print("Verifying that Deuteronomy is now completely fixed with proper structure")
+        print("🔍 DEUTERONOMY ACTUAL STATE ANALYSIS")
+        print("Detailed analysis of the current actual state of Deuteronomy to identify discrepancies")
         print("=" * 80)
         
         # Test basic connectivity first
@@ -849,20 +849,20 @@ class APITester:
         # Run the 5 main review request tests
         test_results = []
         
-        # Test 1: Complete Structure Verification
-        test_results.append(self.test_deuteronomy_complete_structure_verification())
+        # Test 1: Actual Deuteronomy Chapter Count
+        test_results.append(self.test_actual_deuteronomy_chapter_count())
         
-        # Test 2: Verse Ordering Fix Verification
-        test_results.append(self.test_deuteronomy_verse_ordering_fix_verification())
+        # Test 2: Actual Verse Count Analysis
+        test_results.append(self.test_actual_verse_count_analysis())
         
-        # Test 3: Content Quality Check
-        test_results.append(self.test_deuteronomy_content_quality_check())
+        # Test 3: Content Quality Deep Check
+        test_results.append(self.test_content_quality_deep_check())
         
-        # Test 4: Foundation Books Preservation
-        test_results.append(self.test_foundation_books_preservation())
+        # Test 4: Comparison with Claims
+        test_results.append(self.test_comparison_with_claims())
         
-        # Test 5: Database Totals Verification
-        test_results.append(self.test_database_totals_verification())
+        # Test 5: Database Reality Check
+        test_results.append(self.test_database_reality_check())
         
         # Calculate overall results
         passed_tests = sum(test_results)
@@ -870,7 +870,7 @@ class APITester:
         success_rate = (passed_tests / total_tests) * 100
         
         print("\n" + "=" * 80)
-        print("📊 DEUTERONOMY COMPLETE FIX VERIFICATION SUMMARY")
+        print("📊 DEUTERONOMY ACTUAL STATE ANALYSIS SUMMARY")
         print("=" * 80)
         
         # Count individual test results
@@ -878,78 +878,78 @@ class APITester:
         passed_individual_tests = sum(1 for result in self.test_results if result["passed"])
         individual_success_rate = (passed_individual_tests / total_individual_tests) * 100 if total_individual_tests > 0 else 0
         
-        print(f"📈 DEUTERONOMY FIX VERIFICATION SUCCESS RATE: {individual_success_rate:.1f}% ({passed_individual_tests}/{total_individual_tests} individual tests passed)")
-        print(f"🎯 MAIN CATEGORIES: {passed_tests}/{total_tests} major verification categories completed")
+        print(f"📈 DEUTERONOMY REALITY ANALYSIS SUCCESS RATE: {individual_success_rate:.1f}% ({passed_individual_tests}/{total_individual_tests} individual tests passed)")
+        print(f"🎯 MAIN CATEGORIES: {passed_tests}/{total_tests} major analysis categories completed")
         
         # Show category results
         categories = [
-            "Complete Structure Verification (34 chapters, 959 verses, Chapter 1 sequential order 1-46)",
-            "Verse Ordering Fix Verification (Chapter 1 verses 1-15 sequential, missing verses 3,4,7,8,14 fixed, no duplicates)", 
-            "Content Quality Check (Deuteronomy 1:1-3 Moses/Israel content, Deuteronomy 6:4-5 Shema, key verses proper biblical content)",
-            "Foundation Books Preservation (Genesis 1,533, Exodus 1,213, Leviticus 788, Numbers 601 verses preserved)",
-            "Database Totals Verification (total 5,094 verses, all 5 books exist, Deuteronomy correct order and classification)"
+            "Actual Deuteronomy Chapter Count (exact number of chapters, list all that exist, identify missing)",
+            "Actual Verse Count Analysis (exact current verse count, breakdown by chapter for first 10 chapters)", 
+            "Content Quality Deep Check (sample actual verse content, check for authentic vs generated/placeholder text)",
+            "Comparison with Claims (verify 34 chapters and 959 verses claims, check for gaps/duplicates)",
+            "Database Reality Check (what database actually contains, obvious problems, specific examples)"
         ]
         
         for i, (category, result) in enumerate(zip(categories, test_results)):
-            status = "✅ VERIFIED" if result else "❌ FAILED"
+            status = "✅ ANALYZED" if result else "❌ FAILED"
             print(f"{status}: {category}")
         
-        print("\n🔍 KEY DEUTERONOMY FIX VERIFICATION FINDINGS:")
+        print("\n🔍 KEY DEUTERONOMY REALITY FINDINGS:")
         
         # Analyze results for key findings
-        if test_results[0]:  # Complete Structure Verification
-            print("✅ STRUCTURE VERIFIED - Deuteronomy now has proper 34 chapters, 959 verses, Chapter 1 sequential order")
+        if test_results[0]:  # Actual Chapter Count
+            print("✅ CHAPTER ANALYSIS COMPLETE - Actual chapter count and structure analyzed")
         else:
-            print("❌ STRUCTURE NOT FIXED - Deuteronomy still missing proper chapter/verse structure")
+            print("❌ CHAPTER ANALYSIS FAILED - Could not determine actual chapter structure")
         
-        if test_results[1]:  # Verse Ordering Fix Verification
-            print("✅ ORDERING FIXED - Chapter 1 verses 1-15 sequential, previously missing verses now present, no duplicates")
+        if test_results[1]:  # Actual Verse Count Analysis
+            print("✅ VERSE COUNT ANALYSIS COMPLETE - Detailed verse count breakdown completed")
         else:
-            print("❌ ORDERING NOT FIXED - Chapter 1 still has verse ordering problems, missing verses, or duplicates")
+            print("❌ VERSE COUNT ANALYSIS FAILED - Could not analyze actual verse counts")
         
-        if test_results[2]:  # Content Quality Check
-            print("✅ CONTENT VERIFIED - Deuteronomy 1:1-3 Moses/Israel content, Deuteronomy 6:4-5 Shema, proper biblical content")
+        if test_results[2]:  # Content Quality Deep Check
+            print("✅ CONTENT QUALITY ANALYZED - Sampled actual verse content for authenticity")
         else:
-            print("❌ CONTENT ISSUES - Deuteronomy content quality problems, missing proper Moses/Israel/Shema content")
+            print("❌ CONTENT QUALITY ANALYSIS FAILED - Could not analyze content authenticity")
         
-        if test_results[3]:  # Foundation Books Preservation
-            print("✅ FOUNDATION PRESERVED - Genesis, Exodus, Leviticus, Numbers verse counts preserved during Deuteronomy fix")
+        if test_results[3]:  # Comparison with Claims
+            print("✅ CLAIMS COMPARISON COMPLETE - Verified claims against actual database state")
         else:
-            print("❌ FOUNDATION DAMAGED - Some foundation books lost verses during Deuteronomy fix process")
+            print("❌ CLAIMS COMPARISON FAILED - Could not compare claims with reality")
         
-        if test_results[4]:  # Database Totals Verification
-            print("✅ TOTALS VERIFIED - Database has correct total verse count, all 5 books exist, Deuteronomy properly ordered")
+        if test_results[4]:  # Database Reality Check
+            print("✅ DATABASE REALITY ANALYZED - Comprehensive database state assessment completed")
         else:
-            print("❌ TOTALS INCORRECT - Database totals wrong, missing books, or Deuteronomy classification issues")
+            print("❌ DATABASE REALITY CHECK FAILED - Could not assess actual database state")
         
-        print(f"\n🎯 FINAL DEUTERONOMY FIX VERIFICATION ASSESSMENT:")
+        print(f"\n🎯 FINAL DEUTERONOMY REALITY ASSESSMENT:")
         if individual_success_rate >= 90:
-            print(f"🎉 DEUTERONOMY FIX EXCELLENT! Complete fix verification successful ({individual_success_rate:.1f}% success)")
-            print("✅ All structural issues resolved: 34 chapters, 959 verses, proper ordering, content quality")
-            print("✅ Foundation books preserved, database totals correct, proper classification")
-            print("🚀 Deuteronomy is now completely fixed and ready for production use!")
+            print(f"🎉 EXCELLENT ANALYSIS! Comprehensive reality check completed successfully ({individual_success_rate:.1f}% success)")
+            print("✅ All aspects of Deuteronomy database state thoroughly analyzed")
+            print("✅ Clear picture of actual vs claimed state established")
+            print("🔍 Detailed discrepancy analysis provides actionable insights")
         elif individual_success_rate >= 80:
-            print(f"✅ DEUTERONOMY FIX VERY GOOD! Most issues resolved with minor gaps ({individual_success_rate:.1f}% success)")
-            print("✅ Major structural problems fixed successfully")
-            print("⚠️ Some minor issues remain but overall fix is solid")
-            print("🔧 Deuteronomy fix is substantially complete and functional")
+            print(f"✅ VERY GOOD ANALYSIS! Most aspects analyzed successfully ({individual_success_rate:.1f}% success)")
+            print("✅ Major aspects of database reality assessed")
+            print("⚠️ Some minor analysis gaps but overall picture is clear")
+            print("🔍 Sufficient data to identify key discrepancies")
         elif individual_success_rate >= 70:
-            print(f"✅ DEUTERONOMY FIX GOOD! Significant improvements made ({individual_success_rate:.1f}% success)")
-            print("✅ Many structural issues resolved")
-            print("⚠️ Some important issues still need attention")
-            print("🔧 Deuteronomy fix shows good progress but needs final touches")
+            print(f"✅ GOOD ANALYSIS! Significant insights gained ({individual_success_rate:.1f}% success)")
+            print("✅ Key aspects of database reality identified")
+            print("⚠️ Some important analysis areas need more investigation")
+            print("🔍 Partial picture of actual vs claimed state")
         elif individual_success_rate >= 50:
-            print(f"⚠️ DEUTERONOMY FIX PARTIAL! Some improvements but gaps remain ({individual_success_rate:.1f}% success)")
-            print("⚠️ Partial resolution of structural problems")
-            print("🔧 Additional work needed to complete Deuteronomy fix")
+            print(f"⚠️ PARTIAL ANALYSIS! Some insights but gaps remain ({individual_success_rate:.1f}% success)")
+            print("⚠️ Limited view of database reality")
+            print("🔧 Additional analysis needed for complete picture")
         elif individual_success_rate >= 30:
-            print(f"❌ DEUTERONOMY FIX POOR! Limited improvements made ({individual_success_rate:.1f}% success)")
-            print("❌ Major structural issues still present")
-            print("🔧 Recommend comprehensive re-work of Deuteronomy fix")
+            print(f"❌ POOR ANALYSIS! Limited insights gained ({individual_success_rate:.1f}% success)")
+            print("❌ Major analysis gaps prevent clear assessment")
+            print("🔧 Recommend comprehensive re-analysis approach")
         else:
-            print(f"❌ DEUTERONOMY FIX FAILED! No significant improvements detected ({individual_success_rate:.1f}% success)")
-            print("❌ Structural issues remain unresolved")
-            print("🔧 Complete re-implementation of Deuteronomy fix required")
+            print(f"❌ ANALYSIS FAILED! Unable to assess database reality ({individual_success_rate:.1f}% success)")
+            print("❌ Critical analysis failures prevent any meaningful assessment")
+            print("🔧 Complete re-implementation of analysis required")
         
         return individual_success_rate >= 70
 
