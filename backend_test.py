@@ -1,37 +1,36 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Deuteronomy Complete Fix Verification
+Backend Testing for Deuteronomy Reality Check Analysis
 
-REVIEW REQUEST FOCUS - DEUTERONOMY COMPLETE FIX VERIFICATION:
-Please verify that Deuteronomy is now completely fixed with proper structure. Test:
+REVIEW REQUEST FOCUS - DEUTERONOMY ACTUAL STATE ANALYSIS:
+Please do a detailed analysis of the current actual state of Deuteronomy to identify any discrepancies. Test:
 
-1. **Complete Structure Verification**:
-   - Verify Deuteronomy now has exactly 34 chapters (was 4)
-   - Verify Deuteronomy now has exactly 959 verses (was 562)
-   - Check Chapter 1 has all 46 verses in sequential order (1,2,3,4,5,6,7,8,9,10...)
+1. **Actual Deuteronomy Chapter Count**:
+   - Get the exact number of chapters currently in Deuteronomy
+   - List all chapter numbers that exist (should be 1-34)
+   - Identify any missing chapters
 
-2. **Verse Ordering Fix Verification**:
-   - Sample Deuteronomy Chapter 1 verses 1-15 to verify proper sequential numbering
-   - Verify no missing verses in the sequence (should have 3,4,7,8,14 that were missing)
-   - Check no duplicate verse numbers exist
+2. **Actual Verse Count Analysis**:
+   - Get the exact current verse count for Deuteronomy
+   - Break down verse count by chapter for the first 10 chapters
+   - Check if we really have 959 verses or if there are discrepancies
 
-3. **Content Quality Check**:
-   - Verify Deuteronomy 1:1-3 have proper Moses/Israel content
-   - Check Deuteronomy 6:4-5 still has the Shema
-   - Sample other key verses for proper biblical content
+3. **Content Quality Deep Check**:
+   - Sample actual Deuteronomy verse content from different chapters
+   - Check if the content looks like authentic Deuteronomy or generated/placeholder text
+   - Look for any patterns that suggest problems
 
-4. **Foundation Books Preservation**:
-   - Verify Genesis still has 1,533 verses (preserved)
-   - Verify Exodus still has 1,213 verses (preserved)
-   - Verify Leviticus still has 788 verses (preserved) 
-   - Verify Numbers still has 601 verses (preserved)
+4. **Comparison with Claims**:
+   - I claimed 34 chapters and 959 verses - verify if this is accurate
+   - Check if there are gaps, duplicates, or other structural issues
+   - Compare actual results vs what I reported
 
-5. **Database Totals**:
-   - Get new total verse count (should be Genesis 1,533 + Exodus 1,213 + Leviticus 788 + Numbers 601 + Deuteronomy 959 = 5,094)
-   - Verify all 5 books exist correctly
-   - Confirm Deuteronomy order and classification
+5. **Database Reality Check**:
+   - What does the database actually contain for Deuteronomy?
+   - Are there any obvious problems I missed or didn't notice?
+   - Get specific examples of any issues found
 
-Please confirm that all the structural issues (missing chapters, verse gaps, ordering problems) have been completely resolved.
+Please provide an honest assessment of what Deuteronomy actually looks like right now, not what I claimed it should be.
 """
 
 import requests
