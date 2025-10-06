@@ -311,128 +311,22 @@ class APITester:
             self.log_test("Actual Verse Count Analysis", False, f"Error: {str(e)}")
             return False
 
-    def test_deuteronomy_content_quality_check(self):
-        """REVIEW REQUEST TEST 3: Content Quality Check - Verify Deuteronomy 1:1-3 Moses/Israel content, Deuteronomy 6:4-5 Shema, other key verses"""
+    def test_content_quality_deep_check(self):
+        """REVIEW REQUEST TEST 3: Content Quality Deep Check - Sample actual verse content, check for authentic vs generated/placeholder text"""
         try:
-            print("\n🔍 DEUTERONOMY CONTENT QUALITY CHECK - VERIFY MOSES/ISRAEL CONTENT, SHEMA, KEY VERSES...")
+            print("\n🔍 CONTENT QUALITY DEEP CHECK - SAMPLING ACTUAL VERSE CONTENT, CHECKING FOR AUTHENTICITY...")
             
-            # Verify Deuteronomy 1:1-3 have proper Moses/Israel content
+            # Sample verses from different chapters to check content quality
             try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter=1&limit=10")
-                if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    
-                    if verses:
-                        print(f"\n📖 DEUTERONOMY 1:1-3 MOSES/ISRAEL CONTENT VERIFICATION:")
-                        
-                        # Check verses 1-3 for proper Moses/Israel content
-                        verses_1_3 = []
-                        for verse in verses:
-                            verse_num = verse.get('verse')
-                            if verse_num and int(verse_num) <= 3:
-                                verses_1_3.append({
-                                    'number': int(verse_num),
-                                    'text': verse.get('text', ''),
-                                    'ref': f"Deuteronomy 1:{verse_num}"
-                                })
-                        
-                        verses_1_3.sort(key=lambda x: x['number'])
-                        
-                        # Check for Moses/Israel content keywords
-                        moses_israel_keywords = ['moses', 'israel', 'children of israel', 'israelites', 'lord', 'god', 'commandments', 'law']
-                        content_quality_score = 0
-                        
-                        for verse in verses_1_3:
-                            verse_text = verse['text'].lower()
-                            keywords_found = []
-                            for keyword in moses_israel_keywords:
-                                if keyword in verse_text:
-                                    keywords_found.append(keyword)
-                            
-                            print(f"   📝 {verse['ref']}: '{verse['text'][:80]}...'")
-                            print(f"      Keywords found: {keywords_found}")
-                            
-                            if len(keywords_found) >= 2:
-                                content_quality_score += 1
-                        
-                        if content_quality_score >= 2:
-                            self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", True, f"✅ GOOD! {content_quality_score}/3 verses have proper Moses/Israel content")
-                        elif content_quality_score >= 1:
-                            self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", True, f"✅ PARTIAL! {content_quality_score}/3 verses have Moses/Israel content")
-                        else:
-                            self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", False, f"❌ POOR! Only {content_quality_score}/3 verses have proper content")
-                        
-                    else:
-                        self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", False, f"❌ NO DATA! No verses found in Deuteronomy Chapter 1")
-                else:
-                    self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Deuteronomy 1:1-3 Proper Moses/Israel Content", False, f"Error: {str(e)}")
-            
-            # Check Deuteronomy 6:4-5 still has the Shema
-            try:
-                response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter=6&limit=10")
-                if response.status_code == 200:
-                    data = response.json()
-                    verses = data.get('verses', [])
-                    
-                    if verses:
-                        print(f"\n📖 DEUTERONOMY 6:4-5 SHEMA VERIFICATION:")
-                        
-                        # Check verses 4-5 for Shema content
-                        shema_verses = []
-                        for verse in verses:
-                            verse_num = verse.get('verse')
-                            if verse_num and int(verse_num) in [4, 5]:
-                                shema_verses.append({
-                                    'number': int(verse_num),
-                                    'text': verse.get('text', ''),
-                                    'ref': f"Deuteronomy 6:{verse_num}"
-                                })
-                        
-                        shema_verses.sort(key=lambda x: x['number'])
-                        
-                        # Check for Shema keywords
-                        shema_keywords = ['hear', 'israel', 'lord', 'god', 'one', 'love', 'heart', 'soul', 'might']
-                        shema_quality_score = 0
-                        
-                        for verse in shema_verses:
-                            verse_text = verse['text'].lower()
-                            keywords_found = []
-                            for keyword in shema_keywords:
-                                if keyword in verse_text:
-                                    keywords_found.append(keyword)
-                            
-                            print(f"   📝 {verse['ref']}: '{verse['text'][:80]}...'")
-                            print(f"      Shema keywords found: {keywords_found}")
-                            
-                            if len(keywords_found) >= 3:
-                                shema_quality_score += 1
-                        
-                        if shema_quality_score >= 2:
-                            self.log_test("Deuteronomy 6:4-5 Contains Shema", True, f"✅ EXCELLENT! Both verses contain proper Shema content")
-                        elif shema_quality_score >= 1:
-                            self.log_test("Deuteronomy 6:4-5 Contains Shema", True, f"✅ PARTIAL! {shema_quality_score}/2 verses contain Shema content")
-                        else:
-                            self.log_test("Deuteronomy 6:4-5 Contains Shema", False, f"❌ MISSING! Shema content not found in verses 4-5")
-                        
-                    else:
-                        self.log_test("Deuteronomy 6:4-5 Contains Shema", False, f"❌ NO DATA! No verses found in Deuteronomy Chapter 6")
-                else:
-                    self.log_test("Deuteronomy 6:4-5 Contains Shema", False, f"API Error - Status: {response.status_code}")
-            except Exception as e:
-                self.log_test("Deuteronomy 6:4-5 Contains Shema", False, f"Error: {str(e)}")
-            
-            # Sample other key verses for proper biblical content
-            try:
-                key_chapters = [8, 30, 34]  # Sample other important Deuteronomy chapters
-                print(f"\n📖 OTHER KEY DEUTERONOMY VERSES CONTENT VERIFICATION:")
+                sample_chapters = [1, 6, 10, 15, 20, 25, 30, 34]  # Spread across Deuteronomy
+                print(f"\n📖 SAMPLING DEUTERONOMY CONTENT FROM MULTIPLE CHAPTERS:")
                 
-                key_verse_quality = 0
-                total_key_chapters = len(key_chapters)
+                authentic_content_score = 0
+                placeholder_patterns_found = []
+                generated_patterns_found = []
+                total_samples = 0
                 
-                for chapter in key_chapters:
+                for chapter in sample_chapters:
                     try:
                         response = self.session.get(f"{self.base_url}/bible/verses?version=kjv1611_divine&book=Deuteronomy&chapter={chapter}&limit=5")
                         if response.status_code == 200:
@@ -440,41 +334,147 @@ class APITester:
                             chapter_verses = chapter_data.get('verses', [])
                             
                             if chapter_verses:
-                                # Check first verse of each chapter for biblical content
-                                first_verse = chapter_verses[0]
-                                verse_text = first_verse.get('text', '').lower()
-                                verse_ref = f"Deuteronomy {chapter}:{first_verse.get('verse', '?')}"
-                                
-                                # Check for general biblical content
-                                biblical_keywords = ['lord', 'god', 'israel', 'moses', 'commandments', 'law', 'covenant', 'people']
-                                keywords_found = [kw for kw in biblical_keywords if kw in verse_text]
-                                
-                                print(f"   📝 {verse_ref}: '{first_verse.get('text', '')[:60]}...'")
-                                print(f"      Biblical keywords: {keywords_found}")
-                                
-                                if len(keywords_found) >= 2:
-                                    key_verse_quality += 1
+                                # Analyze first 2 verses from each chapter
+                                for i, verse in enumerate(chapter_verses[:2]):
+                                    verse_text = verse.get('text', '')
+                                    verse_ref = f"Deuteronomy {chapter}:{verse.get('verse', '?')}"
+                                    total_samples += 1
+                                    
+                                    print(f"\n   📝 {verse_ref}:")
+                                    print(f"      Text: '{verse_text[:100]}{'...' if len(verse_text) > 100 else ''}'")
+                                    print(f"      Length: {len(verse_text)} characters")
+                                    
+                                    # Check for placeholder patterns
+                                    placeholder_indicators = [
+                                        'lorem ipsum', 'placeholder', 'sample text', 'dummy text',
+                                        'test verse', 'example content', '[placeholder]', 'TBD',
+                                        'coming soon', 'under construction'
+                                    ]
+                                    
+                                    # Check for generated/repetitive patterns
+                                    generated_indicators = [
+                                        'and the lord said unto moses', 'and moses spake unto',
+                                        'these are the words', 'and it came to pass'
+                                    ]
+                                    
+                                    # Check for authentic Deuteronomy content
+                                    authentic_indicators = [
+                                        'moses', 'israel', 'lord', 'god', 'commandments', 'law',
+                                        'covenant', 'wilderness', 'jordan', 'promised land',
+                                        'hear o israel', 'love the lord', 'statutes', 'judgments'
+                                    ]
+                                    
+                                    verse_lower = verse_text.lower()
+                                    
+                                    # Check for placeholder content
+                                    placeholder_found = [p for p in placeholder_indicators if p in verse_lower]
+                                    if placeholder_found:
+                                        placeholder_patterns_found.extend(placeholder_found)
+                                        print(f"      ⚠️ Placeholder patterns: {placeholder_found}")
+                                    
+                                    # Check for overly repetitive generated content
+                                    repetitive_count = sum(1 for g in generated_indicators if verse_lower.count(g) > 0)
+                                    if repetitive_count >= 2:
+                                        generated_patterns_found.append(f"Multiple repetitive patterns in {verse_ref}")
+                                        print(f"      ⚠️ Potentially generated (repetitive patterns)")
+                                    
+                                    # Check for authentic content
+                                    authentic_count = sum(1 for a in authentic_indicators if a in verse_lower)
+                                    if authentic_count >= 2 and len(verse_text) >= 20:
+                                        authentic_content_score += 1
+                                        print(f"      ✅ Authentic content indicators: {authentic_count}")
+                                    elif len(verse_text) < 10:
+                                        print(f"      ⚠️ Very short verse (possible truncation)")
+                                    else:
+                                        print(f"      ❓ Limited authentic indicators: {authentic_count}")
                             else:
                                 print(f"   ❌ Chapter {chapter}: No verses found")
-                        else:
-                            print(f"   ❌ Chapter {chapter}: API Error")
                     except Exception as e:
-                        print(f"   ❌ Chapter {chapter}: Error ({str(e)})")
+                        print(f"   ❌ Chapter {chapter}: Error - {str(e)}")
                 
-                if key_verse_quality >= total_key_chapters:
-                    self.log_test("Deuteronomy Other Key Verses Proper Biblical Content", True, f"✅ EXCELLENT! All {key_verse_quality}/{total_key_chapters} sampled chapters have proper biblical content")
-                elif key_verse_quality >= total_key_chapters * 0.7:
-                    self.log_test("Deuteronomy Other Key Verses Proper Biblical Content", True, f"✅ GOOD! {key_verse_quality}/{total_key_chapters} sampled chapters have proper biblical content")
+                print(f"\n📊 CONTENT QUALITY ANALYSIS SUMMARY:")
+                print(f"   📊 Total Samples Analyzed: {total_samples}")
+                print(f"   📊 Authentic Content Score: {authentic_content_score}/{total_samples}")
+                print(f"   📊 Placeholder Patterns Found: {len(set(placeholder_patterns_found))}")
+                print(f"   📊 Generated Patterns Found: {len(generated_patterns_found)}")
+                
+                if len(set(placeholder_patterns_found)) > 0:
+                    print(f"   ⚠️ Placeholder patterns: {list(set(placeholder_patterns_found))}")
+                if len(generated_patterns_found) > 0:
+                    print(f"   ⚠️ Generated patterns: {generated_patterns_found[:3]}{'...' if len(generated_patterns_found) > 3 else ''}")
+                
+                # Test results
+                if len(set(placeholder_patterns_found)) == 0:
+                    self.log_test("Deuteronomy No Placeholder Content", True, f"✅ CLEAN! No placeholder patterns found in {total_samples} samples")
                 else:
-                    self.log_test("Deuteronomy Other Key Verses Proper Biblical Content", False, f"❌ POOR! Only {key_verse_quality}/{total_key_chapters} sampled chapters have proper biblical content")
+                    self.log_test("Deuteronomy No Placeholder Content", False, f"❌ PLACEHOLDER CONTENT! Found {len(set(placeholder_patterns_found))} placeholder patterns")
+                
+                if len(generated_patterns_found) <= total_samples * 0.2:  # Less than 20% generated
+                    self.log_test("Deuteronomy Minimal Generated Content", True, f"✅ GOOD! Minimal generated patterns ({len(generated_patterns_found)}/{total_samples})")
+                else:
+                    self.log_test("Deuteronomy Minimal Generated Content", False, f"❌ TOO MUCH GENERATED! {len(generated_patterns_found)}/{total_samples} samples show generated patterns")
+                
+                if total_samples > 0:
+                    authenticity_percentage = (authentic_content_score / total_samples) * 100
+                    if authenticity_percentage >= 80:
+                        self.log_test("Deuteronomy Authentic Content Quality", True, f"✅ EXCELLENT! {authenticity_percentage:.1f}% of samples show authentic Deuteronomy content")
+                    elif authenticity_percentage >= 60:
+                        self.log_test("Deuteronomy Authentic Content Quality", True, f"✅ GOOD! {authenticity_percentage:.1f}% of samples show authentic content")
+                    else:
+                        self.log_test("Deuteronomy Authentic Content Quality", False, f"❌ POOR! Only {authenticity_percentage:.1f}% of samples show authentic content")
+                else:
+                    self.log_test("Deuteronomy Authentic Content Quality", False, f"❌ NO DATA! No samples available for analysis")
+                
+                # Check specific key verses for authenticity
+                print(f"\n📖 KEY DEUTERONOMY VERSES AUTHENTICITY CHECK:")
+                key_verses = [
+                    {'chapter': 6, 'verse': 4, 'expected': ['hear', 'israel', 'lord', 'god', 'one']},
+                    {'chapter': 6, 'verse': 5, 'expected': ['love', 'lord', 'god', 'heart', 'soul', 'might']},
+                    {'chapter': 8, 'verse': 3, 'expected': ['man', 'live', 'bread', 'word', 'lord']},
+                    {'chapter': 30, 'verse': 19, 'expected': ['heaven', 'earth', 'life', 'death', 'choose']}
+                ]
+                
+                key_verse_authenticity = 0
+                
+                for key_verse in key_verses:
+                    try:
+                        response = self.session.get(f"{self.base_url}/bible/verse/Deuteronomy/{key_verse['chapter']}/{key_verse['verse']}")
+                        if response.status_code == 200:
+                            verse_data = response.json()
+                            verse_text = verse_data.get('text', '').lower()
+                            
+                            expected_keywords = key_verse['expected']
+                            found_keywords = [kw for kw in expected_keywords if kw in verse_text]
+                            
+                            verse_ref = f"Deuteronomy {key_verse['chapter']}:{key_verse['verse']}"
+                            print(f"   📝 {verse_ref}: {len(found_keywords)}/{len(expected_keywords)} expected keywords found")
+                            print(f"      Expected: {expected_keywords}")
+                            print(f"      Found: {found_keywords}")
+                            
+                            if len(found_keywords) >= len(expected_keywords) * 0.6:  # At least 60% of expected keywords
+                                key_verse_authenticity += 1
+                        else:
+                            print(f"   ❌ Deuteronomy {key_verse['chapter']}:{key_verse['verse']}: API Error")
+                    except Exception as e:
+                        print(f"   ❌ Deuteronomy {key_verse['chapter']}:{key_verse['verse']}: Error")
+                
+                if key_verse_authenticity >= 3:
+                    self.log_test("Deuteronomy Key Verses Authentic", True, f"✅ AUTHENTIC! {key_verse_authenticity}/4 key verses show expected content")
+                elif key_verse_authenticity >= 2:
+                    self.log_test("Deuteronomy Key Verses Authentic", True, f"✅ MOSTLY AUTHENTIC! {key_verse_authenticity}/4 key verses show expected content")
+                else:
+                    self.log_test("Deuteronomy Key Verses Authentic", False, f"❌ NOT AUTHENTIC! Only {key_verse_authenticity}/4 key verses show expected content")
                     
             except Exception as e:
-                self.log_test("Deuteronomy Other Key Verses Proper Biblical Content", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy No Placeholder Content", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Minimal Generated Content", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Authentic Content Quality", False, f"Error: {str(e)}")
+                self.log_test("Deuteronomy Key Verses Authentic", False, f"Error: {str(e)}")
             
             return True
             
         except Exception as e:
-            self.log_test("Deuteronomy Content Quality Check", False, f"Error: {str(e)}")
+            self.log_test("Content Quality Deep Check", False, f"Error: {str(e)}")
             return False
 
     def test_foundation_books_preservation(self):
